@@ -88,7 +88,7 @@ export const dismissAttention = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ kind: z.enum(["appointment", "message", "offer"]), id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const db = await assertOwner(context);
-    if (data.kind === "appointment") await db.from("appointments").update({ needs_attention: false }).eq("id", data.id);
+    if (data.kind === "appointment") await db.from("appointments").update({ needs_attention: false, attention_reason: "handled" }).eq("id", data.id);
     if (data.kind === "message") await db.from("messages").update({ delivery: "failed_seen" }).eq("id", data.id);
     if (data.kind === "offer") await db.from("waitlist_offers").update({ status: "claimed_seen" }).eq("id", data.id).eq("status", "claimed");
     return { ok: true };

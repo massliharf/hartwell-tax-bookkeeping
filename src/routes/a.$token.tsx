@@ -104,13 +104,11 @@ function PortalPage() {
               <h2 className="text-3xl font-semibold text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
-            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
-              <Lock className="mt-0.5 size-4 shrink-0 text-evergreen" /> Only Priya can open your files. We never ask for your Social Security number.
-            </p>
             <ul className="space-y-3">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
             </ul>
-            <p className="mt-4 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
+            <p className="mt-4 flex items-start gap-2 text-sm text-graphite"><Lock className="mt-0.5 size-4 shrink-0 text-evergreen" /> Only Priya can open your files. We never ask for your Social Security number.</p>
+            <p className="mt-2 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
           </section>
         )}
         {a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
@@ -177,9 +175,9 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
             {busy === "confirm" ? <Loader2 className="animate-spin" /> : <Check />} I'll be there
           </Button>
         )}
-        <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Move</Button>
+        <Button variant="neutral" onClick={() => setPicking((p) => !p)}><CalendarClock /> Move appointment</Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
+          <AlertDialogTrigger asChild><Button variant="ghost" className="text-destructive">Cancel</Button></AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl bg-sheet">
             <AlertDialogHeader>
               <AlertDialogTitle className="font-sans text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>

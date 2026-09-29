@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,8 +45,8 @@ function ReturningPage() {
   return (
     <BookingShell>
       <div className="mx-auto max-w-md">
-        <StepTitle eyebrow="Welcome back" title="Book again in 30 seconds" sub="Enter the email you used last time. We'll fill in your details and last year's answers." />
-        <form onSubmit={submit} className="sheet-stack space-y-4 p-6">
+        <StepTitle title="Book again in 30 seconds" sub="Enter the email you used last time. We'll fill in your details and last year's answers." />
+        <form onSubmit={submit} className="workbench-panel space-y-4 p-6">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-12 bg-paper" />
@@ -56,7 +56,7 @@ function ReturningPage() {
           )}
           {state === "error" && <p className="text-sm text-destructive" role="alert">Something went wrong. Please try again.</p>}
           <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
-            {state === "busy" ? <Loader2 className="animate-spin" /> : null} Continue <ArrowRight />
+            {state === "busy" ? <Loader2 className="animate-spin" /> : null} Continue
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">New here? <Link to="/book" className="font-medium text-ink underline underline-offset-4">Start a new booking</Link></p>

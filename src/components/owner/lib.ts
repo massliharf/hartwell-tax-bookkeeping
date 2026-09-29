@@ -8,7 +8,7 @@ const parts = (d: Date) => {
     new Intl.DateTimeFormat("en-US", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23", weekday: "short" })
       .formatToParts(d).map((x) => [x.type, x.value]),
   );
-  return p as Record<string, string>;
+  return p as { year: string; month: string; day: string; hour: string; minute: string; weekday: string };
 };
 /** Date (YYYY-MM-DD) and minutes-since-midnight in the office time zone. */
 export function et(iso: string | Date) {

@@ -22,8 +22,10 @@ import { Route as ManageTokenRouteImport } from './routes/manage.$token'
 import { Route as MoveTokenRouteImport } from './routes/move.$token'
 import { Route as AuthenticatedOwnerIndexRouteImport } from './routes/_authenticated/owner.index'
 import { Route as AuthenticatedOwnerCalendarRouteImport } from './routes/_authenticated/owner.calendar'
+import { Route as AuthenticatedOwnerInsightsRouteImport } from './routes/_authenticated/owner.insights'
 import { Route as AuthenticatedOwnerNeedsRouteImport } from './routes/_authenticated/owner.needs'
 import { Route as AuthenticatedOwnerOutboxRouteImport } from './routes/_authenticated/owner.outbox'
+import { Route as AuthenticatedOwnerSettingsRouteImport } from './routes/_authenticated/owner.settings'
 import { Route as AuthenticatedOwnerClientsIndexRouteImport } from './routes/_authenticated/owner.clients.index'
 import { Route as AuthenticatedOwnerClientsIdRouteImport } from './routes/_authenticated/owner.clients.$id'
 import { Route as ApiPublicCronAutomationsRouteImport } from './routes/api/public/cron/automations'
@@ -93,6 +95,12 @@ const AuthenticatedOwnerCalendarRoute =
     path: '/calendar',
     getParentRoute: () => AuthenticatedOwnerRoute,
   } as any)
+const AuthenticatedOwnerInsightsRoute =
+  AuthenticatedOwnerInsightsRouteImport.update({
+    id: '/insights',
+    path: '/insights',
+    getParentRoute: () => AuthenticatedOwnerRoute,
+  } as any)
 const AuthenticatedOwnerNeedsRoute = AuthenticatedOwnerNeedsRouteImport.update({
   id: '/needs',
   path: '/needs',
@@ -102,6 +110,12 @@ const AuthenticatedOwnerOutboxRoute =
   AuthenticatedOwnerOutboxRouteImport.update({
     id: '/outbox',
     path: '/outbox',
+    getParentRoute: () => AuthenticatedOwnerRoute,
+  } as any)
+const AuthenticatedOwnerSettingsRoute =
+  AuthenticatedOwnerSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
     getParentRoute: () => AuthenticatedOwnerRoute,
   } as any)
 const AuthenticatedOwnerClientsIndexRoute =
@@ -135,8 +149,10 @@ export interface FileRoutesByFullPath {
   '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
   '/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
+  '/owner/insights': typeof AuthenticatedOwnerInsightsRoute
   '/owner/needs': typeof AuthenticatedOwnerNeedsRoute
   '/owner/outbox': typeof AuthenticatedOwnerOutboxRoute
+  '/owner/settings': typeof AuthenticatedOwnerSettingsRoute
   '/owner/': typeof AuthenticatedOwnerIndexRoute
   '/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
@@ -153,8 +169,10 @@ export interface FileRoutesByTo {
   '/move/$token': typeof MoveTokenRoute
   '/book': typeof BookIndexRoute
   '/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
+  '/owner/insights': typeof AuthenticatedOwnerInsightsRoute
   '/owner/needs': typeof AuthenticatedOwnerNeedsRoute
   '/owner/outbox': typeof AuthenticatedOwnerOutboxRoute
+  '/owner/settings': typeof AuthenticatedOwnerSettingsRoute
   '/owner': typeof AuthenticatedOwnerIndexRoute
   '/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
@@ -174,8 +192,10 @@ export interface FileRoutesById {
   '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
   '/_authenticated/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
+  '/_authenticated/owner/insights': typeof AuthenticatedOwnerInsightsRoute
   '/_authenticated/owner/needs': typeof AuthenticatedOwnerNeedsRoute
   '/_authenticated/owner/outbox': typeof AuthenticatedOwnerOutboxRoute
+  '/_authenticated/owner/settings': typeof AuthenticatedOwnerSettingsRoute
   '/_authenticated/owner/': typeof AuthenticatedOwnerIndexRoute
   '/_authenticated/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
@@ -195,8 +215,10 @@ export interface FileRouteTypes {
     | '/move/$token'
     | '/book/'
     | '/owner/calendar'
+    | '/owner/insights'
     | '/owner/needs'
     | '/owner/outbox'
+    | '/owner/settings'
     | '/owner/'
     | '/owner/clients/$id'
     | '/api/public/cron/automations'
@@ -213,8 +235,10 @@ export interface FileRouteTypes {
     | '/move/$token'
     | '/book'
     | '/owner/calendar'
+    | '/owner/insights'
     | '/owner/needs'
     | '/owner/outbox'
+    | '/owner/settings'
     | '/owner'
     | '/owner/clients/$id'
     | '/api/public/cron/automations'
@@ -233,8 +257,10 @@ export interface FileRouteTypes {
     | '/move/$token'
     | '/book/'
     | '/_authenticated/owner/calendar'
+    | '/_authenticated/owner/insights'
     | '/_authenticated/owner/needs'
     | '/_authenticated/owner/outbox'
+    | '/_authenticated/owner/settings'
     | '/_authenticated/owner/'
     | '/_authenticated/owner/clients/$id'
     | '/api/public/cron/automations'
@@ -348,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOwnerCalendarRouteImport
       parentRoute: typeof AuthenticatedOwnerRoute
     }
+    '/_authenticated/owner/insights': {
+      id: '/_authenticated/owner/insights'
+      path: '/insights'
+      fullPath: '/owner/insights'
+      preLoaderRoute: typeof AuthenticatedOwnerInsightsRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
     '/_authenticated/owner/needs': {
       id: '/_authenticated/owner/needs'
       path: '/needs'
@@ -360,6 +393,13 @@ declare module '@tanstack/react-router' {
       path: '/outbox'
       fullPath: '/owner/outbox'
       preLoaderRoute: typeof AuthenticatedOwnerOutboxRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
+    '/_authenticated/owner/settings': {
+      id: '/_authenticated/owner/settings'
+      path: '/settings'
+      fullPath: '/owner/settings'
+      preLoaderRoute: typeof AuthenticatedOwnerSettingsRouteImport
       parentRoute: typeof AuthenticatedOwnerRoute
     }
     '/_authenticated/owner/clients/': {
@@ -388,8 +428,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedOwnerRouteChildren {
   AuthenticatedOwnerCalendarRoute: typeof AuthenticatedOwnerCalendarRoute
+  AuthenticatedOwnerInsightsRoute: typeof AuthenticatedOwnerInsightsRoute
   AuthenticatedOwnerNeedsRoute: typeof AuthenticatedOwnerNeedsRoute
   AuthenticatedOwnerOutboxRoute: typeof AuthenticatedOwnerOutboxRoute
+  AuthenticatedOwnerSettingsRoute: typeof AuthenticatedOwnerSettingsRoute
   AuthenticatedOwnerIndexRoute: typeof AuthenticatedOwnerIndexRoute
   AuthenticatedOwnerClientsIdRoute: typeof AuthenticatedOwnerClientsIdRoute
   AuthenticatedOwnerClientsIndexRoute: typeof AuthenticatedOwnerClientsIndexRoute
@@ -397,8 +439,10 @@ interface AuthenticatedOwnerRouteChildren {
 
 const AuthenticatedOwnerRouteChildren: AuthenticatedOwnerRouteChildren = {
   AuthenticatedOwnerCalendarRoute: AuthenticatedOwnerCalendarRoute,
+  AuthenticatedOwnerInsightsRoute: AuthenticatedOwnerInsightsRoute,
   AuthenticatedOwnerNeedsRoute: AuthenticatedOwnerNeedsRoute,
   AuthenticatedOwnerOutboxRoute: AuthenticatedOwnerOutboxRoute,
+  AuthenticatedOwnerSettingsRoute: AuthenticatedOwnerSettingsRoute,
   AuthenticatedOwnerIndexRoute: AuthenticatedOwnerIndexRoute,
   AuthenticatedOwnerClientsIdRoute: AuthenticatedOwnerClientsIdRoute,
   AuthenticatedOwnerClientsIndexRoute: AuthenticatedOwnerClientsIndexRoute,

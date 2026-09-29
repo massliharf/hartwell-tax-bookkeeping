@@ -62,20 +62,20 @@ function Home() {
 
 function Hero() {
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 md:grid-cols-[1.15fr_1fr] md:pt-24">
+    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-12 pt-10 md:grid-cols-[1.15fr_1fr] md:gap-14 md:pt-16">
       <Reveal>
         <Eyebrow>Claire Hartwell, EA · Montclair, New Jersey</Eyebrow>
-        <h1 className="mt-3 text-[40px] leading-[48px] tracking-[-0.4px] text-deep-ink sm:text-[56px] sm:leading-[64px]">
+        <h1 className="mt-3 text-[36px] font-medium leading-[44px] tracking-[-0.4px] text-deep-ink sm:text-[52px] sm:leading-[58px]">
           Taxes, without <em className="relative whitespace-nowrap not-italic text-ink">the chase.</em>
         </h1>
-        <p className="mt-5 max-w-md text-base text-[#363636]">
+        <p className="mt-4 max-w-md text-base leading-6 text-[#363636]">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
         </p>
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg"><Link to="/book">Book an appointment <ArrowRight /></Link></Button>
           <Button asChild size="lg" variant="outline"><Link to="/book/returning">I'm a returning client</Link></Button>
         </div>
-        <p className="mt-5 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
       </Reveal>
       <Reveal delay={0.15}><HeroVisual /></Reveal>
     </section>
@@ -86,14 +86,25 @@ function TrustStrip() {
   const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
     <div className="px-2">
-      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-5 py-4">
+      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-5 py-2">
         {items.map((t) => (
-          <li key={t} className="flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
+          <li key={t} className="flex h-7 items-center gap-1.5 rounded-full border border-border bg-fill-subtle px-3 text-xs font-medium text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
         ))}
       </ul>
     </div>
   );
 }
+
+function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
+  return (
+    <Reveal className="max-w-2xl">
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">{title}</h2>
+      {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground">{sub}</p>}
+    </Reveal>
+  );
+}
+
 
 function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
   return (

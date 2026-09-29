@@ -10,6 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedOwnerRouteImport } from './routes/_authenticated/owner'
 import { Route as ATokenRouteImport } from './routes/a.$token'
 import { Route as BookIndexRouteImport } from './routes/book.index'
 import { Route as BookConfirmedRouteImport } from './routes/book.confirmed'
@@ -17,12 +20,28 @@ import { Route as BookReturningRouteImport } from './routes/book.returning'
 import { Route as ClaimTokenRouteImport } from './routes/claim.$token'
 import { Route as ManageTokenRouteImport } from './routes/manage.$token'
 import { Route as MoveTokenRouteImport } from './routes/move.$token'
+import { Route as AuthenticatedOwnerIndexRouteImport } from './routes/_authenticated/owner.index'
+import { Route as AuthenticatedOwnerNeedsRouteImport } from './routes/_authenticated/owner.needs'
 import { Route as ApiPublicCronAutomationsRouteImport } from './routes/api/public/cron/automations'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedOwnerRoute = AuthenticatedOwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ATokenRoute = ATokenRouteImport.update({
   id: '/a/$token',
@@ -59,6 +78,16 @@ const MoveTokenRoute = MoveTokenRouteImport.update({
   path: '/move/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedOwnerIndexRoute = AuthenticatedOwnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedOwnerRoute,
+} as any)
+const AuthenticatedOwnerNeedsRoute = AuthenticatedOwnerNeedsRouteImport.update({
+  id: '/needs',
+  path: '/needs',
+  getParentRoute: () => AuthenticatedOwnerRoute,
+} as any)
 const ApiPublicCronAutomationsRoute =
   ApiPublicCronAutomationsRouteImport.update({
     id: '/api/public/cron/automations',
@@ -68,6 +97,8 @@ const ApiPublicCronAutomationsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/owner': typeof AuthenticatedOwnerRouteWithChildren
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
@@ -75,10 +106,13 @@ export interface FileRoutesByFullPath {
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
+  '/owner/needs': typeof AuthenticatedOwnerNeedsRoute
+  '/owner/': typeof AuthenticatedOwnerIndexRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
@@ -86,11 +120,16 @@ export interface FileRoutesByTo {
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
   '/book': typeof BookIndexRoute
+  '/owner/needs': typeof AuthenticatedOwnerNeedsRoute
+  '/owner': typeof AuthenticatedOwnerIndexRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/owner': typeof AuthenticatedOwnerRouteWithChildren
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
@@ -98,12 +137,16 @@ export interface FileRoutesById {
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
+  '/_authenticated/owner/needs': typeof AuthenticatedOwnerNeedsRoute
+  '/_authenticated/owner/': typeof AuthenticatedOwnerIndexRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/owner'
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
@@ -111,10 +154,13 @@ export interface FileRouteTypes {
     | '/manage/$token'
     | '/move/$token'
     | '/book/'
+    | '/owner/needs'
+    | '/owner/'
     | '/api/public/cron/automations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
@@ -122,10 +168,15 @@ export interface FileRouteTypes {
     | '/manage/$token'
     | '/move/$token'
     | '/book'
+    | '/owner/needs'
+    | '/owner'
     | '/api/public/cron/automations'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/owner'
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
@@ -133,11 +184,15 @@ export interface FileRouteTypes {
     | '/manage/$token'
     | '/move/$token'
     | '/book/'
+    | '/_authenticated/owner/needs'
+    | '/_authenticated/owner/'
     | '/api/public/cron/automations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ATokenRoute: typeof ATokenRoute
   BookConfirmedRoute: typeof BookConfirmedRoute
   BookReturningRoute: typeof BookReturningRoute
@@ -156,6 +211,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/owner': {
+      id: '/_authenticated/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof AuthenticatedOwnerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/a/$token': {
       id: '/a/$token'
@@ -206,6 +282,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoveTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/owner/': {
+      id: '/_authenticated/owner/'
+      path: '/'
+      fullPath: '/owner/'
+      preLoaderRoute: typeof AuthenticatedOwnerIndexRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
+    '/_authenticated/owner/needs': {
+      id: '/_authenticated/owner/needs'
+      path: '/needs'
+      fullPath: '/owner/needs'
+      preLoaderRoute: typeof AuthenticatedOwnerNeedsRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
     '/api/public/cron/automations': {
       id: '/api/public/cron/automations'
       path: '/api/public/cron/automations'
@@ -216,8 +306,34 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedOwnerRouteChildren {
+  AuthenticatedOwnerNeedsRoute: typeof AuthenticatedOwnerNeedsRoute
+  AuthenticatedOwnerIndexRoute: typeof AuthenticatedOwnerIndexRoute
+}
+
+const AuthenticatedOwnerRouteChildren: AuthenticatedOwnerRouteChildren = {
+  AuthenticatedOwnerNeedsRoute: AuthenticatedOwnerNeedsRoute,
+  AuthenticatedOwnerIndexRoute: AuthenticatedOwnerIndexRoute,
+}
+
+const AuthenticatedOwnerRouteWithChildren =
+  AuthenticatedOwnerRoute._addFileChildren(AuthenticatedOwnerRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOwnerRoute: typeof AuthenticatedOwnerRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOwnerRoute: AuthenticatedOwnerRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ATokenRoute: ATokenRoute,
   BookConfirmedRoute: BookConfirmedRoute,
   BookReturningRoute: BookReturningRoute,

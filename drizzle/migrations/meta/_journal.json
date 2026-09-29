@@ -29,6 +29,13 @@
       "when": 1790705294798,
       "tag": "0003_availability_end_before_closing",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790705411912,
+      "tag": "0004_booking_returning_flags",
+      "breakpoints": true
     }
   ]
 }

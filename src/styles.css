@@ -127,9 +127,6 @@
   --shadow-lift: 0 0 2px rgba(18,18,18,.08), 0 2px 4px rgba(18,18,18,.08), 0 6px 6px rgba(18,18,18,.04), 0 14px 9px rgba(18,18,18,.02), 0 25px 10px rgba(18,18,18,.02);
 }
 
-60 / 6%), 0 18px 36px -18px oklch(0.22 0.015 160 / 18%);
-  --shadow-lift: 0 2px 2px oklch(0.22 0.015 160 / 5%), 0 12px 24px -6px oklch(0.22 0.015 160 / 10%), 0 30px 60px -24px oklch(0.32 0.05 165 / 28%);
-}
 
 @layer base {
   * {

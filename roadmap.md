@@ -1,5 +1,9 @@
-# Visual reset and booking polish
-- [x] Replace legacy typography, palette, texture, and card treatments across public and owner screens.
-- [x] Replace About placeholder with generated portrait; balance five services; hide published badge.
-- [x] Align booking stepper, questions, times, checklist, and details interactions.
-- [x] Walk through booking at desktop and 390px; list remaining inconsistencies.
+# Workbench transformation
+- [x] Phase 0: Save the Workbench design system unchanged and resolve brief conflicts.
+- [ ] Phase 1: Foundation, tokens, typography, controls, and Ready ring.
+- [ ] Phase 2: Homepage workspace and interactive checklist builder.
+- [ ] Phase 3: Booking workspace and confirmation polish.
+- [ ] Phase 4: Client portal and related client pages (without payment).
+- [ ] Phase 5: Owner shell, Today, and Needs you.
+- [ ] Phase 6: Remaining owner pages and demo tools.
+- [ ] Phase 7: Mobile/desktop visual QA and full journey verification.

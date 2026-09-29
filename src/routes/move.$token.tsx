@@ -34,8 +34,8 @@ function MovePage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-xl px-5 py-16 sm:py-24">
-        <div className="sheet-stack ledger p-8 text-center">
+      <main className="mx-auto max-w-xl px-5 py-10 sm:py-16">
+        <div className="sheet-stack p-8 text-center">
           {!to ? (
             <h1 className="font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">Pick a time from your portal.</h1>
           ) : state === "done" ? (

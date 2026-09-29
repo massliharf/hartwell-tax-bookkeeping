@@ -52,8 +52,8 @@ function ClaimPage() {
   const q = useQuery({ queryKey: ["offer", token], queryFn: () => fetchOffer({ data: { token } }) });
   const [state, setState] = useState<"idle" | "busy" | "missed" | { token: string }>("idle");
 
-  if (q.isLoading) return <Shell><Loader2 className="mx-auto size-6 animate-spin text-ink" aria-label="Loading" /></Shell>;
-  if (q.isError || !q.data) return <Shell><h1 className="font-serif text-4xl text-deep-ink">This link isn't working.</h1><p className="mt-4 text-deep-ink/70">It may have expired. You're still on the waitlist.</p></Shell>;
+  if (q.isLoading) return <Shell><div className="mx-auto h-8 w-48 animate-pulse rounded-xl bg-sage/60" aria-label="Loading appointment offer" /><div className="mx-auto mt-4 h-16 w-56 animate-pulse rounded-xl bg-sage/40" /></Shell>;
+  if (q.isError || !q.data) return <Shell><h1 className="font-serif text-4xl text-deep-ink">This link isn't working.</h1><p className="mt-4 text-deep-ink/70">It may have expired. You're still on the waitlist.</p><Button className="mt-6" variant="outline" onClick={() => q.refetch()}>Try again</Button></Shell>;
   if (state === "missed" || (state === "idle" && q.data.status !== "open")) return <Shell><Missed /></Shell>;
   if (typeof state === "object") {
     return (

@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/insights")({ component: Insights });
+export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Insights — Patel Tax & Bookkeeping" }] }), component: Insights });
 
 // Baselines from the practice before the new system (from the brief / Priya's estimate).
 const BEFORE = { ready: 65, noShow: 12, msgsPerBooking: 6 };
@@ -44,7 +44,7 @@ function Insights() {
   const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
 
   const minutes30 = msgs.filter((x) => in30(x.sent_at)).reduce((s, x) => s + x.minutes_saved, 0);
-  const hours30 = Math.round(minutes30 / 60);
+  const hours30 = Math.round(minutes30 / 6) / 10;
 
   const held = appts.filter((x) => (x.status === "completed" || x.status === "no_show") && new Date(x.start_at).getTime() <= t);
   const completed = held.filter((x) => x.status === "completed");
@@ -98,6 +98,7 @@ function Insights() {
           <Bars data={signed} />
         </Metric>
       </div>
+      {completed.filter((x) => in30(x.start_at)).length === 0 && <p className="mt-4 text-sm text-muted-foreground">No completed appointments in this period yet. Readiness and no-show rates will become meaningful as visits finish.</p>}
 
       <section className="mt-12 grid overflow-hidden rounded-2xl border border-border shadow-sheet md:grid-cols-2">
         <div className="bg-paper-deep/60 p-7 md:p-9">
@@ -113,7 +114,7 @@ function Insights() {
           </p>
         </div>
       </section>
-      <p className="mt-3 text-xs text-muted-foreground">Last 30 days. "Before" figures are the practice's typical numbers before online booking.</p>
+      <p className="mt-3 text-xs text-muted-foreground">Last 30 days. "Before" figures are estimates, not measured historical records. Readiness reflects the current checklist state of completed visits; zero involvement uses attention flags as a proxy.</p>
     </>
   );
 }

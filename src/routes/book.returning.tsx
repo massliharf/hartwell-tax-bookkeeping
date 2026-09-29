@@ -50,9 +50,9 @@ function ReturningPage() {
             <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-12 bg-paper" />
           </div>
           {state === "notfound" && (
-            <p className="text-sm text-deep-ink/80">We couldn't find that email. Try another, or <Link to="/book" className="font-medium text-ink underline">book as a new client</Link> — it only takes two minutes.</p>
+            <p className="text-sm text-deep-ink/80" role="status">We couldn't find that email. Try another, or <Link to="/book" className="font-medium text-ink underline">book as a new client</Link> — it only takes two minutes.</p>
           )}
-          {state === "error" && <p className="text-sm text-destructive">Something went wrong. Please try again.</p>}
+          {state === "error" && <p className="text-sm text-destructive" role="alert">Something went wrong. Please try again.</p>}
           <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
             {state === "busy" ? <Loader2 className="animate-spin" /> : null} Continue <ArrowRight />
           </Button>

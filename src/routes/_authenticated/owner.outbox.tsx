@@ -7,7 +7,7 @@ import { MSG_LABEL, fmtStamp } from "@/components/owner/lib";
 import { Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/owner/outbox")({ component: Outbox });
+export const Route = createFileRoute("/_authenticated/owner/outbox")({ head: () => ({ meta: [{ title: "Outbox — Patel Tax & Bookkeeping" }] }), component: Outbox });
 
 function Outbox() {
   const [type, setType] = useState<string | null>(null);

@@ -10,6 +10,7 @@ import { ReadyRing } from "@/components/brand/ReadyRing";
 import { BookingShell } from "@/components/booking/BookingShell";
 import { getAppointmentByToken } from "@/lib/portal.functions";
 import { fmtDateLong, fmtTime } from "@/lib/intake";
+import { buildIcs } from "@/lib/email.server";
 
 export const Route = createFileRoute("/book/confirmed")({
   validateSearch: z.object({ token: z.string().min(10).max(100).optional() }),
@@ -29,13 +30,7 @@ const ADDRESS = "Oak Tree Road, Edison, NJ";
 const gcalStamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 function downloadIcs(title: string, start: string, end: string, where: string, details: string) {
-  const ics = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Patel Tax//Booking//EN", "BEGIN:VEVENT",
-    `UID:${gcalStamp(start)}-patel-tax`, `DTSTAMP:${gcalStamp(new Date().toISOString())}`,
-    `DTSTART:${gcalStamp(start)}`, `DTEND:${gcalStamp(end)}`,
-    `SUMMARY:${title}`, `LOCATION:${where}`, `DESCRIPTION:${details.replace(/\n/g, "\\n")}`,
-    "END:VEVENT", "END:VCALENDAR",
-  ].join("\r\n");
+  const ics = buildIcs({ id: `${gcalStamp(start)}-patel-tax`, start, end, title, location: where, description: details });
   const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
   const a = document.createElement("a");
   a.href = url; a.download = "patel-tax-appointment.ics"; a.click();

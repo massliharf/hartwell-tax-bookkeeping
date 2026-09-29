@@ -13,7 +13,7 @@ import { ErrorNote, MeetingTag, PageHead, StatusPill, useApptActions } from "@/c
 import { ownerMoveAppointment } from "@/lib/owner.functions";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/owner/calendar")({ component: CalendarPage });
+export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Patel Tax & Bookkeeping" }] }), component: CalendarPage });
 
 const START = 9 * 60, END = 18 * 60, PX = 1.1; // px per minute
 const mondayOf = (ymd: string) => {
@@ -66,10 +66,11 @@ function CalendarPage() {
         </div>
       </PageHead>
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
+      {q.isLoading && <div className="space-y-3" aria-label="Loading calendar"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /></div>}
       <p className="mb-3 hidden text-xs text-muted-foreground md:block">Drag an appointment to move it. The client is emailed automatically.</p>
 
       {/* Desktop week grid */}
-      <div className="sheet-stack hidden overflow-hidden md:block">
+      <div className={cn("sheet-stack hidden overflow-hidden md:block", (q.isLoading || q.isError) && "md:hidden")}>
         <div className="grid grid-cols-[52px_repeat(6,1fr)] border-b border-border bg-sheet">
           <div />
           {days.map((d) => (
@@ -106,7 +107,7 @@ function CalendarPage() {
       </div>
 
       {/* Mobile: day by day */}
-      <div className="space-y-6 md:hidden">
+      <div className={cn("space-y-6 md:hidden", (q.isLoading || q.isError) && "hidden")}>
         {days.map((d) => (
           <section key={d}>
             <h2 className={cn("mb-2 text-sm font-medium text-muted-foreground", d === today && "text-ink")}>{ymdLabel(d)}</h2>
@@ -122,7 +123,7 @@ function CalendarPage() {
                   </li>
                 ))}
               </ul>
-            ) : <p className="text-sm text-muted-foreground/70">{q.isLoading ? "…" : "Nothing booked"}</p>}
+            ) : <p className="text-sm text-muted-foreground/70">Nothing booked</p>}
           </section>
         ))}
       </div>

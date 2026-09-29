@@ -162,7 +162,7 @@ function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> 
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-      <StepTitle eyebrow="Step 1 of 4" title="What can Priya help with?" sub="Pick the closest fit. You can add details in the next step." />
+      <StepTitle title="What can Priya help with?" sub="Pick the closest fit. You can add details in the next step." />
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
@@ -210,7 +210,7 @@ function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | un
 
   return (
     <>
-      <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
+      <StepTitle title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
       <div className="space-y-3">
         {qs.map((q) => (
           <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
@@ -295,7 +295,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
 
   return (
     <>
-      <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
+       <StepTitle title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
       <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
@@ -325,7 +325,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
                     active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
                   <span className="tabular font-sans text-2xl leading-tight">{c.day}</span>
-                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : visibleSlots(d.slots).length <= 2 ? "Only 2 left" : c.month}</span>
+                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : visibleSlots(d.slots).length <= 2 ? `Only ${visibleSlots(d.slots).length} left` : c.month}</span>
                 </button>
               );
             })}
@@ -424,7 +424,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
 
   return (
     <>
-      <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
+      <StepTitle title="Your details" sub="So we can send your confirmation and checklist." />
        <form className="mx-auto max-w-lg space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot) submit(draft.slot); }}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>

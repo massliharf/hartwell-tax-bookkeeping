@@ -14,6 +14,7 @@ import { Route as BookRouteImport } from './routes/book'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as ReturningRouteImport } from './routes/returning'
 import { Route as BookIndexRouteImport } from './routes/book.index'
+import { Route as BookConfirmedRouteImport } from './routes/book.confirmed'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,18 +41,25 @@ const BookIndexRoute = BookIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BookRoute,
 } as any)
+const BookConfirmedRoute = BookConfirmedRouteImport.update({
+  id: '/confirmed',
+  path: '/confirmed',
+  getParentRoute: () => BookRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/book': typeof BookRouteWithChildren
   '/owner': typeof OwnerRoute
   '/returning': typeof ReturningRoute
+  '/book/confirmed': typeof BookConfirmedRoute
   '/book/': typeof BookIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/owner': typeof OwnerRoute
   '/returning': typeof ReturningRoute
+  '/book/confirmed': typeof BookConfirmedRoute
   '/book': typeof BookIndexRoute
 }
 export interface FileRoutesById {
@@ -60,14 +68,23 @@ export interface FileRoutesById {
   '/book': typeof BookRouteWithChildren
   '/owner': typeof OwnerRoute
   '/returning': typeof ReturningRoute
+  '/book/confirmed': typeof BookConfirmedRoute
   '/book/': typeof BookIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/book' | '/owner' | '/returning' | '/book/'
+  fullPaths:
+    '/' | '/book' | '/owner' | '/returning' | '/book/confirmed' | '/book/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/owner' | '/returning' | '/book'
-  id: '__root__' | '/' | '/book' | '/owner' | '/returning' | '/book/'
+  to: '/' | '/owner' | '/returning' | '/book/confirmed' | '/book'
+  id:
+    | '__root__'
+    | '/'
+    | '/book'
+    | '/owner'
+    | '/returning'
+    | '/book/confirmed'
+    | '/book/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,14 +131,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookIndexRouteImport
       parentRoute: typeof BookRoute
     }
+    '/book/confirmed': {
+      id: '/book/confirmed'
+      path: '/confirmed'
+      fullPath: '/book/confirmed'
+      preLoaderRoute: typeof BookConfirmedRouteImport
+      parentRoute: typeof BookRoute
+    }
   }
 }
 
 interface BookRouteChildren {
+  BookConfirmedRoute: typeof BookConfirmedRoute
   BookIndexRoute: typeof BookIndexRoute
 }
 
 const BookRouteChildren: BookRouteChildren = {
+  BookConfirmedRoute: BookConfirmedRoute,
   BookIndexRoute: BookIndexRoute,
 }
 

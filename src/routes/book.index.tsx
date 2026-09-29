@@ -84,11 +84,11 @@ function BookPage() {
 
   return (
     <BookingShell step={step}>
-      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[1fr_320px]" : ""}`}>
+      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
         <div className="min-w-0">
           {step > 0 && (
-            <button onClick={() => go(step - 1)} className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-ink">
-              <ArrowLeft className="size-4" /> Back
+            <button onClick={() => go(step - 1)} className="mb-6 inline-flex h-8 items-center gap-1.5 rounded-lg bg-fill-neutral px-3 text-xs font-medium text-deep-ink hover:bg-[#DBDBDB]">
+              <ArrowLeft className="size-3.5" /> Back
             </button>
           )}
           <AnimatePresence mode="wait">
@@ -131,15 +131,20 @@ function BookPage() {
 
 function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
   return (
-    <div className="sheet-stack ledger p-5">
-      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Your checklist so far</p>
-      <p className="mt-1 font-serif text-3xl text-deep-ink">
+    <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
+      <div className="bg-surface-2 p-3 px-4">
+      <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Your checklist so far</p>
+      <p className="font-serif text-xl text-deep-ink">
         <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
       </p>
-      <div className="mt-4 max-h-[440px] overflow-y-auto pr-1">
+      </div>
+      <div className="px-4 pt-4">
+      <div className="max-h-[440px] overflow-y-auto pr-1">
         <DocumentStack docs={[...docs].reverse().map((d) => ({ ...d, received: false }))} />
       </div>
-      <p className="mt-4 text-xs text-muted-foreground">You'll upload these after booking. They never hold up your appointment.</p>
+      </div>
+      <p className="px-4 pb-6 pt-4 text-xs text-muted-foreground">You'll upload these after booking. They never hold up your appointment.</p>
+      </div>
     </div>
   );
 }

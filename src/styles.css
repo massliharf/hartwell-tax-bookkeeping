@@ -139,7 +139,7 @@
     border-color: var(--color-border);
   }
 
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: auto; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -172,3 +172,6 @@
 @utility ledger {
   background-image: none;
 }
+
+/* Keep motion limited to hover feedback, booking steps, and the readiness ring. */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

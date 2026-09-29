@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,7 @@ function ReturningPage() {
           )}
           {state === "error" && <p className="text-sm text-destructive">Something went wrong. Please try again.</p>}
           <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
-            {state === "busy" ? <Loader2 className="animate-spin" /> : null} Continue <ArrowRight />
+            {state === "busy" ? <Loader2  /> : null} Continue
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">New here? <Link to="/book" className="font-medium text-ink underline underline-offset-4">Start a new booking</Link></p>

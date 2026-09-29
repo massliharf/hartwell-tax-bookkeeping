@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Camera, Check, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,7 +63,7 @@ function PortalPage() {
     );
   }
   if (!q.data?.appointment) {
-    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56 animate-pulse rounded-2xl bg-[#F0F0F0]" /><div className="h-96 animate-pulse rounded-2xl bg-[#F0F0F0]" /></div></BookingShell>;
+    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56  rounded-2xl bg-[#F0F0F0]" /><div className="h-96  rounded-2xl bg-[#F0F0F0]" /></div></BookingShell>;
   }
 
   const a = q.data.appointment as Appt;
@@ -80,7 +79,7 @@ function PortalPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
-          <p className="text-xs font-medium uppercase text-ink/70">Your private page</p>
+          <p className="text-xs font-medium text-ink/70">Your private page</p>
           <h1 className="mt-2 text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
@@ -126,7 +125,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[11px] font-medium uppercase text-muted-foreground">{appt.services?.name}</p>
+            <p className="text-[11px] font-medium text-muted-foreground">{appt.services?.name}</p>
             {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
             {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
           </div>
@@ -144,7 +143,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-ink" /> In person · {ADDRESS}</span>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-ink" /> In person, {ADDRESS}</span>
               <Button size="sm" variant="outline" asChild><a href={MAP_URL} target="_blank" rel="noreferrer"><MapPin /> Open map</a></Button>
             </div>
           )}
@@ -169,7 +168,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           <span className="inline-flex h-10 items-center gap-2 rounded-full bg-success/15 px-4 text-sm font-medium text-success"><Check className="size-4" /> You'll be there</span>
         ) : (
           <Button onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
-            {busy === "confirm" ? <Loader2 className="animate-spin" /> : <Check />} I'll be there
+            {busy === "confirm" ? <Loader2 className="" /> : <Check />} I'll be there
           </Button>
         )}
         <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
@@ -187,9 +186,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      <AnimatePresence>
-        {picking && <ReschedulePicker token={token} serviceId={appt.service_id} onDone={async () => { setPicking(false); await onChange(); }} onClose={() => setPicking(false)} />}
-      </AnimatePresence>
+      {picking && <ReschedulePicker token={token} serviceId={appt.service_id} onDone={async () => { setPicking(false); await onChange(); }} onClose={() => setPicking(false)} />}
     </div>
   );
 }
@@ -215,13 +212,13 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
   };
 
   return (
-    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+    <div className="overflow-hidden">
       <div className="rounded-2xl bg-surface-2 p-5">
         <div className="mb-4 flex items-center justify-between">
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-fill-subtle"><X className="size-4" /></button>
         </div>
-        {q.isLoading && <div className="h-32 animate-pulse rounded-lg bg-fill-neutral/50" />}
+        {q.isLoading && <div className="h-32  rounded-lg bg-fill-neutral/50" />}
         {q.data?.error && <p className="text-sm">{q.data.error}</p>}
         {days.length > 0 && (
           <>
@@ -233,7 +230,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 return (
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
                     className={`flex w-[68px] shrink-0 flex-col items-center rounded-lg px-2 py-2 ${active ? "bg-fill-selected text-deep-ink" : off ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
-                    <span className="text-[10px] uppercase tracking-wider opacity-70">{c.dow}</span>
+                    <span className="text-[10px] tracking-wider opacity-70">{c.dow}</span>
                     <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
                     <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
                   </button>
@@ -243,10 +240,9 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
             {day && (
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
-                  <button key={s} disabled={!!busy} onClick={() => pick(s)}
-                    className="tabular inline-flex h-11 items-center justify-center rounded-lg border border-border bg-white text-sm font-medium hover:border-ink">
-                    {busy === s ? <Loader2 className="size-4 animate-spin" /> : fmtTime(s)}
-                  </button>
+                  <Button key={s} variant="secondary" disabled={!!busy} onClick={() => pick(s)} className="tabular h-11 text-sm">
+                    {busy === s ? <Loader2 className="size-4 " /> : fmtTime(s)}
+                  </Button>
                 ))}
               </div>
             )}
@@ -258,9 +254,9 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
             {alts.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {alts.map((s) => (
-                  <button key={s} onClick={() => pick(s)} className="tabular rounded-full border border-ink px-3 py-1.5 text-ink hover:bg-ink hover:text-primary-foreground">
+                  <Button key={s} variant="secondary" onClick={() => pick(s)} className="tabular">
                     {fmtDateLong(s).split(",")[0]} {fmtTime(s)}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -268,7 +264,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
         )}
         <p className="mt-4 text-xs text-muted-foreground">Tap a time and you're moved. Your checklist stays the same.</p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -278,7 +274,6 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
   const confirm = useServerFn(confirmUpload);
   const markNa = useServerFn(markNotApplicable);
   const undoNa = useServerFn(undoNotApplicable);
-  const reduce = useReducedMotion();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [drag, setDrag] = useState(false);
@@ -308,23 +303,20 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
     setBusy(false);
   };
 
-  const flip = { initial: reduce ? false as const : { rotateX: -80, opacity: 0 }, animate: { rotateX: 0, opacity: 1 }, transition: { type: "spring" as const, stiffness: 240, damping: 22 } };
-
   return (
-    <li style={{ perspective: 900 }}>
-      <AnimatePresence mode="wait" initial={false}>
+    <li>
         {item.status === "uploaded" ? (
-          <motion.div key="up" {...flip} className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5">
-            <motion.span initial={reduce ? false : { scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 500, damping: 16, delay: 0.2 }}
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></motion.span>
+          <div key="up" className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5">
+            <span
+              className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink">{item.document_name}</p>
               <p className="text-sm text-success">Received</p>
             </div>
             <button onClick={() => fileRef.current?.click()} className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Replace</button>
-          </motion.div>
+          </div>
         ) : item.status === "not_applicable" ? (
-          <motion.div key="na" {...flip} className="flex items-center gap-4 rounded-2xl bg-surface-2/70 p-5">
+          <div key="na" className="flex items-center gap-4 rounded-2xl bg-surface-2/70 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><X className="size-4" /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink/70">{item.document_name}</p>
@@ -332,12 +324,12 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             </div>
             <button disabled={busy} onClick={async () => { setBusy(true); await undoNa({ data: { token, itemId: item.id } }); await onChange(); setBusy(false); }}
               className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Undo</button>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div key="missing" {...flip}
+          <div key="missing"
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-[#4F69F2]" : ""}`}>
+            className={`sheet-stack p-5 ${drag ? "ring-2 ring-[#4F69F2]" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
@@ -358,15 +350,14 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               </div>
             ) : (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Upload</Button>
+                <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
                 <button onClick={() => setNaOpen(true)} className="ml-auto text-sm text-muted-foreground underline underline-offset-4 hover:text-ink">Doesn't apply to me</button>
               </div>
             )}
             <p className="mt-3 hidden text-xs text-muted-foreground sm:block">Or drag a file onto this card.</p>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
       {err && <p className="mt-2 text-sm text-destructive" role="alert">{err}</p>}
       <input ref={fileRef} type="file" className="sr-only" accept="application/pdf,image/jpeg,image/png" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
       <input ref={camRef} type="file" className="sr-only" accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
@@ -385,7 +376,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
 
   return (
     <section className="sheet-stack p-6">
-      <p className="text-[11px] font-medium uppercase text-warning">One last step</p>
+      <p className="text-[11px] font-medium text-warning">One last step</p>
       <h2 className="mt-1 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
@@ -408,7 +399,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
-        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>
+        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="" /> : <PenLine />} Sign</Button>
       </form>
     </section>
   );

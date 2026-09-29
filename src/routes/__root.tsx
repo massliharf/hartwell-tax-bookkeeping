@@ -12,24 +12,25 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5">
       <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Page not found</p>
+        <p className="text-xs font-medium text-muted-foreground">Page not found</p>
         <h1 className="mt-2 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">This page isn't here.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           The link may be old or mistyped. You can head back home, or book an appointment in about two minutes.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <Link to="/" className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+          <Button asChild><Link to="/">
             Back to home
-          </Link>
-          <Link to="/book" className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-fill-subtle">
+          </Link></Button>
+          <Button asChild variant="secondary"><Link to="/book">
             Book an appointment
-          </Link>
+          </Link></Button>
         </div>
       </div>
     </main>
@@ -46,27 +47,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5">
       <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Something went wrong</p>
+        <p className="text-xs font-medium text-muted-foreground">Something went wrong</p>
         <h1 className="mt-2 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">This page didn't load.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           It's on our side, not yours. Try again, or call the office at (973) 555-0142.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
+          <Button onClick={() => { router.invalidate(); reset(); }}>
             Try again
-          </button>
-          <a
-            href="/"
-            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-fill-subtle"
-          >
+          </Button>
+          <Button asChild variant="secondary"><a href="/">
             Back to home
-          </a>
+          </a></Button>
         </div>
       </div>
     </main>

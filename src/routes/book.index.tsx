@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,13 +73,13 @@ function BookPage() {
 
   const go = (n: number) => {
     navigate({ search: (s) => ({ ...s, step: n }) });
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
   }
 
   return (
@@ -87,17 +87,17 @@ function BookPage() {
       <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
         <div className="min-w-0">
           {step > 0 && (
-            <button onClick={() => go(step - 1)} className="mb-6 inline-flex h-8 items-center gap-1.5 rounded-lg bg-fill-neutral px-3 text-xs font-medium text-deep-ink hover:bg-[#DBDBDB]">
+            <Button variant="secondary" onClick={() => go(step - 1)} className="mb-6">
               <ArrowLeft className="size-3.5" /> Back
-            </button>
+            </Button>
           )}
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              initial={reduce ? false : { opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduce ? 0 : 0.15 }}
             >
               {step === 0 && (
                 <ServiceStep
@@ -133,7 +133,7 @@ function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
       <div className="bg-surface-2 p-3 px-4">
-        <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Your checklist so far</p>
+         <p className="text-xs font-medium leading-6 text-muted-foreground">Your checklist so far</p>
         <p className="font-serif text-xl text-deep-ink">
           <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
         </p>
@@ -154,7 +154,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-[#F0F0F0]" />)}</div>}
+      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36  rounded-2xl bg-[#F0F0F0]" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
@@ -167,7 +167,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
             <button
               key={s.id}
               onClick={() => onPick(s.slug)}
-              className={`group rounded-2xl p-4 text-left transition-colors duration-200 ${active ? "bg-fill-selected" : "bg-fill-neutral hover:bg-[#E3E3E3]"}`}
+               className={`group rounded-2xl p-4 text-left transition-colors duration-150 ${active ? "bg-fill-selected" : "bg-fill-neutral hover:bg-[#E3E3E3]"}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h2>
@@ -230,7 +230,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
-                    className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-200 ${answers[q.key] === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
+                     className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
                   >
                     {v ? "Yes" : "No"}
                   </button>
@@ -243,7 +243,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
       <div className="mt-8 flex items-center gap-3">
         {page > 0 && <Button variant="outline" size="lg" onClick={() => setPage(page - 1)}>Previous</Button>}
         <Button size="lg" disabled={!answered} onClick={() => (page < pages - 1 ? setPage(page + 1) : onDone())}>
-          Continue <ArrowRight />
+          Continue
         </Button>
         {pages > 1 && <span className="tabular text-xs text-muted-foreground">{page + 1} / {pages}</span>}
       </div>
@@ -262,17 +262,17 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
 
   return (
     <>
-      <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
+       <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
       <div className="mb-6 inline-flex h-8 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
-            className={`inline-flex h-6 items-center gap-2 rounded-md px-4 text-xs font-semibold transition-colors duration-200 ${draft.meetingType === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}>
+             className={`inline-flex h-6 items-center gap-2 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${draft.meetingType === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}>
             <Icon className="size-3.5" /> {label}
           </button>
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-[#F0F0F0]" /><div className="h-48 animate-pulse rounded-2xl bg-[#F0F0F0]" /></div>}
+      {q.isLoading && <div className="space-y-4"><div className="h-20  rounded-2xl bg-[#F0F0F0]" /><div className="h-48  rounded-2xl bg-[#F0F0F0]" /></div>}
       {(q.isError || q.data?.error) && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
@@ -288,9 +288,9 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const full = !d.closed && d.slots.length === 0;
               return (
                 <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors ${
+                  className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${
                     active ? "bg-fill-selected text-deep-ink" : d.closed ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
-                  <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
+                   <span className="text-[11px] opacity-70">{c.dow}</span>
                   <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
                 </button>
@@ -303,7 +303,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <button key={s} onClick={() => { update({ date: day.date, slot: s }); onDone(); }}
-                    className={`tabular h-8 rounded-lg text-xs font-medium transition-colors ${draft.slot === s ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] hover:border-ink"}`}>
+                    className={`tabular h-8 rounded-lg text-xs font-medium transition-colors duration-150 ${draft.slot === s ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] hover:border-ink"}`}>
                     {fmtTime(s)}
                   </button>
                 ))}
@@ -346,7 +346,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
       </div>
       {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
       <Button type="submit" variant="highlight" className="mt-4" disabled={state === "saving"}>
-        {state === "saving" && <Loader2 className="animate-spin" />} Join the waitlist
+        {state === "saving" && <Loader2 className="" />} Join the waitlist
       </Button>
     </form>
   );
@@ -396,7 +396,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-canvas py-2 pl-3 pr-2">
         <div className="min-w-0">
           <p className="font-medium text-deep-ink">{service.name}</p>
-          <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>
+          <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}`}, {draft.meetingType === "video" ? "Video call" : "In person"}</p>
         </div>
         <button onClick={onPickAgain} className="text-sm font-medium text-ink underline underline-offset-4">Change</button>
       </div>
@@ -425,7 +425,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
                 <div className="mt-3 flex flex-wrap gap-2">
                   {alternatives.map((a) => (
                     <button key={a} type="button" disabled={busy} onClick={() => { update({ slot: a }); submit(a); }}
-                      className="tabular rounded-full border border-ink px-4 py-2 text-sm font-medium text-ink hover:bg-ink hover:text-primary-foreground">
+                      className="tabular rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors duration-150 hover:bg-secondary/80">
                       {fmtDayChip(new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(a))).dow} {fmtTime(a)}
                     </button>
                   ))}
@@ -438,7 +438,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
         )}
 
         <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={!valid || busy}>
-          {busy ? <Loader2 className="animate-spin" /> : null} Book my appointment
+          {busy ? <Loader2 className="" /> : null} Book my appointment
         </Button>
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
           <Lock className="mt-0.5 size-3.5 shrink-0" /> We'll never ask for your Social Security number online. Confirmed instantly, no payment now.

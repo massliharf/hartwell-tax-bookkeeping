@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { motion, useReducedMotion } from "framer-motion";
 import { CalendarPlus, Check, Download, Lock, Upload, Users, Video } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,6 @@ function downloadIcs(title: string, start: string, end: string, where: string, d
 function ConfirmedPage() {
   const { token } = Route.useSearch();
   const fetchAppt = useServerFn(getAppointmentByToken);
-  const reduce = useReducedMotion();
   const q = useQuery({ queryKey: ["appt", token], queryFn: () => fetchAppt({ data: { token: token! } }), enabled: !!token });
 
   if (!token || (q.data && !q.data.appointment) || q.isError) {
@@ -60,7 +58,7 @@ function ConfirmedPage() {
     );
   }
   if (q.isLoading || !q.data?.appointment) {
-    return <BookingShell><div className="mx-auto h-96 max-w-2xl animate-pulse rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
+    return <BookingShell><div className="mx-auto h-96 max-w-2xl  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
   }
 
   const a = q.data.appointment as {
@@ -80,41 +78,38 @@ function ConfirmedPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
-          <motion.div
-            initial={reduce ? false : { scale: 0, rotate: -40 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 16, delay: 0.25 }}
+          <div
             className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-primary-foreground"
           >
             <Check className="size-8" strokeWidth={2.5} />
-          </motion.div>
-          <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+          </div>
+          <h1
             className="mt-6 text-[28px] leading-[42px] text-deep-ink">
             You're booked{first && `, ${first}`}.
-          </motion.h1>
-          <motion.p initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-3 text-deep-ink/70">
+          </h1>
+          <p className="mt-3 text-deep-ink/70">
             A confirmation is on its way to your inbox.
-          </motion.p>
+          </p>
         </div>
 
-        <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, type: "spring", damping: 22 }}
+        <div
           className="sheet-stack mt-10 p-6">
-          <p className="text-[11px] font-medium uppercase text-muted-foreground">{service}</p>
+          <p className="text-[11px] font-medium text-muted-foreground">{service}</p>
           <p className="mt-1 font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{fmtDateLong(a.start_at)}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
             <span className="tabular">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</span>
             <span className="inline-flex items-center gap-1.5">
               {a.meeting_type === "video" ? <Video className="size-4" /> : <Users className="size-4" />}
-              {a.meeting_type === "video" ? "Video call" : `In person · ${ADDRESS}`}
+              {a.meeting_type === "video" ? "Video call" : `In person, ${ADDRESS}`}
             </span>
           </div>
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button variant="outline" size="sm" onClick={() => downloadIcs(title, a.start_at, a.end_at, where, details)}><Download /> Add to calendar (.ics)</Button>
             <Button variant="outline" size="sm" asChild><a href={gcal} target="_blank" rel="noreferrer"><CalendarPlus /> Google Calendar</a></Button>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, type: "spring", damping: 22 }}
+        <div
           className="sheet-stack mt-8 p-6">
           <div className="flex items-center gap-5">
             <ReadyRing value={a.ready_score} size={84} />
@@ -133,7 +128,7 @@ function ConfirmedPage() {
           <p className="mt-5 flex items-start gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
             <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We'll never ask for your Social Security number online.
           </p>
-        </motion.div>
+        </div>
       </div>
     </BookingShell>
   );

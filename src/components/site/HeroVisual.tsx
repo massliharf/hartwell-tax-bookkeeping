@@ -11,7 +11,7 @@ const ALL: StackDoc[] = [
 
 export function HeroVisual() {
   const reduce = useReducedMotion();
-  const [step, setStep] = useState(reduce ? 3 : 0);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     if (reduce) return;
@@ -19,26 +19,23 @@ export function HeroVisual() {
     return () => clearTimeout(t);
   }, [step, reduce]);
 
-  const shown = Math.min(step, 3);
-  const docs = ALL.slice(0, shown).reverse();
+  const shown = reduce ? 3 : Math.min(step, 3);
+  const docs = [...ALL].reverse().map((doc, i) => ({ ...doc, received: i < shown }));
 
   return (
-    <div className="sheet-stack ledger relative mx-auto w-full max-w-sm p-5 sm:p-6">
+    <div className="sheet-stack ledger relative mx-auto h-[365px] w-full max-w-sm p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase text-muted-foreground">Your checklist</p>
+          <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>
           <p className="mt-1 font-serif text-2xl leading-tight text-deep-ink">Thursday, 10:30 am</p>
-          <p className="text-xs text-muted-foreground">Individual return · 45 min</p>
+          <p className="text-xs text-muted-foreground">Individual return, 45 min</p>
         </div>
         <ReadyRing value={(shown / 3) * 100} size={84} stroke={6} />
       </div>
-      <div className="mt-5 min-h-[212px]">
+      <div className="mt-5">
         <DocumentStack docs={docs} />
-        {shown === 0 && (
-          <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-xs text-muted-foreground">Waiting for your documents…</p>
-        )}
       </div>
-      <p className={`mt-3 text-center text-xs font-medium transition-opacity duration-500 ${shown === 3 ? "text-success opacity-100" : "opacity-0"}`}>
+      <p className={`mt-3 text-center text-xs font-medium ${shown === 3 ? "text-success" : "invisible"}`}>
         All set. Claire has checked everything.
       </p>
     </div>

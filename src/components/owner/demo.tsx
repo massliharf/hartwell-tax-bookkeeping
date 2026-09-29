@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion } from "framer-motion";
 import { FlaskConical, Mail, Smartphone, X } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -42,13 +41,12 @@ export function DemoTools() {
   return (
     <>
       <div className="fixed bottom-20 right-5 z-40 sm:bottom-5 flex gap-2">
-        <button onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview"
-          className={`grid h-11 w-11 place-items-center rounded-full border border-border transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-fill-subtle"}`}>
+        <Button size="icon" variant={phone ? "default" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className="h-11 w-11 rounded-full">
           <Smartphone className="h-4 w-4" />
-        </button>
-        <button onClick={() => setOpen(true)} className="flex h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm text-primary-foreground">
+        </Button>
+        <Button onClick={() => setOpen(true)} className="h-11 gap-2 rounded-full px-4 text-sm">
           <FlaskConical className="h-4 w-4" /> Demo
-        </button>
+        </Button>
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
@@ -62,7 +60,7 @@ export function DemoTools() {
               <Row k="run" label="Run automations now" variant="default" fn={() => fns.run()} />
             </section>
             <section className="space-y-2">
-              <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Jump forward</h3>
+              <h3 className="text-xs text-muted-foreground">Jump forward</h3>
               <div className="grid grid-cols-3 gap-2">
                 {([1, 2, 7] as const).map((d) => (
                   <Button key={d} variant="outline" disabled={!!busy} onClick={() => act(`j${d}`, () => fns.jump({ data: { days: d } }))}>
@@ -72,7 +70,7 @@ export function DemoTools() {
               </div>
             </section>
             <section className="space-y-2">
-              <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Simulate</h3>
+              <h3 className="text-xs text-muted-foreground">Simulate</h3>
               <Row k="up" label="Client uploads a document" fn={() => fns.upload()} />
               <Row k="cx" label="Client cancels an appointment tomorrow" fn={() => fns.cancel()} />
               <Row k="cl" label="Waitlist client claims the slot" fn={() => fns.claim()} />
@@ -85,7 +83,7 @@ export function DemoTools() {
         </SheetContent>
       </Sheet>
 
-      <AnimatePresence>{phone && <PhonePanel onClose={() => setPhone(false)} />}</AnimatePresence>
+      {phone && <PhonePanel onClose={() => setPhone(false)} />}
     </>
   );
 }
@@ -104,7 +102,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
   const name = people.find((p) => p[0] === who)?.[1];
 
   return (
-    <motion.aside initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }}
+    <aside
       className="fixed bottom-36 right-5 z-40 w-[300px] sm:bottom-20">
       <div className="mb-2 flex items-center gap-2">
         <select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Client"
@@ -112,7 +110,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
           <option value="latest">Follow latest message</option>
           {people.map(([r, n]) => <option key={r} value={r}>{n}</option>)}
         </select>
-        <button onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full bg-sheet"><X className="h-4 w-4" /></button>
+        <Button onClick={onClose} aria-label="Close" size="icon" variant="secondary" className="h-9 w-9 rounded-full"><X className="h-4 w-4" /></Button>
       </div>
       <div className="rounded-[44px] bg-deep-ink p-2.5">
         <div className="relative h-[540px] overflow-hidden rounded-[36px] bg-paper">
@@ -123,9 +121,9 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
           </div>
           <div className="h-[calc(100%-68px)] space-y-3 overflow-y-auto px-3 py-4">
             {thread.length === 0 && <p className="pt-20 text-center text-sm text-muted-foreground">Messages will appear here as automations run.</p>}
-            <AnimatePresence initial={false}>
+            
               {thread.map((m) => (
-                <motion.div key={m.id} layout initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
+                <div key={m.id}>
                   {m.channel === "sms" ? (
                     <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-fill-neutral px-3 py-2 text-[13px] leading-snug text-deep-ink [overflow-wrap:anywhere]">{m.body}</div>
                   ) : (
@@ -138,12 +136,12 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   <p className="tabular mt-1 px-1 text-[10px] text-muted-foreground">
                     {new Date(m.sent_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}
                   </p>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
+            
           </div>
         </div>
       </div>
-    </motion.aside>
+    </aside>
   );
 }

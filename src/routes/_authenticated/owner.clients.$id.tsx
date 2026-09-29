@@ -51,7 +51,7 @@ function ClientDetail() {
         <aside className="space-y-10">
           <section>
             <h2 className="mb-3 font-serif text-2xl text-deep-ink">Documents</h2>
-            <p className="text-sm text-muted-foreground">{files.length} received · {items.filter((i) => i.required && i.status === "missing").length} missing</p>
+            <p className="text-sm text-muted-foreground">{files.length} received, {items.filter((i) => i.required && i.status === "missing").length} missing</p>
             <Button size="sm" variant="outline" className="mt-3" disabled={!files.length} onClick={() => setDocs(true)}><FileText />View files</Button>
             <DocViewer open={docs} onOpenChange={setDocs} title={client.name} items={items} />
           </section>
@@ -64,7 +64,7 @@ function ClientDetail() {
                     <span className="absolute -left-[25px] top-1.5 h-2 w-2 rounded-full bg-ink/40" />
                     <p className="text-sm text-deep-ink">{m.subject ?? MSG_LABEL[m.type]}</p>
                     <p className="text-xs text-muted-foreground">
-                      {m.channel === "sms" && <MessageSquare className="mr-1 inline h-3 w-3" />}{fmtStamp(m.sent_at)} · {MSG_LABEL[m.type]}{m.delivery === "failed" ? " · Not delivered" : ""}
+                      {m.channel === "sms" && <MessageSquare className="mr-1 inline h-3 w-3" />}{fmtStamp(m.sent_at)}, {MSG_LABEL[m.type]}{m.delivery === "failed" ? ", Not delivered" : ""}
                     </p>
                   </li>
                 ))}

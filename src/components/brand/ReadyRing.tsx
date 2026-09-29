@@ -32,7 +32,7 @@ export function ReadyRing({ value, size = 120, stroke = 8, label = "Ready", clas
           {Math.round(pct)}
           <span style={{ fontSize: size * 0.14 }}>%</span>
         </span>
-        <span className="mt-1 text-[10px] font-medium uppercase text-muted-foreground">{label}</span>
+        <span className="mt-1 text-[10px] font-medium text-muted-foreground">{label}</span>
       </div>
     </div>
   );

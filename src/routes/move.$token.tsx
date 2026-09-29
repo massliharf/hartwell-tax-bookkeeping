@@ -50,14 +50,14 @@ function MovePage() {
             </>
           ) : (
             <>
-              <p className="text-sm uppercase tracking-widest text-ink/70">Move to</p>
+              <p className="text-sm text-ink/70">Move to</p>
               <h1 className="mt-3 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">{fmtDateLong(to)}</h1>
               <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(to)}</p>
               <Button size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {
                 setState("busy");
                 try { setState((await move({ data: { token, start: to } })).ok ? "done" : "taken"); } catch { setState("taken"); }
               }}>
-                {state === "busy" ? <Loader2 className="size-4 animate-spin" /> : "Yes, move my appointment"}
+                {state === "busy" ? <Loader2 className="size-4 " /> : "Yes, move my appointment"}
               </Button>
             </>
           )}

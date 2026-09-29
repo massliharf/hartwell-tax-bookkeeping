@@ -1,16 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { HOURS } from "@/lib/services";
 
 export function AnnouncementBar() {
   return (
-    <div className="bg-canvas px-2 pt-2">
+    <div className="border-b border-border bg-sheet px-5">
       <Link
         to="/book"
         search={{ service: "extension" }}
-        className="mx-auto flex min-h-[54px] max-w-6xl flex-wrap items-center justify-center gap-2 rounded-2xl bg-sheet px-[18px] py-3 text-center text-sm text-deep-ink"
+        className="mx-auto block min-h-10 max-w-6xl py-2 text-center text-xs leading-5 text-deep-ink sm:text-sm"
       >
-        <span className="rounded-full bg-[rgba(30,91,71,0.15)] px-2 text-[10px] font-medium uppercase tracking-[0.2px] text-ink">Oct 15</span>
+        <span className="mr-2 font-medium text-deep-ink">Oct 15</span>
         <span>
           Filing an extension? The deadline is October 15 — <span className="font-semibold text-ink underline-offset-4 hover:underline">book your slot</span>.
         </span>
@@ -33,12 +33,7 @@ export function SiteHeader() {
           <a href="#about" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">About</a>
           <a href="#faq" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">FAQ</a>
         </nav>
-        <Link
-          to="/book"
-          className="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg bg-primary px-4 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          Book <ArrowRight className="size-3.5" />
-        </Link>
+        <Button asChild><Link to="/book">Book</Link></Button>
       </div>
     </header>
   );
@@ -50,16 +45,16 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
           <p className="text-base font-semibold text-deep-ink">Hartwell Tax & Bookkeeping</p>
-          <p className="mt-2 max-w-sm text-sm text-muted-foreground">Claire Hartwell, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
+           <p className="mt-2 max-w-sm text-sm text-muted-foreground">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
         <div className="text-sm">
-          <p className="mb-2 text-[10px] font-semibold uppercase text-muted-foreground">Visit</p>
+           <p className="mb-2 text-xs font-medium text-muted-foreground">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
           <a href="tel:+19735550142" className="tabular mt-3 block hover:text-deep-ink">(973) 555-0142</a>
         </div>
         <div className="text-sm">
-          <p className="mb-2 text-[10px] font-semibold uppercase text-muted-foreground">Hours</p>
+           <p className="mb-2 text-xs font-medium text-muted-foreground">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4">
               <span>{h.days}</span>

@@ -41,7 +41,7 @@ export function DemoTools() {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-40 flex gap-2">
+      <div className="fixed bottom-20 right-5 z-40 sm:bottom-5 flex gap-2">
         <button onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview"
           className={`grid h-11 w-11 place-items-center rounded-full border border-border transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-sage"}`}>
           <Smartphone className="h-4 w-4" />
@@ -105,7 +105,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
 
   return (
     <motion.aside initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }}
-      className="fixed bottom-20 right-5 z-40 w-[300px]">
+      className="fixed bottom-36 right-5 z-40 w-[300px] sm:bottom-20">
       <div className="mb-2 flex items-center gap-2">
         <select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Client"
           className="h-9 min-w-0 flex-1 rounded-full border border-border bg-sheet px-3 text-sm">

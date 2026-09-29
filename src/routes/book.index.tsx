@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ChevronUp, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, ChevronUp, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,9 +92,9 @@ function BookPage() {
   }
 
   return (
-    <BookingShell step={step}>
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0">
+     <BookingShell step={step}>
+       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+         <div className="min-w-0 rounded-[20px] bg-paper p-5 sm:p-8">
           {step > 0 && (
              <Button variant="ghost" onClick={() => go(step - 1)} className="mb-5 -ml-3 gap-1.5 text-muted-foreground">
               <ArrowLeft className="size-4" /> Back
@@ -128,8 +128,8 @@ function BookPage() {
         </div>
         {(
           <aside className="hidden lg:block">
-             <div className="sticky top-8 space-y-4">
-               {step === 3 && service && <div className="sheet-stack p-5"><p className="font-semibold text-deep-ink">{service.name}</p><p className="mt-2 text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p><Button variant="link" className="mt-2 px-0" onClick={() => go(2)}>Change time</Button></div>}
+              <div className="sticky top-4 space-y-4">
+                {step === 3 && service && <div className="workbench-panel p-5"><p className="font-semibold text-deep-ink">{service.name}</p><p className="mt-2 text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)} at ${fmtTime(draft.slot)}`} — {draft.meetingType === "video" ? "Video call" : "In person"}</p><Button variant="link" className="mt-2 px-0" onClick={() => go(2)}>Change time</Button></div>}
               <ChecklistPreview docs={preview} />
             </div>
           </aside>
@@ -148,7 +148,7 @@ function BookPage() {
 function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
   return (
     <div className="sheet-stack p-5">
-      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Your checklist so far</p>
+       <p className="text-sm font-medium text-graphite">Your checklist so far</p>
       <p className="mt-1 font-sans text-3xl text-deep-ink">
         <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
       </p>
@@ -213,27 +213,27 @@ function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | un
   return (
     <>
       <StepTitle title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
-      <div className="space-y-3">
+       <div className="space-y-3">
         {qs.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
+           <div key={q.key} className="flex flex-col gap-3 rounded-[14px] bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-medium text-deep-ink">{q.label}</p>
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
             </div>
             {q.type === "count" ? (
               <div className="flex shrink-0 items-center gap-3">
-                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
+                 <Button variant="outline" size="icon" aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="size-11 rounded-[10px]">
                   <Minus className="size-4" />
-                </button>
+                 </Button>
                 <span className="tabular w-6 text-center font-sans text-2xl">{(answers[q.key] as number) ?? 0}</span>
-                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
+                 <Button variant="outline" size="icon" aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="size-11 rounded-[10px]">
                   <Plus className="size-4" />
-                </button>
+                 </Button>
               </div>
             ) : (
               <div className="flex shrink-0 gap-2" role="radiogroup" aria-label={q.label}>
                 {[true, false].map((v) => (
-                  <button
+                   <Button
                     key={String(v)}
                     role="radio"
                     aria-checked={answers[q.key] === v}
@@ -246,10 +246,11 @@ function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | un
                         e.currentTarget.parentElement?.querySelector<HTMLElement>(`[aria-checked="${next}"]`)?.focus();
                       }
                     }}
-                    className={`h-10 min-w-16 rounded-full border px-4 text-sm font-medium transition-colors ${answers[q.key] === v ? "border-ink bg-ink text-paper" : "border-border bg-transparent text-deep-ink hover:border-ink"}`}
+                     variant="neutral"
+                     className={`h-11 min-w-16 rounded-[8px] px-4 text-sm ${answers[q.key] === v ? "bg-paper text-evergreen shadow-[var(--shadow-1)]" : "bg-transparent text-graphite"}`}
                   >
                     {v ? "Yes" : "No"}
-                  </button>
+                   </Button>
                 ))}
               </div>
             )}
@@ -258,7 +259,7 @@ function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | un
       </div>
       <div className="mt-8 flex items-center gap-3">
         <Button size="lg" disabled={!answered} onClick={onDone}>
-          Continue <ArrowRight />
+           Continue
         </Button>
       </div>
     </>
@@ -297,13 +298,13 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
 
   return (
     <>
-       <StepTitle title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
+        <StepTitle title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
       <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
-          <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-ink text-paper" : "text-deep-ink hover:bg-sage"}`}>
+           <Button key={v} variant="neutral" role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
+             className={`inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-paper text-evergreen shadow-[var(--shadow-1)]" : "bg-control text-deep-ink"}`}>
             <Icon className="size-4" /> {label}
-          </button>
+           </Button>
         ))}
       </div>
 
@@ -322,13 +323,13 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const active = d.date === selDate;
               const full = !d.closed && d.slots.length === 0;
               return (
-                <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
+                 <Button key={d.date} variant="neutral" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
                   className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
-                    active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
-                  <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
+                     active ? "border-evergreen bg-evergreen-tint text-evergreen" : d.closed ? "border-transparent text-muted-foreground/50" : "border-line bg-paper hover:border-evergreen"}`}>
+                   <span className="text-[11px] opacity-70">{c.dow}</span>
                   <span className="tabular font-sans text-2xl leading-tight">{c.day}</span>
                    <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : visibleSlots(d.slots).length <= 2 ? `Only ${visibleSlots(d.slots).length} left` : c.month}</span>
-                </button>
+                 </Button>
               );
             })}
           </div>
@@ -341,7 +342,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
                    {times.map((s) => <Button key={s} variant={draft.slot === s && draft.date === day.date ? "default" : "outline"} aria-pressed={draft.slot === s && draft.date === day.date} onClick={() => update({ date: day.date, slot: s })} className="tabular h-11 rounded-xl">{fmtTime(s)}</Button>)}
                  </div></div> : null;
                })}
-               <Button size="lg" disabled={!draft.slot || draft.date !== day.date} onClick={onDone}>Continue <ArrowRight /></Button>
+                <Button size="lg" disabled={!draft.slot || draft.date !== day.date} onClick={onDone}>Continue</Button>
              </div>}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
             {!firstOpen && !draft.date && (

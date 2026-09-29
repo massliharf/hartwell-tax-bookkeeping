@@ -131,20 +131,17 @@ function BookPage() {
 
 function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
   return (
-    <div className="overflow-hidden rounded-2xl bg-surface-2">
+    <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
       <div className="bg-surface-2 p-3 px-4">
-      <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Your checklist so far</p>
-      <p className="font-serif text-xl text-deep-ink">
-        <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
-      </p>
+        <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Your checklist so far</p>
+        <p className="font-serif text-xl text-deep-ink">
+          <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
+        </p>
       </div>
-      <div className="px-4 pt-4">
-      <div className="max-h-[440px] overflow-y-auto pr-1">
+      <div className="max-h-[440px] overflow-y-auto px-4 pt-4">
         <DocumentStack docs={[...docs].reverse().map((d) => ({ ...d, received: false }))} />
       </div>
-      </div>
       <p className="px-4 pb-6 pt-4 text-xs text-muted-foreground">You'll upload these after booking. They never hold up your appointment.</p>
-      </div>
     </div>
   );
 }

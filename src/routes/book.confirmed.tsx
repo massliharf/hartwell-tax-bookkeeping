@@ -72,7 +72,7 @@ function ConfirmedPage() {
   const first = a.clients?.name?.split(" ")[0] ?? "";
   const where = a.meeting_type === "video" ? "Video call (link will be emailed)" : ADDRESS;
   const title = `${service} with Priya Patel, EA`;
-  const manageUrl = typeof window !== "undefined" ? `${window.location.origin}/manage/${token}` : "";
+  const manageUrl = typeof window !== "undefined" ? `${window.location.origin}/a/${token}` : "";
   const details = `Upload your documents: ${manageUrl}`;
   const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${gcalStamp(a.start_at)}/${gcalStamp(a.end_at)}&location=${encodeURIComponent(where)}&details=${encodeURIComponent(details)}`;
 
@@ -127,7 +127,7 @@ function ConfirmedPage() {
             <DocumentStack docs={items.map((i) => ({ id: i.id, title: i.document_name, note: i.description ?? (i.required ? "Needed" : "If you have it"), received: i.status === "uploaded" }))} />
           </div>
           <Button asChild size="lg" variant="highlight" className="mt-6 w-full">
-            <Link to="/manage/$token" params={{ token: token! }}><Upload /> Upload your documents now</Link>
+            <Link to="/a/$token" params={{ token: token! }}><Upload /> Upload your documents now</Link>
           </Button>
           <p className="mt-3 text-center text-sm text-muted-foreground">or do it later — we'll remind you</p>
           <p className="mt-5 flex items-start gap-2 border-t border-border pt-4 text-xs text-muted-foreground">

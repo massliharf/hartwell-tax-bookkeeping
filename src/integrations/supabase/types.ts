@@ -26,6 +26,8 @@ export type Database = {
           ready_score: number
           service_id: string
           signature_status: Database["public"]["Enums"]["signature_status"]
+          signed_at: string | null
+          signed_name: string | null
           start_at: string
           status: Database["public"]["Enums"]["appointment_status"]
         }
@@ -40,6 +42,8 @@ export type Database = {
           ready_score?: number
           service_id: string
           signature_status?: Database["public"]["Enums"]["signature_status"]
+          signed_at?: string | null
+          signed_name?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["appointment_status"]
         }
@@ -54,6 +58,8 @@ export type Database = {
           ready_score?: number
           service_id?: string
           signature_status?: Database["public"]["Enums"]["signature_status"]
+          signed_at?: string | null
+          signed_name?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["appointment_status"]
         }
@@ -81,6 +87,7 @@ export type Database = {
           document_name: string
           file_path: string | null
           id: string
+          na_reason: string | null
           required: boolean
           sort_order: number
           status: Database["public"]["Enums"]["checklist_status"]
@@ -92,6 +99,7 @@ export type Database = {
           document_name: string
           file_path?: string | null
           id?: string
+          na_reason?: string | null
           required?: boolean
           sort_order?: number
           status?: Database["public"]["Enums"]["checklist_status"]
@@ -103,6 +111,7 @@ export type Database = {
           document_name?: string
           file_path?: string | null
           id?: string
+          na_reason?: string | null
           required?: boolean
           sort_order?: number
           status?: Database["public"]["Enums"]["checklist_status"]
@@ -418,6 +427,7 @@ export type Database = {
         }
         Returns: Json
       }
+      compute_ready_score: { Args: { _id: string }; Returns: undefined }
       generate_checklist: {
         Args: { _appointment_id: string }
         Returns: undefined
@@ -430,6 +440,10 @@ export type Database = {
         Returns: boolean
       }
       is_owner: { Args: never; Returns: boolean }
+      reschedule_appointment: {
+        Args: { _id: string; _now: string; _start: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin"

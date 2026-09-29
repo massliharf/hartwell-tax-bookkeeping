@@ -21,7 +21,11 @@ import { Route as ClaimTokenRouteImport } from './routes/claim.$token'
 import { Route as ManageTokenRouteImport } from './routes/manage.$token'
 import { Route as MoveTokenRouteImport } from './routes/move.$token'
 import { Route as AuthenticatedOwnerIndexRouteImport } from './routes/_authenticated/owner.index'
+import { Route as AuthenticatedOwnerCalendarRouteImport } from './routes/_authenticated/owner.calendar'
 import { Route as AuthenticatedOwnerNeedsRouteImport } from './routes/_authenticated/owner.needs'
+import { Route as AuthenticatedOwnerOutboxRouteImport } from './routes/_authenticated/owner.outbox'
+import { Route as AuthenticatedOwnerClientsIndexRouteImport } from './routes/_authenticated/owner.clients.index'
+import { Route as AuthenticatedOwnerClientsIdRouteImport } from './routes/_authenticated/owner.clients.$id'
 import { Route as ApiPublicCronAutomationsRouteImport } from './routes/api/public/cron/automations'
 
 const IndexRoute = IndexRouteImport.update({
@@ -83,11 +87,35 @@ const AuthenticatedOwnerIndexRoute = AuthenticatedOwnerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedOwnerRoute,
 } as any)
+const AuthenticatedOwnerCalendarRoute =
+  AuthenticatedOwnerCalendarRouteImport.update({
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedOwnerRoute,
+  } as any)
 const AuthenticatedOwnerNeedsRoute = AuthenticatedOwnerNeedsRouteImport.update({
   id: '/needs',
   path: '/needs',
   getParentRoute: () => AuthenticatedOwnerRoute,
 } as any)
+const AuthenticatedOwnerOutboxRoute =
+  AuthenticatedOwnerOutboxRouteImport.update({
+    id: '/outbox',
+    path: '/outbox',
+    getParentRoute: () => AuthenticatedOwnerRoute,
+  } as any)
+const AuthenticatedOwnerClientsIndexRoute =
+  AuthenticatedOwnerClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
+    getParentRoute: () => AuthenticatedOwnerRoute,
+  } as any)
+const AuthenticatedOwnerClientsIdRoute =
+  AuthenticatedOwnerClientsIdRouteImport.update({
+    id: '/clients/$id',
+    path: '/clients/$id',
+    getParentRoute: () => AuthenticatedOwnerRoute,
+  } as any)
 const ApiPublicCronAutomationsRoute =
   ApiPublicCronAutomationsRouteImport.update({
     id: '/api/public/cron/automations',
@@ -106,9 +134,13 @@ export interface FileRoutesByFullPath {
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
+  '/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
   '/owner/needs': typeof AuthenticatedOwnerNeedsRoute
+  '/owner/outbox': typeof AuthenticatedOwnerOutboxRoute
   '/owner/': typeof AuthenticatedOwnerIndexRoute
+  '/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
+  '/owner/clients/': typeof AuthenticatedOwnerClientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -120,9 +152,13 @@ export interface FileRoutesByTo {
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
   '/book': typeof BookIndexRoute
+  '/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
   '/owner/needs': typeof AuthenticatedOwnerNeedsRoute
+  '/owner/outbox': typeof AuthenticatedOwnerOutboxRoute
   '/owner': typeof AuthenticatedOwnerIndexRoute
+  '/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
+  '/owner/clients': typeof AuthenticatedOwnerClientsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -137,9 +173,13 @@ export interface FileRoutesById {
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
+  '/_authenticated/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
   '/_authenticated/owner/needs': typeof AuthenticatedOwnerNeedsRoute
+  '/_authenticated/owner/outbox': typeof AuthenticatedOwnerOutboxRoute
   '/_authenticated/owner/': typeof AuthenticatedOwnerIndexRoute
+  '/_authenticated/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
+  '/_authenticated/owner/clients/': typeof AuthenticatedOwnerClientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -154,9 +194,13 @@ export interface FileRouteTypes {
     | '/manage/$token'
     | '/move/$token'
     | '/book/'
+    | '/owner/calendar'
     | '/owner/needs'
+    | '/owner/outbox'
     | '/owner/'
+    | '/owner/clients/$id'
     | '/api/public/cron/automations'
+    | '/owner/clients/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -168,9 +212,13 @@ export interface FileRouteTypes {
     | '/manage/$token'
     | '/move/$token'
     | '/book'
+    | '/owner/calendar'
     | '/owner/needs'
+    | '/owner/outbox'
     | '/owner'
+    | '/owner/clients/$id'
     | '/api/public/cron/automations'
+    | '/owner/clients'
   id:
     | '__root__'
     | '/'
@@ -184,9 +232,13 @@ export interface FileRouteTypes {
     | '/manage/$token'
     | '/move/$token'
     | '/book/'
+    | '/_authenticated/owner/calendar'
     | '/_authenticated/owner/needs'
+    | '/_authenticated/owner/outbox'
     | '/_authenticated/owner/'
+    | '/_authenticated/owner/clients/$id'
     | '/api/public/cron/automations'
+    | '/_authenticated/owner/clients/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -289,11 +341,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOwnerIndexRouteImport
       parentRoute: typeof AuthenticatedOwnerRoute
     }
+    '/_authenticated/owner/calendar': {
+      id: '/_authenticated/owner/calendar'
+      path: '/calendar'
+      fullPath: '/owner/calendar'
+      preLoaderRoute: typeof AuthenticatedOwnerCalendarRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
     '/_authenticated/owner/needs': {
       id: '/_authenticated/owner/needs'
       path: '/needs'
       fullPath: '/owner/needs'
       preLoaderRoute: typeof AuthenticatedOwnerNeedsRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
+    '/_authenticated/owner/outbox': {
+      id: '/_authenticated/owner/outbox'
+      path: '/outbox'
+      fullPath: '/owner/outbox'
+      preLoaderRoute: typeof AuthenticatedOwnerOutboxRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
+    '/_authenticated/owner/clients/': {
+      id: '/_authenticated/owner/clients/'
+      path: '/clients'
+      fullPath: '/owner/clients/'
+      preLoaderRoute: typeof AuthenticatedOwnerClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedOwnerRoute
+    }
+    '/_authenticated/owner/clients/$id': {
+      id: '/_authenticated/owner/clients/$id'
+      path: '/clients/$id'
+      fullPath: '/owner/clients/$id'
+      preLoaderRoute: typeof AuthenticatedOwnerClientsIdRouteImport
       parentRoute: typeof AuthenticatedOwnerRoute
     }
     '/api/public/cron/automations': {
@@ -307,13 +387,21 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedOwnerRouteChildren {
+  AuthenticatedOwnerCalendarRoute: typeof AuthenticatedOwnerCalendarRoute
   AuthenticatedOwnerNeedsRoute: typeof AuthenticatedOwnerNeedsRoute
+  AuthenticatedOwnerOutboxRoute: typeof AuthenticatedOwnerOutboxRoute
   AuthenticatedOwnerIndexRoute: typeof AuthenticatedOwnerIndexRoute
+  AuthenticatedOwnerClientsIdRoute: typeof AuthenticatedOwnerClientsIdRoute
+  AuthenticatedOwnerClientsIndexRoute: typeof AuthenticatedOwnerClientsIndexRoute
 }
 
 const AuthenticatedOwnerRouteChildren: AuthenticatedOwnerRouteChildren = {
+  AuthenticatedOwnerCalendarRoute: AuthenticatedOwnerCalendarRoute,
   AuthenticatedOwnerNeedsRoute: AuthenticatedOwnerNeedsRoute,
+  AuthenticatedOwnerOutboxRoute: AuthenticatedOwnerOutboxRoute,
   AuthenticatedOwnerIndexRoute: AuthenticatedOwnerIndexRoute,
+  AuthenticatedOwnerClientsIdRoute: AuthenticatedOwnerClientsIdRoute,
+  AuthenticatedOwnerClientsIndexRoute: AuthenticatedOwnerClientsIndexRoute,
 }
 
 const AuthenticatedOwnerRouteWithChildren =

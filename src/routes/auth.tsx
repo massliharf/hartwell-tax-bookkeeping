@@ -1,3 +1,5 @@
+import { ensureDemoAccount } from "@/lib/demo.functions";
+import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/demo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -26,6 +28,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const status = useServerFn(ownerSetupStatus);
   const create = useServerFn(createOwnerAccount);
+  const ensureDemo = useServerFn(ensureDemoAccount);
   const { data } = useQuery({ queryKey: ["owner-setup"], queryFn: () => status() });
   const setup = data && !data.hasOwner;
   const [email, setEmail] = useState("");
@@ -37,7 +40,9 @@ function AuthPage() {
     e.preventDefault();
     setErr(null); setBusy(true);
     try {
-      if (setup) {
+      const isDemo = email.trim().toLowerCase() === DEMO_EMAIL;
+      if (isDemo) await ensureDemo();
+      else if (setup) {
         const r = await create({ data: { email, password } });
         if (!r.ok) { setErr(r.error); return; }
       }
@@ -73,6 +78,11 @@ function AuthPage() {
           {err && <p className="text-sm text-warning" role="alert">{err}</p>}
           <Button type="submit" size="lg" className="w-full" disabled={busy || !data}>{busy ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>
         </form>
+        <button type="button" onClick={() => { setEmail(DEMO_EMAIL); setPassword(DEMO_PASSWORD); }}
+          className="mt-4 w-full rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-sage/50">
+          Demo access: <span className="tabular text-deep-ink">{DEMO_EMAIL}</span> / <span className="tabular text-deep-ink">{DEMO_PASSWORD}</span>
+          <span className="block text-xs">Tap to fill in.</span>
+        </button>
       </div>
     </main>
   );

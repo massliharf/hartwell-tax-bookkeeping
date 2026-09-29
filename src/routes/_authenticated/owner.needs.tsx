@@ -67,7 +67,7 @@ function Row({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boole
     const a = it.appt;
     return shell(<PenLine className="h-5 w-5" />, "bg-marigold/15 text-warning",
       <>{a.clients?.name} hasn't signed Form 8879</>,
-      <>Appointment was {fmtDay(a.start_at)}. Two reminders already went out.</>, "Send another reminder");
+      <>Appointment was {fmtDay(a.start_at)}. Automatic reminders already went out.</>, "Send another reminder");
   }
   if (it.kind === "failed") {
     return shell(<MailX className="h-5 w-5" />, "bg-destructive/10 text-destructive",

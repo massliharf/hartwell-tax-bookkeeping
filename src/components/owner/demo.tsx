@@ -119,7 +119,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
           <div className="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-deep-ink" />
           <div className="border-b border-border bg-sheet px-4 pb-2 pt-9 text-center">
             <p className="truncate text-sm font-medium text-deep-ink">{name ?? "No messages yet"}</p>
-            <p className="text-[11px] text-muted-foreground">From Priya Patel, EA</p>
+            <p className="text-[11px] text-muted-foreground">From Claire Hartwell, EA</p>
           </div>
           <div className="h-[calc(100%-68px)] space-y-3 overflow-y-auto px-3 py-4">
             {thread.length === 0 && <p className="pt-20 text-center text-sm text-muted-foreground">Messages will appear here as automations run.</p>}

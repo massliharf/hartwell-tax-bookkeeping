@@ -30,7 +30,7 @@ export const ownerSetupStatus = createServerFn({ method: "GET" }).handler(async 
   return { hasOwner: (count ?? 0) > 0 };
 });
 
-/** One-time: creates Priya's account. Refuses once any owner exists. */
+/** One-time: creates Claire's account. Refuses once any owner exists. */
 export const createOwnerAccount = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ email: z.string().trim().email().max(200), password: z.string().min(10).max(128) }).parse(d))
   .handler(async ({ data }) => {
@@ -121,7 +121,7 @@ export const nudgeSignature = createServerFn({ method: "POST" })
     const sent = await sendMessage({
       dedupeKey: `sign-manual:${a.id}:${Date.now()}`, type: "signature_reminder", minutesSaved: 6, clientId: c.id, appointmentId: a.id, to: c.email,
       subject: "One signature and you're filed", heading: "One signature and you're filed.",
-      blocks: [{ p: `Hi ${c.name.split(" ")[0]}, your return is ready. Priya just needs your e-file authorization (Form 8879). It takes about a minute.` }, { button: { label: "Sign now", href: portal } }],
+      blocks: [{ p: `Hi ${c.name.split(" ")[0]}, your return is ready. Claire just needs your e-file authorization (Form 8879). It takes about a minute.` }, { button: { label: "Sign now", href: portal } }],
     });
     return { ok: sent };
   });

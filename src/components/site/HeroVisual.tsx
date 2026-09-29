@@ -39,7 +39,7 @@ export function HeroVisual() {
         )}
       </div>
       <p className={`mt-3 text-center text-xs font-medium transition-opacity duration-500 ${shown === 3 ? "text-success opacity-100" : "opacity-0"}`}>
-        All set. Priya has checked everything.
+        All set. Claire has checked everything.
       </p>
     </div>
   );

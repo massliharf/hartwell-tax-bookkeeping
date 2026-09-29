@@ -20,9 +20,9 @@ export const Route = createFileRoute("/book/")({
   validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Book an appointment — Patel Tax & Bookkeeping" },
-      { name: "description", content: "Book with Priya Patel, EA in about two minutes. Confirmed instantly, with a personal document checklist." },
-      { property: "og:title", content: "Book an appointment — Patel Tax & Bookkeeping" },
+      { title: "Book an appointment — Hartwell Tax & Bookkeeping" },
+      { name: "description", content: "Book with Claire Hartwell, EA in about two minutes. Confirmed instantly, with a personal document checklist." },
+      { property: "og:title", content: "Book an appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a service and a time. Confirmed instantly." },
     ],
   }),
@@ -148,7 +148,7 @@ function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> 
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-      <StepTitle eyebrow="Step 1 of 4" title="What can Priya help with?" sub="Pick the closest fit. You can add details in the next step." />
+      <StepTitle eyebrow="Step 1 of 4" title="What can Claire help with?" sub="Pick the closest fit. You can add details in the next step." />
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>

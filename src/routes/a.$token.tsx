@@ -25,9 +25,9 @@ import { docGuide } from "@/lib/doc-guide";
 export const Route = createFileRoute("/a/$token")({
   head: () => ({
     meta: [
-      { title: "Your appointment — Patel Tax & Bookkeeping" },
+      { title: "Your appointment — Hartwell Tax & Bookkeeping" },
       { name: "description", content: "Manage your appointment and send your documents privately." },
-      { property: "og:title", content: "Your appointment — Patel Tax & Bookkeeping" },
+      { property: "og:title", content: "Your appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Your private appointment page." },
       { name: "robots", content: "noindex" },
     ],
@@ -35,8 +35,8 @@ export const Route = createFileRoute("/a/$token")({
   component: PortalPage,
 });
 
-const ADDRESS = "Oak Tree Road, Edison, NJ 08820";
-const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Oak Tree Road, Edison, NJ")}`;
+const ADDRESS = "412 Bloomfield Avenue, Montclair, NJ 07042";
+const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("412 Bloomfield Avenue, Montclair, NJ 07042")}`;
 const MAX = 15 * 1024 * 1024;
 const TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
@@ -57,7 +57,7 @@ function PortalPage() {
       <BookingShell>
         <div className="mx-auto max-w-md text-center">
           <h1 className="text-4xl text-deep-ink">This link isn't working</h1>
-          <p className="mt-3 text-deep-ink/70">Use the link in your confirmation email, or call the office at (732) 555-0142.</p>
+          <p className="mt-3 text-deep-ink/70">Use the link in your confirmation email, or call the office at (973) 555-0142.</p>
           <Button asChild size="lg" className="mt-6"><Link to="/">Back to home</Link></Button>
         </div>
       </BookingShell>
@@ -83,7 +83,7 @@ function PortalPage() {
           <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">Your private page</p>
           <h1 className="mt-2 text-4xl leading-tight text-deep-ink sm:text-5xl">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
-            {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Priya has everything she needs."}
+            {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
           </p>
         </div>
 
@@ -105,7 +105,7 @@ function PortalPage() {
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
             <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
-              <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Priya can see your files. We never ask for your Social Security number.
+              <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Claire can see your files. We never ask for your Social Security number.
             </p>
             <ul className="space-y-4">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
@@ -387,12 +387,12 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
     <section className="sheet-stack ledger border-l-4 border-l-marigold p-6">
       <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-warning">One last step</p>
       <h2 className="mt-1 text-3xl text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
-      <p className="mt-2 text-sm text-deep-ink/75">Priya has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
+      <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-paper/70 p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>
         <div><dt className="text-muted-foreground">Tax year</dt><dd className="tabular font-medium text-deep-ink">2025</dd></div>
         <div><dt className="text-muted-foreground">Service</dt><dd className="font-medium text-deep-ink">{appt.services?.name}</dd></div>
-        <div><dt className="text-muted-foreground">Preparer</dt><dd className="font-medium text-deep-ink">Priya Patel, EA</dd></div>
+        <div><dt className="text-muted-foreground">Preparer</dt><dd className="font-medium text-deep-ink">Claire Hartwell, EA</dd></div>
       </dl>
       <form className="mt-5 space-y-4" onSubmit={async (e) => {
         e.preventDefault(); if (!ok) return; setBusy(true); setErr(false);
@@ -405,7 +405,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />
-          I've reviewed my return with Priya and authorize her to file it electronically. Typing my name counts as my signature.
+          I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
         <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>

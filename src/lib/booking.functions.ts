@@ -124,7 +124,7 @@ export const getAvailabilityWindow = createServerFn({ method: "GET" })
     return { days, error: null };
   });
 
-/** Saves / updates an unfinished booking so Priya can follow up. */
+/** Saves / updates an unfinished booking so Claire can follow up. */
 export const saveLead = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({

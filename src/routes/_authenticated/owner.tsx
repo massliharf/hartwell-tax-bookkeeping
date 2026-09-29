@@ -10,10 +10,10 @@ import { DemoTools } from "@/components/owner/demo";
 export const Route = createFileRoute("/_authenticated/owner")({
   head: () => ({
     meta: [
-      { title: "Practice — Patel Tax & Bookkeeping" },
-      { name: "description", content: "Priya's practice app: today, calendar, clients and follow-ups." },
-      { property: "og:title", content: "Practice — Patel Tax & Bookkeeping" },
-      { property: "og:description", content: "Priya's practice app: today, calendar, clients and follow-ups." },
+      { title: "Practice — Hartwell Tax & Bookkeeping" },
+      { name: "description", content: "Claire's practice app: today, calendar, clients and follow-ups." },
+      { property: "og:title", content: "Practice — Hartwell Tax & Bookkeeping" },
+      { property: "og:description", content: "Claire's practice app: today, calendar, clients and follow-ups." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -49,7 +49,7 @@ function OwnerLayout() {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-6 text-center">
         <div className="max-w-sm">
-          <h1 className="font-serif text-3xl text-deep-ink">This area is for Priya only.</h1>
+          <h1 className="font-serif text-3xl text-deep-ink">This area is for Claire only.</h1>
           <p className="mt-2 text-sm text-muted-foreground">You're signed in with an account that doesn't have access.</p>
           <Button className="mt-6" variant="outline" onClick={signOut}>Sign out</Button>
         </div>
@@ -63,7 +63,7 @@ function OwnerLayout() {
   return (
     <div className="min-h-screen bg-paper md:grid md:grid-cols-[232px_1fr]">
       <aside className="sticky top-0 hidden h-screen flex-col border-r border-border px-4 py-6 md:flex">
-        <Link to="/" className="px-3 font-serif text-xl leading-tight text-ink">Patel Tax<br />&amp; Bookkeeping</Link>
+        <Link to="/" className="px-3 font-serif text-xl leading-tight text-ink">Hartwell Tax<br />&amp; Bookkeeping</Link>
         <nav className="mt-8 space-y-1">
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} className={link} activeProps={active} activeOptions={{ exact: "exact" in n }}>
@@ -79,7 +79,7 @@ function OwnerLayout() {
       <div className="min-w-0">
         <header className="sticky top-0 z-20 border-b border-border bg-paper/90 backdrop-blur md:hidden">
           <div className="flex items-center justify-between px-5 py-3">
-            <span className="font-serif text-lg text-ink">Patel Tax</span>
+            <span className="font-serif text-lg text-ink">Hartwell Tax</span>
             <button onClick={signOut} aria-label="Sign out" className="rounded-full p-2 hover:bg-sage"><LogOut className="h-4 w-4" /></button>
           </div>
           <nav className="flex gap-1 overflow-x-auto px-3 pb-2 [scrollbar-width:none]">

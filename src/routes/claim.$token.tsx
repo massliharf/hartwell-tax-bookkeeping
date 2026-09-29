@@ -11,9 +11,9 @@ import { fmtDateLong, fmtTime } from "@/lib/intake";
 export const Route = createFileRoute("/claim/$token")({
   head: () => ({
     meta: [
-      { title: "A spot opened up — Patel Tax & Bookkeeping" },
-      { name: "description", content: "Claim an open appointment with Priya Patel, EA." },
-      { property: "og:title", content: "A spot opened up — Patel Tax & Bookkeeping" },
+      { title: "A spot opened up — Hartwell Tax & Bookkeeping" },
+      { name: "description", content: "Claim an open appointment with Claire Hartwell, EA." },
+      { property: "og:title", content: "A spot opened up — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "First to claim gets it." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

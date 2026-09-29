@@ -4,14 +4,14 @@ import type { Database } from "@/integrations/supabase/types";
 
 type MsgType = Database["public"]["Enums"]["message_type"];
 const TZ = "America/New_York";
-const FROM_DEFAULT = "Priya Patel, EA <onboarding@resend.dev>";
+const FROM_DEFAULT = "Claire Hartwell, EA <onboarding@resend.dev>";
 
 export const fmtDate = (iso: string) =>
   new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "long", month: "long", day: "numeric" }).format(new Date(iso));
 export const fmtTime = (iso: string) =>
   new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(new Date(iso));
-export const OFFICE = "Oak Tree Road, Edison, NJ 08820";
-export const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Oak Tree Road, Edison, NJ")}`;
+export const OFFICE = "412 Bloomfield Avenue, Montclair, NJ 07042";
+export const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("412 Bloomfield Avenue, Montclair, NJ 07042")}`;
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
@@ -36,11 +36,11 @@ export function renderEmail(heading: string, blocks: Block[]) {
 <body style="margin:0;padding:0;background:#F5F1E8;font-family:Inter,Helvetica,Arial,sans-serif">
 <table role="presentation" width="100%" style="background:#F5F1E8"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
-<tr><td style="padding:0 4px 16px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#123B2F">Patel Tax &amp; Bookkeeping</td></tr>
+<tr><td style="padding:0 4px 16px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#123B2F">Hartwell Tax &amp; Bookkeeping</td></tr>
 <tr><td style="background:#FFFDF8;border:1px solid #e6dfcf;border-radius:16px;padding:32px 28px;box-shadow:0 6px 0 -3px #efe9dc,0 10px 24px rgba(18,59,47,.06)">
 <h1 style="margin:0 0 20px;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:32px;line-height:1.15;color:#123B2F">${esc(heading)}</h1>
 ${body}
-<p style="margin:24px 0 0;font-size:15px;color:#16201B">Warmly,<br><span style="font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:#123B2F">Priya Patel, EA</span></p>
+<p style="margin:24px 0 0;font-size:15px;color:#16201B">Warmly,<br><span style="font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:#123B2F">Claire Hartwell, EA</span></p>
 </td></tr>
 <tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#5b6660">${OFFICE} &middot; We never ask for your Social Security number by email.</td></tr>
 </table></td></tr></table></body></html>`;
@@ -49,14 +49,14 @@ ${body}
 export function toText(heading: string, blocks: Block[]) {
   return [heading, "", ...blocks.map((b) =>
     "p" in b ? b.p : "note" in b ? b.note : "list" in b ? b.list.map((i) => `- ${i}`).join("\n")
-      : ("button" in b ? [b.button] : b.buttons).map((x) => `${x.label}: ${x.href}`).join("\n")), "", "Priya Patel, EA"].join("\n\n");
+      : ("button" in b ? [b.button] : b.buttons).map((x) => `${x.label}: ${x.href}`).join("\n")), "", "Claire Hartwell, EA"].join("\n\n");
 }
 
 export function buildIcs(o: { id: string; start: string; end: string; title: string; location: string; description: string }) {
   const f = (d: string) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const e = (s: string) => s.replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Patel Tax//Booking//EN", "METHOD:PUBLISH", "BEGIN:VEVENT",
-    `UID:${o.id}@pateltax`, `DTSTAMP:${f(new Date().toISOString())}`, `DTSTART:${f(o.start)}`, `DTEND:${f(o.end)}`,
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Hartwell Tax//Booking//EN", "METHOD:PUBLISH", "BEGIN:VEVENT",
+    `UID:${o.id}@hartwelltax`, `DTSTAMP:${f(new Date().toISOString())}`, `DTSTART:${f(o.start)}`, `DTEND:${f(o.end)}`,
     `SUMMARY:${e(o.title)}`, `LOCATION:${e(o.location)}`, `DESCRIPTION:${e(o.description)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
 }
 

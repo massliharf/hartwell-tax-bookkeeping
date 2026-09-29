@@ -49,7 +49,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Something went wrong</p>
         <h1 className="mt-2 font-serif text-4xl leading-tight text-deep-ink">This page didn't load.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          It's on our side, not yours. Try again, or call the office at (732) 555-0142.
+          It's on our side, not yours. Try again, or call the office at (973) 555-0142.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
           <button
@@ -78,11 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Patel Tax & Bookkeeping — Edison, NJ" },
-      { name: "description", content: "Tax preparation and bookkeeping by Priya Patel, EA, in Edison, New Jersey." },
-      { name: "author", content: "Patel Tax & Bookkeeping" },
-      { property: "og:title", content: "Patel Tax & Bookkeeping — Edison, NJ" },
-      { property: "og:description", content: "Tax preparation and bookkeeping by Priya Patel, EA, in Edison, New Jersey." },
+      { title: "Hartwell Tax & Bookkeeping — Montclair, NJ" },
+      { name: "description", content: "Tax preparation and bookkeeping by Claire Hartwell, EA, in Montclair, New Jersey." },
+      { name: "author", content: "Hartwell Tax & Bookkeeping" },
+      { property: "og:title", content: "Hartwell Tax & Bookkeeping — Montclair, NJ" },
+      { property: "og:description", content: "Tax preparation and bookkeeping by Claire Hartwell, EA, in Montclair, New Jersey." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

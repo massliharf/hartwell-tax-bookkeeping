@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Insights — Patel Tax & Bookkeeping" }, { name: "description", content: "Practice results and time saved." }, { property: "og:title", content: "Insights — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Practice results and time saved." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Insights });
+export const Route = createFileRoute("/_authenticated/owner/insights")({ component: Insights });
 
 // Baselines from the practice before the new system (from the brief / Priya's estimate).
 const BEFORE = { ready: 65, noShow: 12, msgsPerBooking: 6 };
@@ -44,7 +44,7 @@ function Insights() {
   const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
 
   const minutes30 = msgs.filter((x) => in30(x.sent_at)).reduce((s, x) => s + x.minutes_saved, 0);
-  const hours30 = Math.round(minutes30 / 6) / 10;
+  const hours30 = Math.round(minutes30 / 60);
 
   const held = appts.filter((x) => (x.status === "completed" || x.status === "no_show") && new Date(x.start_at).getTime() <= t);
   const completed = held.filter((x) => x.status === "completed");
@@ -85,36 +85,35 @@ function Insights() {
         <Metric title="Wasted appointments avoided" value={String(avoided30)} note="moved after the readiness check">
           <Bars data={avoided} />
         </Metric>
-         <Metric title="Slots refilled from the waitlist" value={String(refilled30)} note="freed times claimed by someone waiting">
-           <Bars data={refilled} tone="info" />
+        <Metric title="Slots refilled from the waitlist" value={String(refilled30)} note="freed times claimed by someone waiting">
+          <Bars data={refilled} tone="marigold" />
         </Metric>
         <Metric title="Booked with zero involvement" value={`${zero30}%`} note="no call, no email from you">
           <AreaSpark data={zero} max={100} suffix="%" />
         </Metric>
         <Metric title="No-show rate" value={`${noShow30}%`} note={`before: ~${BEFORE.noShow}%`} good={noShow30 <= BEFORE.noShow}>
-           <AreaSpark data={noShow} baseline={BEFORE.noShow} max={Math.max(25, ...noShow.map((p) => p.v))} suffix="%" tone="info" />
+          <AreaSpark data={noShow} baseline={BEFORE.noShow} max={Math.max(25, ...noShow.map((p) => p.v))} suffix="%" tone="marigold" />
         </Metric>
         <Metric title="Signatures collected automatically" value={String(signed30)} note="Form 8879, signed online">
           <Bars data={signed} />
         </Metric>
       </div>
-      {completed.filter((x) => in30(x.start_at)).length === 0 && <p className="mt-4 text-sm text-muted-foreground">No completed appointments in this period yet. Readiness and no-show rates will become meaningful as visits finish.</p>}
 
       <section className="mt-12 grid overflow-hidden rounded-2xl border border-border shadow-sheet md:grid-cols-2">
         <div className="bg-paper-deep/60 p-7 md:p-9">
-           <p className="text-sm font-medium text-muted-foreground">Before</p>
-          <p className="mt-4 font-sans text-3xl leading-snug text-deep-ink/60 md:text-4xl">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Before</p>
+          <p className="mt-4 font-serif text-3xl leading-snug text-deep-ink/60 md:text-4xl">
             {BEFORE.msgsPerBooking} messages per booking.<br />1 in 3 clients unprepared.
           </p>
         </div>
         <div className="relative bg-ink p-7 text-primary-foreground md:p-9">
-           <p className="text-sm font-medium text-paper">Now</p>
-          <p className="mt-4 font-sans text-3xl leading-snug md:text-4xl">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-marigold">Now</p>
+          <p className="mt-4 font-serif text-3xl leading-snug md:text-4xl">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>
         </div>
       </section>
-      <p className="mt-3 text-xs text-muted-foreground">Last 30 days. "Before" figures are estimates, not measured historical records. Readiness reflects the current checklist state of completed visits; zero involvement uses attention flags as a proxy.</p>
+      <p className="mt-3 text-xs text-muted-foreground">Last 30 days. "Before" figures are the practice's typical numbers before online booking.</p>
     </>
   );
 }
@@ -122,13 +121,15 @@ function Insights() {
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   const reduce = useReducedMotion();
   return (
-     <header className="relative overflow-hidden rounded-[20px] bg-canvas px-7 py-12 md:px-12 md:py-16">
-       <p className="text-sm font-medium text-muted-foreground">Insights, last 30 days</p>
+    <header className="ledger relative overflow-hidden rounded-3xl border border-border bg-sheet px-7 py-12 shadow-sheet md:px-12 md:py-16">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Insights · last 30 days</p>
       <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-         className="mt-3 text-5xl font-semibold leading-[1.08] text-deep-ink md:text-[52px]">
+        className="mt-3 font-serif text-5xl leading-[1.02] text-deep-ink md:text-7xl">
         <span className="tabular text-ink">{hours}</span> hour{hours === 1 ? "" : "s"} given back<br className="hidden sm:block" /> this month.
       </motion.h1>
       <p className="tabular mt-4 max-w-md text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups you didn't have to write.</p>
+      <motion.span aria-hidden initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.4, duration: 0.8 }}
+        className="mt-8 block h-1 w-24 origin-left rounded-full bg-marigold" />
     </header>
   );
 }
@@ -137,7 +138,7 @@ function Metric({ title, value, note, good, children }: { title: string; value: 
   return (
     <article className="sheet-stack flex flex-col p-5">
       <p className="text-sm text-muted-foreground">{title}</p>
-      <p className="tabular mt-1 font-sans text-5xl text-deep-ink">{value}</p>
+      <p className="tabular mt-1 font-serif text-5xl text-deep-ink">{value}</p>
       <p className={`text-xs ${good === undefined ? "text-muted-foreground" : good ? "text-success" : "text-warning"}`}>{note}</p>
       <div className="mt-4 h-24">{children}</div>
     </article>
@@ -151,8 +152,8 @@ const tip = (suffix = "") => (
 );
 const axis = <XAxis dataKey="w" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} interval="preserveStartEnd" />;
 
-function AreaSpark({ data, baseline, max, suffix, tone = "ink" }: { data: Pt[]; baseline?: number; max: number; suffix?: string; tone?: "ink" | "info" }) {
-   const c = tone === "ink" ? "var(--evergreen)" : "var(--info)";
+function AreaSpark({ data, baseline, max, suffix, tone = "ink" }: { data: Pt[]; baseline?: number; max: number; suffix?: string; tone?: "ink" | "marigold" }) {
+  const c = tone === "ink" ? "var(--ink-green)" : "var(--marigold)";
   const id = `g-${tone}-${baseline ?? "x"}-${max}`;
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -172,12 +173,12 @@ function AreaSpark({ data, baseline, max, suffix, tone = "ink" }: { data: Pt[]; 
     </ResponsiveContainer>
   );
 }
-function Bars({ data, tone = "ink" }: { data: Pt[]; tone?: "ink" | "info" }) {
+function Bars({ data, tone = "ink" }: { data: Pt[]; tone?: "ink" | "marigold" }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
         {axis}
-         <Bar dataKey="v" radius={[6, 6, 2, 2]} fill={tone === "ink" ? "var(--evergreen)" : "var(--info)"} fillOpacity={0.85} maxBarSize={28} />
+        <Bar dataKey="v" radius={[6, 6, 2, 2]} fill={tone === "ink" ? "var(--ink-green)" : "var(--marigold)"} fillOpacity={0.85} maxBarSize={28} />
         {tip()}
       </BarChart>
     </ResponsiveContainer>

@@ -42,18 +42,19 @@ export function DemoTools() {
   return (
     <>
       <div className="fixed bottom-5 right-5 z-40 flex gap-2">
-         <Button size="icon" variant={phone ? "default" : "outline"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" title="Phone preview" className="size-11 rounded-full shadow-[var(--shadow-2)]">
+        <button onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview"
+          className={`grid h-11 w-11 place-items-center rounded-full border border-border shadow-sheet transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-sage"}`}>
           <Smartphone className="h-4 w-4" />
-         </Button>
-         <Button variant="dark" onClick={() => setOpen(true)} className="h-11 rounded-full shadow-[var(--shadow-2)]">
+        </button>
+        <button onClick={() => setOpen(true)} className="flex h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm text-primary-foreground shadow-sheet">
           <FlaskConical className="h-4 w-4" /> Demo
-         </Button>
+        </button>
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className="overflow-y-auto bg-paper">
           <SheetHeader>
-            <SheetTitle className="font-sans text-2xl font-normal">Test controls</SheetTitle>
+            <SheetTitle className="font-serif text-2xl font-normal">Test controls</SheetTitle>
             <SheetDescription>Show the follow-through live. Only you can see this.</SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-6">
@@ -61,7 +62,7 @@ export function DemoTools() {
               <Row k="run" label="Run automations now" variant="default" fn={() => fns.run()} />
             </section>
             <section className="space-y-2">
-               <h3 className="text-sm font-medium text-graphite">Time</h3>
+              <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Jump forward</h3>
               <div className="grid grid-cols-3 gap-2">
                 {([1, 2, 7] as const).map((d) => (
                   <Button key={d} variant="outline" disabled={!!busy} onClick={() => act(`j${d}`, () => fns.jump({ data: { days: d } }))}>
@@ -71,7 +72,7 @@ export function DemoTools() {
               </div>
             </section>
             <section className="space-y-2">
-               <h3 className="text-sm font-medium text-graphite">Simulate</h3>
+              <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Simulate</h3>
               <Row k="up" label="Client uploads a document" fn={() => fns.upload()} />
               <Row k="cx" label="Client cancels an appointment tomorrow" fn={() => fns.cancel()} />
               <Row k="cl" label="Waitlist client claims the slot" fn={() => fns.claim()} />
@@ -111,7 +112,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
           <option value="latest">Follow latest message</option>
           {people.map(([r, n]) => <option key={r} value={r}>{n}</option>)}
         </select>
-         <Button variant="outline" size="icon" onClick={onClose} aria-label="Close" className="size-9 rounded-full"><X className="h-4 w-4" /></Button>
+        <button onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full bg-sheet shadow-sheet"><X className="h-4 w-4" /></button>
       </div>
       <div className="rounded-[44px] bg-deep-ink p-2.5 shadow-sheet">
         <div className="relative h-[540px] overflow-hidden rounded-[36px] bg-paper">
@@ -130,7 +131,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   ) : (
                     <div className="rounded-2xl border border-border bg-sheet p-3 shadow-sheet">
                       <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>
-                      <p className="mt-1 font-sans text-[15px] leading-tight text-ink">{m.subject}</p>
+                      <p className="mt-1 font-serif text-[15px] leading-tight text-ink">{m.subject}</p>
                       <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-deep-ink/75">{m.body}</p>
                     </div>
                   )}

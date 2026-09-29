@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronUp, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,8 +24,6 @@ export const Route = createFileRoute("/book/")({
       { name: "description", content: "Book with Priya Patel, EA in about two minutes. Confirmed instantly, with a personal document checklist." },
       { property: "og:title", content: "Book an appointment — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a service and a time. Confirmed instantly." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: BookPage,
@@ -52,7 +50,6 @@ function BookPage() {
   const services = useServices();
   const reduce = useReducedMotion();
   const applied = useRef(false);
-  const [checklistOpen, setChecklistOpen] = useState(false);
 
   const fetchLead = useServerFn(getLeadDraft);
   useEffect(() => {
@@ -79,34 +76,28 @@ function BookPage() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
   };
 
-  useEffect(() => {
-    if (!loaded) return;
-    const id = window.setTimeout(() => document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true }), reduce ? 0 : 130);
-    return () => window.clearTimeout(id);
-  }, [step, loaded, reduce]);
-
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-[20px] bg-paper" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
   }
 
   return (
-     <BookingShell step={step}>
-       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-         <div className="min-w-0 rounded-[20px] bg-paper p-5 sm:p-8">
+    <BookingShell step={step}>
+      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[1fr_320px]" : ""}`}>
+        <div className="min-w-0">
           {step > 0 && (
-             <Button variant="ghost" onClick={() => go(step - 1)} className="mb-5 -ml-3 gap-1.5 text-muted-foreground">
+            <button onClick={() => go(step - 1)} className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-ink">
               <ArrowLeft className="size-4" /> Back
-             </Button>
+            </button>
           )}
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-               initial={reduce ? false : { opacity: 0.96, y: 4 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={reduce ? { opacity: 1 } : { opacity: 0.96, y: -4 }}
-               transition={{ duration: 0.12, ease: "easeOut" }}
+              initial={reduce ? false : { opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
               {step === 0 && (
                 <ServiceStep
@@ -119,37 +110,30 @@ function BookPage() {
                 />
               )}
               {step === 1 && (
-                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} onDone={() => go(2)} />
+                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} onDone={() => go(2)} count={preview.length} />
               )}
               {step === 2 && service && <TimeStep service={service} draft={draft} update={update} onDone={() => go(3)} />}
               {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} onPickAgain={() => go(2)} />}
             </motion.div>
           </AnimatePresence>
         </div>
-        {(
+        {(step === 1 || step === 2) && (
           <aside className="hidden lg:block">
-              <div className="sticky top-4 space-y-4">
-                {step === 3 && service && <div className="workbench-panel p-5"><p className="font-semibold text-deep-ink">{service.name}</p><p className="mt-2 text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)} at ${fmtTime(draft.slot)}`} — {draft.meetingType === "video" ? "Video call" : "In person"}</p><Button variant="link" className="mt-2 px-0" onClick={() => go(2)}>Change time</Button></div>}
+            <div className="sticky top-8">
               <ChecklistPreview docs={preview} />
             </div>
           </aside>
         )}
       </div>
-       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-sheet shadow-sheet lg:hidden">
-         <Button variant="ghost" className="flex h-14 w-full items-center justify-between rounded-none px-5 text-ink" aria-expanded={checklistOpen} onClick={() => setChecklistOpen(!checklistOpen)}>
-           Your checklist ({preview.length}) <ChevronUp className={`size-4 transition-transform ${checklistOpen ? "rotate-180" : ""}`} />
-         </Button>
-         {checklistOpen && <div className="max-h-[50vh] overflow-y-auto border-t border-border p-4"><ChecklistPreview docs={preview} /></div>}
-       </div>
     </BookingShell>
   );
 }
 
 function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
   return (
-    <div className="sheet-stack p-5">
-       <p className="text-sm font-medium text-graphite">Your checklist so far</p>
-      <p className="mt-1 font-sans text-3xl text-deep-ink">
+    <div className="sheet-stack ledger p-5">
+      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Your checklist so far</p>
+      <p className="mt-1 font-serif text-3xl text-deep-ink">
         <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
       </p>
       <div className="mt-4 max-h-[440px] overflow-y-auto pr-1">
@@ -164,7 +148,7 @@ function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> 
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-      <StepTitle title="What can Priya help with?" sub="Pick the closest fit. You can add details in the next step." />
+      <StepTitle eyebrow="Step 1 of 4" title="What can Priya help with?" sub="Pick the closest fit. You can add details in the next step." />
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
@@ -174,25 +158,25 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
-       <div className="grid gap-4">
+      <div className="grid gap-5 sm:grid-cols-2">
         {services.data?.map((s) => {
           const active = s.slug === selected;
           return (
             <button
               key={s.id}
-               onClick={() => onPick(s.slug)}
-                className={`group w-full rounded-[14px] border border-line bg-paper p-5 text-left transition-colors duration-150 hover:bg-canvas ${active ? "ring-2 ring-evergreen" : ""}`}
+              onClick={() => onPick(s.slug)}
+              className={`sheet-stack group p-5 text-left transition-transform duration-300 hover:-translate-y-0.5 ${active ? "ring-2 ring-ink" : ""}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-2xl leading-tight text-deep-ink">{s.name}</h2>
                 <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-ink" : "border-border"}`} />
               </div>
               <p className="mt-1 text-sm text-deep-ink/70">{s.description}</p>
-               <div className="mt-5 flex items-center justify-between text-sm">
+              <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-sm">
                 <span className="tabular text-muted-foreground">{s.duration_min} min</span>
                 <span className="text-deep-ink">
                   {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                  <span className="tabular font-sans text-2xl">${Number(s.price_from)}</span>
+                  <span className="tabular font-serif text-2xl">${Number(s.price_from)}</span>
                 </span>
               </div>
             </button>
@@ -205,52 +189,49 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
 }
 
 /* ---------- Step 2: questions ---------- */
-function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void; onDone: () => void }) {
+function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void; onDone: () => void; count: number }) {
   const qs = questionsFor(slug);
-  const answered = qs.every((q) => q.type === "count" || typeof answers[q.key] === "boolean");
+  const pages = Math.ceil(qs.length / 4);
+  const [page, setPage] = useState(0);
+  const visible = qs.slice(page * 4, page * 4 + 4);
+  const answered = visible.every((q) => q.type === "count" || typeof answers[q.key] === "boolean");
   const set = (k: keyof Answers, v: boolean | number) => onChange({ ...answers, [k]: v });
 
   return (
     <>
-      <StepTitle title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
-       <div className="space-y-3">
-        {qs.map((q) => (
-           <div key={q.key} className="flex flex-col gap-3 rounded-[14px] bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between">
+      <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
+      <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-sage px-3 py-1.5 text-sm text-ink lg:hidden">
+        Your checklist so far: <span className="tabular font-medium">{count} documents</span>
+      </div>
+      <div className="space-y-3">
+        {visible.map((q) => (
+          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-medium text-deep-ink">{q.label}</p>
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
             </div>
             {q.type === "count" ? (
               <div className="flex shrink-0 items-center gap-3">
-                 <Button variant="outline" size="icon" aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="size-11 rounded-[10px]">
+                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
                   <Minus className="size-4" />
-                 </Button>
-                <span className="tabular w-6 text-center font-sans text-2xl">{(answers[q.key] as number) ?? 0}</span>
-                 <Button variant="outline" size="icon" aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="size-11 rounded-[10px]">
+                </button>
+                <span className="tabular w-6 text-center font-serif text-2xl">{(answers[q.key] as number) ?? 0}</span>
+                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
                   <Plus className="size-4" />
-                 </Button>
+                </button>
               </div>
             ) : (
               <div className="flex shrink-0 gap-2" role="radiogroup" aria-label={q.label}>
                 {[true, false].map((v) => (
-                   <Button
+                  <button
                     key={String(v)}
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
-                    onKeyDown={(e) => {
-                      if (["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) {
-                        e.preventDefault();
-                        const next = !v;
-                        set(q.key, next);
-                        e.currentTarget.parentElement?.querySelector<HTMLElement>(`[aria-checked="${next}"]`)?.focus();
-                      }
-                    }}
-                     variant="neutral"
-                     className={`h-11 min-w-16 rounded-[8px] px-4 text-sm ${answers[q.key] === v ? "bg-paper text-evergreen shadow-[var(--shadow-1)]" : "bg-transparent text-graphite"}`}
+                    className={`h-10 min-w-16 rounded-full border px-4 text-sm font-medium transition-colors ${answers[q.key] === v ? "border-ink bg-ink text-paper" : "border-border bg-transparent text-deep-ink hover:border-ink"}`}
                   >
                     {v ? "Yes" : "No"}
-                   </Button>
+                  </button>
                 ))}
               </div>
             )}
@@ -258,9 +239,11 @@ function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | un
         ))}
       </div>
       <div className="mt-8 flex items-center gap-3">
-        <Button size="lg" disabled={!answered} onClick={onDone}>
-           Continue
+        {page > 0 && <Button variant="outline" size="lg" onClick={() => setPage(page - 1)}>Previous</Button>}
+        <Button size="lg" disabled={!answered} onClick={() => (page < pages - 1 ? setPage(page + 1) : onDone())}>
+          Continue <ArrowRight />
         </Button>
+        {pages > 1 && <span className="tabular text-xs text-muted-foreground">{page + 1} / {pages}</span>}
       </div>
     </>
   );
@@ -274,48 +257,27 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
-  const [loadingSince] = useState(() => Date.now());
-  const [skeletonDone, setSkeletonDone] = useState(false);
-  useEffect(() => {
-    if (!q.data && !q.isError) return;
-    const timer = window.setTimeout(() => setSkeletonDone(true), Math.max(0, 350 - (Date.now() - loadingSince)));
-    return () => window.clearTimeout(timer);
-  }, [q.data, q.isError, loadingSince]);
-  const waiting = q.isLoading || (!skeletonDone && !q.isError);
-  const visibleSlots = (slots: string[]) => {
-    const halfHours = slots.filter((slot) => {
-      const minute = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", minute: "2-digit" }).format(new Date(slot));
-      return minute === "00" || minute === "30";
-    });
-    if (halfHours.length <= 8) return halfHours;
-    const indexes = Array.from({ length: 8 }, (_, i) => Math.round(i * (halfHours.length - 1) / 7));
-    return indexes.map((i) => halfHours[i]).filter((slot): slot is string => Boolean(slot));
-  };
-  const group = (slot: string) => {
-    const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).format(new Date(slot)));
-    return hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening";
-  };
 
   return (
     <>
-        <StepTitle title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
-       <div className="mb-6 inline-flex rounded-[10px] bg-control p-1" role="radiogroup" aria-label="Meeting type">
+      <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
+      <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
-           <Button key={v} variant="neutral" role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
-              className={`inline-flex h-10 items-center gap-2 rounded-[8px] px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-paper text-evergreen shadow-[var(--shadow-1)]" : "bg-control text-deep-ink"}`}>
+          <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-ink text-paper" : "text-deep-ink hover:bg-sage"}`}>
             <Icon className="size-4" /> {label}
-           </Button>
+          </button>
         ))}
       </div>
 
-       {waiting && <div className="space-y-5" aria-label="Loading available times"><div className="flex gap-2 overflow-hidden">{[0,1,2,3,4,5].map(i => <div key={i} className="h-[72px] w-[76px] shrink-0 animate-pulse rounded-xl bg-muted" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{[0,1,2,3,4,5,6,7].map(i => <div key={i} className="h-11 animate-pulse rounded-xl bg-muted" />)}</div></div>}
+      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-48 animate-pulse rounded-2xl bg-sheet/70" /></div>}
       {(q.isError || q.data?.error) && (
         <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
         </div>
       )}
 
-       {!waiting && days.length > 0 && (
+      {days.length > 0 && (
         <>
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2" role="listbox" aria-label="Choose a day">
             {days.map((d) => {
@@ -323,27 +285,28 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const active = d.date === selDate;
               const full = !d.closed && d.slots.length === 0;
               return (
-                 <Button key={d.date} variant="neutral" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-[10px] border px-2 py-2.5 transition-colors ${
-                     active ? "border-evergreen bg-evergreen-tint text-evergreen" : d.closed ? "border-transparent text-muted-foreground/50" : "border-line bg-paper hover:border-evergreen"}`}>
-                   <span className="text-[11px] opacity-70">{c.dow}</span>
-                  <span className="tabular font-sans text-2xl leading-tight">{c.day}</span>
-                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : visibleSlots(d.slots).length <= 2 ? `Only ${visibleSlots(d.slots).length} left` : c.month}</span>
-                 </Button>
+                <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
+                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
+                    active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
+                  <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
+                  <span className="tabular font-serif text-2xl leading-tight">{c.day}</span>
+                  <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
+                </button>
               );
             })}
           </div>
 
           <div className="mt-6">
-             {day && day.slots.length > 0 && <div className="space-y-6">
-               {(["Morning", "Afternoon", "Evening"] as const).map(period => {
-                 const times = visibleSlots(day.slots).filter(s => group(s) === period);
-                 return times.length ? <div key={period}><h2 className="mb-3 text-sm font-semibold text-muted-foreground">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {times.map((s) => <Button key={s} variant={draft.slot === s && draft.date === day.date ? "default" : "outline"} aria-pressed={draft.slot === s && draft.date === day.date} onClick={() => update({ date: day.date, slot: s })} className="tabular h-11 rounded-[10px]">{fmtTime(s)}</Button>)}
-                 </div></div> : null;
-               })}
-                <Button size="lg" disabled={!draft.slot || draft.date !== day.date} onClick={onDone}>Continue</Button>
-             </div>}
+            {day && day.slots.length > 0 && (
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {day.slots.map((s) => (
+                  <button key={s} onClick={() => { update({ date: day.date, slot: s }); onDone(); }}
+                    className={`tabular h-11 rounded-xl border text-sm font-medium transition-all hover:-translate-y-0.5 ${draft.slot === s ? "border-ink bg-ink text-paper" : "border-border bg-sheet text-deep-ink hover:border-ink"}`}>
+                    {fmtTime(s)}
+                  </button>
+                ))}
+              </div>
+            )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
             {!firstOpen && !draft.date && (
               <p className="rounded-2xl border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
@@ -362,7 +325,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
   const c = fmtDayChip(date);
   if (state === "done") {
-    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-sans text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
+    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
   }
   return (
     <form
@@ -373,13 +336,13 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
         try { const r = await join({ data: { serviceId: service.id, name, email, date } }); setState(r.ok ? "done" : "error"); } catch { setState("error"); }
       }}
     >
-      <p className="font-sans text-2xl text-deep-ink">Full — join the waitlist</p>
+      <p className="font-serif text-2xl text-deep-ink">Full — join the waitlist</p>
       <p className="mt-1 text-sm text-deep-ink/70">{c.dow} {c.month} {c.day} is fully booked. We'll email you if a spot opens.</p>
-       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-         <Input required aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 bg-paper" />
-         <Input required aria-label="Email" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 bg-paper" />
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Input required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 bg-paper" />
+        <Input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 bg-paper" />
       </div>
-       {state === "error" && <p className="mt-2 text-sm text-destructive" role="alert">Something went wrong. Please try again.</p>}
+      {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
       <Button type="submit" variant="highlight" className="mt-4" disabled={state === "saving"}>
         {state === "saving" && <Loader2 className="animate-spin" />} Join the waitlist
       </Button>
@@ -427,8 +390,16 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
 
   return (
     <>
-      <StepTitle title="Your details" sub="So we can send your confirmation and checklist." />
-       <form className="mx-auto max-w-lg space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot) submit(draft.slot); }}>
+      <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sage/60 p-4">
+        <div className="min-w-0">
+          <p className="font-medium text-deep-ink">{service.name}</p>
+          <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>
+        </div>
+        <button onClick={onPickAgain} className="text-sm font-medium text-ink underline underline-offset-4">Change</button>
+      </div>
+
+      <form className="max-w-md space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot) submit(draft.slot); }}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>
           <Input id="name" autoComplete="name" required value={draft.name} onChange={(e) => update({ name: e.target.value })} onBlur={saveLeadNow} className="h-12 bg-sheet" />

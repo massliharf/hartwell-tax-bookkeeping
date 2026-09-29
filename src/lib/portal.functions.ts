@@ -126,7 +126,7 @@ export const confirmAttendance = createServerFn({ method: "POST" })
 
 async function freeSlot(serviceId: string, start: string) {
   const { offerFreedSlot } = await import("./automations.server");
-  const { requestOrigin } = await import("./origin.server");
+  const { requestOrigin } = await import("./automations.functions");
   await offerFreedSlot(serviceId, start, await requestOrigin()).catch(console.error);
 }
 

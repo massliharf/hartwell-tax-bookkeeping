@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/settings")({ head: () => ({ meta: [{ title: "Settings — Patel Tax & Bookkeeping" }, { name: "description", content: "Practice hours, services, prices, and reminders." }, { property: "og:title", content: "Settings — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Practice hours, services, prices, and reminders." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: SettingsPage });
+export const Route = createFileRoute("/_authenticated/owner/settings")({ component: SettingsPage });
 
 const DAYS = [["mon", "Monday"], ["tue", "Tuesday"], ["wed", "Wednesday"], ["thu", "Thursday"], ["fri", "Friday"], ["sat", "Saturday"], ["sun", "Sunday"]] as const;
 type Hours = Record<string, [string, string] | null>;
@@ -55,9 +55,9 @@ function SettingsPage() {
 
   return (
     <>
-       <PageHead title="How your practice runs" />
-       <div className="grid gap-6 lg:grid-cols-[160px_minmax(0,1fr)]"><nav className="flex gap-1 overflow-x-auto pb-2 lg:flex-col" aria-label="Settings sections"><a href="#hours" className="rounded-[8px] px-3 py-2 text-sm hover:bg-control">Hours</a><a href="#services" className="rounded-[8px] px-3 py-2 text-sm hover:bg-control">Services</a><a href="#reminders" className="rounded-[8px] px-3 py-2 text-sm hover:bg-control">Reminders</a></nav><div className="space-y-8">
-         <Card id="hours" title="Office hours" note="Bookings only offer times inside these hours.">
+      <PageHead eyebrow="Settings" title="How your practice runs" />
+      <div className="space-y-8">
+        <Card title="Office hours" note="Bookings only offer times inside these hours.">
           <ul className="divide-y divide-border">
             {DAYS.map(([k, label]) => {
               const h = hours[k];
@@ -83,7 +83,7 @@ function SettingsPage() {
           <Button className="mt-5" disabled={saving === "hours"} onClick={() => save("hours", async () => [await supabase.from("settings").update({ hours, buffer_min: buffer }).eq("id", 1)])}>Save hours</Button>
         </Card>
 
-         <Card id="services" title="Services and prices" note="What clients can book, how long it takes, and the starting fee.">
+        <Card title="Services and prices" note="What clients can book, how long it takes, and the starting fee.">
           <div className="space-y-3">
             {svcs.map((s, i) => {
               const set = (p: Partial<Svc>) => setSvcs(svcs.map((x, j) => (j === i ? { ...x, ...p } : x)));
@@ -100,24 +100,24 @@ function SettingsPage() {
           <Button className="mt-5" disabled={saving === "svc"} onClick={() => save("svc", () => Promise.all(svcs.map((s) => supabase.from("services").update({ name: s.name, duration_min: s.duration_min, price_from: s.price_from, active: s.active }).eq("id", s.id))))}>Save services</Button>
         </Card>
 
-         <Card id="reminders" title="Reminder timings" note="When the automatic messages go out.">
+        <Card title="Reminder timings" note="When the automatic messages go out.">
           <div className="grid gap-4 sm:grid-cols-2">
             <Num label="Document reminder" unit="days before" v={tm.docs_reminder_days} on={(n) => setTm({ ...tm, docs_reminder_days: n })} />
             <Num label="Readiness check" unit="hours before" v={tm.readiness_check_hours} on={(n) => setTm({ ...tm, readiness_check_hours: n })} />
             <Num label="Final reminder" unit="hours before" v={tm.final_reminder_hours} on={(n) => setTm({ ...tm, final_reminder_hours: n })} />
             <Num label="Unfinished booking nudge" unit="hours after" v={tm.abandoned_nudge_hours} on={(n) => setTm({ ...tm, abandoned_nudge_hours: n })} />
-           </div>
+          </div>
           <Button className="mt-5" disabled={saving === "tm"} onClick={() => save("tm", async () => [await supabase.from("settings").update({ reminder_timings: tm }).eq("id", 1)])}>Save timings</Button>
         </Card>
-       </div></div>
+      </div>
     </>
   );
 }
 
-function Card({ id, title, note, children }: { id: string; title: string; note: string; children: React.ReactNode }) {
+function Card({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-24 rounded-[14px] border border-line p-6">
-      <h2 className="font-sans text-2xl text-deep-ink">{title}</h2>
+    <section className="sheet-stack p-6">
+      <h2 className="font-serif text-2xl text-deep-ink">{title}</h2>
       <p className="mb-5 text-sm text-muted-foreground">{note}</p>
       {children}
     </section>

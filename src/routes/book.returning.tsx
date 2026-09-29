@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,6 @@ export const Route = createFileRoute("/book/returning")({
       { name: "description", content: "Booked with Priya before? Enter your email and book again in about 30 seconds." },
       { property: "og:title", content: "Returning clients — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Book again in about 30 seconds." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ReturningPage,
@@ -45,18 +43,18 @@ function ReturningPage() {
   return (
     <BookingShell>
       <div className="mx-auto max-w-md">
-        <StepTitle title="Book again in 30 seconds" sub="Enter the email you used last time. We'll fill in your details and last year's answers." />
-        <form onSubmit={submit} className="workbench-panel space-y-4 p-6">
+        <StepTitle eyebrow="Welcome back" title="Book again in 30 seconds" sub="Enter the email you used last time. We'll fill in your details and last year's answers." />
+        <form onSubmit={submit} className="sheet-stack space-y-4 p-6">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-12 bg-paper" />
           </div>
           {state === "notfound" && (
-            <p className="text-sm text-deep-ink/80" role="status">We couldn't find that email. Try another, or <Link to="/book" className="font-medium text-ink underline">book as a new client</Link> — it only takes two minutes.</p>
+            <p className="text-sm text-deep-ink/80">We couldn't find that email. Try another, or <Link to="/book" className="font-medium text-ink underline">book as a new client</Link> — it only takes two minutes.</p>
           )}
-          {state === "error" && <p className="text-sm text-destructive" role="alert">Something went wrong. Please try again.</p>}
+          {state === "error" && <p className="text-sm text-destructive">Something went wrong. Please try again.</p>}
           <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
-            {state === "busy" ? <Loader2 className="animate-spin" /> : null} Continue
+            {state === "busy" ? <Loader2 className="animate-spin" /> : null} Continue <ArrowRight />
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">New here? <Link to="/book" className="font-medium text-ink underline underline-offset-4">Start a new booking</Link></p>

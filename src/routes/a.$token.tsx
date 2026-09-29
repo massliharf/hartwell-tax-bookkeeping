@@ -29,8 +29,6 @@ export const Route = createFileRoute("/a/$token")({
       { name: "description", content: "Manage your appointment and send your documents privately." },
       { property: "og:title", content: "Your appointment — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Your private appointment page." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -80,17 +78,19 @@ function PortalPage() {
 
   return (
     <BookingShell>
-      <div className="mx-auto max-w-3xl space-y-4">
+      <div className="mx-auto max-w-2xl space-y-10">
         <div>
-          <p className="text-sm text-graphite">Your private page</p>
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">Your private page</p>
           <h1 className="mt-2 text-4xl leading-tight text-deep-ink sm:text-5xl">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Priya has everything she needs."}
           </p>
         </div>
 
-        <div className="workbench-panel space-y-6 p-6"><AppointmentCard appt={a} cancelled={cancelled} />
-        {open && <Actions token={token} appt={a} onChange={refresh} />}</div>
+        {a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
+
+        <AppointmentCard appt={a} cancelled={cancelled} />
+        {open && <Actions token={token} appt={a} onChange={refresh} />}
         {cancelled && (
           <div className="rounded-2xl border border-border bg-sheet p-6">
             <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
@@ -99,19 +99,20 @@ function PortalPage() {
         )}
 
         {!cancelled && items.length > 0 && (
-          <section className="workbench-panel p-6">
+          <section>
             <div className="mb-4 flex items-end justify-between gap-4">
-              <h2 className="text-3xl font-semibold text-deep-ink">Your checklist</h2>
+              <h2 className="text-3xl text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
-            <ul className="space-y-3">
+            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
+              <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Priya can see your files. We never ask for your Social Security number.
+            </p>
+            <ul className="space-y-4">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
             </ul>
-            <p className="mt-4 flex items-start gap-2 text-sm text-graphite"><Lock className="mt-0.5 size-4 shrink-0 text-evergreen" /> Only Priya can open your files. We never ask for your Social Security number.</p>
-            <p className="mt-2 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
+            <p className="mt-4 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
           </section>
         )}
-        {a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
       </div>
     </BookingShell>
   );
@@ -121,18 +122,18 @@ function PortalPage() {
 function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }) {
   const video = appt.meeting_type === "video";
   return (
-    <div className={cancelled ? "opacity-70" : ""}>
+    <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-medium text-graphite">{appt.services?.name}</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{appt.services?.name}</p>
             {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
             {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
           </div>
-          <p className={`mt-1 font-sans text-3xl text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
+          <p className={`mt-1 font-serif text-3xl text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
-        {!cancelled && <ReadyRing value={appt.ready_score} size={72} />}
+        {!cancelled && <ReadyRing value={appt.ready_score} size={84} />}
       </div>
       {!cancelled && (
         <div className="mt-5 border-t border-border pt-4 text-sm">
@@ -143,7 +144,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-evergreen" /> In person, {ADDRESS}</span>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-ink" /> In person · {ADDRESS}</span>
               <Button size="sm" variant="outline" asChild><a href={MAP_URL} target="_blank" rel="noreferrer"><MapPin /> Open map</a></Button>
             </div>
           )}
@@ -159,11 +160,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
   const cancel = useServerFn(cancelAppointment);
   const [busy, setBusy] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
-  const [error, setError] = useState(false);
-  const run = async (k: string, fn: () => Promise<unknown>) => {
-    setBusy(k); setError(false);
-    try { await fn(); await onChange(); } catch { setError(true); } finally { setBusy(null); }
-  };
+  const run = async (k: string, fn: () => Promise<unknown>) => { setBusy(k); try { await fn(); await onChange(); } finally { setBusy(null); } };
 
   return (
     <div className="space-y-4">
@@ -175,12 +172,12 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
             {busy === "confirm" ? <Loader2 className="animate-spin" /> : <Check />} I'll be there
           </Button>
         )}
-        <Button variant="neutral" onClick={() => setPicking((p) => !p)}><CalendarClock /> Move appointment</Button>
+        <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="ghost" className="text-destructive">Cancel</Button></AlertDialogTrigger>
+          <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl bg-sheet">
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-sans text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
+              <AlertDialogTitle className="font-serif text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
               <AlertDialogDescription>That's completely fine. Your slot will be offered to someone on the waitlist. If another time would work better, you can reschedule instead.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -190,7 +187,6 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      {error && <p className="text-sm text-destructive" role="alert">We couldn't save that change. Please try again.</p>}
       <AnimatePresence>
         {picking && <ReschedulePicker token={token} serviceId={appt.service_id} onDone={async () => { setPicking(false); await onChange(); }} onClose={() => setPicking(false)} />}
       </AnimatePresence>
@@ -220,14 +216,13 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
 
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-      <div className="rounded-[14px] bg-canvas p-5">
+      <div className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet">
         <div className="mb-4 flex items-center justify-between">
-          <p className="font-sans text-2xl text-deep-ink">Pick a new time</p>
+          <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
         </div>
         {q.isLoading && <div className="h-32 animate-pulse rounded-xl bg-sage/50" />}
-        {(q.isError || q.data?.error) && <p className="text-sm text-deep-ink" role="alert">We couldn't load new times. <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button></p>}
-        {q.isSuccess && days.length === 0 && !q.data?.error && <p className="text-sm text-deep-ink/75">No open times in the next two weeks. Your current appointment is safe.</p>}
+        {q.data?.error && <p className="text-sm">{q.data.error}</p>}
         {days.length > 0 && (
           <>
             <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2">
@@ -239,13 +234,13 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
                     className={`flex w-[68px] shrink-0 flex-col items-center rounded-xl border px-2 py-2 ${active ? "border-ink bg-ink text-paper" : off ? "border-transparent text-muted-foreground/50" : "border-border bg-paper hover:border-ink"}`}>
                     <span className="text-[10px] uppercase tracking-wider opacity-70">{c.dow}</span>
-                    <span className="tabular font-sans text-xl leading-tight">{c.day}</span>
+                    <span className="tabular font-serif text-xl leading-tight">{c.day}</span>
                     <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
                   </button>
                 );
               })}
             </div>
-            {day && day.slots.length > 0 && (
+            {day && (
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <button key={s} disabled={!!busy} onClick={() => pick(s)}
@@ -255,7 +250,6 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 ))}
               </div>
             )}
-            {day && !day.slots.length && <p className="mt-4 text-sm text-deep-ink/75">This day is full. Try another day; your current time is still booked.</p>}
           </>
         )}
         {alts && (
@@ -336,14 +330,14 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               <p className="truncate font-medium text-deep-ink/70">{item.document_name}</p>
               <p className="truncate text-sm text-muted-foreground">Doesn't apply: {item.na_reason}</p>
             </div>
-            <button disabled={busy} onClick={async () => { setBusy(true); setErr(null); try { await undoNa({ data: { token, itemId: item.id } }); await onChange(); } catch { setErr("Couldn't undo that. Please try again."); } finally { setBusy(false); } }}
+            <button disabled={busy} onClick={async () => { setBusy(true); await undoNa({ data: { token, itemId: item.id } }); await onChange(); setBusy(false); }}
               className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Undo</button>
           </motion.div>
         ) : (
           <motion.div key="missing" {...flip}
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`rounded-[14px] border border-line bg-paper p-5 transition-colors ${drag ? "ring-2 ring-evergreen" : ""}`}>
+            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-marigold" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sage text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
@@ -374,8 +368,8 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
         )}
       </AnimatePresence>
       {err && <p className="mt-2 text-sm text-destructive" role="alert">{err}</p>}
-       <input ref={fileRef} type="file" className="hidden" aria-label={`Upload ${item.document_name}`} accept="application/pdf,image/jpeg,image/png" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
-       <input ref={camRef} type="file" className="hidden" aria-label={`Photograph ${item.document_name}`} accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+      <input ref={fileRef} type="file" className="sr-only" accept="application/pdf,image/jpeg,image/png" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+      <input ref={camRef} type="file" className="sr-only" accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
     </li>
   );
 }
@@ -390,8 +384,8 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
   const ok = name.trim().length >= 2 && agree;
 
   return (
-    <section className="workbench-panel p-6">
-      <p className="text-sm font-medium text-graphite">One last step</p>
+    <section className="sheet-stack ledger border-l-4 border-l-marigold p-6">
+      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-warning">One last step</p>
       <h2 className="mt-1 text-3xl text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Priya has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-paper/70 p-4 text-sm">
@@ -407,13 +401,13 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-paper font-sans text-2xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-paper font-serif text-2xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />
           I've reviewed my return with Priya and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
-         {err && <p className="text-sm text-destructive" role="alert">We couldn't save your signature. Please try again.</p>}
+        {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
         <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>
       </form>
     </section>

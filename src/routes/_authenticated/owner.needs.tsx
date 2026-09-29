@@ -9,7 +9,7 @@ import { fmtDay, fmtStamp, fmtTime, missingOf, needsYou, type NeedItem } from "@
 import { Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { dismissAttention, nudgeSignature } from "@/lib/owner.functions";
 
-export const Route = createFileRoute("/_authenticated/owner/needs")({ head: () => ({ meta: [{ title: "Needs you — Patel Tax & Bookkeeping" }, { name: "description", content: "Follow-ups that need Priya’s attention." }, { property: "og:title", content: "Needs you — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Follow-ups that need Priya’s attention." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Needs });
+export const Route = createFileRoute("/_authenticated/owner/needs")({ component: Needs });
 
 function Needs() {
   const now = useOwnerCtx().data!.now;
@@ -30,10 +30,12 @@ function Needs() {
 
   return (
     <>
-       <PageHead title="Needs you"><p>Everything else is handled automatically.</p></PageHead>
+      <PageHead eyebrow="The only list you need" title="Needs you">
+        <p>Everything else is handled automatically.</p>
+      </PageHead>
       {q.isLoading && <LoadingRows />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
-       {q.data && !q.data.length && <Empty title="Nothing needs you right now.">Reminders and reschedules are running on their own.</Empty>}
+      {q.data && !q.data.length && <Empty title="Nothing needs you right now.">Reminders, confirmations and the waitlist are running on their own. Enjoy the quiet.</Empty>}
       <ul className="space-y-4">
         {q.data?.map((it) => <Row key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}
       </ul>
@@ -43,7 +45,7 @@ function Needs() {
 
 function Row({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boolean }) {
   const shell = (icon: React.ReactNode, tone: string, title: React.ReactNode, body: React.ReactNode, action: string, secondary?: React.ReactNode) => (
-     <li className="flex flex-col gap-4 rounded-[14px] border border-line p-4 sm:flex-row sm:items-center">
+    <li className="sheet-stack flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
       <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${tone}`}>{icon}</span>
       <div className="min-w-0 flex-1">
         <p className="font-medium text-deep-ink">{title}</p>
@@ -56,14 +58,14 @@ function Row({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boole
     const a = it.appt;
     const miss = missingOf(a);
     return shell(<AlertTriangle className="h-5 w-5" />, "bg-warning/10 text-warning",
-       <>{a.clients?.name}, {a.ready_score}% ready</>,
+      <>{a.clients?.name} · {a.ready_score}% ready</>,
       <>{a.services?.name}, {fmtDay(a.start_at)} at {fmtTime(a.start_at)}. Missing {miss.map((m) => m.document_name).join(", ") || "nothing required"}. They were offered later times.</>,
       "Keep as is",
       a.clients && <Button size="sm" variant="outline" asChild><Link to="/owner/clients/$id" params={{ id: a.clients.id }}>Contact</Link></Button>);
   }
   if (it.kind === "signature") {
     const a = it.appt;
-    return shell(<PenLine className="h-5 w-5" />, "bg-ink/15 text-warning",
+    return shell(<PenLine className="h-5 w-5" />, "bg-marigold/15 text-warning",
       <>{a.clients?.name} hasn't signed Form 8879</>,
       <>Appointment was {fmtDay(a.start_at)}. Automatic reminders already went out.</>, "Send another reminder");
   }

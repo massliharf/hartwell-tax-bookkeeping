@@ -13,7 +13,7 @@ import { ErrorNote, MeetingTag, PageHead, StatusPill, useApptActions } from "@/c
 import { ownerMoveAppointment } from "@/lib/owner.functions";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Patel Tax & Bookkeeping" }, { name: "description", content: "Appointments and availability on the practice calendar." }, { property: "og:title", content: "Calendar — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Appointments and availability on the practice calendar." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: CalendarPage });
+export const Route = createFileRoute("/_authenticated/owner/calendar")({ component: CalendarPage });
 
 const START = 9 * 60, END = 18 * 60, PX = 1.1; // px per minute
 const mondayOf = (ymd: string) => {
@@ -57,7 +57,7 @@ function CalendarPage() {
 
   return (
     <>
-      <PageHead title={`Week of ${ymdLabel(week)}`}>
+      <PageHead eyebrow="Calendar" title={`Week of ${ymdLabel(week)}`}>
         <div className="flex flex-wrap items-center gap-3">
           <Button size="icon" variant="outline" aria-label="Previous week" onClick={() => setWeek(addDays(week, -7))}><ChevronLeft /></Button>
           <Button size="sm" variant="ghost" onClick={() => setWeek(mondayOf(today))}>This week</Button>
@@ -66,11 +66,10 @@ function CalendarPage() {
         </div>
       </PageHead>
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
-      {q.isLoading && <div className="space-y-3" aria-label="Loading calendar"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /></div>}
       <p className="mb-3 hidden text-xs text-muted-foreground md:block">Drag an appointment to move it. The client is emailed automatically.</p>
 
       {/* Desktop week grid */}
-      <div className={cn("hidden overflow-hidden rounded-[14px] border border-line md:block", (q.isLoading || q.isError) && "md:hidden")}>
+      <div className="sheet-stack hidden overflow-hidden md:block">
         <div className="grid grid-cols-[52px_repeat(6,1fr)] border-b border-border bg-sheet">
           <div />
           {days.map((d) => (
@@ -85,7 +84,7 @@ function CalendarPage() {
           </div>
           {days.map((d) => (
             <div key={d} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(e, d)}
-              className={cn("relative border-l border-border transition-colors", drag && "bg-sage/30", d === today && "bg-ink/5")}
+              className={cn("relative border-l border-border ledger transition-colors", drag && "bg-sage/30", d === today && "bg-marigold/5")}
               style={{ backgroundSize: `100% ${60 * PX}px` }}>
               {byDay(d).map((a) => {
                 const { minutes } = et(a.start_at);
@@ -96,7 +95,7 @@ function CalendarPage() {
                     className={cn("absolute inset-x-1 overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-sheet transition-transform hover:-translate-y-px",
                       readinessStyle[readiness(a.ready_score)], a.status === "completed" && "opacity-60", drag === a.id && "opacity-40")}
                     style={{ top: (minutes - START) * PX, height: Math.max(22, h * PX - 2) }}>
-                    <span className="tabular block font-medium">{fmtTime(a.start_at)}, {a.ready_score}%</span>
+                    <span className="tabular block font-medium">{fmtTime(a.start_at)} · {a.ready_score}%</span>
                     <span className="block truncate text-deep-ink">{a.clients?.name}</span>
                   </button>
                 );
@@ -107,7 +106,7 @@ function CalendarPage() {
       </div>
 
       {/* Mobile: day by day */}
-      <div className={cn("space-y-6 md:hidden", (q.isLoading || q.isError) && "hidden")}>
+      <div className="space-y-6 md:hidden">
         {days.map((d) => (
           <section key={d}>
             <h2 className={cn("mb-2 text-sm font-medium text-muted-foreground", d === today && "text-ink")}>{ymdLabel(d)}</h2>
@@ -115,15 +114,15 @@ function CalendarPage() {
               <ul className="space-y-2">
                 {byDay(d).map((a) => (
                   <li key={a.id}>
-                    <Button variant="ghost" onClick={() => setOpenId(a.id)} className={cn("flex h-14 w-full items-center gap-3 rounded-[14px] border px-3 text-left", readinessStyle[readiness(a.ready_score)])}>
+                    <button onClick={() => setOpenId(a.id)} className={cn("flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left", readinessStyle[readiness(a.ready_score)])}>
                       <span className="tabular w-16 text-xs font-medium">{fmtTime(a.start_at)}</span>
                       <span className="flex-1 truncate text-sm text-deep-ink">{a.clients?.name}</span>
                       <span className="tabular text-xs">{a.ready_score}%</span>
-                    </Button>
+                    </button>
                   </li>
                 ))}
               </ul>
-            ) : <p className="text-sm text-muted-foreground/70">Nothing booked</p>}
+            ) : <p className="text-sm text-muted-foreground/70">{q.isLoading ? "…" : "Nothing booked"}</p>}
           </section>
         ))}
       </div>
@@ -155,8 +154,8 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
         {a && (
           <>
             <DialogHeader>
-              <DialogTitle className="font-sans text-3xl font-normal">{a.clients?.name}</DialogTitle>
-              <DialogDescription>{a.services?.name}, {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
+              <DialogTitle className="font-serif text-3xl font-normal">{a.clients?.name}</DialogTitle>
+              <DialogDescription>{a.services?.name} · {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4">
               <ReadyRing value={a.ready_score} size={72} stroke={6} />

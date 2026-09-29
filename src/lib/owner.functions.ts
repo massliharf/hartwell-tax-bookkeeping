@@ -88,7 +88,7 @@ export const ownerMoveAppointment = createServerFn({ method: "POST" })
     if (!r.ok) return { ok: false as const, error: "That time isn't free." };
     await db.from("appointments").update({ needs_attention: false, attention_reason: null }).eq("id", a.id);
     const { sendBookingConfirmation, offerFreedSlot } = await import("./automations.server");
-    const { requestOrigin } = await import("./origin.server");
+    const { requestOrigin } = await import("./automations.functions");
     const origin = await requestOrigin();
     await sendBookingConfirmation(a.id, origin).catch(console.error);
     await offerFreedSlot(a.service_id, a.start_at, origin).catch(console.error);
@@ -116,7 +116,7 @@ export const nudgeSignature = createServerFn({ method: "POST" })
     const c = a?.clients as { id: string; name: string; email: string } | null;
     if (!a || !c || a.signature_status !== "pending") return { ok: false };
     const { sendMessage } = await import("./email.server");
-    const { requestOrigin } = await import("./origin.server");
+    const { requestOrigin } = await import("./automations.functions");
     const portal = `${await requestOrigin()}/a/${a.manage_token}`;
     const sent = await sendMessage({
       dedupeKey: `sign-manual:${a.id}:${Date.now()}`, type: "signature_reminder", minutesSaved: 6, clientId: c.id, appointmentId: a.id, to: c.email,

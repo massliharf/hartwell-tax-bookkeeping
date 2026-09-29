@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/clients/")({ head: () => ({ meta: [{ title: "Clients — Patel Tax & Bookkeeping" }, { name: "description", content: "Search and review practice clients." }, { property: "og:title", content: "Clients — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Search and review practice clients." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Clients });
+export const Route = createFileRoute("/_authenticated/owner/clients/")({ component: Clients });
 
 function Clients() {
   const [term, setTerm] = useState("");
@@ -33,19 +33,19 @@ function Clients() {
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
       {q.data && !list.length && <p className="py-10 text-center text-sm text-muted-foreground">No one matches "{term}".</p>}
-       <ul className="divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-paper">
+      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-sheet shadow-sheet">
         {list.map((c) => {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (
             <li key={c.id}>
-               <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex min-h-14 items-center gap-4 px-5 py-2 transition-colors hover:bg-control">
-                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-evergreen-tint text-sm font-semibold text-evergreen">{c.name.charAt(0)}</span>
+              <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-paper">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sage font-serif text-lg text-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-deep-ink">{c.name}</span>
                   <span className="block truncate text-sm text-muted-foreground">{c.email}</span>
                 </span>
                 <span className="tabular hidden text-right text-xs text-muted-foreground sm:block">
-                   {appts.length} appointment{appts.length === 1 ? "" : "s"}{c.is_returning ? ", Returning" : ""}
+                  {appts.length} appointment{appts.length === 1 ? "" : "s"}{c.is_returning ? " · Returning" : ""}
                 </span>
               </Link>
             </li>

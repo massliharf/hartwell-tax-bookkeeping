@@ -11,11 +11,11 @@ const ALL: StackDoc[] = [
 
 export function HeroVisual() {
   const reduce = useReducedMotion();
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(reduce ? 3 : 0);
 
   useEffect(() => {
     if (reduce) return;
-    const t = setTimeout(() => setStep((s) => (s >= 5 ? 1 : s + 1)), step >= 3 ? 2200 : 1300);
+    const t = setTimeout(() => setStep((s) => (s >= 5 ? 0 : s + 1)), step === 0 ? 700 : step >= 3 ? 2200 : 1300);
     return () => clearTimeout(t);
   }, [step, reduce]);
 
@@ -23,11 +23,11 @@ export function HeroVisual() {
   const docs = ALL.slice(0, shown).reverse();
 
   return (
-    <div className="sheet-stack relative mx-auto w-full max-w-sm p-5 sm:p-6">
+    <div className="sheet-stack ledger relative mx-auto w-full max-w-sm p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Your checklist</p>
-          <p className="mt-1 font-sans text-2xl leading-tight text-deep-ink">Thursday, 10:30 am</p>
+          <p className="mt-1 font-serif text-2xl leading-tight text-deep-ink">Thursday, 10:30 am</p>
           <p className="text-xs text-muted-foreground">Individual return · 45 min</p>
         </div>
         <ReadyRing value={(shown / 3) * 100} size={84} stroke={6} />

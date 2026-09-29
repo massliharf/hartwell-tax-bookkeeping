@@ -66,13 +66,40 @@ time for demos.
 
 ## 8. Brand & design
 
-Follow `DESIGN_SYSTEM.md` (Workbench) for every visual and UX decision. The
-Workbench design replaces the previous serif, beige, textured-paper visual
-direction; all service, privacy, booking, and clock rules above remain in force.
+This must **NOT** look like a default template.
 
-Use a grey canvas (`#F3F3F1`) with white panels, Geist typography, evergreen
-actions (`#1E5B47`), and marigold (`#F0A534`) only for the Ready ring and
-progress. No serif fonts, beige, textures, gradients, all-caps eyebrows,
-decorative dot chains, arrows in button text, or scroll-triggered fade-ins.
-Keep the Ready ring as the signature element and documents central to the UI.
-No payment is collected in this transformation: fees remain due at filing.
+**Feeling:** calm, trustworthy, warm, quietly premium. A well-run boutique
+practice, not a SaaS dashboard and not a dusty accountant.
+
+**Colors**
+
+| Token | Hex | Use |
+| --- | --- | --- |
+| Paper | `#F5F1E8` | background |
+| Ink green | `#123B2F` | primary |
+| Deep ink | `#16201B` | text |
+| Warm marigold | `#E0A43A` | accent — highlights and progress, used sparingly |
+| Soft sage | `#DCE5DC` | surfaces |
+| Success green | `#2F7D5B` | success |
+| Warning amber | `#C97B22` | warning |
+
+**Type:** headings in "Instrument Serif" (large, elegant), body and UI in "Inter",
+numbers tabular.
+
+**Visual language:** paper and documents. Cards that feel like neat stacked sheets,
+thin ledger lines, subtle paper grain texture, checkmark motifs, generous
+whitespace, 16px radius, soft layered shadows.
+
+**Signature elements to reuse everywhere:**
+
+- the **"Ready ring"** — circular progress showing how ready an appointment is
+- the **"document stack"** — documents stacking up with a check as they arrive
+
+**Motion:** purposeful and smooth (framer-motion) — page transitions, a satisfying
+moment when booked, checkmarks landing as documents are received. Respect
+`prefers-reduced-motion`.
+
+**Copy:** plain, warm, reassuring, confident. No jargon, no emoji.
+
+**Mobile first.** Every screen must work beautifully at 390px. Always design
+empty, loading and error states.

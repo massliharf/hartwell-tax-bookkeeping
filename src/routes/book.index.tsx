@@ -171,24 +171,26 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
         {services.data?.map((s) => {
           const active = s.slug === selected;
           return (
-            <button
+             <Button
               key={s.id}
+               variant="secondary"
               onClick={() => onPick(s.slug)}
-               className={`group rounded-2xl p-4 text-left transition-colors duration-150 ${active ? "bg-fill-selected" : "bg-fill-neutral hover:bg-[#E3E3E3]"}`}
+               aria-pressed={active}
+                className={`group h-auto min-h-36 w-full flex-col items-stretch whitespace-normal rounded-2xl p-4 text-left transition-colors duration-150 ${active ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary hover:bg-fill-indicator"}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <h2 className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h2>
-                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-[#1E5B47]" : "border-[rgba(16,16,16,0.2)] bg-sheet"}`} />
+                <h2 className={`font-serif text-xl leading-[30px] tracking-[-0.2px] ${active ? "text-primary-foreground" : "text-deep-ink"}`}>{s.name}</h2>
+                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-primary-foreground" : "border-border bg-sheet"}`} />
               </div>
-              <p className="mt-1 text-sm text-deep-ink/70">{s.description}</p>
+              <p className={`mt-1 text-sm ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{s.description}</p>
               <div className="mt-4 flex items-center justify-between text-sm">
-                <span className="tabular text-muted-foreground">{s.duration_min} min</span>
-                <span className="text-deep-ink">
-                  {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                <span className={`tabular ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{s.duration_min} min</span>
+                <span className={active ? "text-primary-foreground" : "text-deep-ink"}>
+                  {s.is_from_price && <span className={`mr-1 text-xs ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>from</span>}
                   <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
                 </span>
               </div>
-            </button>
+             </Button>
           );
         })}
       </div>
@@ -198,22 +200,15 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
 }
 
 /* ---------- Step 2: questions ---------- */
-function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void; onDone: () => void; count: number }) {
+function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void }) {
   const qs = questionsFor(slug);
-  const pages = Math.ceil(qs.length / 4);
-  const [page, setPage] = useState(0);
-  const visible = qs.slice(page * 4, page * 4 + 4);
-  const answered = visible.every((q) => q.type === "count" || typeof answers[q.key] === "boolean");
   const set = (k: keyof Answers, v: boolean | number) => onChange({ ...answers, [k]: v });
 
   return (
     <>
       <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
-      <div className="mb-6 inline-flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink lg:hidden">
-        Your checklist so far: <span className="tabular font-medium">{count} {count === 1 ? "document" : "documents"}</span>
-      </div>
       <div className="space-y-3">
-        {visible.map((q) => (
+         {qs.map((q) => (
           <div key={q.key} className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-sm font-medium text-deep-ink">{q.label}</p>
@@ -246,13 +241,6 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
             )}
           </div>
         ))}
-      </div>
-      <div className="mt-8 flex items-center gap-3">
-        {page > 0 && <Button variant="outline" size="lg" onClick={() => setPage(page - 1)}>Previous</Button>}
-        <Button size="lg" disabled={!answered} onClick={() => (page < pages - 1 ? setPage(page + 1) : onDone())}>
-          Continue
-        </Button>
-        {pages > 1 && <span className="tabular text-xs text-muted-foreground">{page + 1} / {pages}</span>}
       </div>
     </>
   );

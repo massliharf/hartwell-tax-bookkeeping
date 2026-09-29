@@ -9,7 +9,7 @@ import { fmtDay, fmtStamp, fmtTime, missingOf, needsYou, type NeedItem } from "@
 import { Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { dismissAttention, nudgeSignature } from "@/lib/owner.functions";
 
-export const Route = createFileRoute("/_authenticated/owner/needs")({ component: Needs });
+export const Route = createFileRoute("/_authenticated/owner/needs")({ head: () => ({ meta: [{ title: "Needs you — Patel Tax & Bookkeeping" }] }), component: Needs });
 
 function Needs() {
   const now = useOwnerCtx().data!.now;

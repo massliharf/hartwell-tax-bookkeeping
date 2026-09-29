@@ -124,12 +124,19 @@ export const confirmAttendance = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+async function freeSlot(serviceId: string, start: string) {
+  const { offerFreedSlot } = await import("./automations.server");
+  const { requestOrigin } = await import("./automations.functions");
+  await offerFreedSlot(serviceId, start, await requestOrigin()).catch(console.error);
+}
+
 export const cancelAppointment = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ token: tokenSchema }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin, appt, open } = await upcoming(data.token);
     if (!open) return { ok: false };
     await supabaseAdmin.from("appointments").update({ status: "cancelled" }).eq("id", appt.id);
+    await freeSlot(appt.service_id, appt.start_at);
     return { ok: true };
   });
 
@@ -146,7 +153,10 @@ export const rescheduleAppointment = createServerFn({ method: "POST" })
       return { ok: false as const, alternatives: [] as string[] };
     }
     const r = res as { ok: boolean; alternatives?: string[] };
-    return r.ok ? { ok: true as const, alternatives: [] as string[] } : { ok: false as const, alternatives: r.alternatives ?? [] };
+    if (!r.ok) return { ok: false as const, alternatives: r.alternatives ?? [] };
+    await supabaseAdmin.from("appointments").update({ needs_attention: false, attention_reason: null }).eq("id", appt.id);
+    await freeSlot(appt.service_id, appt.start_at);
+    return { ok: true as const, alternatives: [] as string[] };
   });
 
 /** Simple e-sign for Form 8879: typed full name + consent. */

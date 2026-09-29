@@ -76,6 +76,9 @@ export const bookAppointment = createServerFn({ method: "POST" })
     const r = res as { ok: boolean; appointment_id?: string; manage_token?: string; alternatives?: string[] };
     if (r.ok) {
       await supabaseAdmin.from("leads").update({ converted: true }).eq("email", data.email.toLowerCase()).eq("converted", false);
+      const { sendBookingConfirmation } = await import("./automations.server");
+      const { requestOrigin } = await import("./automations.functions");
+      await sendBookingConfirmation(r.appointment_id!, await requestOrigin()).catch(console.error);
     }
     if (!r.ok) return { ok: false as const, alternatives: r.alternatives ?? [], error: "That time was just taken." };
     return { ok: true as const, appointmentId: r.appointment_id!, manageToken: r.manage_token! };

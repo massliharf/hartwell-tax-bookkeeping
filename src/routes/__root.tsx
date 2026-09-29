@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -24,12 +25,12 @@ function NotFoundComponent() {
           The link may be old or mistyped. You can head back home, or book an appointment in about two minutes.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <Link to="/" className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors duration-150 hover:bg-primary/90">
+          <Button asChild><Link to="/">
             Back to home
-          </Link>
-          <Link to="/book" className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors duration-150 hover:bg-fill-subtle">
+          </Link></Button>
+          <Button asChild variant="secondary"><Link to="/book">
             Book an appointment
-          </Link>
+          </Link></Button>
         </div>
       </div>
     </main>
@@ -52,21 +53,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           It's on our side, not yours. Try again, or call the office at (973) 555-0142.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors duration-150 hover:bg-primary/90"
-          >
+          <Button onClick={() => { router.invalidate(); reset(); }}>
             Try again
-          </button>
-          <a
-            href="/"
-            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors duration-150 hover:bg-fill-subtle"
-          >
+          </Button>
+          <Button asChild variant="secondary"><a href="/">
             Back to home
-          </a>
+          </a></Button>
         </div>
       </div>
     </main>

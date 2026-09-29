@@ -16,7 +16,7 @@ export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title
   return (
     <header className="mb-8">
       {eyebrow && <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>}
-      <h1 className="mt-1 font-serif text-4xl leading-tight text-deep-ink md:text-5xl">{title}</h1>
+      <h1 className="mt-1 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">{title}</h1>
       {children && <div className="mt-2 text-muted-foreground">{children}</div>}
     </header>
   );
@@ -26,7 +26,7 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   return (
     <div className="sheet-stack ledger mx-auto max-w-md px-8 py-12 text-center">
       <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-success/10 text-success"><Check className="h-6 w-6" /></span>
-      <h2 className="mt-4 font-serif text-3xl text-deep-ink">{title}</h2>
+      <h2 className="mt-4 font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{title}</h2>
       {children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}
     </div>
   );

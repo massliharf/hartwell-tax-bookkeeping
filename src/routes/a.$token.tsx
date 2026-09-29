@@ -56,7 +56,7 @@ function PortalPage() {
     return (
       <BookingShell>
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-4xl text-deep-ink">This link isn't working</h1>
+          <h1 className="text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">This link isn't working</h1>
           <p className="mt-3 text-deep-ink/70">Use the link in your confirmation email, or call the office at (973) 555-0142.</p>
           <Button asChild size="lg" className="mt-6"><Link to="/">Back to home</Link></Button>
         </div>
@@ -81,7 +81,7 @@ function PortalPage() {
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
           <p className="text-xs font-medium uppercase text-ink/70">Your private page</p>
-          <h1 className="mt-2 text-4xl leading-tight text-deep-ink sm:text-5xl">Hello, {first}.</h1>
+          <h1 className="mt-2 text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
           </p>
@@ -101,7 +101,7 @@ function PortalPage() {
         {!cancelled && items.length > 0 && (
           <section>
             <div className="mb-4 flex items-end justify-between gap-4">
-              <h2 className="text-3xl text-deep-ink">Your checklist</h2>
+              <h2 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
             <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
@@ -130,7 +130,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
             {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
             {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
           </div>
-          <p className={`mt-1 font-serif text-3xl text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
+          <p className={`mt-1 font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
         {!cancelled && <ReadyRing value={appt.ready_score} size={84} />}
@@ -177,7 +177,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl bg-sheet">
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-serif text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
+              <AlertDialogTitle className="font-serif text-xl leading-[30px] tracking-[-0.2px]">Cancel this appointment?</AlertDialogTitle>
               <AlertDialogDescription>That's completely fine. Your slot will be offered to someone on the waitlist. If another time would work better, you can reschedule instead.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -386,7 +386,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
   return (
     <section className="sheet-stack ledger border-l-4 border-l-marigold p-6">
       <p className="text-[11px] font-medium uppercase text-warning">One last step</p>
-      <h2 className="mt-1 text-3xl text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
+      <h2 className="mt-1 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-paper/70 p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>

@@ -19,7 +19,7 @@ function NotFoundComponent() {
     <main className="grid min-h-screen place-items-center bg-paper px-5">
       <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Page not found</p>
-        <h1 className="mt-2 font-serif text-4xl leading-tight text-deep-ink">This page isn't here.</h1>
+        <h1 className="mt-2 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">This page isn't here.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           The link may be old or mistyped. You can head back home, or book an appointment in about two minutes.
         </p>
@@ -47,7 +47,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <main className="grid min-h-screen place-items-center bg-paper px-5">
       <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Something went wrong</p>
-        <h1 className="mt-2 font-serif text-4xl leading-tight text-deep-ink">This page didn't load.</h1>
+        <h1 className="mt-2 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">This page didn't load.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           It's on our side, not yours. Try again, or call the office at (973) 555-0142.
         </p>

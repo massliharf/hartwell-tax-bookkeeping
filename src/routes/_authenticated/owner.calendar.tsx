@@ -154,7 +154,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
         {a && (
           <>
             <DialogHeader>
-              <DialogTitle className="font-serif text-3xl font-normal">{a.clients?.name}</DialogTitle>
+              <DialogTitle className="font-serif text-xl leading-[30px] tracking-[-0.2px]">{a.clients?.name}</DialogTitle>
               <DialogDescription>{a.services?.name} · {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4">

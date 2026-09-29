@@ -144,7 +144,7 @@ function Services() {
             const style = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
             const Icon = style.icon;
             return (
-              <Reveal key={s.id} className="h-full">
+              <Reveal key={s.id} className={`h-full ${s.id === "bookkeeping" ? "lg:col-span-2" : ""}`}>
                 <article className="grid h-full min-h-28 grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border bg-sheet p-4 sm:gap-4 sm:p-5">
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
                     <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />

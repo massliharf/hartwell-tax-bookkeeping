@@ -154,7 +154,7 @@ const tip = (suffix = "") => (
 const axis = <XAxis dataKey="w" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} interval="preserveStartEnd" />;
 
 function AreaSpark({ data, baseline, max, suffix, tone = "ink" }: { data: Pt[]; baseline?: number; max: number; suffix?: string; tone?: "ink" | "marigold" }) {
-  const c = tone === "ink" ? "var(--ink-green)" : "var(--marigold)";
+  const c = tone === "ink" ? "var(--ink-green)" : "var(--success)";
   const id = `g-${tone}-${baseline ?? "x"}-${max}`;
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -179,7 +179,7 @@ function Bars({ data, tone = "ink" }: { data: Pt[]; tone?: "ink" | "marigold" })
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
         {axis}
-        <Bar dataKey="v" radius={[6, 6, 2, 2]} fill={tone === "ink" ? "var(--ink-green)" : "var(--marigold)"} fillOpacity={0.85} maxBarSize={28} />
+        <Bar dataKey="v" radius={[6, 6, 2, 2]} fill={tone === "ink" ? "var(--ink-green)" : "var(--success)"} fillOpacity={0.85} maxBarSize={28} />
         {tip()}
       </BarChart>
     </ResponsiveContainer>

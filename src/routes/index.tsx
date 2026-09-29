@@ -6,6 +6,7 @@ import { Reveal } from "@/components/brand/Reveal";
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
+import claire from "@/assets/claire-portrait.jpg";
 
 const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
 const DESC = "Book a tax appointment with Claire Hartwell, EA in Montclair, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
@@ -164,7 +165,7 @@ function About() {
           <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[1.5rem] border border-ink/20" />
           <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[1.5rem] border border-border bg-sheet shadow-lift">
             <div className="ledger absolute inset-0 opacity-60" />
-            <span className="relative font-serif text-8xl text-ink/25">PP</span>
+            <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
           <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Claire Hartwell, EA</figcaption>
         </figure>

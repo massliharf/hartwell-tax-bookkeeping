@@ -20,6 +20,8 @@ export const Route = createFileRoute("/book/confirmed")({
       { name: "description", content: "Your appointment is confirmed." },
       { property: "og:title", content: "You're booked — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Your appointment with Priya Patel, EA is confirmed." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -76,23 +78,23 @@ function ConfirmedPage() {
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
           <motion.div
-            initial={reduce ? false : { scale: 0, rotate: -40 }}
+            initial={reduce ? false : { scale: 0.9, rotate: -8 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 16, delay: 0.25 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-paper shadow-sheet"
           >
             <Check className="size-8" strokeWidth={2.5} />
           </motion.div>
-          <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+          <motion.h1 initial={reduce ? false : { opacity: 0.96, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}
             className="mt-6 text-5xl leading-tight text-deep-ink sm:text-6xl">
             You're booked{first && `, ${first}`}.
           </motion.h1>
-          <motion.p initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-3 text-deep-ink/70">
+          <motion.p initial={reduce ? false : { opacity: 0.96 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="mt-3 text-deep-ink/70">
             A confirmation is on its way to your inbox.
           </motion.p>
         </div>
 
-        <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, type: "spring", damping: 22 }}
+        <motion.div initial={reduce ? false : { opacity: 0.96, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
           className="sheet-stack mt-10 p-6">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{service}</p>
           <p className="mt-1 font-sans text-3xl text-deep-ink">{fmtDateLong(a.start_at)}</p>
@@ -109,7 +111,7 @@ function ConfirmedPage() {
           </div>
         </motion.div>
 
-        <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, type: "spring", damping: 22 }}
+        <motion.div initial={reduce ? false : { opacity: 0.96, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
           className="sheet-stack mt-8 p-6">
           <div className="flex items-center gap-5">
             <ReadyRing value={a.ready_score} size={84} />

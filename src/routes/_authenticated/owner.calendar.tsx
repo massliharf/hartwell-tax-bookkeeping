@@ -13,7 +13,7 @@ import { ErrorNote, MeetingTag, PageHead, StatusPill, useApptActions } from "@/c
 import { ownerMoveAppointment } from "@/lib/owner.functions";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Patel Tax & Bookkeeping" }] }), component: CalendarPage });
+export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Patel Tax & Bookkeeping" }, { name: "description", content: "Appointments and availability on the practice calendar." }, { property: "og:title", content: "Calendar — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Appointments and availability on the practice calendar." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: CalendarPage });
 
 const START = 9 * 60, END = 18 * 60, PX = 1.1; // px per minute
 const mondayOf = (ymd: string) => {

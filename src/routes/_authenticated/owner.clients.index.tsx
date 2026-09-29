@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/clients/")({ head: () => ({ meta: [{ title: "Clients — Patel Tax & Bookkeeping" }] }), component: Clients });
+export const Route = createFileRoute("/_authenticated/owner/clients/")({ head: () => ({ meta: [{ title: "Clients — Patel Tax & Bookkeeping" }, { name: "description", content: "Search and review practice clients." }, { property: "og:title", content: "Clients — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Search and review practice clients." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Clients });
 
 function Clients() {
   const [term, setTerm] = useState("");

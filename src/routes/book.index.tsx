@@ -24,6 +24,8 @@ export const Route = createFileRoute("/book/")({
       { name: "description", content: "Book with Priya Patel, EA in about two minutes. Confirmed instantly, with a personal document checklist." },
       { property: "og:title", content: "Book an appointment — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a service and a time. Confirmed instantly." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: BookPage,

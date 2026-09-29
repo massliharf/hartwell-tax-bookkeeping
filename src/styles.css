@@ -106,7 +106,7 @@
   --input: var(--border);
   --ring: var(--ink-green);
   --chart-1: var(--ink-green);
-  --chart-2: var(--marigold);
+  --chart-2: var(--ink-green);
   --chart-3: var(--success);
   --chart-4: var(--warning);
   --chart-5: var(--sage);
@@ -137,7 +137,7 @@
   }
   h1, h2, h3 { font-family: var(--font-sans); font-weight: 700; letter-spacing: 0; }
   * { font-variant-numeric: tabular-nums; }
-  ::selection { background: color-mix(in oklab, var(--marigold) 45%, transparent); }
+  ::selection { background: color-mix(in oklab, var(--ink-green) 20%, transparent); }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   :is(a, button, input, select, textarea, [role="radio"], [role="option"], [role="checkbox"]):focus-visible {
     outline: 2px solid var(--ring);

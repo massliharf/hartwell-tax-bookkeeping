@@ -76,6 +76,12 @@ function BookPage() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
   };
 
+  useEffect(() => {
+    if (!loaded) return;
+    const id = window.setTimeout(() => document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true }), reduce ? 0 : 380);
+    return () => window.clearTimeout(id);
+  }, [step, loaded, reduce]);
+
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
@@ -228,6 +234,14 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
+                    onKeyDown={(e) => {
+                      if (["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) {
+                        e.preventDefault();
+                        const next = !v;
+                        set(q.key, next);
+                        e.currentTarget.parentElement?.querySelector<HTMLElement>(`[aria-checked="${next}"]`)?.focus();
+                      }
+                    }}
                     className={`h-10 min-w-16 rounded-full border px-4 text-sm font-medium transition-colors ${answers[q.key] === v ? "border-ink bg-ink text-paper" : "border-border bg-transparent text-deep-ink hover:border-ink"}`}
                   >
                     {v ? "Yes" : "No"}
@@ -338,11 +352,11 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
     >
       <p className="font-serif text-2xl text-deep-ink">Full — join the waitlist</p>
       <p className="mt-1 text-sm text-deep-ink/70">{c.dow} {c.month} {c.day} is fully booked. We'll email you if a spot opens.</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Input required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 bg-paper" />
-        <Input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 bg-paper" />
+       <div className="mt-4 grid gap-3 sm:grid-cols-2">
+         <Input required aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 bg-paper" />
+         <Input required aria-label="Email" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 bg-paper" />
       </div>
-      {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
+       {state === "error" && <p className="mt-2 text-sm text-destructive" role="alert">Something went wrong. Please try again.</p>}
       <Button type="submit" variant="highlight" className="mt-4" disabled={state === "saving"}>
         {state === "saving" && <Loader2 className="animate-spin" />} Join the waitlist
       </Button>

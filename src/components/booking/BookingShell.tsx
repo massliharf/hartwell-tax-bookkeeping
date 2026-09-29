@@ -58,7 +58,7 @@ export function StepTitle({ eyebrow, title, sub }: { eyebrow: string; title: str
   return (
     <div className="mb-8">
       <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">{eyebrow}</p>
-      <h1 className="mt-2 text-4xl leading-tight text-deep-ink sm:text-5xl">{title}</h1>
+      <h1 tabIndex={-1} className="mt-2 text-4xl leading-tight text-deep-ink focus:outline-none sm:text-5xl">{title}</h1>
       {sub && <p className="mt-3 text-[15px] text-deep-ink/70">{sub}</p>}
     </div>
   );

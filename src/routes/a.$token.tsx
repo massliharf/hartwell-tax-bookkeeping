@@ -160,7 +160,11 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
   const cancel = useServerFn(cancelAppointment);
   const [busy, setBusy] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
-  const run = async (k: string, fn: () => Promise<unknown>) => { setBusy(k); try { await fn(); await onChange(); } finally { setBusy(null); } };
+  const [error, setError] = useState(false);
+  const run = async (k: string, fn: () => Promise<unknown>) => {
+    setBusy(k); setError(false);
+    try { await fn(); await onChange(); } catch { setError(true); } finally { setBusy(null); }
+  };
 
   return (
     <div className="space-y-4">
@@ -187,6 +191,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           </AlertDialogContent>
         </AlertDialog>
       </div>
+      {error && <p className="text-sm text-destructive" role="alert">We couldn't save that change. Please try again.</p>}
       <AnimatePresence>
         {picking && <ReschedulePicker token={token} serviceId={appt.service_id} onDone={async () => { setPicking(false); await onChange(); }} onClose={() => setPicking(false)} />}
       </AnimatePresence>
@@ -222,7 +227,8 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
         </div>
         {q.isLoading && <div className="h-32 animate-pulse rounded-xl bg-sage/50" />}
-        {q.data?.error && <p className="text-sm">{q.data.error}</p>}
+        {(q.isError || q.data?.error) && <p className="text-sm text-deep-ink" role="alert">We couldn't load new times. <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button></p>}
+        {q.isSuccess && days.length === 0 && !q.data?.error && <p className="text-sm text-deep-ink/75">No open times in the next two weeks. Your current appointment is safe.</p>}
         {days.length > 0 && (
           <>
             <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2">
@@ -240,7 +246,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 );
               })}
             </div>
-            {day && (
+            {day && day.slots.length > 0 && (
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <button key={s} disabled={!!busy} onClick={() => pick(s)}
@@ -250,6 +256,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 ))}
               </div>
             )}
+            {day && !day.slots.length && <p className="mt-4 text-sm text-deep-ink/75">This day is full. Try another day; your current time is still booked.</p>}
           </>
         )}
         {alts && (
@@ -330,7 +337,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               <p className="truncate font-medium text-deep-ink/70">{item.document_name}</p>
               <p className="truncate text-sm text-muted-foreground">Doesn't apply: {item.na_reason}</p>
             </div>
-            <button disabled={busy} onClick={async () => { setBusy(true); await undoNa({ data: { token, itemId: item.id } }); await onChange(); setBusy(false); }}
+            <button disabled={busy} onClick={async () => { setBusy(true); setErr(null); try { await undoNa({ data: { token, itemId: item.id } }); await onChange(); } catch { setErr("Couldn't undo that. Please try again."); } finally { setBusy(false); } }}
               className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Undo</button>
           </motion.div>
         ) : (
@@ -368,8 +375,8 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
         )}
       </AnimatePresence>
       {err && <p className="mt-2 text-sm text-destructive" role="alert">{err}</p>}
-      <input ref={fileRef} type="file" className="sr-only" accept="application/pdf,image/jpeg,image/png" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
-      <input ref={camRef} type="file" className="sr-only" accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+       <input ref={fileRef} type="file" className="hidden" aria-label={`Upload ${item.document_name}`} accept="application/pdf,image/jpeg,image/png" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+       <input ref={camRef} type="file" className="hidden" aria-label={`Photograph ${item.document_name}`} accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
     </li>
   );
 }
@@ -407,7 +414,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />
           I've reviewed my return with Priya and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
-        {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
+         {err && <p className="text-sm text-destructive" role="alert">We couldn't save your signature. Please try again.</p>}
         <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>
       </form>
     </section>

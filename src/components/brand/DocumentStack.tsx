@@ -3,7 +3,7 @@ import { Check, FileText } from "lucide-react";
 
 export type StackDoc = { id: string; title: string; note: string; received: boolean };
 
-/** Signature "document stack" — documents stacking up with a check as they arrive. */
+/** Document list with a visible received state. */
 export function DocumentStack({ docs }: { docs: StackDoc[] }) {
   const reduce = useReducedMotion();
   return (
@@ -17,9 +17,9 @@ export function DocumentStack({ docs }: { docs: StackDoc[] }) {
              animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
              transition={{ duration: 0.2 }}
-            className="flex items-center gap-3 rounded-xl border border-border bg-sheet px-3.5 py-3 shadow-sheet"
+             className="flex items-center gap-3 rounded-[14px] border border-line bg-paper px-3.5 py-3 shadow-[var(--shadow-1)]"
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sage text-ink">
+             <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-control text-evergreen">
               <FileText className="size-4" strokeWidth={1.75} />
             </span>
             <span className="min-w-0 flex-1">

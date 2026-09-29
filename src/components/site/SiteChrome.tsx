@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { HOURS } from "@/lib/services";
 
 export function AnnouncementBar() {
   return (
-    <div className="bg-ink text-paper">
+    <div className="bg-evergreen text-paper">
       <Link
         to="/book"
         search={{ service: "extension" }}
@@ -21,24 +21,18 @@ export function AnnouncementBar() {
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-paper/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
+    <header className="sticky top-0 z-40 mx-2 mt-2 rounded-[20px] bg-paper sm:mx-4">
+      <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between gap-4 px-5">
         <Link to="/" className="flex min-w-0 items-baseline gap-2">
-          <span className="font-sans text-2xl leading-none text-ink">Patel</span>
-          <span className="truncate text-[13px] text-muted-foreground">Tax & Bookkeeping</span>
+           <span className="font-sans text-xl font-semibold leading-none text-evergreen">Patel Tax</span>
         </Link>
-        <nav className="hidden items-center gap-7 text-sm text-deep-ink/80 md:flex">
-          <a href="#how" className="hover:text-ink">How it works</a>
+        <nav className="hidden items-center gap-7 text-sm text-graphite md:flex">
           <a href="#services" className="hover:text-ink">Services</a>
           <a href="#about" className="hover:text-ink">About</a>
-          <a href="#faq" className="hover:text-ink">FAQ</a>
+           <a href="#reviews" className="hover:text-ink">Reviews</a>
+           <Link to="/book/returning" className="hover:text-ink">Find my appointment</Link>
         </nav>
-        <Link
-          to="/book"
-          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-medium text-paper transition hover:-translate-y-0.5"
-        >
-          Book <ArrowRight className="size-4" />
-        </Link>
+        <Button asChild size="sm"><Link to="/book">Book</Link></Button>
       </div>
     </header>
   );
@@ -46,20 +40,20 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-     <footer className="bg-ink text-paper/85">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
+      <footer className="mx-2 mb-2 rounded-[20px] bg-evergreen text-paper/85 sm:mx-4">
+       <div className="mx-auto grid max-w-[1120px] gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
           <p className="font-sans text-4xl text-paper">Patel Tax & Bookkeeping</p>
-          <p className="mt-3 max-w-sm text-sm text-paper/65">Priya Patel, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Edison.</p>
+           <p className="mt-3 max-w-sm text-sm text-paper/75">Priya Patel, EA. Careful, calm tax work for families and small businesses in Edison.</p>
         </div>
         <div className="text-sm">
-          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-paper">Visit</p>
+           <p className="mb-3 text-sm font-semibold text-paper">Visit</p>
           <p>Oak Tree Road</p>
           <p>Edison, NJ 08820</p>
           <a href="tel:+17325550142" className="tabular mt-3 block hover:text-paper">(732) 555-0142</a>
         </div>
         <div className="text-sm">
-          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-paper">Hours</p>
+           <p className="mb-3 text-sm font-semibold text-paper">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4">
               <span>{h.days}</span>

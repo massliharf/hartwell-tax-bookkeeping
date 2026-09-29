@@ -2,3 +2,6 @@
 - [x] Convert services to equal two-column list rows; simplify About and lighten testimonials.
 - [x] Add a working mobile header menu and keep checklist date/time on one line.
 - [x] Verify mobile and desktop layouts and menu interaction.
+- [ ] Fix New York booking date state, matching selected slot and confirmation.
+- [ ] Unify four-step navigation, selection styles, questions, date strip, and checklist layout.
+- [ ] Verify booking at mobile/desktop and three appointments against saved records.

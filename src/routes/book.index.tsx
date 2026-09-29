@@ -57,7 +57,7 @@ function BookPage() {
     applied.current = true;
     if (search.resume) {
       fetchLead({ data: { id: search.resume } }).then((l) => {
-        if (!l) return navigate({ search: {} , replace: true });
+        if (!l) { navigate({ search: {}, replace: true }); return; }
         update({ email: l.email, name: l.name, meetingType: l.meetingType, answers: l.answers as Answers, ...(l.service ? { serviceSlug: l.service } : {}), slot: undefined, date: undefined });
         navigate({ search: { step: l.service ? 2 : 0 }, replace: true });
       }).catch(() => {});

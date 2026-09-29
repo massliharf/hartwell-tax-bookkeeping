@@ -10,20 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BookRouteImport } from './routes/book'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as ReturningRouteImport } from './routes/returning'
 import { Route as BookIndexRouteImport } from './routes/book.index'
 import { Route as BookConfirmedRouteImport } from './routes/book.confirmed'
+import { Route as BookReturningRouteImport } from './routes/book.returning'
+import { Route as ManageTokenRouteImport } from './routes/manage.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookRoute = BookRouteImport.update({
-  id: '/book',
-  path: '/book',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerRoute = OwnerRouteImport.update({
@@ -37,22 +33,33 @@ const ReturningRoute = ReturningRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookIndexRoute = BookIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => BookRoute,
+  id: '/book/',
+  path: '/book/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BookConfirmedRoute = BookConfirmedRouteImport.update({
-  id: '/confirmed',
-  path: '/confirmed',
-  getParentRoute: () => BookRoute,
+  id: '/book/confirmed',
+  path: '/book/confirmed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookReturningRoute = BookReturningRouteImport.update({
+  id: '/book/returning',
+  path: '/book/returning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageTokenRoute = ManageTokenRouteImport.update({
+  id: '/manage/$token',
+  path: '/manage/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/book': typeof BookRouteWithChildren
   '/owner': typeof OwnerRoute
   '/returning': typeof ReturningRoute
   '/book/confirmed': typeof BookConfirmedRoute
+  '/book/returning': typeof BookReturningRoute
+  '/manage/$token': typeof ManageTokenRoute
   '/book/': typeof BookIndexRoute
 }
 export interface FileRoutesByTo {
@@ -60,38 +67,58 @@ export interface FileRoutesByTo {
   '/owner': typeof OwnerRoute
   '/returning': typeof ReturningRoute
   '/book/confirmed': typeof BookConfirmedRoute
+  '/book/returning': typeof BookReturningRoute
+  '/manage/$token': typeof ManageTokenRoute
   '/book': typeof BookIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/book': typeof BookRouteWithChildren
   '/owner': typeof OwnerRoute
   '/returning': typeof ReturningRoute
   '/book/confirmed': typeof BookConfirmedRoute
+  '/book/returning': typeof BookReturningRoute
+  '/manage/$token': typeof ManageTokenRoute
   '/book/': typeof BookIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/book' | '/owner' | '/returning' | '/book/confirmed' | '/book/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/owner' | '/returning' | '/book/confirmed' | '/book'
-  id:
-    | '__root__'
     | '/'
-    | '/book'
     | '/owner'
     | '/returning'
     | '/book/confirmed'
+    | '/book/returning'
+    | '/manage/$token'
+    | '/book/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/owner'
+    | '/returning'
+    | '/book/confirmed'
+    | '/book/returning'
+    | '/manage/$token'
+    | '/book'
+  id:
+    | '__root__'
+    | '/'
+    | '/owner'
+    | '/returning'
+    | '/book/confirmed'
+    | '/book/returning'
+    | '/manage/$token'
     | '/book/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BookRoute: typeof BookRouteWithChildren
   OwnerRoute: typeof OwnerRoute
   ReturningRoute: typeof ReturningRoute
+  BookConfirmedRoute: typeof BookConfirmedRoute
+  BookReturningRoute: typeof BookReturningRoute
+  ManageTokenRoute: typeof ManageTokenRoute
+  BookIndexRoute: typeof BookIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -101,13 +128,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/book': {
-      id: '/book'
-      path: '/book'
-      fullPath: '/book'
-      preLoaderRoute: typeof BookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner': {
@@ -126,38 +146,43 @@ declare module '@tanstack/react-router' {
     }
     '/book/': {
       id: '/book/'
-      path: '/'
+      path: '/book'
       fullPath: '/book/'
       preLoaderRoute: typeof BookIndexRouteImport
-      parentRoute: typeof BookRoute
+      parentRoute: typeof rootRouteImport
     }
     '/book/confirmed': {
       id: '/book/confirmed'
-      path: '/confirmed'
+      path: '/book/confirmed'
       fullPath: '/book/confirmed'
       preLoaderRoute: typeof BookConfirmedRouteImport
-      parentRoute: typeof BookRoute
+      parentRoute: typeof rootRouteImport
+    }
+    '/book/returning': {
+      id: '/book/returning'
+      path: '/book/returning'
+      fullPath: '/book/returning'
+      preLoaderRoute: typeof BookReturningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage/$token': {
+      id: '/manage/$token'
+      path: '/manage/$token'
+      fullPath: '/manage/$token'
+      preLoaderRoute: typeof ManageTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface BookRouteChildren {
-  BookConfirmedRoute: typeof BookConfirmedRoute
-  BookIndexRoute: typeof BookIndexRoute
-}
-
-const BookRouteChildren: BookRouteChildren = {
-  BookConfirmedRoute: BookConfirmedRoute,
-  BookIndexRoute: BookIndexRoute,
-}
-
-const BookRouteWithChildren = BookRoute._addFileChildren(BookRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BookRoute: BookRouteWithChildren,
   OwnerRoute: OwnerRoute,
   ReturningRoute: ReturningRoute,
+  BookConfirmedRoute: BookConfirmedRoute,
+  BookReturningRoute: BookReturningRoute,
+  ManageTokenRoute: ManageTokenRoute,
+  BookIndexRoute: BookIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

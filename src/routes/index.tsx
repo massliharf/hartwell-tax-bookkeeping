@@ -1,257 +1,45 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarCheck, Check, FileUp, KeyRound, Lock, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowRight, LockKeyhole, Link2, ShieldCheck, FileCheck2, Star, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Reveal } from "@/components/brand/Reveal";
-import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { FindTime } from "@/components/site/FindTime";
+import { SituationChecklist } from "@/components/site/SituationChecklist";
 import { SERVICES } from "@/lib/services";
+import individual from "@/assets/service-individual.jpg";
+import freelance from "@/assets/service-self-employed.jpg";
+import rental from "@/assets/service-rental.jpg";
+import extension from "@/assets/service-extension.jpg";
+import bookkeeping from "@/assets/service-bookkeeping.jpg";
+import priya from "@/assets/priya-portrait.jpg";
 
+export const SERVICE_PHOTOS: Record<string, string> = { individual, "self-employed": freelance, rental, extension, bookkeeping };
 const TITLE = "Patel Tax & Bookkeeping — Taxes, without the chase";
-const DESC = "Book a tax appointment with Priya Patel, EA in Edison, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-       { property: "og:image", content: "/social-share.jpg" },
-       { name: "twitter:image", content: "/social-share.jpg" },
-    ],
-  }),
-  component: Home,
-});
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">{children}</p>;
-}
-
-function Home() {
-  return (
-    <div className="min-h-screen overflow-x-clip">
-      <AnnouncementBar />
-      <SiteHeader />
-      <main>
-        <Hero />
-        <TrustStrip />
-        <HowItWorks />
-        <Services />
-        <About />
-        <Testimonials />
-        <Privacy />
-        <Faq />
-      </main>
-      <SiteFooter />
-    </div>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 md:grid-cols-[1.15fr_1fr] md:pt-24">
-      <Reveal>
-        <Eyebrow>Priya Patel, EA · Edison, New Jersey</Eyebrow>
-        <h1 className="mt-5 text-[3.4rem] leading-[0.95] text-deep-ink sm:text-7xl lg:text-[5.75rem]">
-          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-marigold/40" /></em>
-        </h1>
-        <p className="mt-6 max-w-md text-lg leading-relaxed text-deep-ink/75">
-          Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
-        </p>
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg"><Link to="/book">Book an appointment <ArrowRight /></Link></Button>
-          <Button asChild size="lg" variant="outline"><Link to="/book/returning">I'm a returning client</Link></Button>
-        </div>
-        <p className="mt-5 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
-      </Reveal>
-      <Reveal delay={0.15}><HeroVisual /></Reveal>
-    </section>
-  );
-}
-
-function TrustStrip() {
-  const items = ["IRS Enrolled Agent", "12 years in Edison", "In person or video", "Your documents stay private"];
-  return (
-    <div className="border-y border-border bg-sheet/60">
-      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-5 py-4 text-sm text-deep-ink/80">
-        {items.map((t) => (
-          <li key={t} className="flex items-center gap-2"><Check className="size-3.5 text-success" strokeWidth={2.5} />{t}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
-  return (
-    <Reveal className="max-w-2xl">
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-3 text-4xl leading-tight text-deep-ink sm:text-5xl">{title}</h2>
-      {sub && <p className="mt-4 text-base leading-relaxed text-deep-ink/70">{sub}</p>}
-    </Reveal>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    { icon: CalendarCheck, title: "Book a time", text: "Pick a service and a slot that suits you. You're confirmed on the spot." },
-    { icon: FileUp, title: "Upload what's on your list", text: "You get a short checklist made for your return. Add documents whenever you have them." },
-    { icon: Check, title: "Arrive ready, file once", text: "Priya reviews everything beforehand, so your appointment is the only one you need." },
-  ];
-  return (
-    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
-      <SectionHead eyebrow="How it works" title="Three steps. One appointment." />
-      <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-6">
-        {steps.map((s, i) => (
-          <Reveal key={s.title} delay={i * 0.1}>
-            <li className="relative">
-              <div className="relative mb-6 h-28 w-40">
-                <div className="absolute left-6 top-3 h-24 w-28 rotate-6 rounded-xl border border-border bg-paper-deep" />
-                <div className="absolute left-3 top-1.5 h-24 w-28 rotate-2 rounded-xl border border-border bg-sheet shadow-sheet" />
-                <div className="ledger absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet shadow-sheet">
-                  <s.icon className="size-8 text-ink" strokeWidth={1.5} />
-                </div>
-                <span className="tabular absolute -right-1 -top-2 grid size-8 place-items-center rounded-full bg-marigold font-serif text-lg text-deep-ink">{i + 1}</span>
-              </div>
-              <h3 className="text-2xl text-deep-ink">{s.title}</h3>
-              <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-deep-ink/70">{s.text}</p>
-            </li>
-          </Reveal>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-function Services() {
-  return (
-    <section id="services" className="scroll-mt-24 bg-sage/50 py-24">
-      <div className="mx-auto max-w-6xl px-5">
-        <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
-        <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s, i) => (
-            <Reveal key={s.id} delay={(i % 3) * 0.08}>
-              <Link to="/book" search={{ service: s.id }} className="sheet-stack group flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1">
-                <p className="tabular text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{s.minutes} min</p>
-                <h3 className="mt-3 text-[1.75rem] leading-tight text-deep-ink">{s.name}</h3>
-                <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
-                <div className="mt-auto flex items-end justify-between border-t border-border pt-5 mt-8">
-                  <p className="text-deep-ink">
-                    {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                    <span className="tabular font-serif text-3xl">${s.price}</span>
-                  </p>
-                  <span className="inline-flex items-center gap-1 text-sm font-medium text-ink">
-                    Book <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-14 px-5 py-24 md:grid-cols-[0.9fr_1.1fr]">
-      <Reveal>
-        <figure className="relative mx-auto w-full max-w-xs">
-          <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[1.5rem] border border-ink/20" />
-          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[1.5rem] border border-border bg-sheet shadow-lift">
-            <div className="ledger absolute inset-0 opacity-60" />
-            <span className="relative font-serif text-8xl text-ink/25">PP</span>
-          </div>
-          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Priya Patel, EA</figcaption>
-        </figure>
-      </Reveal>
-      <Reveal delay={0.1}>
-        <Eyebrow>About Priya</Eyebrow>
-        <h2 className="mt-3 text-4xl leading-tight text-deep-ink sm:text-5xl">A neighbor who happens to love the tax code.</h2>
-        <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-deep-ink/75">
-          <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Edison file with confidence.</p>
-          <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
-        </div>
-        <p className="mt-6 font-serif text-2xl italic text-ink">— Priya</p>
-      </Reveal>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const t = [
-    { q: "I uploaded everything the week before and my appointment took forty minutes. First year I didn't have to come back.", n: "Anita R.", r: "Individual return, Edison" },
-    { q: "Priya untangled three years of 1099s from my design work and explained every line. I finally understand my taxes.", n: "Marcus L.", r: "Freelancer, Metuchen" },
-    { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Iselin" },
-  ];
-  return (
-    <section className="bg-ink py-24 text-paper">
-      <div className="mx-auto max-w-6xl px-5">
-        <Reveal><p className="text-xs font-medium uppercase tracking-[0.16em] text-marigold">Kind words</p></Reveal>
-        <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
-          {t.map((x, i) => (
-            <Reveal key={x.n} delay={i * 0.1}>
-              <figure className="border-t border-paper/20 pt-6">
-                <blockquote className="font-serif text-2xl leading-snug">"{x.q}"</blockquote>
-                <figcaption className="mt-5 text-sm"><span className="text-paper">{x.n}</span><span className="block text-paper/60">{x.r}</span></figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Privacy() {
-  const points = [
-    { icon: Lock, title: "Private by default", text: "Your files are kept in private storage. Only Priya can open them." },
-    { icon: KeyRound, title: "Short-lived access", text: "Each time a file is opened, a link is created that expires within minutes." },
-    { icon: ShieldCheck, title: "No Social Security number", text: "We never ask for it online. What's needed is handled in person, safely." },
-    { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
-  ];
-  return (
-    <section className="mx-auto max-w-6xl px-5 py-24">
-      <div className="sheet-stack p-8 sm:p-12">
-        <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
-        <div className="mt-10 grid gap-8 sm:grid-cols-2">
-          {points.map((p, i) => (
-            <Reveal key={p.title} delay={i * 0.06} className="flex gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
-              <div><h3 className="text-xl text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-deep-ink/70">{p.text}</p></div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Faq() {
-  const qs = [
-    { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return — usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Priya will confirm everything is there." },
-    { q: "Video call or in person?", a: "Whichever you prefer. Both work the same way: documents are uploaded beforehand, and we go through your return together. Choose when you book." },
-    { q: "Can I reschedule?", a: "Of course. Use the link in your confirmation email to pick a new time. If you can't make it, please let us know so someone waiting can take your slot." },
-    { q: "Can you file an extension for me?", a: "Yes. An extension gives you until October 15 to file, but any tax owed is still due in April. Book an Extension review and we'll handle it." },
-    { q: "What are the key deadlines?", a: "Most individual returns are due April 15. Extended returns are due October 15. Estimated taxes are due in April, June, September and January." },
-  ];
-  return (
-    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-10 px-5 py-16 md:grid-cols-[0.8fr_1.2fr]">
-      <SectionHead eyebrow="Questions" title="Good to know." />
-      <Reveal>
-        <Accordion type="single" collapsible className="border-t border-border">
-          {qs.map((x) => (
-            <AccordionItem key={x.q} value={x.q} className="border-border">
-              <AccordionTrigger className="py-5 text-left font-serif text-xl font-normal text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
-              <AccordionContent className="pb-5 text-[15px] leading-relaxed text-deep-ink/70">{x.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </Reveal>
-    </section>
-  );
-}
+const DESC = "Book with Priya Patel, EA in Edison, NJ. Get a personal checklist, share your documents privately, and arrive ready.";
+export const Route = createFileRoute("/")({ head: () => ({ meta: [
+  { title: TITLE }, { name: "description", content: DESC }, { property: "og:title", content: TITLE }, { property: "og:description", content: DESC }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
+] }), component: Home });
+function SectionHeading({ overline, children }: { overline: string; children: React.ReactNode }) { return <div><p className="text-xs font-bold uppercase text-ink">{overline}</p><h2 className="mt-3 font-serif text-4xl leading-tight text-deep-ink sm:text-5xl">{children}</h2></div>; }
+function Home() { return <div className="min-h-screen overflow-x-clip"><AnnouncementBar/><SiteHeader/><main><Hero/><SituationChecklist/><Services/><Profile/><Reviews/><Privacy/><Faq/></main><SiteFooter/><MobileBookBar/></div>; }
+function Hero() { return <section id="home" className="mx-auto max-w-6xl px-5 pb-16 pt-16 sm:pt-24"><Reveal><p className="text-xs font-semibold uppercase text-ink">Tax preparation in Edison, New Jersey</p><h1 className="mt-5 max-w-[800px] font-serif text-[42px] leading-[1.06] text-deep-ink sm:text-[72px] sm:leading-[1.03]">Taxes, without <em className="text-ink">the chase.</em></h1><p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">Book in two minutes. We’ll tell you exactly what to bring, and check it before you arrive.</p><div className="mt-10 max-w-5xl"><FindTime/></div><p className="mt-5 text-sm text-muted-foreground">Confirmed instantly · No payment now · <Link to="/book/returning" className="font-semibold text-ink underline underline-offset-4">Returning client?</Link></p></Reveal></section>; }
+function Services() { return <section id="services" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-20"><SectionHeading overline="Services">The right help for your return.</SectionHeading><p className="mt-3 text-muted-foreground">Straightforward pricing. You pay when your return is filed, not when you book.</p><div className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">{SERVICES.map((s,i)=><Reveal key={s.id} delay={(i%3)*0.07}><Link to="/services/$slug" params={{slug:s.id}} className="group block h-full"><img src={SERVICE_PHOTOS[s.id]} alt="" loading="lazy" width={900} height={650} className="aspect-[1.55] w-full rounded-[14px] object-cover"/><div className="pt-5"><h3 className="font-serif text-[26px] leading-tight text-deep-ink">{s.name}</h3><p className="mt-2 text-sm text-muted-foreground">{s.blurb}</p><p className="tabular mt-4 text-sm font-semibold text-ink">{s.minutes} min · {s.from ? "from " : ""}${s.price} <ArrowRight className="ml-2 inline size-4 transition-transform group-hover:translate-x-1"/></p></div></Link></Reveal>)}</div></section>; }
+function Profile() { return <section id="about" className="scroll-mt-24 bg-sheet py-20"><div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)] md:items-center md:gap-20"><Reveal><img src={priya} alt="Illustrative portrait representing Priya Patel; not an actual photograph of Priya" loading="lazy" width={850} height={1050} className="aspect-[4/4.5] w-full rounded-[14px] object-cover object-top"/></Reveal><Reveal delay={0.1}><p className="text-xs font-semibold uppercase text-ink">Meet Priya</p><h2 className="mt-3 font-serif text-4xl text-deep-ink sm:text-5xl">Real attention, from start to finish.</h2><p className="mt-3 text-sm font-semibold text-ink">Priya Patel · IRS Enrolled Agent</p><div className="mt-8 grid grid-cols-3 gap-3 border-y border-border py-6"><div><strong className="tabular block font-serif text-3xl">12</strong><span className="text-xs text-muted-foreground">years in Edison</span></div><div><strong className="tabular block font-serif text-3xl">1,800+</strong><span className="text-xs text-muted-foreground">returns</span></div><div><strong className="tabular block font-serif text-3xl">4.9</strong><span className="text-xs text-muted-foreground">rating</span></div></div><p className="mt-7 leading-relaxed text-muted-foreground">Priya helps local families, freelancers and landlords make sense of their taxes. Her practice is small by choice: when you book, you work directly with her, from your first document to the final signature.</p><Button asChild variant="outline" className="mt-7"><Link to="/book">Ask a question <MessageCircle/></Link></Button><p className="mt-3 text-xs text-muted-foreground">Portrait is illustrative; replace with Priya’s real photo before launch.</p></Reveal></div></section>; }
+const REVIEWS = [
+  { name: "Anita R.", town: "Edison", quote: "I uploaded everything the week before. For once I didn't have to come back with another document." },
+  { name: "Marcus L.", town: "Metuchen", quote: "Priya explained my freelance income clearly. I finally understood what I was filing." },
+  { name: "Deepa S.", town: "Iselin", quote: "The rental checklist was spot on. I knew exactly what to gather before our appointment." },
+  { name: "Rohan M.", town: "Edison", quote: "Booking took minutes, and I could see what was still missing without another phone call." },
+  { name: "Elena P.", town: "Woodbridge", quote: "Calm, careful, and never rushed. It felt like she knew my situation before we even sat down." },
+  { name: "Samir K.", town: "Piscataway", quote: "The reminders made it easy to get everything in on time. A genuinely easier tax season." },
+];
+function Reviews() { return <section id="reviews" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-20"><SectionHeading overline="Client experiences">Good words from the neighborhood.</SectionHeading><div className="mt-10 grid gap-10 lg:grid-cols-[250px_1fr]"><div><p className="tabular font-serif text-7xl leading-none text-deep-ink">4.9</p><p className="mt-2 flex gap-1 text-warning" aria-label="Rated 4.9 out of 5">{Array.from({length:5},(_,i)=><Star key={i} className="size-4 fill-current"/>)}</p><p className="mt-2 text-xs text-muted-foreground">Illustrative rating and reviews; verify before publishing.</p><div className="mt-7 space-y-3">{[["Clarity",98],["Speed",96],["Communication",99],["Value",94]].map(([label,value])=><div key={label}><div className="mb-1 flex justify-between text-xs text-muted-foreground"><span>{label}</span><span className="tabular">{value}%</span></div><div className="h-1.5 rounded-full bg-sheet"><div className="h-full rounded-full bg-ink" style={{width:`${value}%`}}/></div></div>)}</div></div><div className="grid gap-5 sm:grid-cols-2"><div className="contents">{REVIEWS.map(r=><figure key={r.name} className="rounded-[14px] border border-border p-6 shadow-sheet"><div className="mb-4 flex gap-0.5 text-warning" aria-label="Five stars">{Array.from({length:5},(_,i)=><Star key={i} className="size-3 fill-current"/>)}</div><blockquote className="text-sm leading-relaxed text-deep-ink">“{r.quote}”</blockquote><figcaption className="mt-5 text-xs font-semibold text-ink">{r.name} <span className="font-normal text-muted-foreground">· {r.town}</span></figcaption></figure>)}</div></div></div></section>; }
+function Privacy() { const points=[{icon:LockKeyhole,title:"Private storage",text:"Your files aren't public. Only Priya can see them."},{icon:Link2,title:"Links that expire",text:"Document viewing links stop working after a short time."},{icon:ShieldCheck,title:"No sensitive number online",text:"We never ask for your Social Security number."},{icon:FileCheck2,title:"Only what you need",text:"A personal list shows exactly what to share, after you book."}]; return <section className="bg-sheet py-20"><div className="mx-auto max-w-6xl px-5"><SectionHeading overline="Your documents are safe">Your paperwork stays yours.</SectionHeading><div className="mt-10 grid gap-x-16 gap-y-10 sm:grid-cols-2">{points.map(p=><div key={p.title} className="flex gap-4"><p.icon className="mt-1 size-6 shrink-0 text-ink" strokeWidth={1.7}/><div><h3 className="font-serif text-2xl text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.text}</p></div></div>)}</div></div></section>; }
+function Faq() { const qs=[
+  ["What should I bring?", "After booking, you'll get a checklist made for your situation. Upload what you have before you arrive; documents never hold up booking."],
+  ["Video call or in person?", "Both work the same way. Select what works for you when booking, then upload your documents privately beforehand."],
+  ["Can I reschedule?", "Yes. Use the link in your confirmation message to choose another available time."],
+  ["Can you file an extension?", "Yes. An extension can give you until October 15 to file, though any taxes owed are still due in April."],
+  ["What are the key deadlines?", "Most individual returns are due April 15; extended returns are generally due October 15. Your exact deadline can vary."],
+]; return <section id="faq" className="mx-auto grid max-w-6xl gap-10 px-5 py-20 md:grid-cols-[0.8fr_1.2fr]"><SectionHeading overline="Questions">Good to know.</SectionHeading><Accordion type="single" collapsible className="border-t border-border">{qs.map(([q,a])=><AccordionItem key={q} value={q}><AccordionTrigger className="py-5 text-left font-serif text-xl font-normal text-deep-ink">{q}</AccordionTrigger><AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">{a}</AccordionContent></AccordionItem>)}</Accordion></section>; }
+function MobileBookBar() { return <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-border bg-background px-5 py-3 shadow-lift md:hidden"><p className="text-xs text-muted-foreground">Appointments <span className="tabular block text-sm font-semibold text-deep-ink">From $150</span></p><Button asChild size="sm"><Link to="/book">Book <ArrowRight/></Link></Button></div>; }

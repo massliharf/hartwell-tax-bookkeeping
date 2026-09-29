@@ -33,6 +33,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -55,8 +56,7 @@
   --color-sage: var(--sage);
   --color-success: var(--success);
   --color-warning: var(--warning);
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --shadow-sheet: var(--shadow-sheet);
   --shadow-lift: var(--shadow-lift);
   --color-chart-1: var(--chart-1);
@@ -76,16 +76,15 @@
 
 :root {
   --radius: 1rem;
-  --paper: oklch(0.955 0.015 85);
-  --paper-deep: oklch(0.925 0.02 82);
-  --ink-green: oklch(0.32 0.05 165);
-  --deep-ink: oklch(0.22 0.015 160);
-  --marigold: oklch(0.76 0.14 75);
-  --sage: oklch(0.91 0.02 145);
+  --paper: oklch(1 0 0);
+  --paper-deep: oklch(0.977 0 0);
+  --ink-green: oklch(0.4236 0.06831 169.65);
+  --deep-ink: oklch(0.252 0 0);
+  --marigold: oklch(0.78709 0.14706 73.02);
+  --sage: oklch(0.977 0 0);
   --success: oklch(0.53 0.1 160);
   --warning: oklch(0.64 0.14 65);
-  --sheet: oklch(0.985 0.008 85);
-
+  --sheet: oklch(1 0 0);
   --background: var(--paper);
   --foreground: var(--deep-ink);
   --card: var(--sheet);
@@ -93,17 +92,18 @@
   --popover: var(--sheet);
   --popover-foreground: var(--deep-ink);
   --primary: var(--ink-green);
+  --primary-hover: oklch(0.35719 0.05756 168.82);
   --primary-foreground: var(--paper);
   --secondary: var(--sage);
   --secondary-foreground: var(--ink-green);
   --muted: var(--paper-deep);
-  --muted-foreground: oklch(0.45 0.02 160);
-  --accent: var(--marigold);
+  --muted-foreground: oklch(0.5243 0 0);
+  --accent: var(--sage);
   --accent-foreground: var(--deep-ink);
   --destructive: oklch(0.55 0.17 30);
   --destructive-foreground: var(--paper);
-  --border: oklch(0.86 0.02 85);
-  --input: oklch(0.86 0.02 85);
+  --border: oklch(0.94 0 0);
+  --input: var(--border);
   --ring: var(--ink-green);
   --chart-1: var(--ink-green);
   --chart-2: var(--marigold);
@@ -118,9 +118,8 @@
   --sidebar-accent-foreground: var(--ink-green);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ink-green);
-
-  --shadow-sheet: 0 1px 1px oklch(0.22 0.015 160 / 4%), 0 4px 10px -2px oklch(0.22 0.015 160 / 6%), 0 18px 36px -18px oklch(0.22 0.015 160 / 18%);
-  --shadow-lift: 0 2px 2px oklch(0.22 0.015 160 / 5%), 0 12px 24px -6px oklch(0.22 0.015 160 / 10%), 0 30px 60px -24px oklch(0.32 0.05 165 / 28%);
+  --shadow-sheet: 0 6px 20px oklch(0 0 0 / 8%);
+  --shadow-lift: 0 6px 20px oklch(0 0 0 / 8%);
 }
 
 @layer base {
@@ -136,17 +135,8 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv11", "ss01";
   }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 60;
-    opacity: 0.35;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  h1, h2, h3, .font-serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+  h1, h2, h3 { font-family: var(--font-sans); font-weight: 700; letter-spacing: 0; }
+  * { font-variant-numeric: tabular-nums; }
   ::selection { background: color-mix(in oklab, var(--marigold) 45%, transparent); }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   :is(a, button, input, select, textarea, [role="radio"], [role="option"], [role="checkbox"]):focus-visible {
@@ -157,21 +147,9 @@
 
 @utility tabular { font-variant-numeric: tabular-nums; }
 
-/* Card that reads as a neat stack of sheets */
 @utility sheet-stack {
-  position: relative;
   background: var(--sheet);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow:
-    0 6px 0 -3px var(--sheet),
-    0 6px 0 -2px var(--border),
-    0 12px 0 -6px var(--paper-deep),
-    0 12px 0 -5px var(--border),
-    var(--shadow-sheet);
-}
-
-/* Thin ledger lines */
-@utility ledger {
-  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, color-mix(in oklab, var(--ink-green) 9%, transparent) 31px 32px);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sheet);
 }

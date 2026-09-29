@@ -10,7 +10,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
       <header className="border-b border-border/60 bg-paper/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-5">
           <Link to="/" className="flex min-w-0 items-baseline gap-2">
-            <span className="font-serif text-2xl leading-none text-ink">Patel</span>
+            <span className="font-sans text-2xl leading-none text-ink">Patel</span>
             <span className="truncate text-[13px] text-muted-foreground">Tax & Bookkeeping</span>
           </Link>
           <Link to="/" aria-label="Leave booking" className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-sage hover:text-ink">
@@ -54,11 +54,10 @@ function Progress({ step }: { step: number }) {
   );
 }
 
-export function StepTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
+export function StepTitle({ title, sub }: { eyebrow?: string; title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">{eyebrow}</p>
-      <h1 tabIndex={-1} className="mt-2 text-4xl leading-tight text-deep-ink focus:outline-none sm:text-5xl">{title}</h1>
+       <h1 tabIndex={-1} className="text-3xl leading-tight text-deep-ink focus:outline-none sm:text-4xl">{title}</h1>
       {sub && <p className="mt-3 text-[15px] text-deep-ink/70">{sub}</p>}
     </div>
   );

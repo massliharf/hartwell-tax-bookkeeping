@@ -16,7 +16,7 @@ export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title
   return (
     <header className="mb-8">
       {eyebrow && <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>}
-      <h1 className="mt-1 font-serif text-4xl leading-tight text-deep-ink md:text-5xl">{title}</h1>
+      <h1 className="mt-1 font-sans text-4xl leading-tight text-deep-ink md:text-5xl">{title}</h1>
       {children && <div className="mt-2 text-muted-foreground">{children}</div>}
     </header>
   );
@@ -24,9 +24,9 @@ export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title
 
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="sheet-stack ledger mx-auto max-w-md px-8 py-12 text-center">
+    <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
       <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-success/10 text-success"><Check className="h-6 w-6" /></span>
-      <h2 className="mt-4 font-serif text-3xl text-deep-ink">{title}</h2>
+      <h2 className="mt-4 font-sans text-3xl text-deep-ink">{title}</h2>
       {children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}
     </div>
   );
@@ -90,7 +90,7 @@ export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean 
             <MeetingTag type={a.meeting_type} />
             <StatusPill status={a.status} />
           </div>
-          <h3 className="mt-1 truncate font-serif text-2xl text-deep-ink">
+          <h3 className="mt-1 truncate font-sans text-2xl text-deep-ink">
             {a.clients ? <Link to="/owner/clients/$id" params={{ id: a.clients.id }} className="hover:underline underline-offset-4">{a.clients.name}</Link> : "Client"}
           </h3>
           <p className="text-sm text-muted-foreground">{a.services?.name}</p>
@@ -135,7 +135,7 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setSel(null); }}>
       <DialogContent className="max-w-4xl bg-paper p-0 sm:rounded-2xl">
         <DialogHeader className="border-b border-border px-6 py-4">
-          <DialogTitle className="font-serif text-2xl font-normal">{title}</DialogTitle>
+          <DialogTitle className="font-sans text-2xl font-normal">{title}</DialogTitle>
           <DialogDescription>Private files. Links expire after a minute.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-0 md:grid-cols-[220px_1fr]">

@@ -35,23 +35,23 @@ function MovePage() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-xl px-5 py-16 sm:py-24">
-        <div className="sheet-stack ledger p-8 text-center">
+        <div className="sheet-stack p-8 text-center">
           {!to ? (
-            <h1 className="font-serif text-4xl text-deep-ink">Pick a time from your portal.</h1>
+            <h1 className="font-sans text-4xl text-deep-ink">Pick a time from your portal.</h1>
           ) : state === "done" ? (
             <>
-              <h1 className="font-serif text-4xl text-deep-ink">You're moved.</h1>
+              <h1 className="font-sans text-4xl text-deep-ink">You're moved.</h1>
               <p className="mt-4 text-deep-ink/70">New time: {fmtDateLong(to)} at {fmtTime(to)}. More time to gather your documents.</p>
             </>
           ) : state === "taken" ? (
             <>
-              <h1 className="font-serif text-4xl text-deep-ink">That time was just taken.</h1>
+              <h1 className="font-sans text-4xl text-deep-ink">That time was just taken.</h1>
               <p className="mt-4 text-deep-ink/70">Your original appointment is still booked. You can pick another time in your portal.</p>
             </>
           ) : (
             <>
               <p className="text-sm uppercase tracking-widest text-ink/70">Move to</p>
-              <h1 className="mt-3 font-serif text-4xl text-deep-ink">{fmtDateLong(to)}</h1>
+              <h1 className="mt-3 font-sans text-4xl text-deep-ink">{fmtDateLong(to)}</h1>
               <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(to)}</p>
               <Button size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {
                 setState("busy");

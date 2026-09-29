@@ -22,27 +22,27 @@ export type Block =
   | { buttons: { label: string; href: string }[] }
   | { note: string };
 
-/** Brand email: paper background, ink green, serif heading. Table layout for mail clients. */
+/** Brand email: clean white background, forest green heading. Table layout for mail clients. */
 export function renderEmail(heading: string, blocks: Block[]) {
   const body = blocks.map((b) => {
-    if ("p" in b) return `<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#16201B">${esc(b.p)}</p>`;
-    if ("note" in b) return `<p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#5b6660">${esc(b.note)}</p>`;
+    if ("p" in b) return `<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#222222">${esc(b.p)}</p>`;
+    if ("note" in b) return `<p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#6A6A6A">${esc(b.note)}</p>`;
     if ("list" in b) return `<table role="presentation" width="100%" style="margin:0 0 20px;border-collapse:collapse">${b.list.map((i) =>
-      `<tr><td style="padding:10px 0;border-bottom:1px solid #e6dfcf;font-size:15px;color:#16201B"><span style="color:#E0A43A;font-weight:700">&#9675;</span>&nbsp;&nbsp;${esc(i)}</td></tr>`).join("")}</table>`;
+      `<tr><td style="padding:10px 0;border-bottom:1px solid #EBEBEB;font-size:15px;color:#222222"><span style="color:#1F5A48;font-weight:700">&#9675;</span>&nbsp;&nbsp;${esc(i)}</td></tr>`).join("")}</table>`;
     const btns = "button" in b ? [b.button] : b.buttons;
-    return btns.map((x, i) => `<a href="${esc(x.href)}" style="display:block;text-align:center;margin:0 0 10px;padding:14px 20px;border-radius:999px;font-size:15px;font-weight:600;text-decoration:none;${i === 0 && "button" in b ? "background:#123B2F;color:#F5F1E8" : "background:#ffffff;color:#123B2F;border:1px solid #123B2F"}">${esc(x.label)}</a>`).join("") + `<div style="height:8px"></div>`;
+    return btns.map((x, i) => `<a href="${esc(x.href)}" style="display:block;text-align:center;margin:0 0 10px;padding:14px 20px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;${i === 0 && "button" in b ? "background:#1F5A48;color:#FFFFFF" : "background:#ffffff;color:#1F5A48;border:1px solid #1F5A48"}">${esc(x.label)}</a>`).join("") + `<div style="height:8px"></div>`;
   }).join("");
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#F5F1E8;font-family:Inter,Helvetica,Arial,sans-serif">
-<table role="presentation" width="100%" style="background:#F5F1E8"><tr><td align="center" style="padding:32px 16px">
+<body style="margin:0;padding:0;background:#FFFFFF;font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" style="background:#FFFFFF"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
-<tr><td style="padding:0 4px 16px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#123B2F">Patel Tax &amp; Bookkeeping</td></tr>
-<tr><td style="background:#FFFDF8;border:1px solid #e6dfcf;border-radius:16px;padding:32px 28px;box-shadow:0 6px 0 -3px #efe9dc,0 10px 24px rgba(18,59,47,.06)">
-<h1 style="margin:0 0 20px;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:32px;line-height:1.15;color:#123B2F">${esc(heading)}</h1>
+<tr><td style="padding:0 4px 16px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#1F5A48">Patel Tax &amp; Bookkeeping</td></tr>
+<tr><td style="background:#FFFFFF;border:1px solid #EBEBEB;border-radius:16px;padding:32px 28px;box-shadow:0 6px 20px rgba(0,0,0,.08)">
+<h1 style="margin:0 0 20px;font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif;font-weight:700;font-size:32px;line-height:1.15;color:#1F5A48">${esc(heading)}</h1>
 ${body}
-<p style="margin:24px 0 0;font-size:15px;color:#16201B">Warmly,<br><span style="font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:#123B2F">Priya Patel, EA</span></p>
+<p style="margin:24px 0 0;font-size:15px;color:#222222">Warmly,<br><span style="font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif;font-size:20px;color:#1F5A48">Priya Patel, EA</span></p>
 </td></tr>
-<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#5b6660">${OFFICE} &middot; We never ask for your Social Security number by email.</td></tr>
+<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#6A6A6A">${OFFICE} &middot; We never ask for your Social Security number by email.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 

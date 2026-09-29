@@ -18,7 +18,7 @@ export function ReadyRing({ value, size = 120, stroke = 8, label = "Ready", clas
           cy={size / 2}
           r={r}
           fill="none"
-          stroke={done ? "var(--success)" : "var(--marigold)"}
+           stroke="var(--marigold)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={c}
@@ -28,7 +28,7 @@ export function ReadyRing({ value, size = 120, stroke = 8, label = "Ready", clas
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="tabular font-serif leading-none text-deep-ink" style={{ fontSize: size * 0.28 }}>
+        <span className="tabular font-sans leading-none text-deep-ink" style={{ fontSize: size * 0.28 }}>
           {Math.round(pct)}
           <span style={{ fontSize: size * 0.14 }}>%</span>
         </span>

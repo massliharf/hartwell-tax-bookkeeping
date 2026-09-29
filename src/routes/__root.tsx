@@ -18,9 +18,9 @@ import { supabase } from "@/integrations/supabase/client";
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-      <div className="sheet-stack ledger max-w-md p-8 text-center sm:p-12">
+      <div className="sheet-stack max-w-md p-8 text-center sm:p-12">
         <p className="tabular text-sm font-medium tracking-widest text-ink">404</p>
-        <h1 className="mt-4 font-serif text-4xl text-deep-ink">We couldn't find this page.</h1>
+        <h1 className="mt-4 font-sans text-4xl text-deep-ink">We couldn't find this page.</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           It may have moved. You can always start from the beginning.
         </p>
@@ -41,8 +41,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-      <div className="sheet-stack ledger max-w-md p-8 text-center sm:p-12">
-        <h1 className="font-serif text-4xl text-deep-ink">
+      <div className="sheet-stack max-w-md p-8 text-center sm:p-12">
+        <h1 className="font-sans text-4xl text-deep-ink">
           This page didn't load.
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -82,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
       {
         rel: "stylesheet",

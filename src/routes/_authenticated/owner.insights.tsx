@@ -103,13 +103,13 @@ function Insights() {
       <section className="mt-12 grid overflow-hidden rounded-2xl border border-border shadow-sheet md:grid-cols-2">
         <div className="bg-paper-deep/60 p-7 md:p-9">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Before</p>
-          <p className="mt-4 font-serif text-3xl leading-snug text-deep-ink/60 md:text-4xl">
+          <p className="mt-4 font-sans text-3xl leading-snug text-deep-ink/60 md:text-4xl">
             {BEFORE.msgsPerBooking} messages per booking.<br />1 in 3 clients unprepared.
           </p>
         </div>
         <div className="relative bg-ink p-7 text-primary-foreground md:p-9">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-marigold">Now</p>
-          <p className="mt-4 font-serif text-3xl leading-snug md:text-4xl">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-paper">Now</p>
+          <p className="mt-4 font-sans text-3xl leading-snug md:text-4xl">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>
         </div>
@@ -122,15 +122,15 @@ function Insights() {
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   const reduce = useReducedMotion();
   return (
-    <header className="ledger relative overflow-hidden rounded-3xl border border-border bg-sheet px-7 py-12 shadow-sheet md:px-12 md:py-16">
+    <header className="relative overflow-hidden rounded-3xl border border-border bg-sheet px-7 py-12 shadow-sheet md:px-12 md:py-16">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Insights · last 30 days</p>
       <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="mt-3 font-serif text-5xl leading-[1.02] text-deep-ink md:text-7xl">
+        className="mt-3 font-sans text-5xl leading-[1.02] text-deep-ink md:text-7xl">
         <span className="tabular text-ink">{hours}</span> hour{hours === 1 ? "" : "s"} given back<br className="hidden sm:block" /> this month.
       </motion.h1>
       <p className="tabular mt-4 max-w-md text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups you didn't have to write.</p>
       <motion.span aria-hidden initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.4, duration: 0.8 }}
-        className="mt-8 block h-1 w-24 origin-left rounded-full bg-marigold" />
+        className="mt-8 block h-1 w-24 origin-left rounded-full bg-ink" />
     </header>
   );
 }
@@ -139,7 +139,7 @@ function Metric({ title, value, note, good, children }: { title: string; value: 
   return (
     <article className="sheet-stack flex flex-col p-5">
       <p className="text-sm text-muted-foreground">{title}</p>
-      <p className="tabular mt-1 font-serif text-5xl text-deep-ink">{value}</p>
+      <p className="tabular mt-1 font-sans text-5xl text-deep-ink">{value}</p>
       <p className={`text-xs ${good === undefined ? "text-muted-foreground" : good ? "text-success" : "text-warning"}`}>{note}</p>
       <div className="mt-4 h-24">{children}</div>
     </article>

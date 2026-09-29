@@ -65,7 +65,7 @@ function Row({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boole
   }
   if (it.kind === "signature") {
     const a = it.appt;
-    return shell(<PenLine className="h-5 w-5" />, "bg-marigold/15 text-warning",
+    return shell(<PenLine className="h-5 w-5" />, "bg-ink/15 text-warning",
       <>{a.clients?.name} hasn't signed Form 8879</>,
       <>Appointment was {fmtDay(a.start_at)}. Automatic reminders already went out.</>, "Send another reminder");
   }

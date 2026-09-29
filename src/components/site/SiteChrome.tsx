@@ -10,9 +10,9 @@ export function AnnouncementBar() {
         search={{ service: "extension" }}
         className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-5 py-2 text-center text-[13px]"
       >
-        <span className="size-1.5 shrink-0 rounded-full bg-marigold" />
+        <span className="size-1.5 shrink-0 rounded-full bg-paper" />
         <span>
-          Filing an extension? The deadline is October 15 — <span className="underline decoration-marigold underline-offset-4">book your slot</span>.
+          Filing an extension? The deadline is October 15 — <span className="underline decoration-ink underline-offset-4">book your slot</span>.
         </span>
       </Link>
     </div>
@@ -24,7 +24,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-paper/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
         <Link to="/" className="flex min-w-0 items-baseline gap-2">
-          <span className="font-serif text-2xl leading-none text-ink">Patel</span>
+          <span className="font-sans text-2xl leading-none text-ink">Patel</span>
           <span className="truncate text-[13px] text-muted-foreground">Tax & Bookkeeping</span>
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-deep-ink/80 md:flex">
@@ -46,20 +46,20 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 bg-deep-ink text-paper/85">
+     <footer className="bg-ink text-paper/85">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
-          <p className="font-serif text-4xl text-paper">Patel Tax & Bookkeeping</p>
+          <p className="font-sans text-4xl text-paper">Patel Tax & Bookkeeping</p>
           <p className="mt-3 max-w-sm text-sm text-paper/65">Priya Patel, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Edison.</p>
         </div>
         <div className="text-sm">
-          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-marigold">Visit</p>
+          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-paper">Visit</p>
           <p>Oak Tree Road</p>
           <p>Edison, NJ 08820</p>
           <a href="tel:+17325550142" className="tabular mt-3 block hover:text-paper">(732) 555-0142</a>
         </div>
         <div className="text-sm">
-          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-marigold">Hours</p>
+          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-paper">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4">
               <span>{h.days}</span>

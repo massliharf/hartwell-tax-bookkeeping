@@ -95,7 +95,7 @@ function ConfirmedPage() {
         <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, type: "spring", damping: 22 }}
           className="sheet-stack mt-10 p-6">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{service}</p>
-          <p className="mt-1 font-serif text-3xl text-deep-ink">{fmtDateLong(a.start_at)}</p>
+          <p className="mt-1 font-sans text-3xl text-deep-ink">{fmtDateLong(a.start_at)}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
             <span className="tabular">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</span>
             <span className="inline-flex items-center gap-1.5">
@@ -110,11 +110,11 @@ function ConfirmedPage() {
         </motion.div>
 
         <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, type: "spring", damping: 22 }}
-          className="sheet-stack ledger mt-8 p-6">
+          className="sheet-stack mt-8 p-6">
           <div className="flex items-center gap-5">
             <ReadyRing value={a.ready_score} size={84} />
             <div className="min-w-0">
-              <p className="font-serif text-3xl text-deep-ink">Your checklist</p>
+              <p className="font-sans text-3xl text-deep-ink">Your checklist</p>
               <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Priya will check everything before you arrive.</p>
             </div>
           </div>

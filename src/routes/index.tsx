@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarCheck, Check, FileUp, KeyRound, Lock, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, CalendarCheck, Check, FileSpreadsheet, FileUp, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Reveal } from "@/components/brand/Reveal";
@@ -7,6 +7,15 @@ import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import claire from "@/assets/claire-portrait.jpg";
+
+const SERVICE_STYLE: Record<string, { icon: typeof Receipt; rgb: string }> = {
+  individual: { icon: Receipt, rgb: "79,105,242" },
+  "self-employed": { icon: Briefcase, rgb: "133,102,220" },
+  rental: { icon: HomeIcon, rgb: "30,91,71" },
+  extension: { icon: FileSpreadsheet, rgb: "196,120,44" },
+  bookkeeping: { icon: Building2, rgb: "33,124,150" },
+};
+
 
 const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
 const DESC = "Book a tax appointment with Claire Hartwell, EA in Montclair, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";

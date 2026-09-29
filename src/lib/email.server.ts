@@ -112,7 +112,7 @@ export async function sendMessage(a: SendArgs): Promise<boolean> {
   if (a.sms) {
     await supabaseAdmin.from("messages").insert({
       dedupe_key: `${a.dedupeKey}:sms`, type: a.type, channel: "sms", client_id: a.clientId, appointment_id: a.appointmentId ?? null,
-      body: a.sms, sent_at: now, minutes_saved: 0, delivery: "simulated",
+      body: a.sms, sent_at: now, minutes_saved: 0, delivery: "simulated", recipient: a.to,
     });
   }
   return true;

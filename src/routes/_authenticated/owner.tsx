@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { needsYou } from "@/components/owner/lib";
+import { DemoTools } from "@/components/owner/demo";
 
 export const Route = createFileRoute("/_authenticated/owner")({
   head: () => ({
@@ -94,6 +95,7 @@ function OwnerLayout() {
           <Outlet />
         </main>
       </div>
+      <DemoTools />
     </div>
   );
 }

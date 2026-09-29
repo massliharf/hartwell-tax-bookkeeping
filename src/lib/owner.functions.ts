@@ -11,6 +11,18 @@ async function assertOwner(context: unknown) {
   return supabaseAdmin;
 }
 
+/** Owners other than the public demo account. */
+async function realOwnerCount(s: import("@supabase/supabase-js").SupabaseClient) {
+  const { DEMO_EMAIL } = await import("./demo");
+  const { data } = await s.from("user_roles").select("user_id").eq("role", "admin");
+  let n = 0;
+  for (const r of data ?? []) {
+    const { data: u } = await s.auth.admin.getUserById(r.user_id);
+    if (u.user?.email !== DEMO_EMAIL) n++;
+  }
+  return n;
+}
+
 /** Public: is an owner account set up yet? (Only reveals a boolean.) */
 export const ownerSetupStatus = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

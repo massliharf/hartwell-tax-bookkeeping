@@ -46,10 +46,11 @@ function Progress({ step }: { step: number }) {
   );
 }
 
-export function StepTitle({ eyebrow: _eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
+export function StepTitle({ eyebrow, title, sub, hideEyebrow = false }: { eyebrow: string; title: string; sub?: string; hideEyebrow?: boolean }) {
   return (
     <div className="mb-8">
-       <h1 className="text-2xl leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]">{title}</h1>
+       {!hideEyebrow && <p className="text-xs font-medium leading-6 text-muted-foreground">{eyebrow}</p>}
+       <h1 className={`${hideEyebrow ? "" : "mt-1 "}text-2xl leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]`}>{title}</h1>
       {sub && <p className="mt-2 text-sm text-muted-foreground">{sub}</p>}
     </div>
   );

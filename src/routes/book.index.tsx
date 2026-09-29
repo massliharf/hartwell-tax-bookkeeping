@@ -158,7 +158,7 @@ function ChecklistPreview({ docs, hasService }: { docs: ReturnType<typeof previe
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-      <StepTitle eyebrow="Step 1 of 4" title="What can Claire help with?" sub="Pick the closest fit. You can add details in the next step." />
+       <StepTitle hideEyebrow eyebrow="Step 1 of 4" title="What can Claire help with?" sub="Pick the closest fit. You can add details in the next step." />
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
@@ -207,7 +207,7 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
 
   return (
     <>
-      <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
+       <StepTitle hideEyebrow eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
       <div className="space-y-3">
          {qs.map((q) => (
           <div key={q.key} className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -259,7 +259,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
   return (
     <>
-       <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
+        <StepTitle hideEyebrow eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
       <div className="mb-6 inline-flex h-8 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
@@ -407,7 +407,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
 
   return (
     <>
-      <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
+       <StepTitle hideEyebrow eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
        <div className="mb-6 lg:hidden"><BookingSummary service={service} draft={draft} onPickAgain={onPickAgain} /></div>
        <form id="booking-details" className="w-full space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot && draft.date === nyDay(draft.slot)) submit(draft.slot); }}>
         <div className="space-y-1.5">

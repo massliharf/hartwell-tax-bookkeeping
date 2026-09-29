@@ -7,6 +7,7 @@ import { useState, type FormEvent } from "react";
 import { Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createOwnerAccount, ownerSetupStatus } from "@/lib/owner.functions";
@@ -76,7 +77,7 @@ function AuthPage() {
             {setup && <p className="text-xs text-muted-foreground">At least 10 characters.</p>}
           </div>
           {err && <p className="text-sm text-warning" role="alert">{err}</p>}
-          <Button type="submit" size="lg" className="w-full" disabled={busy || !data}>{busy ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>
+           {!data ? <Skeleton className="h-10 w-full rounded-lg" /> : <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>}
         </form>
         <button type="button" onClick={() => { setEmail(DEMO_EMAIL); setPassword(DEMO_PASSWORD); }}
           className="mt-4 w-full rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-fill-subtle/50">

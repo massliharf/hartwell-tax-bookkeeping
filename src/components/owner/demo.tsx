@@ -127,7 +127,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
               {thread.map((m) => (
                 <motion.div key={m.id} layout initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
                   {m.channel === "sms" ? (
-                    <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-sage px-3 py-2 text-[13px] leading-snug text-deep-ink">{m.body}</div>
+                    <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-sage px-3 py-2 text-[13px] leading-snug text-deep-ink [overflow-wrap:anywhere]">{m.body}</div>
                   ) : (
                     <div className="rounded-2xl border border-border bg-sheet p-3 shadow-sheet">
                       <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>

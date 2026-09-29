@@ -117,7 +117,7 @@ function HowItWorks() {
       <ol className="mt-8 grid gap-4 md:grid-cols-3">
         {steps.map((s, i) => (
           <Reveal key={s.title} delay={i * 0.1} className="h-full">
-            <li className="relative h-full rounded-2xl border border-border bg-panel p-6">
+            <li className="relative h-full rounded-2xl border border-border bg-sheet p-6">
               <div className="relative mb-4 h-12 w-12">
                 <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
                   <s.icon className="size-5 text-ink" strokeWidth={1.75} />
@@ -148,7 +148,7 @@ function Services() {
                 <Link
                   to="/book"
                   search={{ service: s.id }}
-                  className="group flex h-full flex-col rounded-2xl border border-border bg-panel p-5 transition-colors duration-200 hover:bg-fill-subtle"
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-sheet p-5 transition-colors duration-200 hover:bg-fill-subtle"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>

@@ -18,3 +18,4 @@
   _Why: this is a real client project (Patel Tax & Bookkeeping); the rules there
   (instant booking, never ask for an SSN, `getNow()` for all time logic) are
   non-negotiable and must survive every session._
+- Brand primitives live in src/components/brand (ReadyRing, DocumentStack, Reveal); service data in src/lib/services.ts — single source for prices/hours.

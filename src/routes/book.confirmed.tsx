@@ -52,7 +52,7 @@ function ConfirmedPage() {
     return (
       <BookingShell>
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-4xl text-deep-ink">We couldn't find that booking</h1>
+          <h1 className="text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">We couldn't find that booking</h1>
           <p className="mt-3 text-deep-ink/70">Check the link in your confirmation email, or book again.</p>
           <Button asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
         </div>
@@ -60,7 +60,7 @@ function ConfirmedPage() {
     );
   }
   if (q.isLoading || !q.data?.appointment) {
-    return <BookingShell><div className="mx-auto h-96 max-w-2xl animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
+    return <BookingShell><div className="mx-auto h-96 max-w-2xl animate-pulse rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
   }
 
   const a = q.data.appointment as {
@@ -84,12 +84,12 @@ function ConfirmedPage() {
             initial={reduce ? false : { scale: 0, rotate: -40 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 380, damping: 16, delay: 0.25 }}
-            className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-paper shadow-sheet"
+            className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-primary-foreground"
           >
             <Check className="size-8" strokeWidth={2.5} />
           </motion.div>
           <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-            className="mt-6 text-5xl leading-tight text-deep-ink sm:text-6xl">
+            className="mt-6 text-[28px] leading-[42px] text-deep-ink">
             You're booked{first && `, ${first}`}.
           </motion.h1>
           <motion.p initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-3 text-deep-ink/70">
@@ -99,8 +99,8 @@ function ConfirmedPage() {
 
         <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, type: "spring", damping: 22 }}
           className="sheet-stack mt-10 p-6">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{service}</p>
-          <p className="mt-1 font-serif text-3xl text-deep-ink">{fmtDateLong(a.start_at)}</p>
+          <p className="text-[11px] font-medium uppercase text-muted-foreground">{service}</p>
+          <p className="mt-1 font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{fmtDateLong(a.start_at)}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
             <span className="tabular">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</span>
             <span className="inline-flex items-center gap-1.5">
@@ -119,7 +119,7 @@ function ConfirmedPage() {
           <div className="flex items-center gap-5">
             <ReadyRing value={a.ready_score} size={84} />
             <div className="min-w-0">
-              <p className="font-serif text-3xl text-deep-ink">Your checklist</p>
+              <p className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Your checklist</p>
               <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Claire will check everything before you arrive.</p>
             </div>
           </div>

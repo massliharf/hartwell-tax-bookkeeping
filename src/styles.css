@@ -46,6 +46,11 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-canvas: var(--canvas);
+  --color-surface-2: var(--surface-2);
+  --color-fill-neutral: var(--fill-neutral);
+  --color-fill-subtle: var(--fill-subtle);
+  --color-fill-selected: var(--fill-selected);
   --color-paper: var(--paper);
   --color-sheet: var(--sheet);
   --color-paper-deep: var(--paper-deep);
@@ -55,8 +60,8 @@
   --color-sage: var(--sage);
   --color-success: var(--success);
   --color-warning: var(--warning);
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Figtree", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --shadow-sheet: var(--shadow-sheet);
   --shadow-lift: var(--shadow-lift);
   --color-chart-1: var(--chart-1);
@@ -75,53 +80,59 @@
 }
 
 :root {
-  --radius: 1rem;
-  --paper: oklch(0.955 0.015 85);
-  --paper-deep: oklch(0.925 0.02 82);
-  --ink-green: oklch(0.32 0.05 165);
-  --deep-ink: oklch(0.22 0.015 160);
-  --marigold: oklch(0.76 0.14 75);
-  --sage: oklch(0.91 0.02 145);
-  --success: oklch(0.53 0.1 160);
-  --warning: oklch(0.64 0.14 65);
-  --sheet: oklch(0.985 0.008 85);
+  --radius: 8px;
+  --canvas: #F5F5F5;
+  --surface-2: #FCFCFC;
+  --fill-neutral: #EDEDED;
+  --fill-subtle: rgba(115,115,115,0.05);
+  --fill-selected: rgba(115,115,115,0.15);
+  --paper: #FAFAFA;
+  --paper-deep: #EDEDED;
+  --ink-green: #1E5B47;
+  --deep-ink: #1A1A1A;
+  --marigold: #737373;
+  --sage: #EDEDED;
+  --success: #1E5B47;
+  --warning: #B26B17;
+  --sheet: #FFFFFF;
 
   --background: var(--paper);
-  --foreground: var(--deep-ink);
-  --card: var(--sheet);
-  --card-foreground: var(--deep-ink);
-  --popover: var(--sheet);
-  --popover-foreground: var(--deep-ink);
-  --primary: var(--ink-green);
-  --primary-foreground: var(--paper);
-  --secondary: var(--sage);
-  --secondary-foreground: var(--ink-green);
-  --muted: var(--paper-deep);
-  --muted-foreground: oklch(0.45 0.02 160);
-  --accent: var(--marigold);
-  --accent-foreground: var(--deep-ink);
-  --destructive: oklch(0.55 0.17 30);
-  --destructive-foreground: var(--paper);
-  --border: oklch(0.86 0.02 85);
-  --input: oklch(0.86 0.02 85);
-  --ring: var(--ink-green);
-  --chart-1: var(--ink-green);
-  --chart-2: var(--marigold);
-  --chart-3: var(--success);
-  --chart-4: var(--warning);
-  --chart-5: var(--sage);
-  --sidebar: var(--sheet);
-  --sidebar-foreground: var(--deep-ink);
-  --sidebar-primary: var(--ink-green);
-  --sidebar-primary-foreground: var(--paper);
-  --sidebar-accent: var(--sage);
-  --sidebar-accent-foreground: var(--ink-green);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ink-green);
+  --foreground: #0D0D0D;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #1A1A1A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EDEDED;
+  --secondary-foreground: #1A1A1A;
+  --muted: #F0F0F0;
+  --muted-foreground: #616161;
+  --accent: #EDEDED;
+  --accent-foreground: #1A1A1A;
+  --destructive: #C2412D;
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(16,16,16,0.1);
+  --input: rgba(16,16,16,0.15);
+  --ring: #4F69F2;
+  --chart-1: #1E5B47;
+  --chart-2: #737373;
+  --chart-3: #3B8A6E;
+  --chart-4: #B26B17;
+  --chart-5: #DBDBDB;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #363636;
+  --sidebar-primary: #1E5B47;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(115,115,115,0.15);
+  --sidebar-accent-foreground: #1A1A1A;
+  --sidebar-border: rgba(16,16,16,0.1);
+  --sidebar-ring: #4F69F2;
 
-  --shadow-sheet: 0 1px 1px oklch(0.22 0.015 160 / 4%), 0 4px 10px -2px oklch(0.22 0.015 160 / 6%), 0 18px 36px -18px oklch(0.22 0.015 160 / 18%);
-  --shadow-lift: 0 2px 2px oklch(0.22 0.015 160 / 5%), 0 12px 24px -6px oklch(0.22 0.015 160 / 10%), 0 30px 60px -24px oklch(0.32 0.05 165 / 28%);
+  --shadow-sheet: none;
+  --shadow-lift: 0 0 2px rgba(18,18,18,.08), 0 2px 4px rgba(18,18,18,.08), 0 6px 6px rgba(18,18,18,.04), 0 14px 9px rgba(18,18,18,.02), 0 25px 10px rgba(18,18,18,.02);
 }
+
 
 @layer base {
   * {
@@ -136,21 +147,11 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv11", "ss01";
   }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 60;
-    opacity: 0.35;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  h1, h2, h3, .font-serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
-  ::selection { background: color-mix(in oklab, var(--marigold) 45%, transparent); }
+  h1, h2, h3, .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
+  ::selection { background: rgba(30,91,71,0.15); }
   /* One consistent, high-contrast focus ring everywhere keyboard users land. */
   :focus-visible {
-    outline: 2px solid var(--ink-green);
+    outline: 2px solid #4F69F2;
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -162,18 +163,12 @@
 /* Card that reads as a neat stack of sheets */
 @utility sheet-stack {
   position: relative;
-  background: var(--sheet);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow:
-    0 6px 0 -3px var(--sheet),
-    0 6px 0 -2px var(--border),
-    0 12px 0 -6px var(--paper-deep),
-    0 12px 0 -5px var(--border),
-    var(--shadow-sheet);
+  background: #FFFFFF;
+  border: 1px solid rgba(16,16,16,0.05);
+  border-radius: 16px;
 }
 
 /* Thin ledger lines */
 @utility ledger {
-  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, color-mix(in oklab, var(--ink-green) 9%, transparent) 31px 32px);
+  background-image: none;
 }

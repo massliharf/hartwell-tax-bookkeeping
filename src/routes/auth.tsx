@@ -59,9 +59,9 @@ function AuthPage() {
       <div className="w-full max-w-sm">
         <Link to="/" className="font-serif text-2xl text-ink">Hartwell Tax &amp; Bookkeeping</Link>
         <form onSubmit={submit} className="sheet-stack mt-8 space-y-5 p-7">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-sage text-ink"><Lock className="h-4 w-4" /></span>
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-ink"><Lock className="h-4 w-4" /></span>
           <div>
-            <h1 className="font-serif text-3xl text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
+            <h1 className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {setup ? "This is a one-time step. After this, only you can sign in." : "Sign in to see your day."}
             </p>
@@ -79,7 +79,7 @@ function AuthPage() {
           <Button type="submit" size="lg" className="w-full" disabled={busy || !data}>{busy ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>
         </form>
         <button type="button" onClick={() => { setEmail(DEMO_EMAIL); setPassword(DEMO_PASSWORD); }}
-          className="mt-4 w-full rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-sage/50">
+          className="mt-4 w-full rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-fill-subtle/50">
           Demo access: <span className="tabular text-deep-ink">{DEMO_EMAIL}</span> / <span className="tabular text-deep-ink">{DEMO_PASSWORD}</span>
           <span className="block text-xs">Tap to fill in.</span>
         </button>

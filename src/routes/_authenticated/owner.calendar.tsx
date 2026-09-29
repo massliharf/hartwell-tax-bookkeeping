@@ -84,7 +84,7 @@ function CalendarPage() {
           </div>
           {days.map((d) => (
             <div key={d} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(e, d)}
-              className={cn("relative border-l border-border ledger transition-colors", drag && "bg-sage/30", d === today && "bg-marigold/5")}
+              className={cn("relative border-l border-border ledger transition-colors", drag && "bg-fill-neutral/30", d === today && "bg-marigold/5")}
               style={{ backgroundSize: `100% ${60 * PX}px` }}>
               {byDay(d).map((a) => {
                 const { minutes } = et(a.start_at);
@@ -92,7 +92,7 @@ function CalendarPage() {
                 return (
                   <button key={a.id} draggable onDragStart={(e) => { e.dataTransfer.setData("text/plain", a.id); setDrag(a.id); }} onDragEnd={() => setDrag(null)}
                     onClick={() => setOpenId(a.id)}
-                    className={cn("absolute inset-x-1 overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-sheet transition-transform hover:-translate-y-px",
+                    className={cn("absolute inset-x-1 overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight transition-transform hover:-translate-y-px",
                       readinessStyle[readiness(a.ready_score)], a.status === "completed" && "opacity-60", drag === a.id && "opacity-40")}
                     style={{ top: (minutes - START) * PX, height: Math.max(22, h * PX - 2) }}>
                     <span className="tabular block font-medium">{fmtTime(a.start_at)} · {a.ready_score}%</span>
@@ -154,7 +154,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
         {a && (
           <>
             <DialogHeader>
-              <DialogTitle className="font-serif text-3xl font-normal">{a.clients?.name}</DialogTitle>
+              <DialogTitle className="font-serif text-xl leading-[30px] tracking-[-0.2px]">{a.clients?.name}</DialogTitle>
               <DialogDescription>{a.services?.name} · {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4">

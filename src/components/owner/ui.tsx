@@ -16,7 +16,7 @@ export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title
   return (
     <header className="mb-8">
       {eyebrow && <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>}
-      <h1 className="mt-1 font-serif text-4xl leading-tight text-deep-ink md:text-5xl">{title}</h1>
+      <h1 className="mt-1 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">{title}</h1>
       {children && <div className="mt-2 text-muted-foreground">{children}</div>}
     </header>
   );
@@ -26,7 +26,7 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   return (
     <div className="sheet-stack ledger mx-auto max-w-md px-8 py-12 text-center">
       <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-success/10 text-success"><Check className="h-6 w-6" /></span>
-      <h2 className="mt-4 font-serif text-3xl text-deep-ink">{title}</h2>
+      <h2 className="mt-4 font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{title}</h2>
       {children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}
     </div>
   );
@@ -142,7 +142,7 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
           <ul className="max-h-[60vh] overflow-auto border-b border-border p-3 md:border-b-0 md:border-r">
             {files.map((f) => (
               <li key={f.id}>
-                <button onClick={() => pick(f)} className={cn("w-full rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-sage", sel?.id === f.id && "bg-sage")}>
+                <button onClick={() => pick(f)} className={cn("w-full rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-fill-subtle", sel?.id === f.id && "bg-fill-neutral")}>
                   <span className="block text-deep-ink">{f.document_name}</span>
                   {f.uploaded_at && <span className="text-xs text-muted-foreground">Received {fmtLong(f.uploaded_at)}</span>}
                 </button>
@@ -165,5 +165,5 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
 }
 
 export function CloseX({ onClick }: { onClick: () => void }) {
-  return <button onClick={onClick} aria-label="Close" className="rounded-full p-1 hover:bg-sage"><X className="h-4 w-4" /></button>;
+  return <button onClick={onClick} aria-label="Close" className="rounded-full p-1 hover:bg-fill-subtle"><X className="h-4 w-4" /></button>;
 }

@@ -4,11 +4,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const tokenSchema = z.string().regex(/^[a-f0-9]{64}$/);
 
-export async function requestOrigin() {
-  const { getRequest } = await import("@tanstack/react-start/server");
-  try { return new URL(getRequest().url).origin; } catch { return process.env["SITE_URL"] ?? ""; }
-}
-
 /** Owner: run all automations now (same as the 15-minute schedule). */
 export const runAutomationsNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -16,7 +11,8 @@ export const runAutomationsNow = createServerFn({ method: "POST" })
     const { data: isOwner } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (!isOwner) throw new Error("Forbidden");
     const { runAutomations } = await import("./automations.server");
-    return runAutomations(await requestOrigin());
+    const { requestOrigin } = await import("./origin.server");
+    return runAutomations(requestOrigin());
   });
 
 /** Waitlist: first to claim gets the slot. */
@@ -35,7 +31,8 @@ export const claimOffer = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ token: tokenSchema }).parse(d))
   .handler(async ({ data }) => {
     const { claimOfferByToken } = await import("./automations.server");
-    return claimOfferByToken(data.token, await requestOrigin());
+    const { requestOrigin } = await import("./origin.server");
+    return claimOfferByToken(data.token, requestOrigin());
   });
 
 /** Abandoned-booking link: returns the saved partial booking. */

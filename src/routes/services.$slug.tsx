@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Clock3, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SERVICES } from "@/lib/services";
-import { SERVICE_PHOTOS } from "./index";
+import { SERVICE_PHOTOS } from "@/components/site/service-photos";
 import { SiteHeader, SiteFooter } from "@/components/site/SiteChrome";
 export const Route = createFileRoute("/services/$slug")({
   loader: ({ params }) => { const service = SERVICES.find(s => s.id === params.slug); if (!service) throw notFound(); return service; },

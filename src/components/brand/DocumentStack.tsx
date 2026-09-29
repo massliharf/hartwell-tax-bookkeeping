@@ -13,18 +13,18 @@ export function DocumentStack({ docs }: { docs: StackDoc[] }) {
           <motion.li
             key={d.id}
             layout={!reduce}
-            initial={reduce ? false : { opacity: 0, y: -18, rotate: -1.5, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
+             initial={reduce ? false : { opacity: 0.9, y: 8 }}
+             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ type: "spring", stiffness: 260, damping: 24 }}
+             transition={{ duration: 0.2 }}
             className="flex items-center gap-3 rounded-xl border border-border bg-sheet px-3.5 py-3 shadow-sheet"
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sage text-ink">
               <FileText className="size-4" strokeWidth={1.75} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium text-deep-ink">{d.title}</span>
-              <span className="block truncate text-xs text-muted-foreground">{d.note}</span>
+               <span className="block break-words text-sm font-medium text-deep-ink">{d.title}</span>
+               <span className="block break-words text-xs text-muted-foreground">{d.note}</span>
             </span>
             <span className="relative grid size-6 shrink-0 place-items-center rounded-full border border-border">
               <AnimatePresence>

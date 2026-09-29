@@ -103,12 +103,12 @@ function BookPage() {
 
   return (
     <BookingShell step={step}>
-      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[1fr_320px]" : ""}`}>
+      <div className={`mx-auto grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_280px]" : "max-w-2xl"}`}>
         <div className="min-w-0">
           {step > 0 && (
-            <button onClick={() => go(step - 1)} className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-ink">
+            <Button variant="ghost" size="sm" onClick={() => go(step - 1)} className="mb-6 -ml-3 text-muted-foreground hover:text-ink">
               <ArrowLeft className="size-4" /> Back
-            </button>
+            </Button>
           )}
           <AnimatePresence mode="wait">
             <motion.div

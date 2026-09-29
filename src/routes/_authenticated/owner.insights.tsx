@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { motion, useReducedMotion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows } from "@/components/owner/ui";
@@ -101,13 +100,13 @@ function Insights() {
 
       <section className="mt-12 grid overflow-hidden rounded-2xl border border-border md:grid-cols-2">
         <div className="bg-paper-deep/60 p-7 md:p-9">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Before</p>
+          <p className="text-xs font-medium text-muted-foreground">Before</p>
           <p className="mt-4 font-serif text-xl leading-[30px] text-deep-ink/60">
             {BEFORE.msgsPerBooking} messages per booking.<br />1 in 3 clients unprepared.
           </p>
         </div>
         <div className="relative bg-ink p-7 text-primary-foreground md:p-9">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-marigold">Now</p>
+          <p className="text-xs font-medium text-marigold">Now</p>
           <p className="mt-4 font-serif text-xl leading-[30px]">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>
@@ -119,16 +118,15 @@ function Insights() {
 }
 
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
-  const reduce = useReducedMotion();
   return (
     <header className="ledger relative overflow-hidden rounded-2xl bg-surface-2 px-7 py-12 md:px-12 md:py-16">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Insights · last 30 days</p>
-      <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      <p className="text-xs font-medium text-muted-foreground">Insights, last 30 days</p>
+      <h1
         className="mt-3 font-serif text-[40px] leading-[48px] text-deep-ink md:text-[56px] md:leading-[64px]">
         <span className="tabular text-ink">{hours}</span> hour{hours === 1 ? "" : "s"} given back<br className="hidden sm:block" /> this month.
-      </motion.h1>
+      </h1>
       <p className="tabular mt-4 max-w-md text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups you didn't have to write.</p>
-      <motion.span aria-hidden initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.4, duration: 0.8 }}
+      <span aria-hidden
         className="mt-8 block h-1 w-24 origin-left rounded-full bg-marigold" />
     </header>
   );
@@ -166,7 +164,7 @@ function AreaSpark({ data, baseline, max, suffix, tone = "ink" }: { data: Pt[]; 
         </defs>
         {axis}
         {baseline !== undefined && <ReferenceLine y={baseline} stroke="var(--muted-foreground)" strokeOpacity={0.45} strokeDasharray="3 4" />}
-        <Area type="monotone" dataKey="v" stroke={c} strokeWidth={2} fill={`url(#${id})`} dot={false} activeDot={{ r: 3 }} isAnimationActive />
+        <Area type="monotone" dataKey="v" stroke={c} strokeWidth={2} fill={`url(#${id})`} dot={false} activeDot={{ r: 3 }} isAnimationActive={false} />
         {tip(suffix)}
         <YAxis hide domain={[0, max]} />
       </AreaChart>
@@ -178,7 +176,7 @@ function Bars({ data, tone = "ink" }: { data: Pt[]; tone?: "ink" | "marigold" })
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
         {axis}
-        <Bar dataKey="v" radius={[6, 6, 2, 2]} fill={tone === "ink" ? "var(--ink-green)" : "var(--marigold)"} fillOpacity={0.85} maxBarSize={28} />
+        <Bar dataKey="v" radius={[6, 6, 2, 2]} fill={tone === "ink" ? "var(--ink-green)" : "var(--marigold)"} fillOpacity={0.85} maxBarSize={28} isAnimationActive={false} />
         {tip()}
       </BarChart>
     </ResponsiveContainer>

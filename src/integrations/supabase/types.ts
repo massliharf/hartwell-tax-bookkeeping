@@ -86,6 +86,21 @@ export type Database = {
           },
         ]
       }
+      automation_config: {
+        Row: {
+          cron_token: string
+          id: number
+        }
+        Insert: {
+          cron_token?: string
+          id?: number
+        }
+        Update: {
+          cron_token?: string
+          id?: number
+        }
+        Relationships: []
+      }
       checklist_items: {
         Row: {
           appointment_id: string

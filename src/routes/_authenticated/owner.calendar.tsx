@@ -84,7 +84,7 @@ function CalendarPage() {
           </div>
           {days.map((d) => (
             <div key={d} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(e, d)}
-              className={cn("relative border-l border-border ledger transition-colors", drag && "bg-fill-neutral/30", d === today && "bg-marigold/5")}
+              className={cn("relative border-l border-border ledger", drag && "bg-fill-neutral/30", d === today && "bg-marigold/5")}
               style={{ backgroundSize: `100% ${60 * PX}px` }}>
               {byDay(d).map((a) => {
                 const { minutes } = et(a.start_at);

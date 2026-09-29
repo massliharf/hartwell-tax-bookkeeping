@@ -288,7 +288,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const full = !d.closed && d.slots.length === 0;
               return (
                 <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors ${
+                  className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${
                     active ? "bg-fill-selected text-deep-ink" : d.closed ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
                    <span className="text-[11px] opacity-70">{c.dow}</span>
                   <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
@@ -303,7 +303,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <button key={s} onClick={() => { update({ date: day.date, slot: s }); onDone(); }}
-                    className={`tabular h-8 rounded-lg text-xs font-medium transition-colors ${draft.slot === s ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] hover:border-ink"}`}>
+                    className={`tabular h-8 rounded-lg text-xs font-medium transition-colors duration-150 ${draft.slot === s ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] hover:border-ink"}`}>
                     {fmtTime(s)}
                   </button>
                 ))}

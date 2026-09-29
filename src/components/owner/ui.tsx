@@ -99,7 +99,7 @@ export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean 
       <div className="mt-4 border-t border-border pt-4">
         {missing.length ? (
           <>
-            <p className="text-xs font-medium text-warning">Still missing, {missing.length}</p>
+            <p className="text-xs font-medium text-warning">Still missing: {missing.length}</p>
             <ul className="mt-2 flex flex-wrap gap-2">
               {missing.map((m) => <li key={m.id} className="rounded-full border border-border bg-paper px-3 py-1 text-xs text-deep-ink">{m.document_name}</li>)}
             </ul>

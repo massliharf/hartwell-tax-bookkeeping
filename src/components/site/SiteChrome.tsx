@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
@@ -44,7 +44,7 @@ export function SiteHeader() {
               {[{ href: "/#how", label: "How it works" }, { href: "/#services", label: "Services" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }].map((item) => (
                 <SheetClose asChild key={item.href}><a href={item.href} className="rounded-lg px-3 py-3 hover:bg-fill-neutral">{item.label}</a></SheetClose>
               ))}
-              <SheetClose asChild><Button asChild className="mt-4"><Link to="/book">Book</Link></Button></SheetClose>
+              <SheetClose asChild><Link to="/book" className={buttonVariants({ className: "mt-4" })}>Book</Link></SheetClose>
             </nav>
           </SheetContent>
         </Sheet>

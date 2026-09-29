@@ -203,7 +203,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
     <>
       <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
       <div className="mb-6 inline-flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink lg:hidden">
-        Your checklist so far: <span className="tabular font-medium">{count} documents</span>
+        Your checklist so far: <span className="tabular font-medium">{count} {count === 1 ? "document" : "documents"}</span>
       </div>
       <div className="space-y-3">
         {visible.map((q) => (

@@ -15,7 +15,7 @@
   request — it is the source of truth for scope, business rules, service data,
   privacy constraints, and brand. When a request conflicts with it, flag the
   conflict instead of silently overriding it.
-  _Why: this is a real client project (Patel Tax & Bookkeeping); the rules there
+  _Why: this is a real client project (Hartwell Tax & Bookkeeping); the rules there
   (instant booking, never ask for an SSN, `getNow()` for all time logic) are
   non-negotiable and must survive every session._
 - Brand primitives live in src/components/brand (ReadyRing, DocumentStack, Reveal); service data in src/lib/services.ts — single source for prices/hours.

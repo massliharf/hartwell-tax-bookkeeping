@@ -1,4 +1,4 @@
-# PROJECT BRIEF — Patel Tax & Bookkeeping
+# PROJECT BRIEF — Hartwell Tax & Bookkeeping
 
 > Read and follow this file in every future request. It is the source of truth for
 > scope, business rules, data, brand, and constraints. If a request conflicts with
@@ -6,13 +6,13 @@
 
 ## 1. What we are building
 
-A real client project: the website and booking system for **Patel Tax &
-Bookkeeping**, Edison, New Jersey.
+A real client project: the website and booking system for **Hartwell Tax &
+Bookkeeping**, Montclair, New Jersey.
 
 ## 2. The client
 
-Priya Patel, EA (IRS Enrolled Agent). Solo practice, small office on Oak Tree
-Road, Edison NJ. She prepares individual returns, self-employed returns, rental
+Claire Hartwell, EA (IRS Enrolled Agent). Solo practice, small office at 412 Bloomfield
+Avenue, Montclair, NJ 07042 (phone (973) 555-0142). She prepares individual returns, self-employed returns, rental
 property returns, and does small-business bookkeeping. No staff. Clients meet in
 person or by video call.
 
@@ -30,9 +30,9 @@ person or by video call.
 
 ## 4. The goal
 
-Turn "can I book with you?" into "you're booked" with zero effort from Priya, and
+Turn "can I book with you?" into "you're booked" with zero effort from Claire, and
 make sure every client arrives ready. **The booking is ALWAYS confirmed instantly;
-documents are collected afterwards and never block the booking.** Priya only
+documents are collected afterwards and never block the booking.** Claire only
 handles exceptions.
 
 ## 5. Services (duration / price — fee paid at filing, no payment at booking)
@@ -54,7 +54,7 @@ handles exceptions.
 Tax documents are sensitive.
 
 - **Never ask for a Social Security number anywhere.**
-- Uploaded files go to private storage, visible only to Priya, accessed through
+- Uploaded files go to private storage, visible only to Claire, accessed through
   short-lived signed URLs.
 - Always show calm, clear privacy reassurance near uploads.
 

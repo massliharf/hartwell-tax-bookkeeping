@@ -51,11 +51,11 @@ export async function sendBookingConfirmation(apptId: string, origin: string) {
       where(a),
       ...(docs.all.length ? [{ p: "Here is your personal checklist. Upload whenever it suits you, there's no rush today." } as Block, { list: docs.all }] : []),
       { button: { label: "Open your checklist", href: portal } },
-      { note: "A calendar invite is attached. Your documents go to private storage that only Priya can see." },
+      { note: "A calendar invite is attached. Your documents go to private storage that only Claire can see." },
     ],
-    ics: buildIcs({ id: a.id, start: a.start_at, end: a.end_at, title: `Patel Tax: ${a.services?.name ?? "Appointment"}`,
+    ics: buildIcs({ id: a.id, start: a.start_at, end: a.end_at, title: `Hartwell Tax: ${a.services?.name ?? "Appointment"}`,
       location: a.meeting_type === "video" ? "Video call" : OFFICE, description: `Your checklist: ${portal}` }),
-    sms: `Patel Tax: you're booked for ${when}. Your checklist: ${portal}`,
+    sms: `Hartwell Tax: you're booked for ${when}. Your checklist: ${portal}`,
   });
 }
 
@@ -89,7 +89,7 @@ export async function offerFreedSlot(serviceId: string, slotStart: string, origi
         { button: { label: "Claim this time", href: link } },
         { note: "If it's taken before you tap, you stay on the waitlist. Nothing to do." },
       ],
-      sms: `Patel Tax: a spot opened ${when}. First to claim gets it: ${link}`,
+      sms: `Hartwell Tax: a spot opened ${when}. First to claim gets it: ${link}`,
     });
   }
 }
@@ -135,7 +135,7 @@ export async function runAutomations(origin: string) {
             { p: `Hi ${first(c.name)}, your appointment is ${when}. Here's what's still on your list:` },
             { list: missing },
             { button: { label: "Upload from your phone", href: portal } },
-            { note: "A clear photo is fine. Files go to private storage only Priya can see." },
+            { note: "A clear photo is fine. Files go to private storage only Claire can see." },
           ],
         }));
       }
@@ -158,7 +158,7 @@ export async function runAutomations(origin: string) {
             { button: { label: "Keep my time and upload now", href: portal } },
             { note: "Either way is completely fine. We just want your visit to count." },
           ],
-          sms: `Patel Tax: a few documents are still missing for ${when}. Upload or move your time: ${portal}`,
+          sms: `Hartwell Tax: a few documents are still missing for ${when}. Upload or move your time: ${portal}`,
         });
         if (sent) await s.from("appointments").update({ needs_attention: true, attention_reason: `Ready ${a.ready_score}% at 48h check` }).eq("id", a.id);
         hit("readiness_low", sent);
@@ -167,7 +167,7 @@ export async function runAutomations(origin: string) {
           dedupeKey: key("ready48"), type: "readiness_check_48h", minutesSaved: 10, clientId: c.id, appointmentId: a.id, to: c.email,
           subject: "You're all set",
           heading: "You're all set.",
-          blocks: [{ p: `Hi ${first(c.name)}, Priya has everything she needs for ${when}. See you then.` }, { button: { label: "View your appointment", href: portal } }],
+          blocks: [{ p: `Hi ${first(c.name)}, Claire has everything she needs for ${when}. See you then.` }, { button: { label: "View your appointment", href: portal } }],
         }));
       }
     }
@@ -186,7 +186,7 @@ export async function runAutomations(origin: string) {
           ...(all.length ? [{ list: all } as Block] : []),
           { button: { label: "I'll be there", href: `${portal}?confirm=1` } },
         ],
-        sms: `Patel Tax: see you ${when}. Tap to confirm: ${portal}?confirm=1`,
+        sms: `Hartwell Tax: see you ${when}. Tap to confirm: ${portal}?confirm=1`,
       }));
     }
   }
@@ -205,8 +205,8 @@ export async function runAutomations(origin: string) {
           dedupeKey: `sign${d}d:${a.id}`, type: "signature_reminder", minutesSaved: 6, clientId: c.id, appointmentId: a.id, to: c.email,
           subject: "One signature and you're filed",
           heading: "One signature and you're filed.",
-          blocks: [{ p: `Hi ${first(c.name)}, your return is ready. Priya just needs your e-file authorization (Form 8879). It takes about a minute.` }, { button: { label: "Sign now", href: portal } }],
-          sms: `Patel Tax: your return is ready to file. Sign here: ${portal}`,
+          blocks: [{ p: `Hi ${first(c.name)}, your return is ready. Claire just needs your e-file authorization (Form 8879). It takes about a minute.` }, { button: { label: "Sign now", href: portal } }],
+          sms: `Hartwell Tax: your return is ready to file. Sign here: ${portal}`,
         }));
       }
     }
@@ -216,7 +216,7 @@ export async function runAutomations(origin: string) {
         dedupeKey: `missing2d:${a.id}`, type: "missing_docs_after", minutesSaved: 6, clientId: c.id, appointmentId: a.id, to: c.email,
         subject: "Just a few documents to finish your return",
         heading: "Almost done.",
-        blocks: [{ p: `Hi ${first(c.name)}, thanks for coming in. To finish your return, Priya still needs:` }, { list: missing }, { button: { label: "Upload them here", href: portal } }],
+        blocks: [{ p: `Hi ${first(c.name)}, thanks for coming in. To finish your return, Claire still needs:` }, { list: missing }, { button: { label: "Upload them here", href: portal } }],
       }));
     }
   }

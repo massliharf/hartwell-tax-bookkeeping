@@ -13,9 +13,9 @@ import { fromIntakePayload } from "@/lib/intake";
 export const Route = createFileRoute("/book/returning")({
   head: () => ({
     meta: [
-      { title: "Returning clients — Patel Tax & Bookkeeping" },
-      { name: "description", content: "Booked with Priya before? Enter your email and book again in about 30 seconds." },
-      { property: "og:title", content: "Returning clients — Patel Tax & Bookkeeping" },
+      { title: "Returning clients — Hartwell Tax & Bookkeeping" },
+      { name: "description", content: "Booked with Claire before? Enter your email and book again in about 30 seconds." },
+      { property: "og:title", content: "Returning clients — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Book again in about 30 seconds." },
     ],
   }),

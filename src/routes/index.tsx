@@ -6,9 +6,10 @@ import { Reveal } from "@/components/brand/Reveal";
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
+import claire from "@/assets/claire-portrait.jpg";
 
-const TITLE = "Patel Tax & Bookkeeping — Taxes, without the chase";
-const DESC = "Book a tax appointment with Priya Patel, EA in Edison, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
+const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
+const DESC = "Book a tax appointment with Claire Hartwell, EA in Montclair, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,7 +55,7 @@ function Hero() {
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 md:grid-cols-[1.15fr_1fr] md:pt-24">
       <Reveal>
-        <Eyebrow>Priya Patel, EA · Edison, New Jersey</Eyebrow>
+        <Eyebrow>Claire Hartwell, EA · Montclair, New Jersey</Eyebrow>
         <h1 className="mt-5 text-[3.4rem] leading-[0.95] text-deep-ink sm:text-7xl lg:text-[5.75rem]">
           Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-marigold/40" /></em>
         </h1>
@@ -73,7 +74,7 @@ function Hero() {
 }
 
 function TrustStrip() {
-  const items = ["IRS Enrolled Agent", "12 years in Edison", "In person or video", "Your documents stay private"];
+  const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
     <div className="border-y border-border bg-sheet/60">
       <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-5 py-4 text-sm text-deep-ink/80">
@@ -99,7 +100,7 @@ function HowItWorks() {
   const steps = [
     { icon: CalendarCheck, title: "Book a time", text: "Pick a service and a slot that suits you. You're confirmed on the spot." },
     { icon: FileUp, title: "Upload what's on your list", text: "You get a short checklist made for your return. Add documents whenever you have them." },
-    { icon: Check, title: "Arrive ready, file once", text: "Priya reviews everything beforehand, so your appointment is the only one you need." },
+    { icon: Check, title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need." },
   ];
   return (
     <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
@@ -164,19 +165,19 @@ function About() {
           <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[1.5rem] border border-ink/20" />
           <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[1.5rem] border border-border bg-sheet shadow-lift">
             <div className="ledger absolute inset-0 opacity-60" />
-            <span className="relative font-serif text-8xl text-ink/25">PP</span>
+            <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
-          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Priya Patel, EA</figcaption>
+          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>
-        <Eyebrow>About Priya</Eyebrow>
+        <Eyebrow>About Claire</Eyebrow>
         <h2 className="mt-3 text-4xl leading-tight text-deep-ink sm:text-5xl">A neighbor who happens to love the tax code.</h2>
         <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-deep-ink/75">
-          <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Edison file with confidence.</p>
+          <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
-        <p className="mt-6 font-serif text-2xl italic text-ink">— Priya</p>
+        <p className="mt-6 font-serif text-2xl italic text-ink">— Claire</p>
       </Reveal>
     </section>
   );
@@ -184,9 +185,9 @@ function About() {
 
 function Testimonials() {
   const t = [
-    { q: "I uploaded everything the week before and my appointment took forty minutes. First year I didn't have to come back.", n: "Anita R.", r: "Individual return, Edison" },
-    { q: "Priya untangled three years of 1099s from my design work and explained every line. I finally understand my taxes.", n: "Marcus L.", r: "Freelancer, Metuchen" },
-    { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Iselin" },
+    { q: "I uploaded everything the week before and my appointment took forty minutes. First year I didn't have to come back.", n: "Anita R.", r: "Individual return, Montclair" },
+    { q: "Claire untangled three years of 1099s from my design work and explained every line. I finally understand my taxes.", n: "Marcus L.", r: "Freelancer, Glen Ridge" },
+    { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
     <section className="bg-ink py-24 text-paper">
@@ -209,7 +210,7 @@ function Testimonials() {
 
 function Privacy() {
   const points = [
-    { icon: Lock, title: "Private by default", text: "Your files are kept in private storage. Only Priya can open them." },
+    { icon: Lock, title: "Private by default", text: "Your files are kept in private storage. Only Claire can open them." },
     { icon: KeyRound, title: "Short-lived access", text: "Each time a file is opened, a link is created that expires within minutes." },
     { icon: ShieldCheck, title: "No Social Security number", text: "We never ask for it online. What's needed is handled in person, safely." },
     { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
@@ -233,7 +234,7 @@ function Privacy() {
 
 function Faq() {
   const qs = [
-    { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return — usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Priya will confirm everything is there." },
+    { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return — usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Claire will confirm everything is there." },
     { q: "Video call or in person?", a: "Whichever you prefer. Both work the same way: documents are uploaded beforehand, and we go through your return together. Choose when you book." },
     { q: "Can I reschedule?", a: "Of course. Use the link in your confirmation email to pick a new time. If you can't make it, please let us know so someone waiting can take your slot." },
     { q: "Can you file an extension for me?", a: "Yes. An extension gives you until October 15 to file, but any tax owed is still due in April. Book an Extension review and we'll handle it." },

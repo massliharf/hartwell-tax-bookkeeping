@@ -216,8 +216,8 @@ insert into public.settings (id, hours, buffer_min, reminder_timings, demo_time_
 
 do $$
 declare
-  names text[] := array['Anita Raman','Marcus Lee','Deepa Shah','Raj Shah','Wei Zhang','Mei Lin Chen','Jae-won Park','Soo-jin Kim','Carlos Mendoza','Lucia Hernandez','Giovanni Russo','Maria DeLuca','Sean O''Brien','Kathleen Murphy','Darnell Washington','Keisha Johnson','Maricel Santos','Jose Reyes','Piotr Kowalski','Agnieszka Nowak','Omar Haddad','Layla Mansour','Vikram Iyer','Sunita Reddy','Arjun Mehta','Kavya Nair','Hiroshi Tanaka','Yuki Sato','Daniel Goldberg','Rachel Klein','Amit Desai','Neha Kapoor','Tomasz Wisniewski','Fatima Ahmed','Samuel Okafor','Grace Adeyemi','Michael Thompson','Jennifer Walsh','Priyanka Joshi','Rohan Gupta','Elena Petrova','Ahmed Khalil','Nicole Brennan','Kevin Nguyen','Linh Tran'];
-  employers text[] := array['Johnson & Johnson','Rutgers University','Hackensack Meridian Health','JFK University Medical Center','Wakefern Food Corp','Siemens Healthineers','Middlesex County','Edison Public Schools','Novo Nordisk','Verizon'];
+  names text[] := array['Anita Raman','Marcus Lee','Deepa Shah','Raj Shah','Wei Zhang','Mei Lin Chen','Jae-won Park','Soo-jin Kim','Carlos Mendoza','Lucia Hernandez','Giovanni Russo','Maria DeLuca','Sean O''Brien','Kathleen Murphy','Darnell Washington','Keisha Johnson','Maricel Santos','Jose Reyes','Piotr Kowalski','Agnieszka Nowak','Omar Haddad','Layla Mansour','Vikram Iyer','Sunita Reddy','Arjun Mehta','Kavya Nair','Hiroshi Tanaka','Yuki Sato','Daniel Goldberg','Rachel Klein','Amit Desai','Neha Kapoor','Tomasz Wisniewski','Fatima Ahmed','Samuel Okafor','Grace Adeyemi','Michael Thompson','Jennifer Walsh','Clairenka Joshi','Rohan Gupta','Elena Petrova','Ahmed Khalil','Nicole Brennan','Kevin Nguyen','Linh Tran'];
+  employers text[] := array['Johnson & Johnson','Rutgers University','Hackensack Meridian Health','JFK University Medical Center','Wakefern Food Corp','Siemens Healthineers','Middlesex County','Montclair Public Schools','Novo Nordisk','Verizon'];
   client_ids uuid[] := '{}';
   cid uuid; aid uuid; svc record; fn text; ln text;
   i int; d date; t time; slots time[]; st timestamptz; ci int := 0;
@@ -230,7 +230,7 @@ begin
     insert into clients (name, email, phone, is_returning, created_at)
     values (names[i],
             lower(regexp_replace(fn,'[^A-Za-z]','','g')) || '.' || lower(regexp_replace(ln,'[^A-Za-z]','','g')) || '@example.com',
-            '(732) 555-' || lpad((100 + i)::text, 4, '0'),
+            '(973) 555-' || lpad((100 + i)::text, 4, '0'),
             random() < 0.6,
             now() - (interval '1 day' * (30 + floor(random()*900))))
     returning id into cid;
@@ -311,7 +311,7 @@ begin
    ('ayesha.malik@example.com','Ayesha Malik','{"service":"individual","slot":"2026-10-13T10:30"}','intake', now() - interval '3 days', now() - interval '1 day');
 
   insert into messages (client_id, appointment_id, channel, type, subject, body, sent_at, minutes_saved)
-  select a.client_id, a.id, 'email', 'booking_confirmation', 'You''re booked with Priya',
+  select a.client_id, a.id, 'email', 'booking_confirmation', 'You''re booked with Claire',
          'Your appointment is confirmed. Your document checklist is ready whenever you are.', a.created_at, 6
   from appointments a where a.start_at >= timestamptz '2026-10-01' order by a.start_at limit 8;
   insert into messages (client_id, appointment_id, channel, type, subject, body, sent_at, minutes_saved)
@@ -320,6 +320,6 @@ begin
   from appointments a where a.signature_status = 'pending';
   insert into messages (client_id, appointment_id, channel, type, subject, body, sent_at, minutes_saved)
   select a.client_id, a.id, 'sms', 'docs_reminder_7d', null,
-         'Patel Tax: your appointment is in a week. A few documents are still on your list.', a.start_at - interval '7 days', 4
+         'Hartwell Tax: your appointment is in a week. A few documents are still on your list.', a.start_at - interval '7 days', 4
   from appointments a where a.ready_score < 60 and a.start_at >= timestamptz '2026-10-05' order by a.start_at limit 5;
 end $$;

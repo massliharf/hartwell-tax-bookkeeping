@@ -13,9 +13,9 @@ export const Route = createFileRoute("/move/$token")({
   validateSearch: z.object({ to: z.string().datetime({ offset: true }).optional() }),
   head: () => ({
     meta: [
-      { title: "Move your appointment — Patel Tax & Bookkeeping" },
+      { title: "Move your appointment — Hartwell Tax & Bookkeeping" },
       { name: "description", content: "Move your appointment to a later time in one tap." },
-      { property: "og:title", content: "Move your appointment — Patel Tax & Bookkeeping" },
+      { property: "og:title", content: "Move your appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a later time so your visit counts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -15,30 +15,30 @@ export const Route = createFileRoute("/book/confirmed")({
   validateSearch: z.object({ token: z.string().min(10).max(100).optional() }),
   head: () => ({
     meta: [
-      { title: "You're booked — Patel Tax & Bookkeeping" },
+      { title: "You're booked — Hartwell Tax & Bookkeeping" },
       { name: "description", content: "Your appointment is confirmed." },
-      { property: "og:title", content: "You're booked — Patel Tax & Bookkeeping" },
-      { property: "og:description", content: "Your appointment with Priya Patel, EA is confirmed." },
+      { property: "og:title", content: "You're booked — Hartwell Tax & Bookkeeping" },
+      { property: "og:description", content: "Your appointment with Claire Hartwell, EA is confirmed." },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: ConfirmedPage,
 });
 
-const ADDRESS = "Oak Tree Road, Edison, NJ";
+const ADDRESS = "412 Bloomfield Avenue, Montclair, NJ 07042";
 const gcalStamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 function downloadIcs(title: string, start: string, end: string, where: string, details: string) {
   const ics = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Patel Tax//Booking//EN", "BEGIN:VEVENT",
-    `UID:${gcalStamp(start)}-patel-tax`, `DTSTAMP:${gcalStamp(new Date().toISOString())}`,
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Hartwell Tax//Booking//EN", "BEGIN:VEVENT",
+    `UID:${gcalStamp(start)}-hartwell-tax`, `DTSTAMP:${gcalStamp(new Date().toISOString())}`,
     `DTSTART:${gcalStamp(start)}`, `DTEND:${gcalStamp(end)}`,
     `SUMMARY:${title}`, `LOCATION:${where}`, `DESCRIPTION:${details.replace(/\n/g, "\\n")}`,
     "END:VEVENT", "END:VCALENDAR",
   ].join("\r\n");
   const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
   const a = document.createElement("a");
-  a.href = url; a.download = "patel-tax-appointment.ics"; a.click();
+  a.href = url; a.download = "hartwell-tax-appointment.ics"; a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -71,7 +71,7 @@ function ConfirmedPage() {
   const service = a.services?.name ?? "Appointment";
   const first = a.clients?.name?.split(" ")[0] ?? "";
   const where = a.meeting_type === "video" ? "Video call (link will be emailed)" : ADDRESS;
-  const title = `${service} with Priya Patel, EA`;
+  const title = `${service} with Claire Hartwell, EA`;
   const manageUrl = typeof window !== "undefined" ? `${window.location.origin}/a/${token}` : "";
   const details = `Upload your documents: ${manageUrl}`;
   const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${gcalStamp(a.start_at)}/${gcalStamp(a.end_at)}&location=${encodeURIComponent(where)}&details=${encodeURIComponent(details)}`;
@@ -120,7 +120,7 @@ function ConfirmedPage() {
             <ReadyRing value={a.ready_score} size={84} />
             <div className="min-w-0">
               <p className="font-serif text-3xl text-deep-ink">Your checklist</p>
-              <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Priya will check everything before you arrive.</p>
+              <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Claire will check everything before you arrive.</p>
             </div>
           </div>
           <div className="mt-6">
@@ -131,7 +131,7 @@ function ConfirmedPage() {
           </Button>
           <p className="mt-3 text-center text-sm text-muted-foreground">or do it later — we'll remind you</p>
           <p className="mt-5 flex items-start gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
-            <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Priya can open. We'll never ask for your Social Security number online.
+            <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We'll never ask for your Social Security number online.
           </p>
         </motion.div>
       </div>

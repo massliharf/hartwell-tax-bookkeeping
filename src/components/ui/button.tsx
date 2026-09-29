@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground shadow-sheet hover:-translate-y-0.5 hover:shadow-lift",
-        highlight: "bg-marigold text-deep-ink shadow-sheet hover:-translate-y-0.5 hover:shadow-lift",
+        highlight: "bg-ink text-deep-ink shadow-sheet hover:-translate-y-0.5 hover:shadow-lift",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-ink/25 bg-transparent text-ink hover:border-ink hover:bg-sheet",

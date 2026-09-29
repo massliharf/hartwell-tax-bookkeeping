@@ -56,7 +56,7 @@ function Hero() {
       <Reveal>
         <Eyebrow>Priya Patel, EA · Edison, New Jersey</Eyebrow>
         <h1 className="mt-5 text-[3.4rem] leading-[0.95] text-deep-ink sm:text-7xl lg:text-[5.75rem]">
-          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-marigold/40" /></em>
+          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-ink/40" /></em>
         </h1>
         <p className="mt-6 max-w-md text-lg leading-relaxed text-deep-ink/75">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
@@ -111,10 +111,10 @@ function HowItWorks() {
               <div className="relative mb-6 h-28 w-40">
                 <div className="absolute left-6 top-3 h-24 w-28 rotate-6 rounded-xl border border-border bg-paper-deep" />
                 <div className="absolute left-3 top-1.5 h-24 w-28 rotate-2 rounded-xl border border-border bg-sheet shadow-sheet" />
-                <div className="ledger absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet shadow-sheet">
+                <div className="absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet shadow-sheet">
                   <s.icon className="size-8 text-ink" strokeWidth={1.5} />
                 </div>
-                <span className="tabular absolute -right-1 -top-2 grid size-8 place-items-center rounded-full bg-marigold font-serif text-lg text-deep-ink">{i + 1}</span>
+                <span className="tabular absolute -right-1 -top-2 grid size-8 place-items-center rounded-full bg-ink font-sans text-lg text-deep-ink">{i + 1}</span>
               </div>
               <h3 className="text-2xl text-deep-ink">{s.title}</h3>
               <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-deep-ink/70">{s.text}</p>
@@ -141,7 +141,7 @@ function Services() {
                 <div className="mt-auto flex items-end justify-between border-t border-border pt-5 mt-8">
                   <p className="text-deep-ink">
                     {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                    <span className="tabular font-serif text-3xl">${s.price}</span>
+                    <span className="tabular font-sans text-3xl">${s.price}</span>
                   </p>
                   <span className="inline-flex items-center gap-1 text-sm font-medium text-ink">
                     Book <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -163,8 +163,8 @@ function About() {
         <figure className="relative mx-auto w-full max-w-xs">
           <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[1.5rem] border border-ink/20" />
           <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[1.5rem] border border-border bg-sheet shadow-lift">
-            <div className="ledger absolute inset-0 opacity-60" />
-            <span className="relative font-serif text-8xl text-ink/25">PP</span>
+            <div className="absolute inset-0 opacity-60" />
+            <span className="relative font-sans text-8xl text-ink/25">PP</span>
           </div>
           <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Priya Patel, EA</figcaption>
         </figure>
@@ -176,7 +176,7 @@ function About() {
           <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Edison file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
-        <p className="mt-6 font-serif text-2xl italic text-ink">— Priya</p>
+        <p className="mt-6 font-sans text-2xl text-ink">— Priya</p>
       </Reveal>
     </section>
   );
@@ -191,12 +191,12 @@ function Testimonials() {
   return (
     <section className="bg-ink py-24 text-paper">
       <div className="mx-auto max-w-6xl px-5">
-        <Reveal><p className="text-xs font-medium uppercase tracking-[0.16em] text-marigold">Kind words</p></Reveal>
+        <Reveal><p className="text-xs font-medium uppercase tracking-[0.16em] text-paper">Kind words</p></Reveal>
         <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
           {t.map((x, i) => (
             <Reveal key={x.n} delay={i * 0.1}>
               <figure className="border-t border-paper/20 pt-6">
-                <blockquote className="font-serif text-2xl leading-snug">"{x.q}"</blockquote>
+                <blockquote className="font-sans text-2xl leading-snug">"{x.q}"</blockquote>
                 <figcaption className="mt-5 text-sm"><span className="text-paper">{x.n}</span><span className="block text-paper/60">{x.r}</span></figcaption>
               </figure>
             </Reveal>
@@ -246,7 +246,7 @@ function Faq() {
         <Accordion type="single" collapsible className="border-t border-border">
           {qs.map((x) => (
             <AccordionItem key={x.q} value={x.q} className="border-border">
-              <AccordionTrigger className="py-5 text-left font-serif text-xl font-normal text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
+              <AccordionTrigger className="py-5 text-left font-sans text-xl font-normal text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
               <AccordionContent className="pb-5 text-[15px] leading-relaxed text-deep-ink/70">{x.a}</AccordionContent>
             </AccordionItem>
           ))}

@@ -85,7 +85,7 @@ function CalendarPage() {
           </div>
           {days.map((d) => (
             <div key={d} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(e, d)}
-              className={cn("relative border-l border-border ledger transition-colors", drag && "bg-sage/30", d === today && "bg-marigold/5")}
+              className={cn("relative border-l border-border transition-colors", drag && "bg-sage/30", d === today && "bg-ink/5")}
               style={{ backgroundSize: `100% ${60 * PX}px` }}>
               {byDay(d).map((a) => {
                 const { minutes } = et(a.start_at);
@@ -155,7 +155,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
         {a && (
           <>
             <DialogHeader>
-              <DialogTitle className="font-serif text-3xl font-normal">{a.clients?.name}</DialogTitle>
+              <DialogTitle className="font-sans text-3xl font-normal">{a.clients?.name}</DialogTitle>
               <DialogDescription>{a.services?.name} · {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4">

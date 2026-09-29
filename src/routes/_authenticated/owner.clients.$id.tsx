@@ -44,19 +44,19 @@ function ClientDetail() {
 
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         <section>
-          <h2 className="mb-4 font-serif text-2xl text-deep-ink">Appointments</h2>
+          <h2 className="mb-4 font-sans text-2xl text-deep-ink">Appointments</h2>
           {appts.length ? <div className="space-y-6">{appts.map((a) => <ApptCard key={a.id} a={a} showDate />)}</div>
             : <p className="text-sm text-muted-foreground">No appointments yet.</p>}
         </section>
         <aside className="space-y-10">
           <section>
-            <h2 className="mb-3 font-serif text-2xl text-deep-ink">Documents</h2>
+            <h2 className="mb-3 font-sans text-2xl text-deep-ink">Documents</h2>
             <p className="text-sm text-muted-foreground">{files.length} received · {items.filter((i) => i.required && i.status === "missing").length} missing</p>
             <Button size="sm" variant="outline" className="mt-3" disabled={!files.length} onClick={() => setDocs(true)}><FileText />View files</Button>
             <DocViewer open={docs} onOpenChange={setDocs} title={client.name} items={items} />
           </section>
           <section>
-            <h2 className="mb-3 font-serif text-2xl text-deep-ink">Messages</h2>
+            <h2 className="mb-3 font-sans text-2xl text-deep-ink">Messages</h2>
             {msgs.length ? (
               <ol className="relative space-y-4 border-l border-border pl-5">
                 {msgs.map((m) => (

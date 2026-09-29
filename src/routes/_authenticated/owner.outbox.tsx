@@ -56,7 +56,7 @@ function Outbox() {
                   {m.channel === "sms" && " · Text (simulated)"}
                 </span>
               </span>
-              {m.minutes_saved > 0 && <span className="tabular shrink-0 rounded-full bg-marigold/20 px-2.5 py-1 text-xs font-medium text-deep-ink">saved {m.minutes_saved} min</span>}
+              {m.minutes_saved > 0 && <span className="tabular shrink-0 rounded-full bg-ink/20 px-2.5 py-1 text-xs font-medium text-deep-ink">saved {m.minutes_saved} min</span>}
             </button>
             {open === m.id && <pre className="whitespace-pre-wrap border-t border-border px-5 py-4 font-sans text-sm text-deep-ink/80">{m.body}</pre>}
           </li>

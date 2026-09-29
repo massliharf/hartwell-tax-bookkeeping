@@ -137,9 +137,9 @@ function BookPage() {
 
 function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
   return (
-    <div className="sheet-stack ledger p-5">
+    <div className="sheet-stack p-5">
       <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Your checklist so far</p>
-      <p className="mt-1 font-serif text-3xl text-deep-ink">
+      <p className="mt-1 font-sans text-3xl text-deep-ink">
         <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
       </p>
       <div className="mt-4 max-h-[440px] overflow-y-auto pr-1">
@@ -182,7 +182,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
                 <span className="tabular text-muted-foreground">{s.duration_min} min</span>
                 <span className="text-deep-ink">
                   {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                  <span className="tabular font-serif text-2xl">${Number(s.price_from)}</span>
+                  <span className="tabular font-sans text-2xl">${Number(s.price_from)}</span>
                 </span>
               </div>
             </button>
@@ -221,7 +221,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
                 <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
                   <Minus className="size-4" />
                 </button>
-                <span className="tabular w-6 text-center font-serif text-2xl">{(answers[q.key] as number) ?? 0}</span>
+                <span className="tabular w-6 text-center font-sans text-2xl">{(answers[q.key] as number) ?? 0}</span>
                 <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
                   <Plus className="size-4" />
                 </button>
@@ -303,7 +303,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
                   className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
                     active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
-                  <span className="tabular font-serif text-2xl leading-tight">{c.day}</span>
+                  <span className="tabular font-sans text-2xl leading-tight">{c.day}</span>
                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
                 </button>
               );
@@ -339,7 +339,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
   const c = fmtDayChip(date);
   if (state === "done") {
-    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
+    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-sans text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
   }
   return (
     <form
@@ -350,7 +350,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
         try { const r = await join({ data: { serviceId: service.id, name, email, date } }); setState(r.ok ? "done" : "error"); } catch { setState("error"); }
       }}
     >
-      <p className="font-serif text-2xl text-deep-ink">Full — join the waitlist</p>
+      <p className="font-sans text-2xl text-deep-ink">Full — join the waitlist</p>
       <p className="mt-1 text-sm text-deep-ink/70">{c.dow} {c.month} {c.day} is fully booked. We'll email you if a spot opens.</p>
        <div className="mt-4 grid gap-3 sm:grid-cols-2">
          <Input required aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 bg-paper" />

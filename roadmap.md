@@ -1,6 +1,5 @@
-# Launch quality pass
-- [ ] Test public booking, portal, waitlist, signature, and owner flows on mobile and desktop.
-- [ ] Repair broken flows and improve empty, loading, and error states.
-- [ ] Fix mobile layout, brand consistency, contrast, focus, and keyboard navigation.
-- [ ] Add route metadata, monogram favicon, social image, and Eastern-time consistency.
-- [ ] Re-test central flows and report remaining launch blockers.
+# Visual reset and booking polish
+- [ ] Replace legacy typography, palette, texture, and card treatments across public and owner screens.
+- [ ] Replace About placeholder with generated portrait; balance five services; hide published badge.
+- [ ] Align booking stepper, questions, times, checklist, and details interactions.
+- [ ] Walk through booking at desktop and 390px; list remaining inconsistencies.

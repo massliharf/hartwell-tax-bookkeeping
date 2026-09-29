@@ -130,7 +130,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
             {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
             {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
           </div>
-          <p className={`mt-1 font-serif text-3xl text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
+          <p className={`mt-1 font-sans text-3xl text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
         {!cancelled && <ReadyRing value={appt.ready_score} size={84} />}
@@ -181,7 +181,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl bg-sheet">
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-serif text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
+              <AlertDialogTitle className="font-sans text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
               <AlertDialogDescription>That's completely fine. Your slot will be offered to someone on the waitlist. If another time would work better, you can reschedule instead.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -223,7 +223,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
       <div className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet">
         <div className="mb-4 flex items-center justify-between">
-          <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
+          <p className="font-sans text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
         </div>
         {q.isLoading && <div className="h-32 animate-pulse rounded-xl bg-sage/50" />}
@@ -240,7 +240,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
                     className={`flex w-[68px] shrink-0 flex-col items-center rounded-xl border px-2 py-2 ${active ? "border-ink bg-ink text-paper" : off ? "border-transparent text-muted-foreground/50" : "border-border bg-paper hover:border-ink"}`}>
                     <span className="text-[10px] uppercase tracking-wider opacity-70">{c.dow}</span>
-                    <span className="tabular font-serif text-xl leading-tight">{c.day}</span>
+                    <span className="tabular font-sans text-xl leading-tight">{c.day}</span>
                     <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
                   </button>
                 );
@@ -344,7 +344,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <motion.div key="missing" {...flip}
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-marigold" : ""}`}>
+            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-ink" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sage text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
@@ -391,7 +391,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
   const ok = name.trim().length >= 2 && agree;
 
   return (
-    <section className="sheet-stack ledger border-l-4 border-l-marigold p-6">
+    <section className="sheet-stack border-l-4 border-l-ink p-6">
       <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-warning">One last step</p>
       <h2 className="mt-1 text-3xl text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Priya has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
@@ -408,7 +408,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-paper font-serif text-2xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-paper font-sans text-2xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />

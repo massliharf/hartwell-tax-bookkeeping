@@ -39,7 +39,7 @@ function Clients() {
           return (
             <li key={c.id}>
               <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-paper">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sage font-serif text-lg text-ink">{c.name.charAt(0)}</span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sage font-sans text-lg text-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-deep-ink">{c.name}</span>
                   <span className="block truncate text-sm text-muted-foreground">{c.email}</span>

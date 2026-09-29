@@ -38,14 +38,14 @@ function Clients() {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (
             <li key={c.id}>
-              <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-paper">
+              <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-paper">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-fill-neutral font-serif text-lg text-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-deep-ink">{c.name}</span>
                   <span className="block truncate text-sm text-muted-foreground">{c.email}</span>
                 </span>
                 <span className="tabular hidden text-right text-xs text-muted-foreground sm:block">
-                  {appts.length} appointment{appts.length === 1 ? "" : "s"}{c.is_returning ? " · Returning" : ""}
+                  {appts.length} appointment{appts.length === 1 ? "" : "s"}{c.is_returning ? ", Returning" : ""}
                 </span>
               </Link>
             </li>

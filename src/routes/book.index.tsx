@@ -79,7 +79,7 @@ function BookPage() {
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
   }
 
   return (
@@ -154,7 +154,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-[#F0F0F0]" />)}</div>}
+      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36  rounded-2xl bg-[#F0F0F0]" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
@@ -272,7 +272,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-[#F0F0F0]" /><div className="h-48 animate-pulse rounded-2xl bg-[#F0F0F0]" /></div>}
+      {q.isLoading && <div className="space-y-4"><div className="h-20  rounded-2xl bg-[#F0F0F0]" /><div className="h-48  rounded-2xl bg-[#F0F0F0]" /></div>}
       {(q.isError || q.data?.error) && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
@@ -346,7 +346,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
       </div>
       {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
       <Button type="submit" variant="highlight" className="mt-4" disabled={state === "saving"}>
-        {state === "saving" && <Loader2 className="animate-spin" />} Join the waitlist
+        {state === "saving" && <Loader2 className="" />} Join the waitlist
       </Button>
     </form>
   );
@@ -438,7 +438,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
         )}
 
         <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={!valid || busy}>
-          {busy ? <Loader2 className="animate-spin" /> : null} Book my appointment
+          {busy ? <Loader2 className="" /> : null} Book my appointment
         </Button>
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
           <Lock className="mt-0.5 size-3.5 shrink-0" /> We'll never ask for your Social Security number online. Confirmed instantly, no payment now.

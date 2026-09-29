@@ -74,11 +74,11 @@ function OwnerLayout() {
   const current = NAV.find((n) => ("exact" in n ? path === n.to : path.startsWith(n.to))) ?? NAV[0];
   const mobileMain = NAV.slice(0, 4);
   const mobileMore = NAV.slice(4);
-  const item = "flex h-8 items-center gap-2.5 rounded-lg pr-2 text-xs text-[#363636] transition-colors hover:bg-fill-subtle";
+  const item = "flex h-8 items-center gap-2.5 rounded-lg pr-2 text-xs text-[#363636] transition-colors duration-150 hover:bg-fill-subtle";
 
   return (
     <div className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2">
-      <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-4 rounded-2xl bg-sheet py-4 transition-[width] duration-200 sm:flex ${collapsed ? "w-[72px] px-5" : "w-56 px-5"}`}>
+      <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-4 rounded-2xl bg-sheet py-4  sm:flex ${collapsed ? "w-[72px] px-5" : "w-56 px-5"}`}>
         <div className="flex h-8 items-center justify-between">
           {!collapsed && <Link to="/" className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</Link>}
           <button onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-fill-subtle">

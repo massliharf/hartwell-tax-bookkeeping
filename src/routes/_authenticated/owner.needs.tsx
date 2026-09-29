@@ -58,7 +58,7 @@ function Row({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boole
     const a = it.appt;
     const miss = missingOf(a);
     return shell(<AlertTriangle className="h-5 w-5" />, "bg-warning/10 text-warning",
-      <>{a.clients?.name} · {a.ready_score}% ready</>,
+      <>{a.clients?.name}, {a.ready_score}% ready</>,
       <>{a.services?.name}, {fmtDay(a.start_at)} at {fmtTime(a.start_at)}. Missing {miss.map((m) => m.document_name).join(", ") || "nothing required"}. They were offered later times.</>,
       "Keep as is",
       a.clients && <Button size="sm" variant="outline" asChild><Link to="/owner/clients/$id" params={{ id: a.clients.id }}>Contact</Link></Button>);

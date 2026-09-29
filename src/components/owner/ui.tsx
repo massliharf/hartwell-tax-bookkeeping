@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title: ReactNode; children?: ReactNode }) {
   return (
     <header className="mb-8">
-      {eyebrow && <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>}
+      {eyebrow && <p className="text-xs font-medium text-muted-foreground">{eyebrow}</p>}
       <h1 className="mt-1 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">{title}</h1>
       {children && <div className="mt-2 text-muted-foreground">{children}</div>}
     </header>
@@ -33,7 +33,7 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
 }
 
 export function LoadingRows({ n = 3 }: { n?: number }) {
-  return <div className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="h-28 animate-pulse rounded-2xl bg-sheet" />)}</div>;
+  return <div className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="h-28  rounded-2xl bg-sheet" />)}</div>;
 }
 
 export function ErrorNote({ onRetry }: { onRetry?: () => void }) {
@@ -86,7 +86,7 @@ export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean 
         <ReadyRing value={a.ready_score} size={64} stroke={6} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <p className="tabular text-sm font-medium text-ink">{showDate ? `${fmtLong(a.start_at)} · ` : ""}{fmtTime(a.start_at)}–{fmtTime(a.end_at)}</p>
+            <p className="tabular text-sm font-medium text-ink">{showDate ? `${fmtLong(a.start_at)}, ` : ""}{fmtTime(a.start_at)}–{fmtTime(a.end_at)}</p>
             <MeetingTag type={a.meeting_type} />
             <StatusPill status={a.status} />
           </div>
@@ -99,7 +99,7 @@ export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean 
       <div className="mt-4 border-t border-border pt-4">
         {missing.length ? (
           <>
-            <p className="text-xs font-medium uppercase tracking-wider text-warning">Still missing · {missing.length}</p>
+            <p className="text-xs font-medium text-warning">Still missing, {missing.length}</p>
             <ul className="mt-2 flex flex-wrap gap-2">
               {missing.map((m) => <li key={m.id} className="rounded-full border border-border bg-paper px-3 py-1 text-xs text-deep-ink">{m.document_name}</li>)}
             </ul>
@@ -142,7 +142,7 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
           <ul className="max-h-[60vh] overflow-auto border-b border-border p-3 md:border-b-0 md:border-r">
             {files.map((f) => (
               <li key={f.id}>
-                <button onClick={() => pick(f)} className={cn("w-full rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-fill-subtle", sel?.id === f.id && "bg-fill-neutral")}>
+                <button onClick={() => pick(f)} className={cn("w-full rounded-xl px-3 py-2 text-left text-sm transition-colors duration-150 hover:bg-fill-subtle", sel?.id === f.id && "bg-fill-neutral")}>
                   <span className="block text-deep-ink">{f.document_name}</span>
                   {f.uploaded_at && <span className="text-xs text-muted-foreground">Received {fmtLong(f.uploaded_at)}</span>}
                 </button>

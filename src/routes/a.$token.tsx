@@ -63,7 +63,7 @@ function PortalPage() {
     );
   }
   if (!q.data?.appointment) {
-    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56 animate-pulse rounded-2xl bg-[#F0F0F0]" /><div className="h-96 animate-pulse rounded-2xl bg-[#F0F0F0]" /></div></BookingShell>;
+    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56  rounded-2xl bg-[#F0F0F0]" /><div className="h-96  rounded-2xl bg-[#F0F0F0]" /></div></BookingShell>;
   }
 
   const a = q.data.appointment as Appt;
@@ -168,7 +168,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           <span className="inline-flex h-10 items-center gap-2 rounded-full bg-success/15 px-4 text-sm font-medium text-success"><Check className="size-4" /> You'll be there</span>
         ) : (
           <Button onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
-            {busy === "confirm" ? <Loader2 className="animate-spin" /> : <Check />} I'll be there
+            {busy === "confirm" ? <Loader2 className="" /> : <Check />} I'll be there
           </Button>
         )}
         <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
@@ -218,7 +218,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-fill-subtle"><X className="size-4" /></button>
         </div>
-        {q.isLoading && <div className="h-32 animate-pulse rounded-lg bg-fill-neutral/50" />}
+        {q.isLoading && <div className="h-32  rounded-lg bg-fill-neutral/50" />}
         {q.data?.error && <p className="text-sm">{q.data.error}</p>}
         {days.length > 0 && (
           <>
@@ -242,7 +242,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 {day.slots.map((s) => (
                   <button key={s} disabled={!!busy} onClick={() => pick(s)}
                     className="tabular inline-flex h-11 items-center justify-center rounded-lg border border-border bg-white text-sm font-medium hover:border-ink">
-                    {busy === s ? <Loader2 className="size-4 animate-spin" /> : fmtTime(s)}
+                    {busy === s ? <Loader2 className="size-4 " /> : fmtTime(s)}
                   </button>
                 ))}
               </div>
@@ -351,7 +351,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               </div>
             ) : (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Upload</Button>
+                <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
                 <button onClick={() => setNaOpen(true)} className="ml-auto text-sm text-muted-foreground underline underline-offset-4 hover:text-ink">Doesn't apply to me</button>
               </div>
@@ -400,7 +400,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
-        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>
+        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="" /> : <PenLine />} Sign</Button>
       </form>
     </section>
   );

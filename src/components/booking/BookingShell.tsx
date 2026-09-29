@@ -29,13 +29,13 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
 function Progress({ step }: { step: number }) {
   return (
     <div className="px-6 pt-6 sm:px-8">
-      <ol className="flex gap-1 overflow-x-auto [scrollbar-width:none]" aria-label="Booking progress">
+      <ol className="flex gap-1 overflow-x-auto [scrollbar-width:none] sm:overflow-visible" aria-label="Booking progress">
         {STEPS.map((label, i) => {
           const done = i < step;
           const active = i === step;
           return (
             <li key={label} aria-current={active ? "step" : undefined}
-               className={`flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-medium ${active ? "bg-fill-selected text-deep-ink" : done ? "text-deep-ink" : "text-muted-foreground"}`}>
+               className={`flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-medium min-[390px]:px-3 sm:px-4 sm:text-xs ${active ? "bg-fill-selected text-deep-ink" : done ? "text-deep-ink" : "text-muted-foreground"}`}>
               {done ? <Check className="size-3.5 text-ink" strokeWidth={3} /> : <span className="tabular">{i + 1}</span>}
               {label}
             </li>

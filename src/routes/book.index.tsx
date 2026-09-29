@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { DocumentStack } from "@/components/brand/DocumentStack";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
@@ -89,7 +90,7 @@ function BookPage() {
   const canContinue = step === 0 ? !!service : step === 1 ? questionsComplete : step === 2 ? !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date : detailsComplete && !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date && !bookingBusy;
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
+     return <BookingShell step={0}><div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]"><div><Skeleton className="h-10 w-3/4" /><Skeleton className="mt-3 h-5 w-2/3" /><div className="mt-14 grid gap-5 sm:grid-cols-2">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div></div><div className="hidden lg:block"><Skeleton className="h-48 rounded-2xl" /></div></div></BookingShell>;
   }
 
   return (
@@ -162,13 +163,13 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36  rounded-2xl bg-[#F0F0F0]" />)}</div>}
+       {services.isLoading && <div className="grid gap-5 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
-      <div className="grid gap-5 sm:grid-cols-2">
+       <div className="grid gap-5 sm:grid-cols-2">
         {services.data?.map((s) => {
           const active = s.slug === selected;
           return (
@@ -269,7 +270,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20  rounded-2xl bg-[#F0F0F0]" /><div className="h-48  rounded-2xl bg-[#F0F0F0]" /></div>}
+       {q.isLoading && <div className="space-y-6"><div className="flex gap-1 overflow-hidden">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[72px] shrink-0 rounded-lg" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-8 rounded-lg" />)}</div></div>}
       {(q.isError || q.data?.error) && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>

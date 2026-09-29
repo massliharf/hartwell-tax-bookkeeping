@@ -240,10 +240,9 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
             {day && (
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
-                  <button key={s} disabled={!!busy} onClick={() => pick(s)}
-                    className="tabular inline-flex h-11 items-center justify-center rounded-lg border border-border bg-white text-sm font-medium hover:border-ink">
+                  <Button key={s} variant="secondary" disabled={!!busy} onClick={() => pick(s)} className="tabular h-11 text-sm">
                     {busy === s ? <Loader2 className="size-4 " /> : fmtTime(s)}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -255,9 +254,9 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
             {alts.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {alts.map((s) => (
-                  <button key={s} onClick={() => pick(s)} className="tabular rounded-full border border-ink px-3 py-1.5 text-ink hover:bg-ink hover:text-primary-foreground">
+                  <Button key={s} variant="secondary" onClick={() => pick(s)} className="tabular">
                     {fmtDateLong(s).split(",")[0]} {fmtTime(s)}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

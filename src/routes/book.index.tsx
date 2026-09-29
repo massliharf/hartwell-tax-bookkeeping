@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
@@ -87,9 +88,9 @@ function BookPage() {
       <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
         <div className="min-w-0">
           {step > 0 && (
-            <button onClick={() => go(step - 1)} className="mb-6 inline-flex h-8 items-center gap-1.5 rounded-lg bg-fill-neutral px-3 text-xs font-medium text-deep-ink hover:bg-[#DBDBDB]">
+            <Button variant="secondary" onClick={() => go(step - 1)} className="mb-6">
               <ArrowLeft className="size-3.5" /> Back
-            </button>
+            </Button>
           )}
           <AnimatePresence mode="wait">
             <motion.div

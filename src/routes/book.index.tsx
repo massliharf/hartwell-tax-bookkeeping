@@ -292,7 +292,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               return (
                 <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
                   className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors ${
-                    active ? "border-ink bg-ink text-primary-foreground" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
+                    active ? "bg-fill-selected text-deep-ink" : d.closed ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
                   <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>

@@ -232,9 +232,9 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 const off = d.closed || d.slots.length === 0;
                 return (
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
-                    className={`flex w-[68px] shrink-0 flex-col items-center rounded-xl border px-2 py-2 ${active ? "border-ink bg-ink text-primary-foreground" : off ? "border-transparent text-muted-foreground/50" : "border-border bg-paper hover:border-ink"}`}>
+                    className={`flex w-[68px] shrink-0 flex-col items-center rounded-lg px-2 py-2 ${active ? "bg-fill-selected text-deep-ink" : off ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
                     <span className="text-[10px] uppercase tracking-wider opacity-70">{c.dow}</span>
-                    <span className="tabular font-serif text-xl leading-tight">{c.day}</span>
+                    <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
                     <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
                   </button>
                 );

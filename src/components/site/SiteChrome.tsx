@@ -4,15 +4,15 @@ import { HOURS } from "@/lib/services";
 
 export function AnnouncementBar() {
   return (
-    <div className="bg-ink text-primary-foreground">
+    <div className="bg-canvas px-2 pt-2">
       <Link
         to="/book"
         search={{ service: "extension" }}
-        className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-5 py-2 text-center text-[13px]"
+        className="mx-auto flex min-h-[54px] max-w-6xl flex-wrap items-center justify-center gap-2 rounded-2xl bg-sheet px-[18px] py-3 text-center text-sm text-deep-ink"
       >
-        <span className="size-1.5 shrink-0 rounded-full bg-marigold" />
+        <span className="rounded-full bg-[rgba(30,91,71,0.15)] px-2 text-[10px] font-medium uppercase tracking-[0.2px] text-ink">Oct 15</span>
         <span>
-          Filing an extension? The deadline is October 15 — <span className="underline decoration-marigold underline-offset-4">book your slot</span>.
+          Filing an extension? The deadline is October 15 — <span className="font-semibold text-ink underline-offset-4 hover:underline">book your slot</span>.
         </span>
       </Link>
     </div>

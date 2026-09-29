@@ -33,7 +33,7 @@ function Outbox() {
       <div className="mb-6 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
         {[null, ...types].map((t) => (
           <button key={t ?? "all"} onClick={() => setType(t)}
-            className={cn("shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors", type === t ? "border-ink bg-ink text-primary-foreground" : "border-border bg-sheet text-deep-ink hover:border-ink/40")}>
+            className={cn("h-8 shrink-0 rounded-full px-4 text-xs font-medium transition-colors duration-200", type === t ? "bg-fill-selected text-deep-ink" : "text-muted-foreground hover:text-deep-ink")}>
             {t ? MSG_LABEL[t] ?? t : "All"}
           </button>
         ))}

@@ -105,17 +105,6 @@ function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; 
   );
 }
 
-
-function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
-  return (
-    <Reveal className="max-w-2xl">
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-1 text-[28px] leading-[38px] text-deep-ink">{title}</h2>
-      {sub && <p className="mt-2 text-sm text-muted-foreground">{sub}</p>}
-    </Reveal>
-  );
-}
-
 function HowItWorks() {
   const steps = [
     { icon: CalendarCheck, title: "Book a time", text: "Pick a service and a slot that suits you. You're confirmed on the spot." },

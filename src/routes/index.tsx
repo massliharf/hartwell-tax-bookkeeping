@@ -61,7 +61,7 @@ function Hero() {
         </p>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg"><Link to="/book">Book an appointment <ArrowRight /></Link></Button>
-          <Button asChild size="lg" variant="outline"><Link to="/returning">I'm a returning client</Link></Button>
+          <Button asChild size="lg" variant="outline"><Link to="/book/returning">I'm a returning client</Link></Button>
         </div>
         <p className="mt-5 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
       </Reveal>

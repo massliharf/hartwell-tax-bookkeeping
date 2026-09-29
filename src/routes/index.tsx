@@ -37,7 +37,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">{children}</p>;
+  return <p className="text-xs font-medium leading-6 text-muted-foreground">{children}</p>;
 }
 
 function Home() {
@@ -64,9 +64,9 @@ function Hero() {
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-12 pt-10 md:grid-cols-[1.15fr_1fr] md:gap-14 md:pt-16">
       <Reveal>
-        <Eyebrow>Claire Hartwell, EA · Montclair, New Jersey</Eyebrow>
-        <h1 className="mt-3 text-[36px] font-medium leading-[44px] tracking-[-0.4px] text-deep-ink sm:text-[52px] sm:leading-[58px]">
-          Taxes, without <em className="relative whitespace-nowrap not-italic text-ink">the chase.</em>
+         <Eyebrow>Claire Hartwell, EA, Montclair, New Jersey</Eyebrow>
+         <h1 className="mt-3 text-[36px] font-medium leading-[44px] tracking-[-0.4px] text-deep-ink sm:text-[52px] sm:leading-[58px]">
+           Taxes, without <em className="relative whitespace-nowrap not-italic">the chase.</em>
         </h1>
         <p className="mt-4 max-w-md text-base leading-6 text-[#363636]">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
@@ -148,13 +148,13 @@ function Services() {
                 <Link
                   to="/book"
                   search={{ service: s.id }}
-                  className="group flex h-full flex-col rounded-2xl border border-border bg-sheet p-5 transition-colors duration-200 hover:bg-fill-subtle"
+                   className="group flex h-full flex-col rounded-2xl border border-border bg-sheet p-5 transition-colors duration-150 hover:bg-fill-subtle"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
                       <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />
                     </span>
-                    <span className="tabular rounded border border-border px-1.5 text-[10px] font-medium uppercase leading-4 tracking-[0.2px] text-muted-foreground">{s.minutes} min</span>
+                     <span className="tabular rounded border border-border px-1.5 text-[10px] font-medium leading-4 text-muted-foreground">{s.minutes} min</span>
                   </div>
                   <h3 className="mt-4 text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
                   <p className="mt-1.5 text-sm leading-[22px] text-muted-foreground">{s.blurb}</p>
@@ -164,7 +164,7 @@ function Services() {
                       <span className="tabular text-xl font-semibold">${s.price}</span>
                     </p>
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-ink">
-                      Book <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                      Book <ArrowRight className="size-3.5" />
                     </span>
                   </div>
                 </Link>
@@ -212,7 +212,7 @@ function Testimonials() {
   return (
     <section className="py-14">
       <div className="mx-auto max-w-6xl px-5">
-        <Reveal><p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Kind words</p></Reveal>
+         <Reveal><p className="text-xs font-medium leading-6 text-muted-foreground">Kind words</p></Reveal>
         <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible [scrollbar-width:none]">
           {t.map((x, i) => (
             <Reveal key={x.n} delay={i * 0.1} className="h-full">

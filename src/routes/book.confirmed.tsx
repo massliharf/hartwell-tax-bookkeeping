@@ -55,7 +55,7 @@ function ConfirmedPage() {
     );
   }
   if (q.isLoading || !q.data?.appointment) {
-    return <BookingShell><div className="mx-auto h-96 max-w-2xl animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
+    return <BookingShell><div className="mx-auto h-96 max-w-2xl animate-pulse rounded-[14px] bg-sheet/60" /></BookingShell>;
   }
 
   const a = q.data.appointment as {

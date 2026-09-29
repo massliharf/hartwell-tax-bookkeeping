@@ -98,7 +98,7 @@ function BookPage() {
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-[14px] bg-sheet/60" /></BookingShell>;
   }
 
   return (
@@ -171,9 +171,9 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-sheet/70" />)}</div>}
+      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-[14px] bg-sheet/70" />)}</div>}
       {services.isError && (
-        <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
+        <div className="rounded-[14px] border border-border bg-sheet p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
@@ -224,7 +224,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
       </div>
       <div className="space-y-3">
         {visible.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
+          <div key={q.key} className="flex flex-col gap-3 rounded-[14px] border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-medium text-deep-ink">{q.label}</p>
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
@@ -297,9 +297,9 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-48 animate-pulse rounded-2xl bg-sheet/70" /></div>}
+      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-[14px] bg-sheet/70" /><div className="h-48 animate-pulse rounded-[14px] bg-sheet/70" /></div>}
       {(q.isError || q.data?.error) && (
-        <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
+        <div className="rounded-[14px] border border-border bg-sheet p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
         </div>
       )}
@@ -313,7 +313,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const full = !d.closed && d.slots.length === 0;
               return (
                 <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
+                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-[14px] border px-2 py-2.5 transition-colors ${
                     active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
                   <span className="tabular font-serif text-2xl leading-tight">{c.day}</span>
@@ -336,7 +336,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
             )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
             {!firstOpen && !draft.date && (
-              <p className="rounded-2xl border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
+              <p className="rounded-[14px] border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
             )}
           </div>
         </>
@@ -352,11 +352,11 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
   const c = fmtDayChip(date);
   if (state === "done") {
-    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
+    return <div className="rounded-[14px] border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
   }
   return (
     <form
-      className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet"
+      className="rounded-[14px] border border-border bg-sheet p-5 shadow-sheet"
       onSubmit={async (e) => {
         e.preventDefault();
         setState("saving");
@@ -418,7 +418,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   return (
     <>
       <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sage/60 p-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-border bg-sage/60 p-4">
         <div className="min-w-0">
           <p className="font-medium text-deep-ink">{service.name}</p>
           <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>
@@ -442,7 +442,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
         </div>
 
         {error && (
-          <div className="rounded-2xl border border-warning/40 bg-sheet p-4" role="alert">
+          <div className="rounded-[14px] border border-warning/40 bg-sheet p-4" role="alert">
             <p className="font-medium text-deep-ink">{error}</p>
             {alternatives.length > 0 ? (
               <>

@@ -100,7 +100,7 @@ function Insights() {
       </div>
       {completed.filter((x) => in30(x.start_at)).length === 0 && <p className="mt-4 text-sm text-muted-foreground">No completed appointments in this period yet. Readiness and no-show rates will become meaningful as visits finish.</p>}
 
-      <section className="mt-12 grid overflow-hidden rounded-2xl border border-border shadow-sheet md:grid-cols-2">
+      <section className="mt-12 grid overflow-hidden rounded-[14px] border border-border shadow-sheet md:grid-cols-2">
         <div className="bg-paper-deep/60 p-7 md:p-9">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Before</p>
           <p className="mt-4 font-serif text-3xl leading-snug text-deep-ink/60 md:text-4xl">
@@ -122,7 +122,7 @@ function Insights() {
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   const reduce = useReducedMotion();
   return (
-    <header className="ledger relative overflow-hidden rounded-3xl border border-border bg-sheet px-7 py-12 shadow-sheet md:px-12 md:py-16">
+    <header className="ledger relative overflow-hidden rounded-[14px] border border-border bg-sheet px-7 py-12 shadow-sheet md:px-12 md:py-16">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Insights · last 30 days</p>
       <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="mt-3 font-serif text-5xl leading-[1.02] text-deep-ink md:text-7xl">

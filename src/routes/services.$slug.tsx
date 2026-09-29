@@ -1,0 +1,12 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, Clock3, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SERVICES } from "@/lib/services";
+import { SERVICE_PHOTOS } from "@/components/site/service-photos";
+import { SiteHeader, SiteFooter } from "@/components/site/SiteChrome";
+export const Route = createFileRoute("/services/$slug")({
+  loader: ({ params }) => { const service = SERVICES.find(s => s.id === params.slug); if (!service) throw notFound(); return service; },
+  head: ({ loaderData }) => ({ meta: [ { title: `${loaderData?.name ?? "Service"} — Patel Tax & Bookkeeping` }, { name: "description", content: `${loaderData?.blurb ?? "Tax services"} Book with Priya Patel, EA in Edison.` }, { property: "og:title", content: `${loaderData?.name ?? "Service"} — Patel Tax & Bookkeeping` }, { property: "og:description", content: loaderData?.blurb ?? "Tax services in Edison, NJ." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" } ] }),
+  component: ServiceDetail,
+});
+function ServiceDetail() { const s = Route.useLoaderData(); return <><SiteHeader/><main className="mx-auto max-w-6xl px-5 pb-20 pt-10"><Link to="/" className="inline-flex items-center gap-2 text-sm text-ink"><ArrowLeft className="size-4"/> All services</Link><div className="mt-10 grid gap-10 md:grid-cols-2 md:items-center md:gap-16"><div><p className="text-xs font-semibold uppercase text-ink">Tax & bookkeeping services</p><h1 className="mt-3 font-serif text-5xl leading-tight text-deep-ink sm:text-6xl">{s.name}</h1><p className="mt-5 text-lg leading-relaxed text-muted-foreground">{s.blurb} Priya will send you a personal document checklist after your appointment is confirmed.</p><div className="mt-8 flex items-center gap-6 border-y border-border py-5 text-sm text-deep-ink"><span className="inline-flex items-center gap-2"><Clock3 className="size-4 text-ink"/>{s.minutes} minutes</span><span className="tabular font-semibold">{s.from ? "From " : ""}${s.price}</span></div><Button asChild className="mt-8"><Link to="/book" search={{service:s.id}}>Book this service <ArrowRight/></Link></Button><p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="size-4"/> Confirmed instantly. Pay when you file.</p></div><img src={SERVICE_PHOTOS[s.id]} alt="" width={900} height={650} className="aspect-[4/3] w-full rounded-[14px] object-cover"/></div></main><SiteFooter/></>; }

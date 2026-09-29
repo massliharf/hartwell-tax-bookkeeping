@@ -33,7 +33,7 @@ function Clients() {
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
       {q.data && !list.length && <p className="py-10 text-center text-sm text-muted-foreground">No one matches "{term}".</p>}
-      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-sheet shadow-sheet">
+      <ul className="divide-y divide-border overflow-hidden rounded-[14px] border border-border bg-sheet shadow-sheet">
         {list.map((c) => {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (

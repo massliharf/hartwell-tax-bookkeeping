@@ -64,7 +64,7 @@ function PortalPage() {
     );
   }
   if (!q.data?.appointment) {
-    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56 animate-pulse rounded-2xl bg-sheet/60" /><div className="h-96 animate-pulse rounded-2xl bg-sheet/60" /></div></BookingShell>;
+    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56 animate-pulse rounded-[14px] bg-sheet/60" /><div className="h-96 animate-pulse rounded-[14px] bg-sheet/60" /></div></BookingShell>;
   }
 
   const a = q.data.appointment as Appt;
@@ -92,7 +92,7 @@ function PortalPage() {
         <AppointmentCard appt={a} cancelled={cancelled} />
         {open && <Actions token={token} appt={a} onChange={refresh} />}
         {cancelled && (
-          <div className="rounded-2xl border border-border bg-sheet p-6">
+          <div className="rounded-[14px] border border-border bg-sheet p-6">
             <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
             <Button asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
           </div>
@@ -104,7 +104,7 @@ function PortalPage() {
               <h2 className="text-3xl text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
-            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
+            <p className="mb-5 flex items-start gap-2 rounded-[14px] bg-sage/70 p-4 text-sm text-deep-ink/85">
               <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Priya can see your files. We never ask for your Social Security number.
             </p>
             <ul className="space-y-4">
@@ -179,7 +179,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
         <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
         <AlertDialog>
           <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
-          <AlertDialogContent className="rounded-2xl bg-sheet">
+          <AlertDialogContent className="rounded-[14px] bg-sheet">
             <AlertDialogHeader>
               <AlertDialogTitle className="font-serif text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
               <AlertDialogDescription>That's completely fine. Your slot will be offered to someone on the waitlist. If another time would work better, you can reschedule instead.</AlertDialogDescription>
@@ -221,7 +221,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
 
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-      <div className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet">
+      <div className="rounded-[14px] border border-border bg-sheet p-5 shadow-sheet">
         <div className="mb-4 flex items-center justify-between">
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
@@ -321,7 +321,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
     <li style={{ perspective: 900 }}>
       <AnimatePresence mode="wait" initial={false}>
         {item.status === "uploaded" ? (
-          <motion.div key="up" {...flip} className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5 shadow-sheet">
+          <motion.div key="up" {...flip} className="flex items-center gap-4 rounded-[14px] border border-success/30 bg-sheet p-5 shadow-sheet">
             <motion.span initial={reduce ? false : { scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 500, damping: 16, delay: 0.2 }}
               className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-paper"><Check className="size-5" strokeWidth={3} /></motion.span>
             <div className="min-w-0 flex-1">
@@ -331,7 +331,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             <button onClick={() => fileRef.current?.click()} className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Replace</button>
           </motion.div>
         ) : item.status === "not_applicable" ? (
-          <motion.div key="na" {...flip} className="flex items-center gap-4 rounded-2xl border border-border bg-sheet/70 p-5">
+          <motion.div key="na" {...flip} className="flex items-center gap-4 rounded-[14px] border border-border bg-sheet/70 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><X className="size-4" /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink/70">{item.document_name}</p>

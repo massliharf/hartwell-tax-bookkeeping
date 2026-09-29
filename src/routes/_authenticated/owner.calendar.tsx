@@ -66,7 +66,7 @@ function CalendarPage() {
         </div>
       </PageHead>
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
-      {q.isLoading && <div className="space-y-3" aria-label="Loading calendar"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /></div>}
+      {q.isLoading && <div className="space-y-3" aria-label="Loading calendar"><div className="h-20 animate-pulse rounded-[14px] bg-sheet/70" /><div className="h-20 animate-pulse rounded-[14px] bg-sheet/70" /><div className="h-20 animate-pulse rounded-[14px] bg-sheet/70" /></div>}
       <p className="mb-3 hidden text-xs text-muted-foreground md:block">Drag an appointment to move it. The client is emailed automatically.</p>
 
       {/* Desktop week grid */}
@@ -151,7 +151,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
   const open = a && (a.status === "booked" || a.status === "confirmed");
   return (
     <Dialog open={!!a} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md bg-paper sm:rounded-2xl">
+      <DialogContent className="max-w-md bg-paper sm:rounded-[14px]">
         {a && (
           <>
             <DialogHeader>

@@ -144,8 +144,8 @@ function ChecklistPreview({ docs, hasService }: { docs: ReturnType<typeof previe
     <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
       <div className="bg-surface-2 p-3 px-4">
          <p className="text-xs font-medium leading-6 text-muted-foreground">Your checklist so far</p>
-        <p className="font-serif text-xl text-deep-ink">
-          <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
+         <p className="font-serif text-xl text-deep-ink">
+           <span className="tabular">{hasService ? docs.length : 0}</span> document{hasService && docs.length === 1 ? "" : "s"}
         </p>
       </div>
        {hasService ? <><div className="max-h-[440px] overflow-y-auto px-4 pt-4"><DocumentStack docs={[...docs].reverse().map((d) => ({ ...d, received: false }))} /></div>
@@ -279,7 +279,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
       {days.length > 0 && (
         <>
            <div className="relative">
-             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-sheet to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 z-10 h-[68px] w-10 bg-gradient-to-l from-sheet to-transparent" />
              <div ref={strip} className="flex gap-1 overflow-x-auto pb-2 pr-9 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
             {days.map((d) => {
               const c = fmtDayChip(d.date);

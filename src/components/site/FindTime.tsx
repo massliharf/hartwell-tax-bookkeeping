@@ -18,7 +18,7 @@ export function FindTime() {
   const windowFn = useServerFn(getAvailabilityWindow);
   const svc = useQuery({ queryKey: ["home-services"], queryFn: async () => { const { data, error } = await supabase.from("services").select("id,slug").eq("active", true); if (error) throw error; return data; } });
   const id = svc.data?.find(s => s.slug === service)?.id;
-  const availability = useQuery({ queryKey: ["home-availability", id], enabled: !!id, queryFn: () => windowFn({ data: { serviceId: id as string, days: 21 } }), staleTime: 30000 });
+  const availability = useQuery({ queryKey: ["home-availability", id], enabled: !!id, queryFn: () => windowFn({ data: { serviceId: id as string, days: 14 } }), staleTime: 30000 });
   const days = availability.data?.days.filter(d => d.slots.length) ?? [];
   const chosenDate = days.some(d => d.date === date) ? date : days[0]?.date;
   const chosen = days.find(d => d.date === chosenDate);
@@ -34,7 +34,7 @@ export function FindTime() {
   return <div className="relative">
     <div className="hidden rounded-full border border-border bg-background p-2 shadow-lift md:block">{form}</div>
     <Button variant="outline" className="flex h-auto w-full items-center justify-between rounded-full px-5 py-4 text-left shadow-lift md:hidden" onClick={() => setOpen(true)}><span className="flex min-w-0 items-center gap-3"><CalendarDays className="size-5 shrink-0"/><span className="min-w-0 truncate text-sm">{SERVICES.find(s => s.id === service)?.name} · {dayText}</span></span><ChevronDown className="size-4 shrink-0" /></Button>
-    <p aria-live="polite" className="mt-4 text-sm text-muted-foreground">{availability.isLoading || svc.isLoading ? "Finding the next opening…" : availability.isError || availability.data?.error ? "Times aren’t available right now. Please try booking directly." : first ? `Next opening ${fmtDayChip(chosenDate ?? "").dow} ${fmtTime(first)} · ${days.reduce((n,d) => n + d.slots.length,0)} openings in the next three weeks` : "No open times right now. Check back soon or join the waitlist while booking."}</p>
+    <p aria-live="polite" className="mt-4 text-sm text-muted-foreground">{availability.isLoading || svc.isLoading ? "Finding the next opening…" : availability.isError || availability.data?.error ? "Times aren’t available right now. Please try booking directly." : first ? `Next opening ${fmtDayChip(chosenDate ?? "").dow} ${fmtTime(first)} · ${days.reduce((n,d) => n + d.slots.length,0)} openings in the next two weeks` : "No open times right now. Check back soon or join the waitlist while booking."}</p>
     {open && <div className="fixed inset-0 z-[100] overflow-y-auto bg-background px-5 py-8 md:hidden" role="dialog" aria-modal="true" aria-label="Find a time"><div className="mx-auto max-w-sm"><div className="mb-8 flex items-center justify-between"><h2 className="font-serif text-3xl">Find a time</h2><Button size="icon" variant="ghost" aria-label="Close" onClick={() => setOpen(false)}><X /></Button></div><div className="space-y-7">{form}</div><p className="mt-8 text-sm text-muted-foreground">Booking is confirmed instantly. Documents come later.</p></div></div>}
   </div>;
 }

@@ -10,7 +10,7 @@ export function AnnouncementBar() {
         search={{ service: "extension" }}
         className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-5 py-2 text-center text-[13px]"
       >
-        <span className="size-1.5 shrink-0 rounded-full bg-ink" />
+        <span className="size-1.5 shrink-0 rounded-full bg-paper" />
         <span>
           Filing an extension? The deadline is October 15 — <span className="underline decoration-ink underline-offset-4">book your slot</span>.
         </span>

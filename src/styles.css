@@ -78,9 +78,9 @@
   --radius: 1rem;
   --paper: oklch(1 0 0);
   --paper-deep: oklch(0.977 0 0);
-  --ink-green: oklch(0.43 0.075 164);
+  --ink-green: oklch(0.4236 0.06831 169.65);
   --deep-ink: oklch(0.252 0 0);
-  --marigold: oklch(0.76 0.14 75);
+  --marigold: oklch(0.78709 0.14706 73.02);
   --sage: oklch(0.977 0 0);
   --success: oklch(0.53 0.1 160);
   --warning: oklch(0.64 0.14 65);
@@ -92,12 +92,12 @@
   --popover: var(--sheet);
   --popover-foreground: var(--deep-ink);
   --primary: var(--ink-green);
-  --primary-hover: oklch(0.352 0.065 164);
+  --primary-hover: oklch(0.35719 0.05756 168.82);
   --primary-foreground: var(--paper);
   --secondary: var(--sage);
   --secondary-foreground: var(--ink-green);
   --muted: var(--paper-deep);
-  --muted-foreground: oklch(0.518 0 0);
+  --muted-foreground: oklch(0.5243 0 0);
   --accent: var(--sage);
   --accent-foreground: var(--deep-ink);
   --destructive: oklch(0.55 0.17 30);

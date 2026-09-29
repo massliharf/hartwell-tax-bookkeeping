@@ -18,7 +18,7 @@ export function ReadyRing({ value, size = 120, stroke = 8, label = "Ready", clas
           cy={size / 2}
           r={r}
           fill="none"
-          stroke={done ? "var(--success)" : "var(--marigold)"}
+           stroke="var(--marigold)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={c}

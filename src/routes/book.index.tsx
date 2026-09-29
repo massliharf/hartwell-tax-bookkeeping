@@ -2,13 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { DocumentStack } from "@/components/brand/DocumentStack";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
@@ -31,6 +32,11 @@ export const Route = createFileRoute("/book/")({
 
 type Service = { id: string; name: string; slug: string; duration_min: number; price_from: number; is_from_price: boolean; description: string | null };
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
+const nyDay = (iso: string) => {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(iso));
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
 
 function useServices() {
   return useQuery({
@@ -77,6 +83,9 @@ function BookPage() {
   };
 
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
+  const questionsComplete = questionsFor(draft.serviceSlug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean");
+  const detailsComplete = draft.name.trim().length > 0 && emailOk(draft.email);
+  const canContinue = step === 0 ? !!service : step === 1 ? questionsComplete : step === 2 ? !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date : detailsComplete && !!draft.slot;
 
   if (!loaded) {
     return <BookingShell step={0}><div className="h-64  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
@@ -84,13 +93,8 @@ function BookPage() {
 
   return (
     <BookingShell step={step}>
-      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
-        <div className="min-w-0">
-          {step > 0 && (
-            <Button variant="secondary" onClick={() => go(step - 1)} className="mb-6">
-              <ArrowLeft className="size-3.5" /> Back
-            </Button>
-          )}
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 pb-24 lg:pb-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -105,31 +109,36 @@ function BookPage() {
                   selected={draft.serviceSlug}
                   onPick={(slug) => {
                     if (slug !== draft.serviceSlug) update({ serviceSlug: slug, slot: undefined, date: undefined });
-                    go(1);
                   }}
                 />
               )}
               {step === 1 && (
-                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} onDone={() => go(2)} count={preview.length} />
+                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} />
               )}
-              {step === 2 && service && <TimeStep service={service} draft={draft} update={update} onDone={() => go(3)} />}
+              {step === 2 && service && <TimeStep service={service} draft={draft} update={update} />}
               {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} onPickAgain={() => go(2)} />}
             </motion.div>
           </AnimatePresence>
+          <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
+            <Button size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
+          </div>
         </div>
-        {(step === 1 || step === 2) && (
-          <aside className="hidden lg:block">
-            <div className="sticky top-8">
-              <ChecklistPreview docs={preview} />
-            </div>
-          </aside>
-        )}
+        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">
+          {step === 3 && service && <BookingSummary service={service} draft={draft} onPickAgain={() => go(2)} />}
+          <ChecklistPreview docs={preview} hasService={!!service} />
+        </div></aside>
+      </div>
+      <div className="fixed inset-x-0 bottom-[64px] z-30 border-t border-border bg-sheet px-5 py-2 lg:hidden">
+        <Sheet><SheetTrigger asChild><Button variant="secondary" className="w-full justify-between">Your checklist ({service ? preview.length : 0}) <ChevronRight className="size-4" /></Button></SheetTrigger>
+          <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl border-border bg-sheet pt-10"><SheetHeader className="sr-only"><SheetTitle>Your checklist</SheetTitle></SheetHeader><ChecklistPreview docs={preview} hasService={!!service} /></SheetContent>
+        </Sheet>
       </div>
     </BookingShell>
   );
 }
 
-function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
+function ChecklistPreview({ docs, hasService }: { docs: ReturnType<typeof previewChecklist>; hasService: boolean }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
       <div className="bg-surface-2 p-3 px-4">
@@ -138,10 +147,8 @@ function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> 
           <span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}
         </p>
       </div>
-      <div className="max-h-[440px] overflow-y-auto px-4 pt-4">
-        <DocumentStack docs={[...docs].reverse().map((d) => ({ ...d, received: false }))} />
-      </div>
-      <p className="px-4 pb-6 pt-4 text-xs text-muted-foreground">You'll upload these after booking. They never hold up your appointment.</p>
+       {hasService ? <><div className="max-h-[440px] overflow-y-auto px-4 pt-4"><DocumentStack docs={[...docs].reverse().map((d) => ({ ...d, received: false }))} /></div>
+       <p className="px-4 pb-6 pt-4 text-xs text-muted-foreground">You'll upload these after booking. They never hold up your appointment.</p></> : <p className="px-4 py-8 text-sm text-muted-foreground">Pick a service to start your checklist.</p>}
     </div>
   );
 }

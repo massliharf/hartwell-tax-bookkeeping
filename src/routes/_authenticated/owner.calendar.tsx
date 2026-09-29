@@ -122,7 +122,7 @@ function CalendarPage() {
                   </li>
                 ))}
               </ul>
-            ) : <p className="text-sm text-muted-foreground/70">{q.isLoading ? "…" : "Nothing booked"}</p>}
+            ) : q.isLoading ? <div aria-hidden="true" className="h-12 rounded-xl bg-muted" /> : <p className="text-sm text-muted-foreground/70">Nothing booked</p>}
           </section>
         ))}
       </div>

@@ -88,7 +88,7 @@ function BookPage() {
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-[20px] bg-paper" /></BookingShell>;
   }
 
   return (
@@ -180,8 +180,8 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
           return (
             <button
               key={s.id}
-              onClick={() => onPick(s.slug)}
-               className={`sheet-stack group w-full p-5 text-left transition-transform duration-200 hover:-translate-y-0.5 ${active ? "ring-2 ring-ink" : ""}`}
+               onClick={() => onPick(s.slug)}
+                className={`group w-full rounded-[14px] border border-line bg-paper p-5 text-left transition-colors duration-150 hover:bg-canvas ${active ? "ring-2 ring-evergreen" : ""}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-2xl leading-tight text-deep-ink">{s.name}</h2>
@@ -299,10 +299,10 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   return (
     <>
         <StepTitle title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
-      <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
+       <div className="mb-6 inline-flex rounded-[10px] bg-control p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
            <Button key={v} variant="neutral" role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
-             className={`inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-paper text-evergreen shadow-[var(--shadow-1)]" : "bg-control text-deep-ink"}`}>
+              className={`inline-flex h-10 items-center gap-2 rounded-[8px] px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-paper text-evergreen shadow-[var(--shadow-1)]" : "bg-control text-deep-ink"}`}>
             <Icon className="size-4" /> {label}
            </Button>
         ))}
@@ -324,7 +324,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const full = !d.closed && d.slots.length === 0;
               return (
                  <Button key={d.date} variant="neutral" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
+                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-[10px] border px-2 py-2.5 transition-colors ${
                      active ? "border-evergreen bg-evergreen-tint text-evergreen" : d.closed ? "border-transparent text-muted-foreground/50" : "border-line bg-paper hover:border-evergreen"}`}>
                    <span className="text-[11px] opacity-70">{c.dow}</span>
                   <span className="tabular font-sans text-2xl leading-tight">{c.day}</span>
@@ -339,7 +339,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
                {(["Morning", "Afternoon", "Evening"] as const).map(period => {
                  const times = visibleSlots(day.slots).filter(s => group(s) === period);
                  return times.length ? <div key={period}><h2 className="mb-3 text-sm font-semibold text-muted-foreground">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                   {times.map((s) => <Button key={s} variant={draft.slot === s && draft.date === day.date ? "default" : "outline"} aria-pressed={draft.slot === s && draft.date === day.date} onClick={() => update({ date: day.date, slot: s })} className="tabular h-11 rounded-xl">{fmtTime(s)}</Button>)}
+                    {times.map((s) => <Button key={s} variant={draft.slot === s && draft.date === day.date ? "default" : "outline"} aria-pressed={draft.slot === s && draft.date === day.date} onClick={() => update({ date: day.date, slot: s })} className="tabular h-11 rounded-[10px]">{fmtTime(s)}</Button>)}
                  </div></div> : null;
                })}
                 <Button size="lg" disabled={!draft.slot || draft.date !== day.date} onClick={onDone}>Continue</Button>

@@ -4,7 +4,7 @@ import { useOwnerCtx } from "@/components/owner/ctx";
 import { addDays, apptsRange, et, etToIso, fmtLong } from "@/components/owner/lib";
 import { ApptCard, Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/")({ component: Today });
+export const Route = createFileRoute("/_authenticated/owner/")({ head: () => ({ meta: [{ title: "Today — Patel Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Today });
 
 function Today() {
   const now = useOwnerCtx().data!.now;

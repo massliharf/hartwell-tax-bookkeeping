@@ -14,16 +14,431 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          client_id: string
+          created_at: string
+          end_at: string
+          id: string
+          intake_answers: Json
+          manage_token: string
+          meeting_type: Database["public"]["Enums"]["meeting_type"]
+          ready_score: number
+          service_id: string
+          signature_status: Database["public"]["Enums"]["signature_status"]
+          start_at: string
+          status: Database["public"]["Enums"]["appointment_status"]
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          end_at: string
+          id?: string
+          intake_answers?: Json
+          manage_token?: string
+          meeting_type?: Database["public"]["Enums"]["meeting_type"]
+          ready_score?: number
+          service_id: string
+          signature_status?: Database["public"]["Enums"]["signature_status"]
+          start_at: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          end_at?: string
+          id?: string
+          intake_answers?: Json
+          manage_token?: string
+          meeting_type?: Database["public"]["Enums"]["meeting_type"]
+          ready_score?: number
+          service_id?: string
+          signature_status?: Database["public"]["Enums"]["signature_status"]
+          start_at?: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_items: {
+        Row: {
+          appointment_id: string
+          description: string | null
+          document_name: string
+          file_path: string | null
+          id: string
+          required: boolean
+          sort_order: number
+          status: Database["public"]["Enums"]["checklist_status"]
+          uploaded_at: string | null
+        }
+        Insert: {
+          appointment_id: string
+          description?: string | null
+          document_name: string
+          file_path?: string | null
+          id?: string
+          required?: boolean
+          sort_order?: number
+          status?: Database["public"]["Enums"]["checklist_status"]
+          uploaded_at?: string | null
+        }
+        Update: {
+          appointment_id?: string
+          description?: string | null
+          document_name?: string
+          file_path?: string | null
+          id?: string
+          required?: boolean
+          sort_order?: number
+          status?: Database["public"]["Enums"]["checklist_status"]
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_returning: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_returning?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_returning?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      document_rules: {
+        Row: {
+          active: boolean
+          condition: string
+          description: string | null
+          document_name: string
+          id: string
+          required: boolean
+          service_id: string | null
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          condition: string
+          description?: string | null
+          document_name: string
+          id?: string
+          required?: boolean
+          service_id?: string | null
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          condition?: string
+          description?: string | null
+          document_name?: string
+          id?: string
+          required?: boolean
+          service_id?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_rules_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          converted: boolean
+          created_at: string
+          email: string
+          id: string
+          last_step: string | null
+          name: string | null
+          nudged_at: string | null
+          partial_booking: Json
+        }
+        Insert: {
+          converted?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          last_step?: string | null
+          name?: string | null
+          nudged_at?: string | null
+          partial_booking?: Json
+        }
+        Update: {
+          converted?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          last_step?: string | null
+          name?: string | null
+          nudged_at?: string | null
+          partial_booking?: Json
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          appointment_id: string | null
+          body: string
+          channel: Database["public"]["Enums"]["message_channel"]
+          client_id: string | null
+          id: string
+          minutes_saved: number
+          sent_at: string
+          subject: string | null
+          type: Database["public"]["Enums"]["message_type"]
+        }
+        Insert: {
+          appointment_id?: string | null
+          body: string
+          channel?: Database["public"]["Enums"]["message_channel"]
+          client_id?: string | null
+          id?: string
+          minutes_saved?: number
+          sent_at?: string
+          subject?: string | null
+          type: Database["public"]["Enums"]["message_type"]
+        }
+        Update: {
+          appointment_id?: string | null
+          body?: string
+          channel?: Database["public"]["Enums"]["message_channel"]
+          client_id?: string | null
+          id?: string
+          minutes_saved?: number
+          sent_at?: string
+          subject?: string | null
+          type?: Database["public"]["Enums"]["message_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          active: boolean
+          description: string | null
+          duration_min: number
+          id: string
+          is_from_price: boolean
+          name: string
+          price_from: number
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          description?: string | null
+          duration_min: number
+          id?: string
+          is_from_price?: boolean
+          name: string
+          price_from: number
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          description?: string | null
+          duration_min?: number
+          id?: string
+          is_from_price?: boolean
+          name?: string
+          price_from?: number
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          buffer_min: number
+          demo_time_offset_minutes: number
+          hours: Json
+          id: number
+          reminder_timings: Json
+          timezone: string
+        }
+        Insert: {
+          buffer_min?: number
+          demo_time_offset_minutes?: number
+          hours: Json
+          id?: number
+          reminder_timings: Json
+          timezone?: string
+        }
+        Update: {
+          buffer_min?: number
+          demo_time_offset_minutes?: number
+          hours?: Json
+          id?: number
+          reminder_timings?: Json
+          timezone?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      waitlist: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          preferred_days: string[]
+          service_id: string
+          status: Database["public"]["Enums"]["waitlist_status"]
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          preferred_days?: string[]
+          service_id: string
+          status?: Database["public"]["Enums"]["waitlist_status"]
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          preferred_days?: string[]
+          service_id?: string
+          status?: Database["public"]["Enums"]["waitlist_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waitlist_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_checklist: {
+        Args: { _appointment_id: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_owner: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
+      appointment_status:
+        | "booked"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
+        | "no_show"
+        | "rescheduled"
+      checklist_status: "missing" | "uploaded" | "not_applicable"
+      meeting_type: "in_person" | "video"
+      message_channel: "email" | "sms"
+      message_type:
+        | "booking_confirmation"
+        | "docs_reminder_7d"
+        | "readiness_check_48h"
+        | "reschedule_offer"
+        | "final_reminder_24h"
+        | "waitlist_offer"
+        | "abandoned_nudge"
+        | "signature_reminder"
+        | "missing_docs_after"
+        | "new_season"
+      signature_status: "not_needed" | "pending" | "signed"
+      waitlist_status: "waiting" | "offered" | "booked" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +565,33 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+      appointment_status: [
+        "booked",
+        "confirmed",
+        "completed",
+        "cancelled",
+        "no_show",
+        "rescheduled",
+      ],
+      checklist_status: ["missing", "uploaded", "not_applicable"],
+      meeting_type: ["in_person", "video"],
+      message_channel: ["email", "sms"],
+      message_type: [
+        "booking_confirmation",
+        "docs_reminder_7d",
+        "readiness_check_48h",
+        "reschedule_offer",
+        "final_reminder_24h",
+        "waitlist_offer",
+        "abandoned_nudge",
+        "signature_reminder",
+        "missing_docs_after",
+        "new_season",
+      ],
+      signature_status: ["not_needed", "pending", "signed"],
+      waitlist_status: ["waiting", "offered", "booked", "expired"],
+    },
   },
 } as const

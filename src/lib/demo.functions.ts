@@ -7,7 +7,7 @@ async function owner(context: { supabase: import("@supabase/supabase-js").Supaba
   const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
   if (!data) throw new Error("Forbidden");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { requestOrigin } = await import("./automations.functions");
+  const { requestOrigin } = await import("./origin.server");
   const { getNow } = await import("./clock.server");
   return { s: supabaseAdmin, origin: await requestOrigin(), getNow };
 }

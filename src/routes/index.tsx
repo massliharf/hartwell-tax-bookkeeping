@@ -19,6 +19,8 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://patel-ready-book.lovable.app/og-image.jpg" },
+      { name: "twitter:image", content: "https://patel-ready-book.lovable.app/og-image.jpg" },
     ],
   }),
   component: Home,

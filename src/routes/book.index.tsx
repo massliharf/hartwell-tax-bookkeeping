@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -243,7 +243,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
       <div className="mt-8 flex items-center gap-3">
         {page > 0 && <Button variant="outline" size="lg" onClick={() => setPage(page - 1)}>Previous</Button>}
         <Button size="lg" disabled={!answered} onClick={() => (page < pages - 1 ? setPage(page + 1) : onDone())}>
-          Continue <ArrowRight />
+          Continue
         </Button>
         {pages > 1 && <span className="tabular text-xs text-muted-foreground">{page + 1} / {pages}</span>}
       </div>

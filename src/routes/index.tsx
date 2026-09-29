@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Briefcase, Building2, CalendarCheck, Check, FileSpreadsheet, FileUp, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2 } from "lucide-react";
+import { Briefcase, Building2, CalendarCheck, Check, FileSpreadsheet, FileUp, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Reveal } from "@/components/brand/Reveal";
@@ -72,7 +72,7 @@ function Hero() {
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
         </p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg"><Link to="/book">Book an appointment <ArrowRight /></Link></Button>
+           <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
           <Button asChild size="lg" variant="outline"><Link to="/book/returning">I'm a returning client</Link></Button>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
@@ -164,7 +164,7 @@ function Services() {
                       <span className="tabular text-xl font-semibold">${s.price}</span>
                     </p>
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-ink">
-                      Book <ArrowRight className="size-3.5" />
+                       Book
                     </span>
                   </div>
                 </Link>

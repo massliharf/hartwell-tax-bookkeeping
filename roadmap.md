@@ -1,0 +1,4 @@
+- [ ] Remove scroll reveals and nonessential motion; preserve booking cross-fade and Ready ring.
+- [ ] Stabilize hero checklist with three visible rows and animated completion only.
+- [ ] Normalize headings, separators, announcement bar, and button/link styles across screens.
+- [ ] Verify desktop and phone rendering and interaction; review remaining tasks.

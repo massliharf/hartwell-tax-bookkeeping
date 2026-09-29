@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Patel Tax & Bookkeeping — Edison, NJ" },
       { name: "description", content: "Tax preparation and bookkeeping by Priya Patel, EA, in Edison, New Jersey." },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "Patel Tax & Bookkeeping" },
       { property: "og:title", content: "Patel Tax & Bookkeeping — Edison, NJ" },
       { property: "og:description", content: "Tax preparation and bookkeeping by Priya Patel, EA, in Edison, New Jersey." },
       { property: "og:type", content: "website" },

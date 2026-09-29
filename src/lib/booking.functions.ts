@@ -95,7 +95,7 @@ const DOW = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
 /** Next N days from getNow(), each with its open slots (or closed/full). */
 export const getAvailabilityWindow = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ serviceId: z.string().uuid(), days: z.number().int().min(1).max(21) }).parse(d))
+  .inputValidator((d) => z.object({ serviceId: z.string().uuid(), days: z.number().int().min(1).max(62) }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { getNow } = await import("./clock.server");

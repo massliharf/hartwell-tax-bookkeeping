@@ -26,9 +26,9 @@ export function SiteHeader() {
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-5">
         <Link to="/" className="shrink-0 font-serif text-[27px] leading-none text-ink">Patel Tax</Link>
         <nav className="hidden items-center gap-8 text-sm font-medium text-deep-ink/80 md:flex">
-          <a href="#services" className="hover:text-ink">Services</a>
-          <a href="#about" className="hover:text-ink">About</a>
-          <a href="#reviews" className="hover:text-ink">Reviews</a>
+          <Link to="/" hash="services" className="hover:text-ink">Services</Link>
+          <Link to="/" hash="about" className="hover:text-ink">About</Link>
+          <Link to="/" hash="reviews" className="hover:text-ink">Reviews</Link>
         </nav>
         <div className="flex items-center gap-3 sm:gap-6">
           <Link to="/owner" className="text-xs font-medium text-muted-foreground hover:text-ink sm:text-sm">Owner login</Link>

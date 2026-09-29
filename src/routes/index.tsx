@@ -112,20 +112,20 @@ function HowItWorks() {
     { icon: Check, title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need." },
   ];
   return (
-    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
+    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-14">
       <SectionHead eyebrow="How it works" title="Three steps. One appointment." />
-      <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-6">
+      <ol className="mt-8 grid gap-4 md:grid-cols-3">
         {steps.map((s, i) => (
-          <Reveal key={s.title} delay={i * 0.1}>
-            <li className="relative rounded-2xl bg-sheet px-7 py-4">
+          <Reveal key={s.title} delay={i * 0.1} className="h-full">
+            <li className="relative h-full rounded-2xl border border-border bg-panel p-6">
               <div className="relative mb-4 h-12 w-12">
-                                                <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
+                <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
                   <s.icon className="size-5 text-ink" strokeWidth={1.75} />
                 </div>
                 <span className="tabular absolute -right-2 -top-2 grid size-4 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{i + 1}</span>
               </div>
-              <h3 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.title}</h3>
-              <p className="mt-1 max-w-xs font-serif text-base font-normal text-[#363636]">{s.text}</p>
+              <h3 className="text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.title}</h3>
+              <p className="mt-1.5 text-sm leading-[22px] text-[#363636]">{s.text}</p>
             </li>
           </Reveal>
         ))}
@@ -136,33 +136,47 @@ function HowItWorks() {
 
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24 py-24">
+    <section id="services" className="scroll-mt-24 py-14">
       <div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
-        <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s, i) => (
-            <Reveal key={s.id} delay={(i % 3) * 0.08}>
-              <Link to="/book" search={{ service: s.id }} className="group flex h-full flex-col rounded-2xl bg-sheet p-5 transition-colors duration-200 hover:bg-surface-2">
-                <p className="tabular text-xs font-medium uppercase text-muted-foreground">{s.minutes} min</p>
-                <h3 className="mt-2 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
-                <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
-                <div className="mt-auto flex items-end justify-between pt-5 mt-6">
-                  <p className="text-deep-ink">
-                    {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                    <span className="tabular text-xl font-semibold">${s.price}</span>
-                  </p>
-                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-ink">
-                    Book <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {SERVICES.map((s, i) => {
+            const style = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
+            const Icon = style.icon;
+            return (
+              <Reveal key={s.id} delay={(i % 3) * 0.08} className="h-full">
+                <Link
+                  to="/book"
+                  search={{ service: s.id }}
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-panel p-5 transition-colors duration-200 hover:bg-fill-subtle"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
+                      <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />
+                    </span>
+                    <span className="tabular rounded border border-border px-1.5 text-[10px] font-medium uppercase leading-4 tracking-[0.2px] text-muted-foreground">{s.minutes} min</span>
+                  </div>
+                  <h3 className="mt-4 text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
+                  <p className="mt-1.5 text-sm leading-[22px] text-muted-foreground">{s.blurb}</p>
+                  <div className="mt-auto flex items-end justify-between pt-6">
+                    <p className="text-deep-ink">
+                      {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                      <span className="tabular text-xl font-semibold">${s.price}</span>
+                    </p>
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-ink">
+                      Book <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
+
 
 function About() {
   return (

@@ -26,3 +26,4 @@
 - Owner app lives under src/routes/_authenticated/owner.*; reads use the browser client (owner RLS), writes that email clients go through src/lib/owner.functions.ts. _Why: RLS already scopes data; server only where automations run._
 - Owner account is created once via /auth setup (createOwnerAccount refuses when an admin exists); public sign-ups are disabled. _Why: single-owner practice._
 - Demo tooling (src/lib/demo.functions.ts, src/components/owner/demo.tsx): "Reset demo data" restores public.demo_snapshot via demo_restore(); re-take with select demo_take_snapshot() after changing seed data. The public demo account (src/lib/demo.ts) is excluded from the one-owner check. _Why: judges need a repeatable live demo._
+- Visual design: DESIGN_SYSTEM.md ("Studio Shell") is the single source of truth; tokens live in src/styles.css. _Why: user replaced the earlier Calm Ledger / paper brand._

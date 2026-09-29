@@ -81,7 +81,7 @@ function ConfirmedPage() {
             initial={reduce ? false : { scale: 0.9, rotate: -8 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-paper shadow-sheet"
+             className="mx-auto grid size-16 place-items-center rounded-full bg-evergreen-tint text-evergreen"
           >
             <Check className="size-8" strokeWidth={2.5} />
           </motion.div>
@@ -96,13 +96,13 @@ function ConfirmedPage() {
 
         <motion.div initial={reduce ? false : { opacity: 0.96, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
           className="sheet-stack mt-10 p-6">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{service}</p>
+           <p className="text-sm font-medium text-graphite">{service}</p>
           <p className="mt-1 font-sans text-3xl text-deep-ink">{fmtDateLong(a.start_at)}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
             <span className="tabular">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</span>
             <span className="inline-flex items-center gap-1.5">
               {a.meeting_type === "video" ? <Video className="size-4" /> : <Users className="size-4" />}
-              {a.meeting_type === "video" ? "Video call" : `In person · ${ADDRESS}`}
+               {a.meeting_type === "video" ? "Video call" : `In person, ${ADDRESS}`}
             </span>
           </div>
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
@@ -114,7 +114,7 @@ function ConfirmedPage() {
         <motion.div initial={reduce ? false : { opacity: 0.96, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
           className="sheet-stack mt-8 p-6">
           <div className="flex items-center gap-5">
-            <ReadyRing value={a.ready_score} size={84} />
+             <ReadyRing value={a.ready_score} size={128} stroke={9} />
             <div className="min-w-0">
               <p className="font-sans text-3xl text-deep-ink">Your checklist</p>
               <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Priya will check everything before you arrive.</p>
@@ -126,7 +126,7 @@ function ConfirmedPage() {
           <Button asChild size="lg" variant="highlight" className="mt-6 w-full">
             <Link to="/a/$token" params={{ token: token! }}><Upload /> Upload your documents now</Link>
           </Button>
-          <p className="mt-3 text-center text-sm text-muted-foreground">or do it later — we'll remind you</p>
+           <p className="mt-3 text-center text-sm text-muted-foreground">Later is fine, we'll remind you.</p>
           <p className="mt-5 flex items-start gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
             <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Priya can open. We'll never ask for your Social Security number online.
           </p>

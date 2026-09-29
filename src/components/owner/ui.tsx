@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils";
 export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title: ReactNode; children?: ReactNode }) {
   return (
     <header className="mb-8">
-      {eyebrow && <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>}
-      <h1 className="mt-1 font-sans text-4xl leading-tight text-deep-ink md:text-5xl">{title}</h1>
+       {eyebrow && <p className="text-sm text-graphite">{eyebrow}</p>}
+       <h1 className="mt-1 text-3xl font-semibold leading-tight text-deep-ink md:text-4xl">{title}</h1>
       {children && <div className="mt-2 text-muted-foreground">{children}</div>}
     </header>
   );
@@ -24,22 +24,22 @@ export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title
 
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
-      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-success/10 text-success"><Check className="h-6 w-6" /></span>
-      <h2 className="mt-4 font-sans text-3xl text-deep-ink">{title}</h2>
+     <div className="mx-auto max-w-md px-8 py-12 text-center">
+       <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-evergreen-tint text-evergreen"><Check className="h-6 w-6" /></span>
+       <h2 className="mt-4 text-2xl font-semibold text-deep-ink">{title}</h2>
       {children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}
     </div>
   );
 }
 
 export function LoadingRows({ n = 3 }: { n?: number }) {
-  return <div className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="h-28 animate-pulse rounded-2xl bg-sheet" />)}</div>;
+   return <div className="space-y-3">{Array.from({ length: n }, (_, i) => <div key={i} className="h-24 animate-pulse rounded-[14px] bg-control" />)}</div>;
 }
 
 export function ErrorNote({ onRetry }: { onRetry?: () => void }) {
   return (
     <div className="rounded-2xl border border-warning/40 bg-warning/10 p-5 text-sm text-deep-ink">
-      This didn't load. {onRetry && <button onClick={onRetry} className="font-medium underline underline-offset-4">Try again</button>}
+       This didn't load. {onRetry && <Button size="sm" variant="ghost" onClick={onRetry}>Try again</Button>}
     </div>
   );
 }
@@ -73,7 +73,7 @@ export function StatusPill({ status }: { status: string }) {
   );
 }
 
-/** One appointment as a paper card: time, client, ring, missing docs, actions. */
+/** One appointment with readiness and actions. */
 export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean }) {
   const [docs, setDocs] = useState(false);
   const { complete, noShow } = useApptActions();
@@ -81,16 +81,16 @@ export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean 
   const uploaded = a.checklist_items.filter((i) => i.file_path);
   const open = a.status === "booked" || a.status === "confirmed";
   return (
-    <article className="sheet-stack p-5 md:p-6">
+     <article className="rounded-[14px] border border-line p-4 md:p-5">
       <div className="flex gap-4">
-        <ReadyRing value={a.ready_score} size={64} stroke={6} />
+         <ReadyRing value={a.ready_score} size={72} stroke={6} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <p className="tabular text-sm font-medium text-ink">{showDate ? `${fmtLong(a.start_at)} · ` : ""}{fmtTime(a.start_at)}–{fmtTime(a.end_at)}</p>
+             <p className="tabular text-sm font-medium text-deep-ink">{showDate ? `${fmtLong(a.start_at)} at ` : ""}{fmtTime(a.start_at)}–{fmtTime(a.end_at)}</p>
             <MeetingTag type={a.meeting_type} />
             <StatusPill status={a.status} />
           </div>
-          <h3 className="mt-1 truncate font-sans text-2xl text-deep-ink">
+           <h3 className="mt-1 break-words text-xl font-semibold text-deep-ink">
             {a.clients ? <Link to="/owner/clients/$id" params={{ id: a.clients.id }} className="hover:underline underline-offset-4">{a.clients.name}</Link> : "Client"}
           </h3>
           <p className="text-sm text-muted-foreground">{a.services?.name}</p>
@@ -99,7 +99,7 @@ export function ApptCard({ a, showDate = false }: { a: Appt; showDate?: boolean 
       <div className="mt-4 border-t border-border pt-4">
         {missing.length ? (
           <>
-            <p className="text-xs font-medium uppercase tracking-wider text-warning">Still missing · {missing.length}</p>
+             <p className="text-xs font-medium text-warning">Still missing: {missing.length}</p>
             <ul className="mt-2 flex flex-wrap gap-2">
               {missing.map((m) => <li key={m.id} className="rounded-full border border-border bg-paper px-3 py-1 text-xs text-deep-ink">{m.document_name}</li>)}
             </ul>
@@ -165,5 +165,5 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
 }
 
 export function CloseX({ onClick }: { onClick: () => void }) {
-  return <button onClick={onClick} aria-label="Close" className="rounded-full p-1 hover:bg-sage"><X className="h-4 w-4" /></button>;
+   return <Button variant="ghost" size="icon" onClick={onClick} aria-label="Close" className="size-8"><X className="h-4 w-4" /></Button>;
 }

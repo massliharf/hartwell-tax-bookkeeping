@@ -57,7 +57,7 @@ function CalendarPage() {
 
   return (
     <>
-      <PageHead eyebrow="Calendar" title={`Week of ${ymdLabel(week)}`}>
+      <PageHead title={`Week of ${ymdLabel(week)}`}>
         <div className="flex flex-wrap items-center gap-3">
           <Button size="icon" variant="outline" aria-label="Previous week" onClick={() => setWeek(addDays(week, -7))}><ChevronLeft /></Button>
           <Button size="sm" variant="ghost" onClick={() => setWeek(mondayOf(today))}>This week</Button>
@@ -70,7 +70,7 @@ function CalendarPage() {
       <p className="mb-3 hidden text-xs text-muted-foreground md:block">Drag an appointment to move it. The client is emailed automatically.</p>
 
       {/* Desktop week grid */}
-      <div className={cn("sheet-stack hidden overflow-hidden md:block", (q.isLoading || q.isError) && "md:hidden")}>
+      <div className={cn("hidden overflow-hidden rounded-[14px] border border-line md:block", (q.isLoading || q.isError) && "md:hidden")}>
         <div className="grid grid-cols-[52px_repeat(6,1fr)] border-b border-border bg-sheet">
           <div />
           {days.map((d) => (
@@ -96,7 +96,7 @@ function CalendarPage() {
                     className={cn("absolute inset-x-1 overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight shadow-sheet transition-transform hover:-translate-y-px",
                       readinessStyle[readiness(a.ready_score)], a.status === "completed" && "opacity-60", drag === a.id && "opacity-40")}
                     style={{ top: (minutes - START) * PX, height: Math.max(22, h * PX - 2) }}>
-                    <span className="tabular block font-medium">{fmtTime(a.start_at)} · {a.ready_score}%</span>
+                    <span className="tabular block font-medium">{fmtTime(a.start_at)}, {a.ready_score}%</span>
                     <span className="block truncate text-deep-ink">{a.clients?.name}</span>
                   </button>
                 );
@@ -115,11 +115,11 @@ function CalendarPage() {
               <ul className="space-y-2">
                 {byDay(d).map((a) => (
                   <li key={a.id}>
-                    <button onClick={() => setOpenId(a.id)} className={cn("flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left", readinessStyle[readiness(a.ready_score)])}>
+                    <Button variant="ghost" onClick={() => setOpenId(a.id)} className={cn("flex h-14 w-full items-center gap-3 rounded-[14px] border px-3 text-left", readinessStyle[readiness(a.ready_score)])}>
                       <span className="tabular w-16 text-xs font-medium">{fmtTime(a.start_at)}</span>
                       <span className="flex-1 truncate text-sm text-deep-ink">{a.clients?.name}</span>
                       <span className="tabular text-xs">{a.ready_score}%</span>
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -156,7 +156,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
           <>
             <DialogHeader>
               <DialogTitle className="font-sans text-3xl font-normal">{a.clients?.name}</DialogTitle>
-              <DialogDescription>{a.services?.name} · {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
+              <DialogDescription>{a.services?.name}, {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4">
               <ReadyRing value={a.ready_score} size={72} stroke={6} />

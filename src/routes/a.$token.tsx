@@ -80,19 +80,17 @@ function PortalPage() {
 
   return (
     <BookingShell>
-      <div className="mx-auto max-w-2xl space-y-10">
+      <div className="mx-auto max-w-3xl space-y-4">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">Your private page</p>
+          <p className="text-sm text-graphite">Your private page</p>
           <h1 className="mt-2 text-4xl leading-tight text-deep-ink sm:text-5xl">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Priya has everything she needs."}
           </p>
         </div>
 
-        {a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
-
-        <AppointmentCard appt={a} cancelled={cancelled} />
-        {open && <Actions token={token} appt={a} onChange={refresh} />}
+        <div className="workbench-panel space-y-6 p-6"><AppointmentCard appt={a} cancelled={cancelled} />
+        {open && <Actions token={token} appt={a} onChange={refresh} />}</div>
         {cancelled && (
           <div className="rounded-2xl border border-border bg-sheet p-6">
             <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
@@ -101,20 +99,19 @@ function PortalPage() {
         )}
 
         {!cancelled && items.length > 0 && (
-          <section>
+          <section className="workbench-panel p-6">
             <div className="mb-4 flex items-end justify-between gap-4">
-              <h2 className="text-3xl text-deep-ink">Your checklist</h2>
+              <h2 className="text-3xl font-semibold text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
-            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
-              <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Priya can see your files. We never ask for your Social Security number.
-            </p>
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
             </ul>
-            <p className="mt-4 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
+            <p className="mt-4 flex items-start gap-2 text-sm text-graphite"><Lock className="mt-0.5 size-4 shrink-0 text-evergreen" /> Only Priya can open your files. We never ask for your Social Security number.</p>
+            <p className="mt-2 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
           </section>
         )}
+        {a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
       </div>
     </BookingShell>
   );
@@ -124,18 +121,18 @@ function PortalPage() {
 function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }) {
   const video = appt.meeting_type === "video";
   return (
-    <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
+    <div className={cancelled ? "opacity-70" : ""}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{appt.services?.name}</p>
+            <p className="text-sm font-medium text-graphite">{appt.services?.name}</p>
             {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
             {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
           </div>
           <p className={`mt-1 font-sans text-3xl text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
-        {!cancelled && <ReadyRing value={appt.ready_score} size={84} />}
+        {!cancelled && <ReadyRing value={appt.ready_score} size={72} />}
       </div>
       {!cancelled && (
         <div className="mt-5 border-t border-border pt-4 text-sm">
@@ -146,7 +143,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-ink" /> In person · {ADDRESS}</span>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-evergreen" /> In person, {ADDRESS}</span>
               <Button size="sm" variant="outline" asChild><a href={MAP_URL} target="_blank" rel="noreferrer"><MapPin /> Open map</a></Button>
             </div>
           )}
@@ -178,9 +175,9 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
             {busy === "confirm" ? <Loader2 className="animate-spin" /> : <Check />} I'll be there
           </Button>
         )}
-        <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
+        <Button variant="neutral" onClick={() => setPicking((p) => !p)}><CalendarClock /> Move appointment</Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
+          <AlertDialogTrigger asChild><Button variant="ghost" className="text-destructive">Cancel</Button></AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl bg-sheet">
             <AlertDialogHeader>
               <AlertDialogTitle className="font-sans text-3xl font-normal">Cancel this appointment?</AlertDialogTitle>
@@ -223,7 +220,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
 
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-      <div className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet">
+      <div className="rounded-[14px] bg-canvas p-5">
         <div className="mb-4 flex items-center justify-between">
           <p className="font-sans text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
@@ -346,7 +343,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <motion.div key="missing" {...flip}
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-ink" : ""}`}>
+            className={`rounded-[14px] border border-line bg-paper p-5 transition-colors ${drag ? "ring-2 ring-evergreen" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sage text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
@@ -393,8 +390,8 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
   const ok = name.trim().length >= 2 && agree;
 
   return (
-    <section className="sheet-stack border-l-4 border-l-ink p-6">
-      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-warning">One last step</p>
+    <section className="workbench-panel p-6">
+      <p className="text-sm font-medium text-graphite">One last step</p>
       <h2 className="mt-1 text-3xl text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Priya has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-paper/70 p-4 text-sm">

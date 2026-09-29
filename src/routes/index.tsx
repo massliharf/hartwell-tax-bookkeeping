@@ -210,15 +210,16 @@ function Testimonials() {
     { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
-    <section className="py-24">
+    <section className="py-14">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal><p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Kind words</p></Reveal>
         <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible [scrollbar-width:none]">
           {t.map((x, i) => (
-            <Reveal key={x.n} delay={i * 0.1}>
-              <figure className="h-full w-[85vw] shrink-0 snap-start rounded-2xl bg-[#2B2B2B] p-6 text-white md:w-auto">
-                <blockquote className="font-serif text-xl font-medium leading-[30px] tracking-[-0.2px]">"{x.q}"</blockquote>
-                <figcaption className="mt-5 text-sm"><span className="text-white">{x.n}</span><span className="block text-white/60">{x.r}</span></figcaption>
+            <Reveal key={x.n} delay={i * 0.1} className="h-full">
+              <figure className="flex h-full w-[85vw] shrink-0 snap-start flex-col rounded-2xl bg-[#2B2B2B] p-6 text-white md:w-auto">
+                <blockquote className="text-lg font-medium leading-[28px] tracking-[-0.2px]">"{x.q}"</blockquote>
+                <figcaption className="mt-auto pt-5 text-sm"><span className="text-white">{x.n}</span><span className="block text-white/60">{x.r}</span></figcaption>
+
               </figure>
             </Reveal>
           ))}

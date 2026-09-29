@@ -48,6 +48,7 @@
   --color-ring-offset-background: var(--background);
   --color-paper: var(--paper);
   --color-sheet: var(--sheet);
+  --color-paper-deep: var(--paper-deep);
   --color-ink: var(--ink-green);
   --color-deep-ink: var(--deep-ink);
   --color-marigold: var(--marigold);

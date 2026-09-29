@@ -45,7 +45,7 @@ function Home() {
     <div className="min-h-screen overflow-x-clip bg-canvas">
       <AnnouncementBar />
       <SiteHeader />
-      <main>
+      <main className="space-y-16 lg:space-y-24">
         <Hero />
         <TrustStrip />
         <HowItWorks />
@@ -62,7 +62,7 @@ function Home() {
 
 function Hero() {
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-12 pt-10 md:grid-cols-[1.15fr_1fr] md:gap-14 md:pt-16">
+    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 md:grid-cols-[1.15fr_1fr] md:gap-14 md:pt-16">
       <Reveal>
          <Eyebrow>Claire Hartwell, EA, Montclair, New Jersey</Eyebrow>
          <h1 className="mt-3 text-[36px] font-medium leading-[44px] tracking-[-0.4px] text-deep-ink sm:text-[52px] sm:leading-[58px]">
@@ -85,8 +85,8 @@ function Hero() {
 function TrustStrip() {
   const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
-    <div className="px-2">
-      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-5 py-2">
+    <div className="mx-auto max-w-6xl px-5">
+      <ul className="flex flex-wrap items-center justify-start gap-2">
         {items.map((t) => (
           <li key={t} className="flex h-7 items-center gap-1.5 rounded-full border border-border bg-fill-subtle px-3 text-xs font-medium text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
         ))}
@@ -112,7 +112,7 @@ function HowItWorks() {
     { icon: Check, title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need." },
   ];
   return (
-    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-14">
+    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5">
       <SectionHead eyebrow="How it works" title="Three steps. One appointment." />
       <ol className="mt-8 grid gap-4 md:grid-cols-3">
         {steps.map((s, i) => (
@@ -136,38 +136,32 @@ function HowItWorks() {
 
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24 py-14">
+    <section id="services" className="scroll-mt-24">
       <div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s, i) => {
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          {SERVICES.map((s) => {
             const style = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
             const Icon = style.icon;
             return (
-              <Reveal key={s.id} delay={(i % 3) * 0.08} className="h-full">
-                <Link
-                  to="/book"
-                  search={{ service: s.id }}
-                   className="group flex h-full flex-col rounded-2xl border border-border bg-sheet p-5 transition-colors duration-150 hover:bg-fill-subtle"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
-                      <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />
-                    </span>
-                     <span className="tabular rounded border border-border px-1.5 text-[10px] font-medium leading-4 text-muted-foreground">{s.minutes} min</span>
+              <Reveal key={s.id} className={`h-full ${s.id === "bookkeeping" ? "lg:col-span-2" : ""}`}>
+                <article className="grid h-full min-h-36 grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border bg-sheet p-4 sm:gap-4 sm:p-5 lg:min-h-28">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
+                    <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-medium leading-6 text-deep-ink">{s.name}</h3>
+                    <p className="mt-1 truncate text-sm text-muted-foreground" title={s.blurb}>{s.blurb}</p>
+                    <p className="tabular mt-1 text-xs text-muted-foreground">{s.minutes} min</p>
                   </div>
-                  <h3 className="mt-4 text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
-                  <p className="mt-1.5 text-sm leading-[22px] text-muted-foreground">{s.blurb}</p>
-                  <div className="mt-auto flex items-end justify-between pt-6">
-                    <p className="text-deep-ink">
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <p className="whitespace-nowrap text-deep-ink">
                       {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                      <span className="tabular text-xl font-semibold">${s.price}</span>
+                      <span className="tabular text-lg font-semibold">${s.price}</span>
                     </p>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-ink">
-                       Book
-                    </span>
+                    <Button asChild size="sm"><Link to="/book" search={{ service: s.id }}>Book</Link></Button>
                   </div>
-                </Link>
+                </article>
               </Reveal>
             );
           })}
@@ -180,19 +174,18 @@ function Services() {
 
 function About() {
   return (
-    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-10 px-5 py-14 md:grid-cols-[0.9fr_1.1fr]">
+    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-10 px-5 md:grid-cols-[0.9fr_1.1fr]">
       <Reveal>
-        <figure className="relative mx-auto w-full max-w-xs">
+        <figure className="w-full max-w-xs">
           <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
             <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
-          <figcaption className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white backdrop-blur-sm">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>
         <Eyebrow>About Claire</Eyebrow>
         <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
-        <div className="mt-4 space-y-3 rounded-2xl border border-border bg-sheet p-6 text-base leading-6 text-[#363636]">
+        <div className="mt-4 space-y-3 text-base leading-6 text-[#363636]">
           <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
@@ -210,15 +203,15 @@ function Testimonials() {
     { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
-    <section className="py-14">
+    <section>
       <div className="mx-auto max-w-6xl px-5">
          <Reveal><p className="text-xs font-medium leading-6 text-muted-foreground">Kind words</p></Reveal>
         <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible [scrollbar-width:none]">
           {t.map((x, i) => (
             <Reveal key={x.n} delay={i * 0.1} className="h-full">
-              <figure className="flex h-full w-[85vw] shrink-0 snap-start flex-col rounded-2xl bg-[#2B2B2B] p-6 text-white md:w-auto">
+              <figure className="flex h-full w-[85vw] shrink-0 snap-start flex-col rounded-2xl border border-border bg-sheet p-6 text-deep-ink md:w-auto">
                 <blockquote className="text-lg font-medium leading-[28px] tracking-[-0.2px]">"{x.q}"</blockquote>
-                <figcaption className="mt-auto pt-5 text-sm"><span className="text-white">{x.n}</span><span className="block text-white/60">{x.r}</span></figcaption>
+                <figcaption className="mt-auto pt-5 text-sm"><span className="text-deep-ink">{x.n}</span><span className="block text-muted-foreground">{x.r}</span></figcaption>
 
               </figure>
             </Reveal>
@@ -237,7 +230,7 @@ function Privacy() {
     { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-5 py-14">
+    <section className="mx-auto max-w-6xl px-5">
       <div className="rounded-2xl border border-border bg-sheet p-6 sm:p-10">
         <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
@@ -262,7 +255,7 @@ function Faq() {
     { q: "What are the key deadlines?", a: "Most individual returns are due April 15. Extended returns are due October 15. Estimated taxes are due in April, June, September and January." },
   ];
   return (
-    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-8 px-5 py-14 md:grid-cols-[0.8fr_1.2fr]">
+    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-8 px-5 md:grid-cols-[0.8fr_1.2fr]">
       <SectionHead eyebrow="Questions" title="Good to know." />
       <Reveal>
         <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-3">

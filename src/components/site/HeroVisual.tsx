@@ -27,10 +27,10 @@ export function HeroVisual() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>
-          <p className="mt-1 font-serif text-2xl leading-tight text-deep-ink">Thursday, 10:30 am</p>
+          <p className="mt-1 whitespace-nowrap font-serif text-[clamp(16px,5vw,24px)] leading-tight text-deep-ink">Thursday, 10:30 am</p>
           <p className="text-xs text-muted-foreground">Individual return, 45 min</p>
         </div>
-        <ReadyRing value={(shown / 3) * 100} size={84} stroke={6} />
+        <div className="shrink-0"><ReadyRing value={(shown / 3) * 100} size={84} stroke={6} /></div>
       </div>
       <div className="mt-5">
         <DocumentStack docs={docs} />

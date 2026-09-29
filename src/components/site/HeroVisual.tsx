@@ -11,11 +11,11 @@ const ALL: StackDoc[] = [
 
 export function HeroVisual() {
   const reduce = useReducedMotion();
-  const [step, setStep] = useState(reduce ? 3 : 0);
+  const [step, setStep] = useState(3);
 
   useEffect(() => {
     if (reduce) return;
-    const t = setTimeout(() => setStep((s) => (s >= 5 ? 0 : s + 1)), step === 0 ? 700 : step >= 3 ? 2200 : 1300);
+    const t = setTimeout(() => setStep((s) => (s >= 5 ? 1 : s + 1)), step >= 3 ? 2200 : 1300);
     return () => clearTimeout(t);
   }, [step, reduce]);
 

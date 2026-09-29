@@ -178,6 +178,24 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_snapshot: {
+        Row: {
+          rows: Json
+          taken_at: string
+          tbl: string
+        }
+        Insert: {
+          rows: Json
+          taken_at?: string
+          tbl: string
+        }
+        Update: {
+          rows?: Json
+          taken_at?: string
+          tbl?: string
+        }
+        Relationships: []
+      }
       document_rules: {
         Row: {
           active: boolean
@@ -506,6 +524,8 @@ export type Database = {
         Returns: Json
       }
       compute_ready_score: { Args: { _id: string }; Returns: undefined }
+      demo_restore: { Args: never; Returns: undefined }
+      demo_take_snapshot: { Args: never; Returns: undefined }
       generate_checklist: {
         Args: { _appointment_id: string }
         Returns: undefined

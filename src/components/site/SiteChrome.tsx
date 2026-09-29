@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HOURS } from "@/lib/services";
 
@@ -11,7 +10,7 @@ export function AnnouncementBar() {
         search={{ service: "extension" }}
         className="mx-auto block min-h-10 max-w-6xl py-2 text-center text-xs leading-5 text-deep-ink sm:text-sm"
       >
-        <span className="mr-2 font-medium text-ink">Oct 15</span>
+        <span className="mr-2 font-medium text-deep-ink">Oct 15</span>
         <span>
           Filing an extension? The deadline is October 15 — <span className="font-semibold text-ink underline-offset-4 hover:underline">book your slot</span>.
         </span>
@@ -34,7 +33,7 @@ export function SiteHeader() {
           <a href="#about" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">About</a>
           <a href="#faq" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">FAQ</a>
         </nav>
-        <Button asChild><Link to="/book">Book <ArrowRight className="size-3.5" /></Link></Button>
+        <Button asChild><Link to="/book">Book</Link></Button>
       </div>
     </header>
   );

@@ -126,8 +126,8 @@ export const confirmAttendance = createServerFn({ method: "POST" })
 
 async function freeSlot(serviceId: string, start: string) {
   const { offerFreedSlot } = await import("./automations.server");
-  const { requestOrigin } = await import("./automations.functions");
-  await offerFreedSlot(serviceId, start, await requestOrigin()).catch(console.error);
+  const { requestOrigin } = await import("./origin.server");
+  await offerFreedSlot(serviceId, start, requestOrigin()).catch(console.error);
 }
 
 export const cancelAppointment = createServerFn({ method: "POST" })

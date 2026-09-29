@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/insights")({ component: Insights });
+export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Insights — Patel Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Insights });
 
 // Baselines from the practice before the new system (from the brief / Priya's estimate).
 const BEFORE = { ready: 65, noShow: 12, msgsPerBooking: 6 };

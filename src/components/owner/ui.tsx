@@ -133,7 +133,7 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
   const isPdf = sel?.path.toLowerCase().endsWith(".pdf");
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setSel(null); }}>
-      <DialogContent className="max-w-4xl bg-paper p-0 sm:rounded-2xl">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-auto bg-paper p-0 sm:rounded-2xl">
         <DialogHeader className="border-b border-border px-6 py-4">
           <DialogTitle className="font-serif text-2xl font-normal">{title}</DialogTitle>
           <DialogDescription>Private files. Links expire after a minute.</DialogDescription>

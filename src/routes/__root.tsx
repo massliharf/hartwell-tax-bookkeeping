@@ -16,23 +16,23 @@ import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <main className="grid min-h-screen place-items-center bg-paper px-5">
+      <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Page not found</p>
+        <h1 className="mt-2 font-serif text-4xl leading-tight text-deep-ink">This page isn't here.</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          The link may be old or mistyped. You can head back home, or book an appointment in about two minutes.
         </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
+        <div className="mt-7 flex flex-wrap justify-center gap-2">
+          <Link to="/" className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+            Back to home
+          </Link>
+          <Link to="/book" className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-sage">
+            Book an appointment
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -44,33 +44,32 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+    <main className="grid min-h-screen place-items-center bg-paper px-5">
+      <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Something went wrong</p>
+        <h1 className="mt-2 font-serif text-4xl leading-tight text-deep-ink">This page didn't load.</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          It's on our side, not yours. Try again, or call the office at (732) 555-0142.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-7 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-sage"
           >
-            Go home
+            Back to home
           </a>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -98,7 +97,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "alternate icon", href: "/favicon.ico" },
+      { rel: "apple-touch-icon", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,

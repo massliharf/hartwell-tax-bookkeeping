@@ -6,6 +6,7 @@ import { Reveal } from "@/components/brand/Reveal";
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
+import priyaPortrait from "@/assets/priya-portrait.jpg";
 
 const TITLE = "Patel Tax & Bookkeeping — Taxes, without the chase";
 const DESC = "Book a tax appointment with Priya Patel, EA in Edison, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
@@ -19,8 +20,6 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-       { property: "og:image", content: "/social-share.jpg" },
-       { name: "twitter:image", content: "/social-share.jpg" },
     ],
   }),
   component: Home,
@@ -56,7 +55,7 @@ function Hero() {
       <Reveal>
         <Eyebrow>Priya Patel, EA · Edison, New Jersey</Eyebrow>
         <h1 className="mt-5 text-[3.4rem] leading-[0.95] text-deep-ink sm:text-7xl lg:text-[5.75rem]">
-          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-ink/40" /></em>
+          Taxes, without the chase.
         </h1>
         <p className="mt-6 max-w-md text-lg leading-relaxed text-deep-ink/75">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
@@ -108,13 +107,11 @@ function HowItWorks() {
         {steps.map((s, i) => (
           <Reveal key={s.title} delay={i * 0.1}>
             <li className="relative">
-              <div className="relative mb-6 h-28 w-40">
-                <div className="absolute left-6 top-3 h-24 w-28 rotate-6 rounded-xl border border-border bg-paper-deep" />
-                <div className="absolute left-3 top-1.5 h-24 w-28 rotate-2 rounded-xl border border-border bg-sheet shadow-sheet" />
-                <div className="absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet shadow-sheet">
+               <div className="relative mb-6 h-20 w-20">
+                 <div className="absolute inset-0 grid place-items-center rounded-2xl bg-sage">
                   <s.icon className="size-8 text-ink" strokeWidth={1.5} />
                 </div>
-                <span className="tabular absolute -right-1 -top-2 grid size-8 place-items-center rounded-full bg-ink font-sans text-lg text-deep-ink">{i + 1}</span>
+                 <span className="tabular absolute -right-2 -top-2 grid size-7 place-items-center rounded-full bg-ink text-sm font-bold text-paper">{i + 1}</span>
               </div>
               <h3 className="text-2xl text-deep-ink">{s.title}</h3>
               <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-deep-ink/70">{s.text}</p>
@@ -131,10 +128,10 @@ function Services() {
     <section id="services" className="scroll-mt-24 bg-sage/50 py-24">
       <div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
-        <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {SERVICES.map((s, i) => (
             <Reveal key={s.id} delay={(i % 3) * 0.08}>
-              <Link to="/book" search={{ service: s.id }} className="sheet-stack group flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1">
+               <Link to="/book" search={{ service: s.id }} className={`sheet-stack group flex h-full flex-col p-6 transition-transform duration-200 hover:-translate-y-0.5 ${i === 4 ? "md:col-span-2" : ""}`}>
                 <p className="tabular text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{s.minutes} min</p>
                 <h3 className="mt-3 text-[1.75rem] leading-tight text-deep-ink">{s.name}</h3>
                 <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
@@ -161,10 +158,8 @@ function About() {
     <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-14 px-5 py-24 md:grid-cols-[0.9fr_1.1fr]">
       <Reveal>
         <figure className="relative mx-auto w-full max-w-xs">
-          <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[1.5rem] border border-ink/20" />
-          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[1.5rem] border border-border bg-sheet shadow-lift">
-            <div className="absolute inset-0 opacity-60" />
-            <span className="relative font-sans text-8xl text-ink/25">PP</span>
+           <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-sheet">
+             <img src={priyaPortrait} alt="Portrait representing Priya Patel in a bright office" loading="lazy" width={1024} height={1280} className="h-full w-full object-cover" />
           </div>
           <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Priya Patel, EA</figcaption>
         </figure>
@@ -176,7 +171,7 @@ function About() {
           <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Edison file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
-        <p className="mt-6 font-sans text-2xl text-ink">— Priya</p>
+         <p className="mt-6 text-lg font-semibold text-ink">— Priya</p>
       </Reveal>
     </section>
   );
@@ -215,8 +210,7 @@ function Privacy() {
     { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-5 py-24">
-      <div className="sheet-stack p-8 sm:p-12">
+     <section className="bg-sage py-24"><div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {points.map((p, i) => (
@@ -226,8 +220,7 @@ function Privacy() {
             </Reveal>
           ))}
         </div>
-      </div>
-    </section>
+       </div></section>
   );
 }
 

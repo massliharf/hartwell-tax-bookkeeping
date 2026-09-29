@@ -33,6 +33,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -91,6 +92,7 @@
   --popover: var(--sheet);
   --popover-foreground: var(--deep-ink);
   --primary: var(--ink-green);
+  --primary-hover: oklch(0.333 0.073 163);
   --primary-foreground: var(--paper);
   --secondary: var(--sage);
   --secondary-foreground: var(--ink-green);

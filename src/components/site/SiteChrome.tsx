@@ -46,7 +46,7 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 bg-deep-ink text-paper/85">
+     <footer className="bg-ink text-paper/85">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
           <p className="font-sans text-4xl text-paper">Patel Tax & Bookkeeping</p>

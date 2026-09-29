@@ -247,12 +247,13 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
 }
 
 /* ---------- Step 3: time ---------- */
-function TimeStep({ service, draft, update, onDone }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void; onDone: () => void }) {
+function TimeStep({ service, draft, update }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void }) {
   const fetchWindow = useServerFn(getAvailabilityWindow);
+  const strip = useRef<HTMLDivElement>(null);
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 14 } }), staleTime: 30_000 });
   const days = q.data?.days ?? [];
   const firstOpen = days.find((d) => d.slots.length)?.date;
-  const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
+  const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : undefined;
   const day = days.find((d) => d.date === selDate);
 
   return (
@@ -276,36 +277,48 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
 
       {days.length > 0 && (
         <>
-          <div className="-mx-6 flex gap-1 overflow-x-auto px-6 pb-2 sm:-mx-0 sm:px-0" role="listbox" aria-label="Choose a day">
+           <div className="relative">
+             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-sheet to-transparent" />
+             <div ref={strip} className="flex gap-1 overflow-x-auto pb-2 pr-9 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
             {days.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
               const full = !d.closed && d.slots.length === 0;
               return (
-                <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
+                 <Button key={d.date} variant="secondary" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
                   className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${
-                    active ? "bg-fill-selected text-deep-ink" : d.closed ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
-                   <span className="text-[11px] opacity-70">{c.dow}</span>
+                     active ? "bg-primary text-primary-foreground hover:bg-primary" : d.closed ? "text-muted-foreground/50" : "bg-secondary hover:bg-fill-indicator"}`}>
+                    <span className="text-[11px] opacity-80">{c.dow}</span>
                   <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
-                  <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
-                </button>
+                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-80"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
+                 </Button>
               );
             })}
+             </div>
+             <div className="mt-1 flex justify-end gap-1">
+               <Button variant="secondary" size="icon" aria-label="Earlier dates" onClick={() => strip.current?.scrollBy({ left: -240, behavior: "smooth" })}><ChevronLeft /></Button>
+               <Button variant="secondary" size="icon" aria-label="Later dates" onClick={() => strip.current?.scrollBy({ left: 240, behavior: "smooth" })}><ChevronRight /></Button>
+             </div>
           </div>
 
           <div className="mt-6">
             {day && day.slots.length > 0 && (
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                {day.slots.map((s) => (
-                  <button key={s} onClick={() => { update({ date: day.date, slot: s }); onDone(); }}
-                    className={`tabular h-8 rounded-lg text-xs font-medium transition-colors duration-150 ${draft.slot === s ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] hover:border-ink"}`}>
-                    {fmtTime(s)}
-                  </button>
-                ))}
-              </div>
+               <div className="space-y-6">{(["Morning", "Afternoon", "Evening"] as const).map((period) => {
+                 const slots = day.slots.filter((s) => {
+                   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).formatToParts(new Date(s));
+                   const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+                   return new Date(s).getUTCMinutes() % 30 === 0 && (period === "Morning" ? hour < 12 : period === "Afternoon" ? hour >= 12 && hour < 17 : hour >= 17);
+                 });
+                 return slots.length ? <div key={period}><h2 className="mb-2 text-sm font-medium text-deep-ink">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{slots.map((s) => (
+                   <Button key={s} variant="secondary" onClick={() => update({ date: day.date, slot: s })} aria-pressed={draft.slot === s && draft.date === day.date}
+                     className={`tabular h-8 rounded-lg text-xs font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-indicator"}`}>
+                     {fmtTime(s)}
+                   </Button>
+                 ))}</div></div> : null;
+               })}</div>
             )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
-            {!firstOpen && !draft.date && (
+             {!firstOpen && !draft.date && (
               <p className="rounded-2xl bg-surface-2 p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
             )}
           </div>

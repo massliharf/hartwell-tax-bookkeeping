@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { APPT_SELECT, MSG_LABEL, fmtStamp, type Appt } from "@/components/owner/lib";
 import { ApptCard, DocViewer, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/clients/$id")({ head: () => ({ meta: [{ title: "Client details — Patel Tax & Bookkeeping" }] }), component: ClientDetail });
+export const Route = createFileRoute("/_authenticated/owner/clients/$id")({ head: () => ({ meta: [{ title: "Client details — Patel Tax & Bookkeeping" }, { name: "description", content: "Appointments, documents, and messages for a practice client." }, { property: "og:title", content: "Client details — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Appointments, documents, and messages for a practice client." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: ClientDetail });
 
 function ClientDetail() {
   const { id } = Route.useParams();

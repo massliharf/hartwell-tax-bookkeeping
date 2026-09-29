@@ -7,7 +7,7 @@ import { MSG_LABEL, fmtStamp } from "@/components/owner/lib";
 import { Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/owner/outbox")({ head: () => ({ meta: [{ title: "Outbox — Patel Tax & Bookkeeping" }] }), component: Outbox });
+export const Route = createFileRoute("/_authenticated/owner/outbox")({ head: () => ({ meta: [{ title: "Outbox — Patel Tax & Bookkeeping" }, { name: "description", content: "Automated client messages and delivery history." }, { property: "og:title", content: "Outbox — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Automated client messages and delivery history." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Outbox });
 
 function Outbox() {
   const [type, setType] = useState<string | null>(null);

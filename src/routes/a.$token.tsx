@@ -29,6 +29,8 @@ export const Route = createFileRoute("/a/$token")({
       { name: "description", content: "Manage your appointment and send your documents privately." },
       { property: "og:title", content: "Your appointment — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Your private appointment page." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

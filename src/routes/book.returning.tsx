@@ -17,6 +17,8 @@ export const Route = createFileRoute("/book/returning")({
       { name: "description", content: "Booked with Priya before? Enter your email and book again in about 30 seconds." },
       { property: "og:title", content: "Returning clients — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Book again in about 30 seconds." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ReturningPage,

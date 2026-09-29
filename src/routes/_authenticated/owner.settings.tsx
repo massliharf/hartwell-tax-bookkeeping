@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
-export const Route = createFileRoute("/_authenticated/owner/settings")({ head: () => ({ meta: [{ title: "Settings — Patel Tax & Bookkeeping" }] }), component: SettingsPage });
+export const Route = createFileRoute("/_authenticated/owner/settings")({ head: () => ({ meta: [{ title: "Settings — Patel Tax & Bookkeeping" }, { name: "description", content: "Practice hours, services, prices, and reminders." }, { property: "og:title", content: "Settings — Patel Tax & Bookkeeping" }, { property: "og:description", content: "Practice hours, services, prices, and reminders." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: SettingsPage });
 
 const DAYS = [["mon", "Monday"], ["tue", "Tuesday"], ["wed", "Wednesday"], ["thu", "Thursday"], ["fri", "Friday"], ["sat", "Saturday"], ["sun", "Sunday"]] as const;
 type Hours = Record<string, [string, string] | null>;

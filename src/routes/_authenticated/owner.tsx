@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/owner")({
       { name: "description", content: "Priya's practice app: today, calendar, clients and follow-ups." },
       { property: "og:title", content: "Practice — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Priya's practice app: today, calendar, clients and follow-ups." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

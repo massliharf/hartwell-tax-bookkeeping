@@ -18,6 +18,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to the Patel Tax & Bookkeeping practice app." },
       { property: "og:title", content: "Owner sign in — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Sign in to the Patel Tax & Bookkeeping practice app." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

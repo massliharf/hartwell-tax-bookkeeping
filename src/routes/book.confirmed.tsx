@@ -20,6 +20,8 @@ export const Route = createFileRoute("/book/confirmed")({
       { name: "description", content: "Your appointment is confirmed." },
       { property: "og:title", content: "You're booked — Patel Tax & Bookkeeping" },
       { property: "og:description", content: "Your appointment with Priya Patel, EA is confirmed." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

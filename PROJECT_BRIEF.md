@@ -66,6 +66,8 @@ time for demos.
 
 ## 8. Brand & design
 
+> **Replaced (Sep 2026):** DESIGN_SYSTEM.md ("Studio Shell") at the project root is now the single visual source of truth. The colors, fonts and paper textures below are superseded; the Ready ring and document stack remain as features.
+
 This must **NOT** look like a default template.
 
 **Feeling:** calm, trustworthy, warm, quietly premium. A well-run boutique

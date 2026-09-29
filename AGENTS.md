@@ -21,3 +21,5 @@
 - Brand primitives live in src/components/brand (ReadyRing, DocumentStack, Reveal); service data in src/lib/services.ts — single source for prices/hours.
 - All DB tables are owner-only via RLS (is_owner()); clients act only through token-validated server functions in src/lib/portal.functions.ts using the admin client.
 - Time logic on the server uses getNow() in src/lib/clock.server.ts (real time + settings.demo_time_offset_minutes).
+- Automations live in src/lib/automations.server.ts; every message goes through sendMessage() in src/lib/email.server.ts, which claims a unique messages.dedupe_key before sending. _Why: the 15-min job and immediate triggers can overlap; nothing may send twice._
+- The 15-min pg_cron job calls /api/public/cron/automations on the published URL with the token from public.automation_config (service-role only). _Why: agent can't place LOVABLE_CRON_SECRET into SQL._

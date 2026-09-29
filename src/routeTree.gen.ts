@@ -15,7 +15,10 @@ import { Route as ATokenRouteImport } from './routes/a.$token'
 import { Route as BookIndexRouteImport } from './routes/book.index'
 import { Route as BookConfirmedRouteImport } from './routes/book.confirmed'
 import { Route as BookReturningRouteImport } from './routes/book.returning'
+import { Route as ClaimTokenRouteImport } from './routes/claim.$token'
 import { Route as ManageTokenRouteImport } from './routes/manage.$token'
+import { Route as MoveTokenRouteImport } from './routes/move.$token'
+import { Route as ApiPublicCronAutomationsRouteImport } from './routes/api/public/cron/automations'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,11 +50,27 @@ const BookReturningRoute = BookReturningRouteImport.update({
   path: '/book/returning',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClaimTokenRoute = ClaimTokenRouteImport.update({
+  id: '/claim/$token',
+  path: '/claim/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManageTokenRoute = ManageTokenRouteImport.update({
   id: '/manage/$token',
   path: '/manage/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MoveTokenRoute = MoveTokenRouteImport.update({
+  id: '/move/$token',
+  path: '/move/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCronAutomationsRoute =
+  ApiPublicCronAutomationsRouteImport.update({
+    id: '/api/public/cron/automations',
+    path: '/api/public/cron/automations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,8 +78,11 @@ export interface FileRoutesByFullPath {
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
+  '/claim/$token': typeof ClaimTokenRoute
   '/manage/$token': typeof ManageTokenRoute
+  '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
+  '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +90,11 @@ export interface FileRoutesByTo {
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
+  '/claim/$token': typeof ClaimTokenRoute
   '/manage/$token': typeof ManageTokenRoute
+  '/move/$token': typeof MoveTokenRoute
   '/book': typeof BookIndexRoute
+  '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +103,11 @@ export interface FileRoutesById {
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
+  '/claim/$token': typeof ClaimTokenRoute
   '/manage/$token': typeof ManageTokenRoute
+  '/move/$token': typeof MoveTokenRoute
   '/book/': typeof BookIndexRoute
+  '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,8 +117,11 @@ export interface FileRouteTypes {
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
+    | '/claim/$token'
     | '/manage/$token'
+    | '/move/$token'
     | '/book/'
+    | '/api/public/cron/automations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -98,8 +129,11 @@ export interface FileRouteTypes {
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
+    | '/claim/$token'
     | '/manage/$token'
+    | '/move/$token'
     | '/book'
+    | '/api/public/cron/automations'
   id:
     | '__root__'
     | '/'
@@ -107,8 +141,11 @@ export interface FileRouteTypes {
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
+    | '/claim/$token'
     | '/manage/$token'
+    | '/move/$token'
     | '/book/'
+    | '/api/public/cron/automations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,8 +154,11 @@ export interface RootRouteChildren {
   ATokenRoute: typeof ATokenRoute
   BookConfirmedRoute: typeof BookConfirmedRoute
   BookReturningRoute: typeof BookReturningRoute
+  ClaimTokenRoute: typeof ClaimTokenRoute
   ManageTokenRoute: typeof ManageTokenRoute
+  MoveTokenRoute: typeof MoveTokenRoute
   BookIndexRoute: typeof BookIndexRoute
+  ApiPublicCronAutomationsRoute: typeof ApiPublicCronAutomationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -165,11 +205,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookReturningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/claim/$token': {
+      id: '/claim/$token'
+      path: '/claim/$token'
+      fullPath: '/claim/$token'
+      preLoaderRoute: typeof ClaimTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manage/$token': {
       id: '/manage/$token'
       path: '/manage/$token'
       fullPath: '/manage/$token'
       preLoaderRoute: typeof ManageTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/move/$token': {
+      id: '/move/$token'
+      path: '/move/$token'
+      fullPath: '/move/$token'
+      preLoaderRoute: typeof MoveTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/automations': {
+      id: '/api/public/cron/automations'
+      path: '/api/public/cron/automations'
+      fullPath: '/api/public/cron/automations'
+      preLoaderRoute: typeof ApiPublicCronAutomationsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -181,8 +242,11 @@ const rootRouteChildren: RootRouteChildren = {
   ATokenRoute: ATokenRoute,
   BookConfirmedRoute: BookConfirmedRoute,
   BookReturningRoute: BookReturningRoute,
+  ClaimTokenRoute: ClaimTokenRoute,
   ManageTokenRoute: ManageTokenRoute,
+  MoveTokenRoute: MoveTokenRoute,
   BookIndexRoute: BookIndexRoute,
+  ApiPublicCronAutomationsRoute: ApiPublicCronAutomationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

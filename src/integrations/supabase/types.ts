@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       appointments: {
         Row: {
+          attention_reason: string | null
           client_id: string
           created_at: string
           end_at: string
@@ -23,6 +24,7 @@ export type Database = {
           intake_answers: Json
           manage_token: string
           meeting_type: Database["public"]["Enums"]["meeting_type"]
+          needs_attention: boolean
           ready_score: number
           service_id: string
           signature_status: Database["public"]["Enums"]["signature_status"]
@@ -32,6 +34,7 @@ export type Database = {
           status: Database["public"]["Enums"]["appointment_status"]
         }
         Insert: {
+          attention_reason?: string | null
           client_id: string
           created_at?: string
           end_at: string
@@ -39,6 +42,7 @@ export type Database = {
           intake_answers?: Json
           manage_token?: string
           meeting_type?: Database["public"]["Enums"]["meeting_type"]
+          needs_attention?: boolean
           ready_score?: number
           service_id: string
           signature_status?: Database["public"]["Enums"]["signature_status"]
@@ -48,6 +52,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["appointment_status"]
         }
         Update: {
+          attention_reason?: string | null
           client_id?: string
           created_at?: string
           end_at?: string
@@ -55,6 +60,7 @@ export type Database = {
           intake_answers?: Json
           manage_token?: string
           meeting_type?: Database["public"]["Enums"]["meeting_type"]
+          needs_attention?: boolean
           ready_score?: number
           service_id?: string
           signature_status?: Database["public"]["Enums"]["signature_status"]
@@ -79,6 +85,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      automation_config: {
+        Row: {
+          cron_token: string
+          id: number
+        }
+        Insert: {
+          cron_token?: string
+          id?: number
+        }
+        Update: {
+          cron_token?: string
+          id?: number
+        }
+        Relationships: []
       }
       checklist_items: {
         Row: {
@@ -237,8 +258,12 @@ export type Database = {
           body: string
           channel: Database["public"]["Enums"]["message_channel"]
           client_id: string | null
+          dedupe_key: string | null
+          delivery: string
+          error: string | null
           id: string
           minutes_saved: number
+          recipient: string | null
           sent_at: string
           subject: string | null
           type: Database["public"]["Enums"]["message_type"]
@@ -248,8 +273,12 @@ export type Database = {
           body: string
           channel?: Database["public"]["Enums"]["message_channel"]
           client_id?: string | null
+          dedupe_key?: string | null
+          delivery?: string
+          error?: string | null
           id?: string
           minutes_saved?: number
+          recipient?: string | null
           sent_at?: string
           subject?: string | null
           type: Database["public"]["Enums"]["message_type"]
@@ -259,8 +288,12 @@ export type Database = {
           body?: string
           channel?: Database["public"]["Enums"]["message_channel"]
           client_id?: string | null
+          dedupe_key?: string | null
+          delivery?: string
+          error?: string | null
           id?: string
           minutes_saved?: number
+          recipient?: string | null
           sent_at?: string
           subject?: string | null
           type?: Database["public"]["Enums"]["message_type"]
@@ -401,6 +434,51 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waitlist_offers: {
+        Row: {
+          created_at: string
+          id: string
+          service_id: string
+          slot_start: string
+          status: string
+          token: string
+          waitlist_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          service_id: string
+          slot_start: string
+          status?: string
+          token?: string
+          waitlist_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          service_id?: string
+          slot_start?: string
+          status?: string
+          token?: string
+          waitlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_offers_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waitlist_offers_waitlist_id_fkey"
+            columns: ["waitlist_id"]
+            isOneToOne: false
+            referencedRelation: "waitlist"
             referencedColumns: ["id"]
           },
         ]

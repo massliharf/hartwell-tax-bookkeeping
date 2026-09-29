@@ -165,5 +165,5 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
 }
 
 export function CloseX({ onClick }: { onClick: () => void }) {
-  return <button onClick={onClick} aria-label="Close" className="rounded-full p-1 hover:bg-sage"><X className="h-4 w-4" /></button>;
+   return <Button variant="ghost" size="icon" onClick={onClick} aria-label="Close" className="size-8"><X className="h-4 w-4" /></Button>;
 }

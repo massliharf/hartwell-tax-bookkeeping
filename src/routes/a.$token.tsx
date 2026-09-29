@@ -107,7 +107,7 @@ function PortalPage() {
             <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
               <Lock className="mt-0.5 size-4 shrink-0 text-evergreen" /> Only Priya can open your files. We never ask for your Social Security number.
             </p>
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
             </ul>
             <p className="mt-4 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
@@ -345,7 +345,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <motion.div key="missing" {...flip}
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-ink" : ""}`}>
+            className={`rounded-[14px] border border-line bg-paper p-5 transition-colors ${drag ? "ring-2 ring-evergreen" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sage text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">

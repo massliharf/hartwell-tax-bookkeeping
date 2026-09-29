@@ -401,6 +401,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      available_slots: {
+        Args: { _from: string; _now: string; _service_id: string; _to: string }
+        Returns: string[]
+      }
+      book_appointment: {
+        Args: {
+          _email: string
+          _intake: Json
+          _meeting_type: Database["public"]["Enums"]["meeting_type"]
+          _name: string
+          _now: string
+          _phone: string
+          _service_id: string
+          _start: string
+        }
+        Returns: Json
+      }
       generate_checklist: {
         Args: { _appointment_id: string }
         Returns: undefined

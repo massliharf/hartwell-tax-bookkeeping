@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { motion, useReducedMotion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { ReadyRing } from "@/components/brand/ReadyRing";
@@ -170,17 +170,11 @@ function AreaSpark({ data, baseline, max, suffix, tone = "ink" }: { data: Pt[]; 
         {baseline !== undefined && <ReferenceLine y={baseline} stroke="var(--muted-foreground)" strokeOpacity={0.45} strokeDasharray="3 4" />}
         <Area type="monotone" dataKey="v" stroke={c} strokeWidth={2} fill={`url(#${id})`} dot={false} activeDot={{ r: 3 }} isAnimationActive />
         {tip(suffix)}
-        <YDomain max={max} />
+        <YAxis hide domain={[0, max]} />
       </AreaChart>
     </ResponsiveContainer>
   );
 }
-// Fixed y-domain without drawing an axis
-import { YAxis } from "recharts";
-function YDomain({ max }: { max: number }) {
-  return <YAxis hide domain={[0, max]} />;
-}
-
 function Bars({ data, tone = "ink" }: { data: Pt[]; tone?: "ink" | "marigold" }) {
   return (
     <ResponsiveContainer width="100%" height="100%">

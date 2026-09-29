@@ -159,19 +159,12 @@
   background: var(--sheet);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sheet);
-  isolation: isolate;
-  &::before, &::after {
-    content: "";
-    position: absolute;
-    left: 10px; right: 10px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--sheet);
-    z-index: -1;
-  }
-  &::before { bottom: -6px; left: 6px; right: 6px; height: 100%; box-shadow: var(--shadow-sheet); }
-  &::after { bottom: -11px; left: 14px; right: 14px; height: 100%; background: var(--paper-deep); }
+  box-shadow:
+    0 6px 0 -3px var(--sheet),
+    0 6px 0 -2px var(--border),
+    0 12px 0 -6px var(--paper-deep),
+    0 12px 0 -5px var(--border),
+    var(--shadow-sheet);
 }
 
 /* Thin ledger lines */

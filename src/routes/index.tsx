@@ -54,7 +54,7 @@ function Hero() {
       <Reveal>
         <Eyebrow>Priya Patel, EA · Edison, New Jersey</Eyebrow>
         <h1 className="mt-5 text-[3.4rem] leading-[0.95] text-deep-ink sm:text-7xl lg:text-[5.75rem]">
-          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute -bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-marigold/40" /></em>
+          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-marigold/40" /></em>
         </h1>
         <p className="mt-6 max-w-md text-lg leading-relaxed text-deep-ink/75">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.

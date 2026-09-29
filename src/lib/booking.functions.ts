@@ -10,16 +10,13 @@ import { z } from "zod";
  * never get the same slot.
  *
  * Test cases (demo clock: Thu Oct 1 2026, 08:00 ET):
- * 1. Self-employed (75 min) at 16:45 on a weekday → ends 18:00 + buffer is fine
- *    for closing, but 16:45 + 75 = 18:00 only if buffer ignored; with slots
- *    ending strictly by 18:00 the last 75-min start is 16:45 → 16:45 is the
- *    boundary; 17:00 fails. Expected for 16:45 per brief: must END BEFORE
- *    closing (18:00) → rejected, alternatives returned. (Last start = 16:45 is
- *    excluded only if an appointment sits right after; see note below.)
- * 2. Individual return (45 min) Saturday 13:30 → ends 14:15 > 14:00 → not offered.
+ * 1. Self-employed (75 min) at 16:45 on a weekday → would end 18:00, not
+ *    before closing → rejected; latest 75-min start is 16:30.
+ * 2. Individual return (45 min) Saturday 13:30 → ends 14:15, after 14:00 → rejected.
  * 3. Any Sunday → no hours in settings → empty list.
- * 4. Two bookings for the same slot one second apart → first gets ok:true,
- *    second gets ok:false with the 3 nearest alternatives.
+ * 4. Same slot booked by someone else a second earlier → the lock makes the
+ *    second request re-check after the first commits → ok:false with the
+ *    3 nearest available alternatives.
  */
 
 const MeetingType = z.enum(["in_person", "video"]);

@@ -28,12 +28,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-medium uppercase text-ink/70">{children}</p>;
+  return <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">{children}</p>;
 }
 
 function Home() {
   return (
-    <div className="min-h-screen overflow-x-clip">
+    <div className="min-h-screen overflow-x-clip bg-canvas">
       <AnnouncementBar />
       <SiteHeader />
       <main>
@@ -56,10 +56,10 @@ function Hero() {
     <section className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 md:grid-cols-[1.15fr_1fr] md:pt-24">
       <Reveal>
         <Eyebrow>Claire Hartwell, EA · Montclair, New Jersey</Eyebrow>
-        <h1 className="mt-5 text-[3.4rem] leading-[0.95] text-deep-ink sm:text-7xl lg:text-[5.75rem]">
-          Taxes, without <em className="relative whitespace-nowrap text-ink">the chase.<span className="absolute bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-marigold/40" /></em>
+        <h1 className="mt-3 text-[40px] leading-[48px] tracking-[-0.4px] text-deep-ink sm:text-[56px] sm:leading-[64px]">
+          Taxes, without <em className="relative whitespace-nowrap not-italic text-ink">the chase.</em>
         </h1>
-        <p className="mt-6 max-w-md text-lg leading-relaxed text-deep-ink/75">
+        <p className="mt-5 max-w-md text-base text-[#363636]">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
         </p>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -76,10 +76,10 @@ function Hero() {
 function TrustStrip() {
   const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
-    <div className="border-y border-border bg-[#F0F0F0]">
-      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-5 py-4 text-sm text-deep-ink/80">
+    <div className="px-2">
+      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-5 py-4">
         {items.map((t) => (
-          <li key={t} className="flex items-center gap-2"><Check className="size-3.5 text-success" strokeWidth={2.5} />{t}</li>
+          <li key={t} className="flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
         ))}
       </ul>
     </div>
@@ -90,8 +90,8 @@ function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; 
   return (
     <Reveal className="max-w-2xl">
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-3 text-4xl leading-tight text-deep-ink sm:text-5xl">{title}</h2>
-      {sub && <p className="mt-4 text-base leading-relaxed text-deep-ink/70">{sub}</p>}
+      <h2 className="mt-1 text-[28px] leading-[38px] text-deep-ink">{title}</h2>
+      {sub && <p className="mt-2 text-sm text-muted-foreground">{sub}</p>}
     </Reveal>
   );
 }
@@ -108,17 +108,15 @@ function HowItWorks() {
       <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-6">
         {steps.map((s, i) => (
           <Reveal key={s.title} delay={i * 0.1}>
-            <li className="relative">
-              <div className="relative mb-6 h-28 w-40">
-                <div className="absolute left-6 top-3 h-24 w-28 rotate-6 rounded-xl border border-border bg-paper-deep" />
-                <div className="absolute left-3 top-1.5 h-24 w-28 rotate-2 rounded-xl border border-border bg-sheet" />
-                <div className="ledger absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet">
-                  <s.icon className="size-8 text-ink" strokeWidth={1.5} />
+            <li className="relative rounded-2xl bg-sheet px-7 py-4">
+              <div className="relative mb-4 h-12 w-12">
+                                                <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
+                  <s.icon className="size-5 text-ink" strokeWidth={1.75} />
                 </div>
-                <span className="tabular absolute -right-1 -top-2 grid size-8 place-items-center rounded-full bg-marigold font-serif text-lg text-deep-ink">{i + 1}</span>
+                <span className="tabular absolute -right-2 -top-2 grid size-4 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{i + 1}</span>
               </div>
-              <h3 className="text-2xl text-deep-ink">{s.title}</h3>
-              <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-deep-ink/70">{s.text}</p>
+              <h3 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.title}</h3>
+              <p className="mt-1 max-w-xs font-serif text-base font-normal text-[#363636]">{s.text}</p>
             </li>
           </Reveal>
         ))}
@@ -129,22 +127,22 @@ function HowItWorks() {
 
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24 bg-fill-neutral/50 py-24">
+    <section id="services" className="scroll-mt-24 py-24">
       <div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
         <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s, i) => (
             <Reveal key={s.id} delay={(i % 3) * 0.08}>
-              <Link to="/book" search={{ service: s.id }} className="sheet-stack group flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1">
+              <Link to="/book" search={{ service: s.id }} className="group flex h-full flex-col rounded-2xl bg-sheet p-5 transition-colors duration-200 hover:bg-surface-2">
                 <p className="tabular text-xs font-medium uppercase text-muted-foreground">{s.minutes} min</p>
-                <h3 className="mt-3 text-[1.75rem] leading-tight text-deep-ink">{s.name}</h3>
+                <h3 className="mt-2 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
                 <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
-                <div className="mt-auto flex items-end justify-between border-t border-border pt-5 mt-8">
+                <div className="mt-auto flex items-end justify-between pt-5 mt-6">
                   <p className="text-deep-ink">
                     {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                    <span className="tabular font-serif text-3xl">${s.price}</span>
+                    <span className="tabular text-xl font-semibold">${s.price}</span>
                   </p>
-                  <span className="inline-flex items-center gap-1 text-sm font-medium text-ink">
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-ink">
                     Book <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
@@ -162,22 +160,20 @@ function About() {
     <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-14 px-5 py-24 md:grid-cols-[0.9fr_1.1fr]">
       <Reveal>
         <figure className="relative mx-auto w-full max-w-xs">
-          <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-2xl border border-ink/20" />
-          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2 shadow-lift">
-            <div className="ledger absolute inset-0 opacity-60" />
-            <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                    <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
+                        <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
-          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-primary-foreground">Claire Hartwell, EA</figcaption>
+          <figcaption className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white backdrop-blur-sm">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>
         <Eyebrow>About Claire</Eyebrow>
-        <h2 className="mt-3 text-4xl leading-tight text-deep-ink sm:text-5xl">A neighbor who happens to love the tax code.</h2>
-        <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-deep-ink/75">
+        <h2 className="mt-1 text-[28px] leading-[38px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
+        <div className="mt-4 space-y-3 rounded-2xl bg-sheet px-7 py-4 font-serif text-base font-normal text-[#363636]">
           <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
-        <p className="mt-6 font-serif text-2xl italic text-ink">— Claire</p>
+        <p className="mt-4 font-serif text-xl text-ink">— Claire</p>
       </Reveal>
     </section>
   );
@@ -190,15 +186,15 @@ function Testimonials() {
     { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
-    <section className="bg-ink py-24 text-primary-foreground">
+    <section className="py-24">
       <div className="mx-auto max-w-6xl px-5">
-        <Reveal><p className="text-xs font-medium uppercase text-marigold">Kind words</p></Reveal>
-        <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+        <Reveal><p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Kind words</p></Reveal>
+        <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible [scrollbar-width:none]">
           {t.map((x, i) => (
             <Reveal key={x.n} delay={i * 0.1}>
-              <figure className="border-t border-paper/20 pt-6">
-                <blockquote className="font-serif text-2xl leading-snug">"{x.q}"</blockquote>
-                <figcaption className="mt-5 text-sm"><span className="text-primary-foreground">{x.n}</span><span className="block text-primary-foreground/60">{x.r}</span></figcaption>
+              <figure className="h-full w-[85vw] shrink-0 snap-start rounded-2xl bg-[#2B2B2B] p-6 text-white md:w-auto">
+                <blockquote className="font-serif text-xl font-medium leading-[30px] tracking-[-0.2px]">"{x.q}"</blockquote>
+                <figcaption className="mt-5 text-sm"><span className="text-white">{x.n}</span><span className="block text-white/60">{x.r}</span></figcaption>
               </figure>
             </Reveal>
           ))}
@@ -217,13 +213,13 @@ function Privacy() {
   ];
   return (
     <section className="mx-auto max-w-6xl px-5 py-24">
-      <div className="sheet-stack p-8 sm:p-12">
+      <div className="rounded-2xl bg-sheet px-7 py-8 sm:p-12">
         <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {points.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.06} className="flex gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-fill-neutral text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
-              <div><h3 className="text-xl text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-deep-ink/70">{p.text}</p></div>
+              <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
+              <div><h3 className="text-base font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-deep-ink/70">{p.text}</p></div>
             </Reveal>
           ))}
         </div>
@@ -244,11 +240,11 @@ function Faq() {
     <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-10 px-5 py-16 md:grid-cols-[0.8fr_1.2fr]">
       <SectionHead eyebrow="Questions" title="Good to know." />
       <Reveal>
-        <Accordion type="single" collapsible className="border-t border-border">
+        <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-3">
           {qs.map((x) => (
             <AccordionItem key={x.q} value={x.q} className="border-border">
-              <AccordionTrigger className="py-5 text-left font-serif text-xl font-normal text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
-              <AccordionContent className="pb-5 text-[15px] leading-relaxed text-deep-ink/70">{x.a}</AccordionContent>
+              <AccordionTrigger className="py-4 text-left text-sm font-medium text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
+              <AccordionContent className="pb-4 text-sm text-muted-foreground">{x.a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>

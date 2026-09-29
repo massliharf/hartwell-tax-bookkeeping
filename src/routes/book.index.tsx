@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronUp, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +50,7 @@ function BookPage() {
   const services = useServices();
   const reduce = useReducedMotion();
   const applied = useRef(false);
+  const [checklistOpen, setChecklistOpen] = useState(false);
 
   const fetchLead = useServerFn(getLeadDraft);
   useEffect(() => {
@@ -78,7 +79,7 @@ function BookPage() {
 
   useEffect(() => {
     if (!loaded) return;
-    const id = window.setTimeout(() => document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true }), reduce ? 0 : 380);
+    const id = window.setTimeout(() => document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true }), reduce ? 0 : 130);
     return () => window.clearTimeout(id);
   }, [step, loaded, reduce]);
 
@@ -90,20 +91,20 @@ function BookPage() {
 
   return (
     <BookingShell step={step}>
-      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[1fr_320px]" : ""}`}>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           {step > 0 && (
-            <button onClick={() => go(step - 1)} className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-ink">
+             <Button variant="ghost" onClick={() => go(step - 1)} className="mb-5 -ml-3 gap-1.5 text-muted-foreground">
               <ArrowLeft className="size-4" /> Back
-            </button>
+             </Button>
           )}
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              initial={reduce ? false : { opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+               initial={reduce ? false : { opacity: 0.96, y: 4 }}
+               animate={{ opacity: 1, y: 0 }}
+               exit={reduce ? { opacity: 1 } : { opacity: 0.96, y: -4 }}
+               transition={{ duration: 0.12, ease: "easeOut" }}
             >
               {step === 0 && (
                 <ServiceStep
@@ -116,21 +117,28 @@ function BookPage() {
                 />
               )}
               {step === 1 && (
-                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} onDone={() => go(2)} count={preview.length} />
+                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} onDone={() => go(2)} />
               )}
               {step === 2 && service && <TimeStep service={service} draft={draft} update={update} onDone={() => go(3)} />}
               {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} onPickAgain={() => go(2)} />}
             </motion.div>
           </AnimatePresence>
         </div>
-        {(step === 1 || step === 2) && (
+        {(
           <aside className="hidden lg:block">
-            <div className="sticky top-8">
+             <div className="sticky top-8 space-y-4">
+               {step === 3 && service && <div className="sheet-stack p-5"><p className="font-semibold text-deep-ink">{service.name}</p><p className="mt-2 text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p><Button variant="link" className="mt-2 px-0" onClick={() => go(2)}>Change time</Button></div>}
               <ChecklistPreview docs={preview} />
             </div>
           </aside>
         )}
       </div>
+       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-sheet shadow-sheet lg:hidden">
+         <Button variant="ghost" className="flex h-14 w-full items-center justify-between rounded-none px-5 text-ink" aria-expanded={checklistOpen} onClick={() => setChecklistOpen(!checklistOpen)}>
+           Your checklist ({preview.length}) <ChevronUp className={`size-4 transition-transform ${checklistOpen ? "rotate-180" : ""}`} />
+         </Button>
+         {checklistOpen && <div className="max-h-[50vh] overflow-y-auto border-t border-border p-4"><ChecklistPreview docs={preview} /></div>}
+       </div>
     </BookingShell>
   );
 }
@@ -195,22 +203,16 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
 }
 
 /* ---------- Step 2: questions ---------- */
-function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void; onDone: () => void; count: number }) {
+function QuestionsStep({ slug, answers, onChange, onDone }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void; onDone: () => void }) {
   const qs = questionsFor(slug);
-  const pages = Math.ceil(qs.length / 4);
-  const [page, setPage] = useState(0);
-  const visible = qs.slice(page * 4, page * 4 + 4);
-  const answered = visible.every((q) => q.type === "count" || typeof answers[q.key] === "boolean");
+  const answered = qs.every((q) => q.type === "count" || typeof answers[q.key] === "boolean");
   const set = (k: keyof Answers, v: boolean | number) => onChange({ ...answers, [k]: v });
 
   return (
     <>
       <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
-      <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-sage px-3 py-1.5 text-sm text-ink lg:hidden">
-        Your checklist so far: <span className="tabular font-medium">{count} documents</span>
-      </div>
       <div className="space-y-3">
-        {visible.map((q) => (
+        {qs.map((q) => (
           <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-medium text-deep-ink">{q.label}</p>
@@ -253,11 +255,9 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
         ))}
       </div>
       <div className="mt-8 flex items-center gap-3">
-        {page > 0 && <Button variant="outline" size="lg" onClick={() => setPage(page - 1)}>Previous</Button>}
-        <Button size="lg" disabled={!answered} onClick={() => (page < pages - 1 ? setPage(page + 1) : onDone())}>
+        <Button size="lg" disabled={!answered} onClick={onDone}>
           Continue <ArrowRight />
         </Button>
-        {pages > 1 && <span className="tabular text-xs text-muted-foreground">{page + 1} / {pages}</span>}
       </div>
     </>
   );

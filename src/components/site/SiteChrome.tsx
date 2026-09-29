@@ -9,9 +9,9 @@ export function AnnouncementBar() {
       <Link
         to="/book"
         search={{ service: "extension" }}
-        className="mx-auto flex min-h-10 max-w-6xl flex-wrap items-center justify-center gap-2 py-2 text-center text-xs text-deep-ink sm:text-sm"
+        className="mx-auto block min-h-10 max-w-6xl py-2 text-center text-xs leading-5 text-deep-ink sm:text-sm"
       >
-        <span className="font-medium text-ink">Oct 15</span>
+        <span className="mr-2 font-medium text-ink">Oct 15</span>
         <span>
           Filing an extension? The deadline is October 15 — <span className="font-semibold text-ink underline-offset-4 hover:underline">book your slot</span>.
         </span>

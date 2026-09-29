@@ -41,13 +41,12 @@ export function DemoTools() {
   return (
     <>
       <div className="fixed bottom-20 right-5 z-40 sm:bottom-5 flex gap-2">
-        <button onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview"
-          className={`grid h-11 w-11 place-items-center rounded-full border border-border transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-fill-subtle"}`}>
+        <Button size="icon" variant={phone ? "default" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className="h-11 w-11 rounded-full">
           <Smartphone className="h-4 w-4" />
-        </button>
-        <button onClick={() => setOpen(true)} className="flex h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm text-primary-foreground">
+        </Button>
+        <Button onClick={() => setOpen(true)} className="h-11 gap-2 rounded-full px-4 text-sm">
           <FlaskConical className="h-4 w-4" /> Demo
-        </button>
+        </Button>
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
@@ -111,7 +110,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
           <option value="latest">Follow latest message</option>
           {people.map(([r, n]) => <option key={r} value={r}>{n}</option>)}
         </select>
-        <button onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full bg-sheet"><X className="h-4 w-4" /></button>
+        <Button onClick={onClose} aria-label="Close" size="icon" variant="secondary" className="h-9 w-9 rounded-full"><X className="h-4 w-4" /></Button>
       </div>
       <div className="rounded-[44px] bg-deep-ink p-2.5">
         <div className="relative h-[540px] overflow-hidden rounded-[36px] bg-paper">

@@ -17,12 +17,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+    <div className="flex min-h-screen items-center justify-center bg-paper px-4">
+      <div className="sheet-stack ledger max-w-md p-8 text-center sm:p-12">
+        <p className="tabular text-sm font-medium tracking-widest text-ink">404</p>
+        <h1 className="mt-4 font-serif text-4xl text-deep-ink">We couldn't find this page.</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          It may have moved. You can always start from the beginning.
         </p>
         <div className="mt-6">
           <Button asChild><Link to="/">Go home</Link></Button>
@@ -40,10 +40,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+    <div className="flex min-h-screen items-center justify-center bg-paper px-4">
+      <div className="sheet-stack ledger max-w-md p-8 text-center sm:p-12">
+        <h1 className="font-serif text-4xl text-deep-ink">
+          This page didn't load.
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.

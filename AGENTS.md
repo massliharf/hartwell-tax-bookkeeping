@@ -23,3 +23,5 @@
 - Time logic on the server uses getNow() in src/lib/clock.server.ts (real time + settings.demo_time_offset_minutes).
 - Automations live in src/lib/automations.server.ts; every message goes through sendMessage() in src/lib/email.server.ts, which claims a unique messages.dedupe_key before sending. _Why: the 15-min job and immediate triggers can overlap; nothing may send twice._
 - The 15-min pg_cron job calls /api/public/cron/automations on the published URL with the token from public.automation_config (service-role only). _Why: agent can't place LOVABLE_CRON_SECRET into SQL._
+- Owner app lives under src/routes/_authenticated/owner.*; reads use the browser client (owner RLS), writes that email clients go through src/lib/owner.functions.ts. _Why: RLS already scopes data; server only where automations run._
+- Owner account is created once via /auth setup (createOwnerAccount refuses when an admin exists); public sign-ups are disabled. _Why: single-owner practice._

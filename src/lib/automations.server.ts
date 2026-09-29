@@ -102,11 +102,15 @@ export async function runAutomations(origin: string) {
   const t = now.getTime();
   const iso = (ms: number) => new Date(ms).toISOString();
   const counts: Record<string, number> = {};
+  const { data: st } = await s.from("settings").select("reminder_timings").eq("id", 1).maybeSingle();
+  const rt = { docs_reminder_days: 7, readiness_check_hours: 48, final_reminder_hours: 24, abandoned_nudge_hours: 1, ...((st?.reminder_timings ?? {}) as Record<string, number>) };
+  const docsD = Number(rt.docs_reminder_days) || 7, readyH = Number(rt.readiness_check_hours) || 48;
+  const finalH = Number(rt.final_reminder_hours) || 24, nudgeH = Number(rt.abandoned_nudge_hours) || 1;
   const hit = (k: string, sent: boolean) => { if (sent) counts[k] = (counts[k] ?? 0) + 1; };
 
   // Upcoming appointments within 7 days
   const { data: up } = await s.from("appointments").select(APPT_COLS)
-    .in("status", ["booked", "confirmed"]).gt("start_at", iso(t)).lte("start_at", iso(t + 7 * D)).order("start_at");
+    .in("status", ["booked", "confirmed"]).gt("start_at", iso(t)).lte("start_at", iso(t + Math.max(docsD * D, readyH * H))).order("start_at");
 
   for (const a of (up ?? []) as Appt[]) {
     if (!a.clients) continue;
@@ -120,7 +124,7 @@ export async function runAutomations(origin: string) {
     await sendBookingConfirmation(a.id, origin);
 
     // 7 days before: missing docs (skip if booked within the last 12h — they just got their list)
-    if (until > 48 * H && t - new Date(a.created_at).getTime() > 12 * H) {
+    if (until > readyH * H && until <= docsD * D && t - new Date(a.created_at).getTime() > 12 * H) {
       const { missing } = await missingDocs(a.id);
       if (missing.length) {
         hit("docs_reminder_7d", await sendMessage({
@@ -138,7 +142,7 @@ export async function runAutomations(origin: string) {
     }
 
     // 48 hours before: readiness check
-    if (until <= 48 * H && until > 24 * H) {
+    if (until <= readyH * H && until > finalH * H) {
       if (a.ready_score < 70) {
         const { data: slots } = await s.rpc("available_slots", {
           _service_id: a.service_id, _from: a.start_at.slice(0, 10), _to: iso(new Date(a.start_at).getTime() + 21 * D).slice(0, 10), _now: now.toISOString(),
@@ -169,7 +173,7 @@ export async function runAutomations(origin: string) {
     }
 
     // 24 hours before: final reminder
-    if (until <= 24 * H) {
+    if (until <= finalH * H) {
       const { all } = await missingDocs(a.id);
       hit("final_reminder_24h", await sendMessage({
         dedupeKey: key("final24"), type: "final_reminder_24h", minutesSaved: 4, clientId: c.id, appointmentId: a.id, to: c.email,
@@ -219,7 +223,7 @@ export async function runAutomations(origin: string) {
 
   // Abandoned bookings: one nudge after 1 hour
   const { data: leads } = await s.from("leads").select("id, email, name, created_at")
-    .eq("converted", false).is("nudged_at", null).lte("created_at", iso(t - H));
+    .eq("converted", false).is("nudged_at", null).lte("created_at", iso(t - nudgeH * H));
   for (const l of leads ?? []) {
     const sent = await sendMessage({
       dedupeKey: `nudge:${l.id}`, type: "abandoned_nudge", minutesSaved: 4, clientId: null, to: l.email,

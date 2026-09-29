@@ -78,7 +78,7 @@
   --radius: 1rem;
   --paper: oklch(1 0 0);
   --paper-deep: oklch(0.977 0 0);
-  --ink-green: oklch(0.405 0.08 163);
+  --ink-green: oklch(0.43 0.075 164);
   --deep-ink: oklch(0.252 0 0);
   --marigold: oklch(0.76 0.14 75);
   --sage: oklch(0.977 0 0);
@@ -92,7 +92,7 @@
   --popover: var(--sheet);
   --popover-foreground: var(--deep-ink);
   --primary: var(--ink-green);
-  --primary-hover: oklch(0.333 0.073 163);
+  --primary-hover: oklch(0.352 0.065 164);
   --primary-foreground: var(--paper);
   --secondary: var(--sage);
   --secondary-foreground: var(--ink-green);

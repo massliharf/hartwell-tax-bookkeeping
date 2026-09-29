@@ -130,8 +130,8 @@ function Services() {
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
          <div className="mt-12 grid gap-6 md:grid-cols-2">
           {SERVICES.map((s, i) => (
-            <Reveal key={s.id} delay={(i % 3) * 0.08}>
-               <Link to="/book" search={{ service: s.id }} className={`sheet-stack group flex h-full flex-col p-6 transition-transform duration-200 hover:-translate-y-0.5 ${i === 4 ? "md:col-span-2" : ""}`}>
+             <Reveal key={s.id} delay={(i % 3) * 0.08} className={i === 4 ? "md:col-span-2" : undefined}>
+               <Link to="/book" search={{ service: s.id }} className="sheet-stack group flex h-full flex-col p-6 transition-transform duration-200 hover:-translate-y-0.5">
                 <p className="tabular text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{s.minutes} min</p>
                 <h3 className="mt-3 text-[1.75rem] leading-tight text-deep-ink">{s.name}</h3>
                 <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
@@ -212,10 +212,10 @@ function Privacy() {
   return (
      <section className="bg-sage py-24"><div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
-        <div className="mt-10 grid gap-8 sm:grid-cols-2">
+         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {points.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.06} className="flex gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sheet text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
               <div><h3 className="text-xl text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-deep-ink/70">{p.text}</p></div>
             </Reveal>
           ))}

@@ -11,7 +11,6 @@ async function owner(context: { supabase: import("@supabase/supabase-js").Supaba
   const { getNow } = await import("./clock.server");
   return { s: supabaseAdmin, origin: await requestOrigin(), getNow };
 }
-const ownerFn = () => createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]);
 
 /** Public: makes sure the demo owner account exists with the published password. Touches only that account. */
 export const ensureDemoAccount = createServerFn({ method: "POST" }).handler(async () => {
@@ -39,7 +38,7 @@ export const phoneFeed = createServerFn({ method: "GET" })
     return (data ?? []).map((m) => ({ ...m, name: (m.clients as { name: string } | null)?.name ?? null }));
   });
 
-export const demoRun = ownerFn().handler(async ({ context }) => {
+export const demoRun = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { origin } = await owner(context);
   const { runAutomations } = await import("./automations.server");
   const r = await runAutomations(origin);
@@ -47,7 +46,7 @@ export const demoRun = ownerFn().handler(async ({ context }) => {
   return { message: n ? `Sent ${n} message${n === 1 ? "" : "s"}.` : "Nothing was due." };
 });
 
-export const demoJump = ownerFn()
+export const demoJump = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ days: z.union([z.literal(1), z.literal(2), z.literal(7)]) }).parse(d))
   .handler(async ({ data, context }) => {
     const { s, origin } = await owner(context);
@@ -59,7 +58,7 @@ export const demoJump = ownerFn()
     return { message: `Jumped ${data.days} day${data.days > 1 ? "s" : ""} ahead. ${n} message${n === 1 ? "" : "s"} went out.` };
   });
 
-export const demoUpload = ownerFn().handler(async ({ context }) => {
+export const demoUpload = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { s, getNow } = await owner(context);
   const now = (await getNow()).toISOString();
   const { data: items } = await s.from("checklist_items")
@@ -76,7 +75,7 @@ export const demoUpload = ownerFn().handler(async ({ context }) => {
   return { message: `${name} uploaded "${it.document_name}".` };
 });
 
-export const demoCancelTomorrow = ownerFn().handler(async ({ context }) => {
+export const demoCancelTomorrow = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { s, origin, getNow } = await owner(context);
   const now = await getNow();
   const from = new Date(now.getTime() + 18 * 3600e3).toISOString();
@@ -97,7 +96,7 @@ export const demoCancelTomorrow = ownerFn().handler(async ({ context }) => {
   return { message: `${name} cancelled. The slot was offered to the waitlist.` };
 });
 
-export const demoClaim = ownerFn().handler(async ({ context }) => {
+export const demoClaim = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { s, origin } = await owner(context);
   const { data: o } = await s.from("waitlist_offers").select("token, waitlist(clients(name))").eq("status", "open")
     .order("created_at", { ascending: false }).limit(1).maybeSingle();
@@ -108,7 +107,7 @@ export const demoClaim = ownerFn().handler(async ({ context }) => {
   return { message: r.ok ? `${name} claimed the slot and is booked.` : "Someone else got there first." };
 });
 
-export const demoAbandon = ownerFn().handler(async ({ context }) => {
+export const demoAbandon = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { s, origin, getNow } = await owner(context);
   const now = await getNow();
   const stamp = Math.floor(now.getTime() / 1000).toString(36);
@@ -123,7 +122,7 @@ export const demoAbandon = ownerFn().handler(async ({ context }) => {
   return { message: "Maya Shah left mid-booking. She got a nudge to finish." };
 });
 
-export const demoReset = ownerFn().handler(async ({ context }) => {
+export const demoReset = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { s } = await owner(context);
   const { error } = await s.rpc("demo_restore");
   if (error) throw new Error("Could not reset demo data.");

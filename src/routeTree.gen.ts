@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as ATokenRouteImport } from './routes/a.$token'
 import { Route as BookIndexRouteImport } from './routes/book.index'
 import { Route as BookConfirmedRouteImport } from './routes/book.confirmed'
@@ -23,11 +22,6 @@ import { Route as ApiPublicCronAutomationsRouteImport } from './routes/api/publi
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OwnerRoute = OwnerRouteImport.update({
-  id: '/owner',
-  path: '/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ATokenRoute = ATokenRouteImport.update({
@@ -74,7 +68,6 @@ const ApiPublicCronAutomationsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/owner': typeof OwnerRoute
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
@@ -86,7 +79,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/owner': typeof OwnerRoute
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
@@ -99,7 +91,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/owner': typeof OwnerRoute
   '/a/$token': typeof ATokenRoute
   '/book/confirmed': typeof BookConfirmedRoute
   '/book/returning': typeof BookReturningRoute
@@ -113,7 +104,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/owner'
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
@@ -125,7 +115,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/owner'
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
@@ -137,7 +126,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/owner'
     | '/a/$token'
     | '/book/confirmed'
     | '/book/returning'
@@ -150,7 +138,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  OwnerRoute: typeof OwnerRoute
   ATokenRoute: typeof ATokenRoute
   BookConfirmedRoute: typeof BookConfirmedRoute
   BookReturningRoute: typeof BookReturningRoute
@@ -168,13 +155,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/owner': {
-      id: '/owner'
-      path: '/owner'
-      fullPath: '/owner'
-      preLoaderRoute: typeof OwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/a/$token': {
@@ -238,7 +218,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  OwnerRoute: OwnerRoute,
   ATokenRoute: ATokenRoute,
   BookConfirmedRoute: BookConfirmedRoute,
   BookReturningRoute: BookReturningRoute,

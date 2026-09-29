@@ -66,7 +66,7 @@ function ClaimPage() {
   }
   return (
     <Shell>
-      <p className="text-smst text-ink/70">A spot opened up</p>
+      <p className="text-sm text-ink/70">A spot opened up</p>
       <h1 className="mt-3 font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">{fmtDateLong(q.data.slotStart)}</h1>
       <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(q.data.slotStart)}, {q.data.service}, {q.data.minutes} min</p>
       <p className="mt-4 text-deep-ink/70">First to claim it gets it. No payment now.</p>

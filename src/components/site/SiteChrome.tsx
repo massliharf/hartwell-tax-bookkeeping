@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
 
 export function AnnouncementBar() {
@@ -22,18 +24,30 @@ export function AnnouncementBar() {
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-canvas/90 backdrop-blur-md">
-      <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-5">
+      <div className="mx-auto grid h-[60px] max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 sm:flex sm:justify-between">
         <Link to="/" className="flex min-w-0 items-baseline gap-2">
           <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
           <span className="truncate text-xs text-muted-foreground">& Bookkeeping</span>
         </Link>
-        <nav className="hidden items-center gap-1 text-xs font-medium text-deep-ink md:flex">
+        <nav className="hidden items-center gap-1 text-xs font-medium text-deep-ink sm:flex">
           <a href="#how" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">How it works</a>
           <a href="#services" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">Services</a>
           <a href="#about" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">About</a>
           <a href="#faq" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">FAQ</a>
         </nav>
-        <Button asChild><Link to="/book">Book</Link></Button>
+        <Button asChild className="hidden sm:inline-flex"><Link to="/book">Book</Link></Button>
+        <Sheet>
+          <SheetTrigger asChild><Button variant="secondary" size="icon" className="size-10 shrink-0 sm:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></SheetTrigger>
+          <SheetContent side="right" className="w-[min(85vw,320px)] border-border bg-sheet pt-14 sm:hidden">
+            <SheetHeader className="text-left"><SheetTitle>Hartwell Tax</SheetTitle></SheetHeader>
+            <nav aria-label="Mobile navigation" className="mt-8 flex flex-col gap-1 text-sm font-medium text-deep-ink">
+              {[{ href: "/#how", label: "How it works" }, { href: "/#services", label: "Services" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }].map((item) => (
+                <SheetClose asChild key={item.href}><a href={item.href} className="rounded-lg px-3 py-3 hover:bg-fill-neutral">{item.label}</a></SheetClose>
+              ))}
+              <SheetClose asChild><Button asChild className="mt-4"><Link to="/book">Book</Link></Button></SheetClose>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );
@@ -41,7 +55,7 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 bg-surface-2 text-[#363636]">
+    <footer className="mt-16 bg-surface-2 text-[#363636] lg:mt-24">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
           <p className="text-base font-semibold text-deep-ink">Hartwell Tax & Bookkeeping</p>

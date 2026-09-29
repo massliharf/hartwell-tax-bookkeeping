@@ -106,10 +106,10 @@ function SettingsPage() {
             <Num label="Readiness check" unit="hours before" v={tm.readiness_check_hours} on={(n) => setTm({ ...tm, readiness_check_hours: n })} />
             <Num label="Final reminder" unit="hours before" v={tm.final_reminder_hours} on={(n) => setTm({ ...tm, final_reminder_hours: n })} />
             <Num label="Unfinished booking nudge" unit="hours after" v={tm.abandoned_nudge_hours} on={(n) => setTm({ ...tm, abandoned_nudge_hours: n })} />
-       </div></div>
+           </div>
           <Button className="mt-5" disabled={saving === "tm"} onClick={() => save("tm", async () => [await supabase.from("settings").update({ reminder_timings: tm }).eq("id", 1)])}>Save timings</Button>
         </Card>
-      </div>
+       </div></div>
     </>
   );
 }

@@ -1,0 +1,2 @@
+create policy "Owner reads client documents" on storage.objects for select to authenticated using (bucket_id = 'client-documents' and public.is_owner());
+create policy "Owner deletes client documents" on storage.objects for delete to authenticated using (bucket_id = 'client-documents' and public.is_owner());

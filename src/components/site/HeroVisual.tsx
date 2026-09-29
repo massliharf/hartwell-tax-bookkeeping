@@ -26,7 +26,7 @@ export function HeroVisual() {
     <div className="sheet-stack ledger relative mx-auto w-full max-w-sm p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Your checklist</p>
+          <p className="text-[11px] font-medium uppercase text-muted-foreground">Your checklist</p>
           <p className="mt-1 font-serif text-2xl leading-tight text-deep-ink">Thursday, 10:30 am</p>
           <p className="text-xs text-muted-foreground">Individual return · 45 min</p>
         </div>

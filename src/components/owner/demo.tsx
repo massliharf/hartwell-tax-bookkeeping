@@ -43,7 +43,7 @@ export function DemoTools() {
     <>
       <div className="fixed bottom-20 right-5 z-40 sm:bottom-5 flex gap-2">
         <button onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview"
-          className={`grid h-11 w-11 place-items-center rounded-full border border-border transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-sage"}`}>
+          className={`grid h-11 w-11 place-items-center rounded-full border border-border transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-fill-subtle"}`}>
           <Smartphone className="h-4 w-4" />
         </button>
         <button onClick={() => setOpen(true)} className="flex h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm text-primary-foreground">
@@ -127,9 +127,9 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
               {thread.map((m) => (
                 <motion.div key={m.id} layout initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}>
                   {m.channel === "sms" ? (
-                    <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-sage px-3 py-2 text-[13px] leading-snug text-deep-ink [overflow-wrap:anywhere]">{m.body}</div>
+                    <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-fill-neutral px-3 py-2 text-[13px] leading-snug text-deep-ink [overflow-wrap:anywhere]">{m.body}</div>
                   ) : (
-                    <div className="rounded-2xl border border-border bg-sheet p-3">
+                    <div className="rounded-2xl bg-surface-2 p-3">
                       <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>
                       <p className="mt-1 font-serif text-[15px] leading-tight text-ink">{m.subject}</p>
                       <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-deep-ink/75">{m.body}</p>

@@ -64,7 +64,7 @@ function PortalPage() {
     );
   }
   if (!q.data?.appointment) {
-    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56 animate-pulse rounded-2xl bg-sheet/60" /><div className="h-96 animate-pulse rounded-2xl bg-sheet/60" /></div></BookingShell>;
+    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56 animate-pulse rounded-2xl bg-[#F0F0F0]" /><div className="h-96 animate-pulse rounded-2xl bg-[#F0F0F0]" /></div></BookingShell>;
   }
 
   const a = q.data.appointment as Appt;
@@ -80,7 +80,7 @@ function PortalPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">Your private page</p>
+          <p className="text-xs font-medium uppercase text-ink/70">Your private page</p>
           <h1 className="mt-2 text-4xl leading-tight text-deep-ink sm:text-5xl">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
@@ -92,7 +92,7 @@ function PortalPage() {
         <AppointmentCard appt={a} cancelled={cancelled} />
         {open && <Actions token={token} appt={a} onChange={refresh} />}
         {cancelled && (
-          <div className="rounded-2xl border border-border bg-sheet p-6">
+          <div className="rounded-2xl bg-surface-2 p-6">
             <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
             <Button asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
           </div>
@@ -104,7 +104,7 @@ function PortalPage() {
               <h2 className="text-3xl text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
-            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-sage/70 p-4 text-sm text-deep-ink/85">
+            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
               <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Claire can see your files. We never ask for your Social Security number.
             </p>
             <ul className="space-y-4">
@@ -126,7 +126,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{appt.services?.name}</p>
+            <p className="text-[11px] font-medium uppercase text-muted-foreground">{appt.services?.name}</p>
             {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
             {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
           </div>
@@ -216,12 +216,12 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
 
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-      <div className="rounded-2xl border border-border bg-sheet p-5">
+      <div className="rounded-2xl bg-surface-2 p-5">
         <div className="mb-4 flex items-center justify-between">
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
-          <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
+          <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-fill-subtle"><X className="size-4" /></button>
         </div>
-        {q.isLoading && <div className="h-32 animate-pulse rounded-xl bg-sage/50" />}
+        {q.isLoading && <div className="h-32 animate-pulse rounded-xl bg-fill-neutral/50" />}
         {q.data?.error && <p className="text-sm">{q.data.error}</p>}
         {days.length > 0 && (
           <>
@@ -232,7 +232,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 const off = d.closed || d.slots.length === 0;
                 return (
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
-                    className={`flex w-[68px] shrink-0 flex-col items-center rounded-xl border px-2 py-2 ${active ? "border-ink bg-ink text-paper" : off ? "border-transparent text-muted-foreground/50" : "border-border bg-paper hover:border-ink"}`}>
+                    className={`flex w-[68px] shrink-0 flex-col items-center rounded-xl border px-2 py-2 ${active ? "border-ink bg-ink text-primary-foreground" : off ? "border-transparent text-muted-foreground/50" : "border-border bg-paper hover:border-ink"}`}>
                     <span className="text-[10px] uppercase tracking-wider opacity-70">{c.dow}</span>
                     <span className="tabular font-serif text-xl leading-tight">{c.day}</span>
                     <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
@@ -258,7 +258,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
             {alts.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {alts.map((s) => (
-                  <button key={s} onClick={() => pick(s)} className="tabular rounded-full border border-ink px-3 py-1.5 text-ink hover:bg-ink hover:text-paper">
+                  <button key={s} onClick={() => pick(s)} className="tabular rounded-full border border-ink px-3 py-1.5 text-ink hover:bg-ink hover:text-primary-foreground">
                     {fmtDateLong(s).split(",")[0]} {fmtTime(s)}
                   </button>
                 ))}
@@ -316,7 +316,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
         {item.status === "uploaded" ? (
           <motion.div key="up" {...flip} className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5">
             <motion.span initial={reduce ? false : { scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 500, damping: 16, delay: 0.2 }}
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-paper"><Check className="size-5" strokeWidth={3} /></motion.span>
+              className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></motion.span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink">{item.document_name}</p>
               <p className="text-sm text-success">Received</p>
@@ -324,7 +324,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             <button onClick={() => fileRef.current?.click()} className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Replace</button>
           </motion.div>
         ) : item.status === "not_applicable" ? (
-          <motion.div key="na" {...flip} className="flex items-center gap-4 rounded-2xl border border-border bg-sheet/70 p-5">
+          <motion.div key="na" {...flip} className="flex items-center gap-4 rounded-2xl bg-surface-2/70 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><X className="size-4" /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink/70">{item.document_name}</p>
@@ -339,7 +339,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
             className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-marigold" : ""}`}>
             <div className="flex items-start gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sage text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-fill-neutral text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-deep-ink">{item.document_name}</p>
@@ -350,7 +350,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             </div>
             {naOpen ? (
               <div className="mt-4 space-y-2">
-                <Input autoFocus placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-11 bg-paper" />
+                <Input autoFocus placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
                 <div className="flex gap-2">
                   <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Save</Button>
                   <Button size="sm" variant="ghost" onClick={() => setNaOpen(false)}>Never mind</Button>
@@ -385,7 +385,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
 
   return (
     <section className="sheet-stack ledger border-l-4 border-l-marigold p-6">
-      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-warning">One last step</p>
+      <p className="text-[11px] font-medium uppercase text-warning">One last step</p>
       <h2 className="mt-1 text-3xl text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-paper/70 p-4 text-sm">

@@ -43,9 +43,9 @@ function Outbox() {
       {q.data && !list.length && <Empty title="Nothing sent yet.">Messages appear here the moment they go out.</Empty>}
       <ul className="space-y-3">
         {list.map((m) => (
-          <li key={m.id} className="rounded-2xl border border-border bg-sheet">
+          <li key={m.id} className="rounded-2xl bg-surface-2">
             <button onClick={() => setOpen(open === m.id ? null : m.id)} className="flex w-full items-start gap-4 p-4 text-left">
-              <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sage text-ink">
+              <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-ink">
                 {m.channel === "sms" ? <MessageSquare className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
               </span>
               <span className="min-w-0 flex-1">

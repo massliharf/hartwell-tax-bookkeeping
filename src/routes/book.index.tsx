@@ -79,7 +79,7 @@ function BookPage() {
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
   }
 
   return (
@@ -131,7 +131,7 @@ function BookPage() {
 
 function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
+    <div className="overflow-hidden rounded-2xl bg-surface-2">
       <div className="bg-surface-2 p-3 px-4">
       <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Your checklist so far</p>
       <p className="font-serif text-xl text-deep-ink">
@@ -157,9 +157,9 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-sheet/70" />)}</div>}
+      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-[#F0F0F0]" />)}</div>}
       {services.isError && (
-        <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
+        <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
@@ -170,18 +170,18 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
             <button
               key={s.id}
               onClick={() => onPick(s.slug)}
-              className={`sheet-stack group p-5 text-left transition-transform duration-300 hover:-translate-y-0.5 ${active ? "ring-2 ring-ink" : ""}`}
+              className={`group rounded-2xl p-4 text-left transition-colors duration-200 ${active ? "bg-fill-selected" : "bg-fill-neutral hover:bg-[#E3E3E3]"}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-2xl leading-tight text-deep-ink">{s.name}</h2>
-                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-ink" : "border-border"}`} />
+                <h2 className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h2>
+                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-ink" : "border-[rgba(16,16,16,0.2)] bg-sheet"}`} />
               </div>
               <p className="mt-1 text-sm text-deep-ink/70">{s.description}</p>
-              <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-sm">
+              <div className="mt-4 flex items-center justify-between text-sm">
                 <span className="tabular text-muted-foreground">{s.duration_min} min</span>
                 <span className="text-deep-ink">
                   {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                  <span className="tabular font-serif text-2xl">${Number(s.price_from)}</span>
+                  <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
                 </span>
               </div>
             </button>
@@ -205,35 +205,35 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
   return (
     <>
       <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
-      <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-sage px-3 py-1.5 text-sm text-ink lg:hidden">
+      <div className="mb-6 inline-flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink lg:hidden">
         Your checklist so far: <span className="tabular font-medium">{count} documents</span>
       </div>
       <div className="space-y-3">
         {visible.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div key={q.key} className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="font-medium text-deep-ink">{q.label}</p>
+              <p className="text-sm font-medium text-deep-ink">{q.label}</p>
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
             </div>
             {q.type === "count" ? (
-              <div className="flex shrink-0 items-center gap-3">
-                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
-                  <Minus className="size-4" />
+              <div className="flex h-8 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
+                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-6 place-items-center rounded-md hover:bg-[#DBDBDB]">
+                  <Minus className="size-3.5" />
                 </button>
-                <span className="tabular w-6 text-center font-serif text-2xl">{(answers[q.key] as number) ?? 0}</span>
-                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-9 place-items-center rounded-full border border-border hover:border-ink">
-                  <Plus className="size-4" />
+                <span className="tabular w-6 text-center text-xs font-semibold">{(answers[q.key] as number) ?? 0}</span>
+                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-6 place-items-center rounded-md hover:bg-[#DBDBDB]">
+                  <Plus className="size-3.5" />
                 </button>
               </div>
             ) : (
-              <div className="flex shrink-0 gap-2" role="radiogroup" aria-label={q.label}>
+              <div className="flex h-8 shrink-0 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label={q.label}>
                 {[true, false].map((v) => (
                   <button
                     key={String(v)}
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
-                    className={`h-10 min-w-16 rounded-full border px-4 text-sm font-medium transition-colors ${answers[q.key] === v ? "border-ink bg-ink text-paper" : "border-border bg-transparent text-deep-ink hover:border-ink"}`}
+                    className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-200 ${answers[q.key] === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
                   >
                     {v ? "Yes" : "No"}
                   </button>
@@ -266,35 +266,35 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   return (
     <>
       <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
-      <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
+      <div className="mb-6 inline-flex h-8 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${draft.meetingType === v ? "bg-ink text-paper" : "text-deep-ink hover:bg-sage"}`}>
-            <Icon className="size-4" /> {label}
+            className={`inline-flex h-6 items-center gap-2 rounded-md px-4 text-xs font-semibold transition-colors duration-200 ${draft.meetingType === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}>
+            <Icon className="size-3.5" /> {label}
           </button>
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-48 animate-pulse rounded-2xl bg-sheet/70" /></div>}
+      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-[#F0F0F0]" /><div className="h-48 animate-pulse rounded-2xl bg-[#F0F0F0]" /></div>}
       {(q.isError || q.data?.error) && (
-        <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
+        <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
         </div>
       )}
 
       {days.length > 0 && (
         <>
-          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2" role="listbox" aria-label="Choose a day">
+          <div className="-mx-6 flex gap-1 overflow-x-auto px-6 pb-2 sm:-mx-0 sm:px-0" role="listbox" aria-label="Choose a day">
             {days.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
               const full = !d.closed && d.slots.length === 0;
               return (
                 <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
-                    active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
+                  className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors ${
+                    active ? "border-ink bg-ink text-primary-foreground" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
-                  <span className="tabular font-serif text-2xl leading-tight">{c.day}</span>
+                  <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
                 </button>
               );
@@ -306,7 +306,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <button key={s} onClick={() => { update({ date: day.date, slot: s }); onDone(); }}
-                    className={`tabular h-11 rounded-xl border text-sm font-medium transition-all hover:-translate-y-0.5 ${draft.slot === s ? "border-ink bg-ink text-paper" : "border-border bg-sheet text-deep-ink hover:border-ink"}`}>
+                    className={`tabular h-8 rounded-lg text-xs font-medium transition-colors ${draft.slot === s ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] hover:border-ink"}`}>
                     {fmtTime(s)}
                   </button>
                 ))}
@@ -314,7 +314,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
             )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
             {!firstOpen && !draft.date && (
-              <p className="rounded-2xl border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
+              <p className="rounded-2xl bg-surface-2 p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
             )}
           </div>
         </>
@@ -330,11 +330,11 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
   const c = fmtDayChip(date);
   if (state === "done") {
-    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
+    return <div className="rounded-2xl bg-surface-2 p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
   }
   return (
     <form
-      className="rounded-2xl border border-border bg-sheet p-5"
+      className="rounded-2xl bg-surface-2 p-5"
       onSubmit={async (e) => {
         e.preventDefault();
         setState("saving");
@@ -344,8 +344,8 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
       <p className="font-serif text-2xl text-deep-ink">Full — join the waitlist</p>
       <p className="mt-1 text-sm text-deep-ink/70">{c.dow} {c.month} {c.day} is fully booked. We'll email you if a spot opens.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Input required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 bg-paper" />
-        <Input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 bg-paper" />
+        <Input required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-10" />
+        <Input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10" />
       </div>
       {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
       <Button type="submit" variant="highlight" className="mt-4" disabled={state === "saving"}>
@@ -396,7 +396,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   return (
     <>
       <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sage/60 p-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-canvas py-2 pl-3 pr-2">
         <div className="min-w-0">
           <p className="font-medium text-deep-ink">{service.name}</p>
           <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>
@@ -428,7 +428,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
                 <div className="mt-3 flex flex-wrap gap-2">
                   {alternatives.map((a) => (
                     <button key={a} type="button" disabled={busy} onClick={() => { update({ slot: a }); submit(a); }}
-                      className="tabular rounded-full border border-ink px-4 py-2 text-sm font-medium text-ink hover:bg-ink hover:text-paper">
+                      className="tabular rounded-full border border-ink px-4 py-2 text-sm font-medium text-ink hover:bg-ink hover:text-primary-foreground">
                       {fmtDayChip(new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(a))).dow} {fmtTime(a)}
                     </button>
                   ))}

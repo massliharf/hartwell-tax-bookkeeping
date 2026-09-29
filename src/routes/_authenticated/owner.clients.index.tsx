@@ -33,13 +33,13 @@ function Clients() {
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
       {q.data && !list.length && <p className="py-10 text-center text-sm text-muted-foreground">No one matches "{term}".</p>}
-      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-sheet">
+      <ul className="divide-y divide-border overflow-hidden rounded-2xl bg-surface-2">
         {list.map((c) => {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (
             <li key={c.id}>
               <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-paper">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sage font-serif text-lg text-ink">{c.name.charAt(0)}</span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-fill-neutral font-serif text-lg text-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-deep-ink">{c.name}</span>
                   <span className="block truncate text-sm text-muted-foreground">{c.email}</span>

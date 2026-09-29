@@ -27,7 +27,7 @@ function NotFoundComponent() {
           <Link to="/" className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
             Back to home
           </Link>
-          <Link to="/book" className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-sage">
+          <Link to="/book" className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-fill-subtle">
             Book an appointment
           </Link>
         </div>
@@ -63,7 +63,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           </button>
           <a
             href="/"
-            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-sage"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-sheet px-5 text-sm font-medium text-deep-ink transition-colors hover:bg-fill-subtle"
           >
             Back to home
           </a>

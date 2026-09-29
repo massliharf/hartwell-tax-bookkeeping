@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">{children}</p>;
+  return <p className="text-xs font-medium uppercase text-ink/70">{children}</p>;
 }
 
 function Home() {
@@ -76,7 +76,7 @@ function Hero() {
 function TrustStrip() {
   const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
-    <div className="border-y border-border bg-sheet/60">
+    <div className="border-y border-border bg-[#F0F0F0]">
       <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-5 py-4 text-sm text-deep-ink/80">
         {items.map((t) => (
           <li key={t} className="flex items-center gap-2"><Check className="size-3.5 text-success" strokeWidth={2.5} />{t}</li>
@@ -129,14 +129,14 @@ function HowItWorks() {
 
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24 bg-sage/50 py-24">
+    <section id="services" className="scroll-mt-24 bg-fill-neutral/50 py-24">
       <div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
         <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s, i) => (
             <Reveal key={s.id} delay={(i % 3) * 0.08}>
               <Link to="/book" search={{ service: s.id }} className="sheet-stack group flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1">
-                <p className="tabular text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{s.minutes} min</p>
+                <p className="tabular text-xs font-medium uppercase text-muted-foreground">{s.minutes} min</p>
                 <h3 className="mt-3 text-[1.75rem] leading-tight text-deep-ink">{s.name}</h3>
                 <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
                 <div className="mt-auto flex items-end justify-between border-t border-border pt-5 mt-8">
@@ -163,11 +163,11 @@ function About() {
       <Reveal>
         <figure className="relative mx-auto w-full max-w-xs">
           <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-2xl border border-ink/20" />
-          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl border border-border bg-sheet shadow-lift">
+          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2 shadow-lift">
             <div className="ledger absolute inset-0 opacity-60" />
             <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
-          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper">Claire Hartwell, EA</figcaption>
+          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-primary-foreground">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>
@@ -190,15 +190,15 @@ function Testimonials() {
     { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
-    <section className="bg-ink py-24 text-paper">
+    <section className="bg-ink py-24 text-primary-foreground">
       <div className="mx-auto max-w-6xl px-5">
-        <Reveal><p className="text-xs font-medium uppercase tracking-[0.16em] text-marigold">Kind words</p></Reveal>
+        <Reveal><p className="text-xs font-medium uppercase text-marigold">Kind words</p></Reveal>
         <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
           {t.map((x, i) => (
             <Reveal key={x.n} delay={i * 0.1}>
               <figure className="border-t border-paper/20 pt-6">
                 <blockquote className="font-serif text-2xl leading-snug">"{x.q}"</blockquote>
-                <figcaption className="mt-5 text-sm"><span className="text-paper">{x.n}</span><span className="block text-paper/60">{x.r}</span></figcaption>
+                <figcaption className="mt-5 text-sm"><span className="text-primary-foreground">{x.n}</span><span className="block text-primary-foreground/60">{x.r}</span></figcaption>
               </figure>
             </Reveal>
           ))}
@@ -222,7 +222,7 @@ function Privacy() {
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {points.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.06} className="flex gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-fill-neutral text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
               <div><h3 className="text-xl text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-deep-ink/70">{p.text}</p></div>
             </Reveal>
           ))}

@@ -4,7 +4,7 @@ import { HOURS } from "@/lib/services";
 
 export function AnnouncementBar() {
   return (
-    <div className="bg-ink text-paper">
+    <div className="bg-ink text-primary-foreground">
       <Link
         to="/book"
         search={{ service: "extension" }}
@@ -35,7 +35,7 @@ export function SiteHeader() {
         </nav>
         <Link
           to="/book"
-          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-medium text-paper transition hover:-translate-y-0.5"
+          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-medium text-primary-foreground transition hover:-translate-y-0.5"
         >
           Book <ArrowRight className="size-4" />
         </Link>
@@ -46,32 +46,32 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 bg-deep-ink text-paper/85">
+    <footer className="mt-24 bg-deep-ink text-primary-foreground/85">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
-          <p className="font-serif text-4xl text-paper">Hartwell Tax & Bookkeeping</p>
-          <p className="mt-3 max-w-sm text-sm text-paper/65">Claire Hartwell, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
+          <p className="font-serif text-4xl text-primary-foreground">Hartwell Tax & Bookkeeping</p>
+          <p className="mt-3 max-w-sm text-sm text-primary-foreground/65">Claire Hartwell, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
         <div className="text-sm">
-          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-marigold">Visit</p>
+          <p className="mb-3 text-xs uppercase text-marigold">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
-          <a href="tel:+19735550142" className="tabular mt-3 block hover:text-paper">(973) 555-0142</a>
+          <a href="tel:+19735550142" className="tabular mt-3 block hover:text-primary-foreground">(973) 555-0142</a>
         </div>
         <div className="text-sm">
-          <p className="mb-3 text-xs uppercase tracking-[0.14em] text-marigold">Hours</p>
+          <p className="mb-3 text-xs uppercase text-marigold">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4">
               <span>{h.days}</span>
-              <span className="text-paper/65">{h.time}</span>
+              <span className="text-primary-foreground/65">{h.time}</span>
             </p>
           ))}
         </div>
       </div>
       <div className="border-t border-paper/10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-paper/50">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-primary-foreground/50">
           <span>© {new Date().getFullYear()} Hartwell Tax & Bookkeeping</span>
-          <Link to="/owner" className="hover:text-paper">Owner login</Link>
+          <Link to="/owner" className="hover:text-primary-foreground">Owner login</Link>
         </div>
       </div>
     </footer>

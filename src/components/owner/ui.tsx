@@ -142,7 +142,7 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
           <ul className="max-h-[60vh] overflow-auto border-b border-border p-3 md:border-b-0 md:border-r">
             {files.map((f) => (
               <li key={f.id}>
-                <button onClick={() => pick(f)} className={cn("w-full rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-sage", sel?.id === f.id && "bg-sage")}>
+                <button onClick={() => pick(f)} className={cn("w-full rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-fill-subtle", sel?.id === f.id && "bg-fill-neutral")}>
                   <span className="block text-deep-ink">{f.document_name}</span>
                   {f.uploaded_at && <span className="text-xs text-muted-foreground">Received {fmtLong(f.uploaded_at)}</span>}
                 </button>
@@ -165,5 +165,5 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
 }
 
 export function CloseX({ onClick }: { onClick: () => void }) {
-  return <button onClick={onClick} aria-label="Close" className="rounded-full p-1 hover:bg-sage"><X className="h-4 w-4" /></button>;
+  return <button onClick={onClick} aria-label="Close" className="rounded-full p-1 hover:bg-fill-subtle"><X className="h-4 w-4" /></button>;
 }

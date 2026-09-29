@@ -121,7 +121,7 @@ function Insights() {
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   const reduce = useReducedMotion();
   return (
-    <header className="ledger relative overflow-hidden rounded-2xl border border-border bg-sheet px-7 py-12 md:px-12 md:py-16">
+    <header className="ledger relative overflow-hidden rounded-2xl bg-surface-2 px-7 py-12 md:px-12 md:py-16">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Insights · last 30 days</p>
       <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="mt-3 font-serif text-5xl leading-[1.02] text-deep-ink md:text-7xl">

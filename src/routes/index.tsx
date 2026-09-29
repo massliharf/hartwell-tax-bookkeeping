@@ -180,23 +180,24 @@ function Services() {
 
 function About() {
   return (
-    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-14 px-5 py-24 md:grid-cols-[0.9fr_1.1fr]">
+    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-10 px-5 py-14 md:grid-cols-[0.9fr_1.1fr]">
       <Reveal>
         <figure className="relative mx-auto w-full max-w-xs">
-                    <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
-                        <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
+            <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
           <figcaption className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white backdrop-blur-sm">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>
         <Eyebrow>About Claire</Eyebrow>
-        <h2 className="mt-1 text-[28px] leading-[38px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
-        <div className="mt-4 space-y-3 rounded-2xl bg-sheet px-7 py-4 font-serif text-base font-normal text-[#363636]">
+        <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
+        <div className="mt-4 space-y-3 rounded-2xl border border-border bg-sheet p-6 text-base leading-6 text-[#363636]">
           <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
-        <p className="mt-4 font-serif text-xl text-ink">— Claire</p>
+        <p className="mt-4 text-lg font-medium text-ink">— Claire</p>
+
       </Reveal>
     </section>
   );

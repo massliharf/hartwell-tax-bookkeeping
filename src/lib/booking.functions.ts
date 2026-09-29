@@ -181,7 +181,7 @@ export const lookupReturning = createServerFn({ method: "POST" })
       found: true as const,
       name: client.name,
       phoneHint: client.phone ? `ending in ${client.phone.slice(-4)}` : null,
-      intake: (last?.intake_answers ?? {}) as Record<string, unknown>,
+      intake: JSON.parse(JSON.stringify(last?.intake_answers ?? {})) as Record<string, string | number | boolean | string[] | null>,
       serviceSlug: (last?.services as { slug: string } | null)?.slug ?? null,
     };
   });

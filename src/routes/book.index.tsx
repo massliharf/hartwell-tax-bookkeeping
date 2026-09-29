@@ -86,7 +86,7 @@ function BookPage() {
               key={step}
               initial={reduce ? false : { opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={reduce ? undefined : { opacity: 0, x: -24 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
               {step === 0 && (
@@ -135,7 +135,7 @@ function ChecklistPreview({ docs }: { docs: ReturnType<typeof previewChecklist> 
 }
 
 /* ---------- Step 1: service ---------- */
-function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string; onPick: (slug: string) => void }) {
+function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
       <StepTitle eyebrow="Step 1 of 4" title="What can Priya help with?" sub="Pick the closest fit. You can add details in the next step." />
@@ -179,7 +179,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
 }
 
 /* ---------- Step 2: questions ---------- */
-function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: string; answers: Answers; onChange: (a: Answers) => void; onDone: () => void; count: number }) {
+function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void; onDone: () => void; count: number }) {
   const qs = questionsFor(slug);
   const pages = Math.ceil(qs.length / 4);
   const [page, setPage] = useState(0);

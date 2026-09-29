@@ -2,16 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import type { Answers } from "./intake";
 
 export type BookingDraft = {
-  serviceSlug?: string;
+  serviceSlug?: string | undefined;
   answers: Answers;
   meetingType: "in_person" | "video";
-  date?: string;
-  slot?: string;
+  date?: string | undefined;
+  slot?: string | undefined;
   name: string;
   email: string;
   phone: string;
-  phoneHint?: string | null;
-  returning?: boolean;
+  phoneHint?: string | null | undefined;
+  returning?: boolean | undefined;
 };
 
 const KEY = "patel-booking-v1";

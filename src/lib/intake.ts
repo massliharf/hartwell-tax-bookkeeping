@@ -1,14 +1,14 @@
 // Intake questions per service + a client-side mirror of document_rules for the live preview.
 export type Answers = {
-  w2_count?: number;
-  freelance?: boolean;
-  interest?: boolean;
-  mortgage?: boolean;
-  student_loans?: boolean;
-  dependents?: boolean;
-  rental?: boolean;
-  irs_letter?: boolean;
-  filed_with_us?: boolean;
+  w2_count?: number | undefined;
+  freelance?: boolean | undefined;
+  interest?: boolean | undefined;
+  mortgage?: boolean | undefined;
+  student_loans?: boolean | undefined;
+  dependents?: boolean | undefined;
+  rental?: boolean | undefined;
+  irs_letter?: boolean | undefined;
+  filed_with_us?: boolean | undefined;
 };
 export type Question = { key: keyof Answers; label: string; hint?: string; type: "yesno" | "count" };
 
@@ -31,7 +31,7 @@ const BY_SERVICE: Record<string, (keyof typeof Q)[]> = {
   bookkeeping: ["w2_count", "interest", "filed_with_us"],
 };
 
-export const questionsFor = (slug?: string | null): Question[] => (BY_SERVICE[slug ?? ""] ?? BY_SERVICE.individual!).map((k) => Q[k]!);
+export const questionsFor = (slug?: string | null): Question[] => (BY_SERVICE[slug ?? ""] ?? BY_SERVICE["individual"]!).map((k) => Q[k]!);
 
 export function impliedFlags(slug?: string | null): Partial<Answers> {
   if (slug === "self-employed" || slug === "bookkeeping") return { freelance: true };
@@ -86,7 +86,7 @@ export function toIntakePayload(slug: string, answers: Answers) {
 
 /** Reverse of toIntakePayload, for returning clients. */
 export function fromIntakePayload(p: Record<string, unknown>): Answers {
-  const emps = Array.isArray(p.w2_employers) ? p.w2_employers.length : 0;
+  const emps = Array.isArray(p["w2_employers"]) ? p["w2_employers"].length : 0;
   const b = (k: string) => (typeof p[k] === "boolean" ? (p[k] as boolean) : undefined);
   return {
     w2_count: emps, freelance: b("freelance"), interest: b("interest"), mortgage: b("mortgage"),

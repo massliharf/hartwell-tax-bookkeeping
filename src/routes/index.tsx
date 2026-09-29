@@ -237,8 +237,8 @@ function Privacy() {
     { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-5 py-24">
-      <div className="rounded-2xl bg-sheet px-7 py-8 sm:p-12">
+    <section className="mx-auto max-w-6xl px-5 py-14">
+      <div className="rounded-2xl border border-border bg-sheet p-6 sm:p-10">
         <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {points.map((p, i) => (
@@ -262,7 +262,7 @@ function Faq() {
     { q: "What are the key deadlines?", a: "Most individual returns are due April 15. Extended returns are due October 15. Estimated taxes are due in April, June, September and January." },
   ];
   return (
-    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-10 px-5 py-16 md:grid-cols-[0.8fr_1.2fr]">
+    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-8 px-5 py-14 md:grid-cols-[0.8fr_1.2fr]">
       <SectionHead eyebrow="Questions" title="Good to know." />
       <Reveal>
         <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-3">

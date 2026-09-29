@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { motion, useReducedMotion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { ReadyRing } from "@/components/brand/ReadyRing";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows } from "@/components/owner/ui";
 
@@ -112,7 +111,6 @@ function Insights() {
           <p className="mt-4 font-serif text-3xl leading-snug md:text-4xl">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>
-          <div className="absolute right-6 top-6 hidden sm:block"><ReadyRing value={ready30} size={56} stroke={5} label="Ready" /></div>
         </div>
       </section>
       <p className="mt-3 text-xs text-muted-foreground">Last 30 days. "Before" figures are the practice's typical numbers before online booking.</p>

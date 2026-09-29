@@ -361,6 +361,13 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
 }
 
 /* ---------- Step 4: details + book ---------- */
+function BookingSummary({ service, draft, onPickAgain }: { service: Service; draft: BookingDraft; onPickAgain: () => void }) {
+  return <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sheet p-4">
+    <div className="min-w-0"><p className="font-medium text-deep-ink">{service.name}</p><p className="text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}`}, {draft.meetingType === "video" ? "Video call" : "In person"}</p></div>
+    <Button variant="secondary" onClick={onPickAgain}>Change</Button>
+  </div>;
+}
+
 function DetailsStep({ service, draft, update, onPickAgain }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void; onPickAgain: () => void }) {
   const navigate = useNavigate();
   const book = useServerFn(bookAppointment);
@@ -401,15 +408,8 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   return (
     <>
       <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-canvas py-2 pl-3 pr-2">
-        <div className="min-w-0">
-          <p className="font-medium text-deep-ink">{service.name}</p>
-          <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}`}, {draft.meetingType === "video" ? "Video call" : "In person"}</p>
-        </div>
-        <button onClick={onPickAgain} className="text-sm font-medium text-ink underline underline-offset-4">Change</button>
-      </div>
-
-      <form className="max-w-md space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot) submit(draft.slot); }}>
+       <div className="mb-6 lg:hidden"><BookingSummary service={service} draft={draft} onPickAgain={onPickAgain} /></div>
+       <form id="booking-details" className="w-full space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot && draft.date === nyDay(draft.slot)) submit(draft.slot); }}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>
           <Input id="name" autoComplete="name" required value={draft.name} onChange={(e) => update({ name: e.target.value })} onBlur={saveLeadNow} className="h-12 bg-sheet" />
@@ -445,9 +445,6 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
           </div>
         )}
 
-        <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={!valid || busy}>
-          {busy ? <Loader2 className="" /> : null} Book my appointment
-        </Button>
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
           <Lock className="mt-0.5 size-3.5 shrink-0" /> We'll never ask for your Social Security number online. Confirmed instantly, no payment now.
         </p>

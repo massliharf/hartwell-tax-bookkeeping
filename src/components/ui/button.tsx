@@ -5,17 +5,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-xs font-medium cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:bg-[#E3E3E3] disabled:text-[#616161] disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-xs font-medium cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        highlight: "bg-ink text-primary-foreground hover:bg-ink/90",
-        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        highlight: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-secondary text-destructive hover:bg-secondary/80",
         outline:
-          "bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB]",
-        secondary: "bg-fill-subtle text-deep-ink hover:bg-fill-selected",
-        ghost: "text-deep-ink hover:bg-fill-subtle",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         link: "text-ink text-sm font-semibold underline-offset-4 hover:underline",
       },
       size: {

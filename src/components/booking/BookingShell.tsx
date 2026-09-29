@@ -35,7 +35,7 @@ function Progress({ step }: { step: number }) {
           const active = i === step;
           return (
             <li key={label} aria-current={active ? "step" : undefined}
-              className={`flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-medium transition-colors duration-200 ${active ? "bg-fill-selected text-deep-ink" : done ? "text-deep-ink" : "text-muted-foreground"}`}>
+               className={`flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-medium ${active ? "bg-fill-selected text-deep-ink" : done ? "text-deep-ink" : "text-muted-foreground"}`}>
               {done ? <Check className="size-3.5 text-ink" strokeWidth={3} /> : <span className="tabular">{i + 1}</span>}
               {label}
             </li>
@@ -49,7 +49,7 @@ function Progress({ step }: { step: number }) {
 export function StepTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">{eyebrow}</p>
+       <p className="text-xs font-medium leading-6 text-muted-foreground">{eyebrow}</p>
       <h1 className="mt-1 text-2xl leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]">{title}</h1>
       {sub && <p className="mt-2 text-sm text-muted-foreground">{sub}</p>}
     </div>

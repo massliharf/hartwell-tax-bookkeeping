@@ -5,6 +5,7 @@ import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Too
 import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows } from "@/components/owner/ui";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Insights — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Insights });
 
@@ -31,7 +32,7 @@ function Insights() {
       return { t, msgs: m.data ?? [], appts: a.data ?? [], offers: o.data ?? [] };
     },
   });
-  if (q.isLoading) return <LoadingRows n={4} />;
+  if (q.isLoading) return <div role="status" aria-label="Loading insights"><Skeleton className="h-4 w-36" /><Skeleton className="mt-4 h-12 w-80 max-w-full" /><Skeleton className="mt-4 h-5 w-64 max-w-full" /><div className="mt-8 grid gap-4 md:grid-cols-2">{Array.from({ length: 6 }, (_, i) => <div key={i} className="rounded-2xl border border-border bg-sheet p-5"><Skeleton className="h-5 w-44 max-w-full" /><Skeleton className="mt-3 h-9 w-24" /><Skeleton className="mt-5 h-32 w-full rounded-lg" /></div>)}</div><Skeleton className="mt-8 h-48 w-full rounded-2xl" /></div>;
   if (q.isError || !q.data) return <ErrorNote onRetry={() => q.refetch()} />;
   const { t, msgs, appts, offers } = q.data;
 

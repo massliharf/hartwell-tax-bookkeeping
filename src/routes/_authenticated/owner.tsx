@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { needsYou } from "@/components/owner/lib";
 import { DemoTools } from "@/components/owner/demo";
@@ -58,7 +59,7 @@ function OwnerLayout() {
     navigate({ to: "/auth", replace: true });
   };
 
-  if (ctx.isLoading) return <div className="grid min-h-screen place-items-center bg-paper text-sm text-muted-foreground">Opening your day…</div>;
+   if (ctx.isLoading) return <div role="status" aria-label="Opening your day" className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2"><div className="hidden w-56 shrink-0 rounded-2xl bg-sheet p-5 sm:block"><Skeleton className="h-8 w-36" /><div className="mt-10 space-y-2">{Array.from({ length: 7 }, (_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div></div><div className="min-w-0 flex-1"><div className="h-[60px]" /><main className="min-h-[calc(100vh-76px)] rounded-2xl bg-sheet p-6"><Skeleton className="h-9 w-60 max-w-full" /><Skeleton className="mt-3 h-5 w-40" /><div className="mt-10 space-y-4">{Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div></main></div></div>;
   if (!ctx.data?.isOwner) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-6 text-center">

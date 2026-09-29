@@ -5,6 +5,7 @@ import { Camera, Check, FileText, Loader2, Lock, MapPin, Upload, Video, Users, C
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -63,7 +64,7 @@ function PortalPage() {
     );
   }
   if (!q.data?.appointment) {
-    return <BookingShell><div className="mx-auto max-w-2xl space-y-4"><div className="h-56  rounded-2xl bg-[#F0F0F0]" /><div className="h-96  rounded-2xl bg-[#F0F0F0]" /></div></BookingShell>;
+     return <BookingShell><div role="status" aria-label="Loading appointment" className="mx-auto max-w-2xl space-y-10"><div><Skeleton className="h-4 w-32" /><Skeleton className="mt-3 h-9 w-48" /><Skeleton className="mt-3 h-5 w-72 max-w-full" /></div><Skeleton className="h-48 rounded-2xl" /><Skeleton className="h-10 w-60" /><div className="space-y-4"><Skeleton className="h-8 w-40" /><Skeleton className="h-16 rounded-2xl" /><Skeleton className="h-44 rounded-2xl" /><Skeleton className="h-44 rounded-2xl" /></div></div></BookingShell>;
   }
 
   const a = q.data.appointment as Appt;
@@ -122,7 +123,7 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
   const video = appt.meeting_type === "video";
   return (
     <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
-      <div className="flex items-start justify-between gap-4">
+         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-[11px] font-medium text-muted-foreground">{appt.services?.name}</p>
@@ -218,7 +219,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-fill-subtle"><X className="size-4" /></button>
         </div>
-        {q.isLoading && <div className="h-32  rounded-lg bg-fill-neutral/50" />}
+         {q.isLoading && <div className="space-y-4"><div className="flex gap-2 overflow-hidden">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-16 w-[68px] shrink-0 rounded-lg" />)}</div><div className="grid grid-cols-3 gap-2">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-11 rounded-lg" />)}</div></div>}
         {q.data?.error && <p className="text-sm">{q.data.error}</p>}
         {days.length > 0 && (
           <>

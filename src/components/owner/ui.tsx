@@ -6,6 +6,7 @@ import { Check, FileText, MapPin, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { getDocumentUrl } from "@/lib/portal.functions";
 import { markComplete, markNoShow } from "@/lib/owner.functions";
@@ -33,7 +34,7 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
 }
 
 export function LoadingRows({ n = 3 }: { n?: number }) {
-  return <div className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="h-28  rounded-2xl bg-sheet" />)}</div>;
+  return <div role="status" aria-label="Loading" className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="rounded-2xl border border-border bg-sheet p-5"><div className="flex items-center gap-4"><Skeleton className="size-16 shrink-0 rounded-full" /><div className="min-w-0 flex-1"><Skeleton className="h-4 w-24" /><Skeleton className="mt-2 h-7 w-40 max-w-full" /><Skeleton className="mt-2 h-4 w-28" /></div></div><Skeleton className="mt-4 h-4 w-2/3" /></div>)}</div>;
 }
 
 export function ErrorNote({ onRetry }: { onRetry?: () => void }) {

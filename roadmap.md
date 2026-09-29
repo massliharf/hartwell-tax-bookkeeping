@@ -5,3 +5,6 @@
 - [x] Fix New York booking date state, matching selected slot and confirmation.
 - [x] Unify four-step navigation, selection styles, questions, date strip, and checklist layout.
 - [x] Verify booking at mobile/desktop and three appointments against saved records.
+- [ ] Audit all pages at 390, 768, and 1440px; list visual defects before fixes.
+- [ ] Repair UI-only layout, loading, interaction, and navigation issues.
+- [ ] Verify full public-to-owner journey and repeat viewport checks.

@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CalendarPlus, Check, Download, Lock, Upload, Users, Video } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DocumentStack } from "@/components/brand/DocumentStack";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { BookingShell } from "@/components/booking/BookingShell";
@@ -58,7 +59,7 @@ function ConfirmedPage() {
     );
   }
   if (q.isLoading || !q.data?.appointment) {
-    return <BookingShell><div className="mx-auto h-96 max-w-2xl  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
+    return <BookingShell><div className="mx-auto max-w-2xl"><Skeleton className="mx-auto size-16 rounded-full" /><Skeleton className="mx-auto mt-6 h-10 w-56" /><Skeleton className="mx-auto mt-3 h-5 w-64" /><Skeleton className="mt-10 h-52 rounded-2xl" /><Skeleton className="mt-8 h-80 rounded-2xl" /></div></BookingShell>;
   }
 
   const a = q.data.appointment as {

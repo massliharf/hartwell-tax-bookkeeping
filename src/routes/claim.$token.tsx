@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { claimOffer, getOffer } from "@/lib/automations.functions";
 import { fmtDateLong, fmtTime } from "@/lib/intake";
 
@@ -52,7 +53,7 @@ function ClaimPage() {
   const q = useQuery({ queryKey: ["offer", token], queryFn: () => fetchOffer({ data: { token } }) });
   const [state, setState] = useState<"idle" | "busy" | "missed" | { token: string }>("idle");
 
-  if (q.isLoading) return <Shell><Loader2 className="mx-auto size-6  text-ink" aria-label="Loading" /></Shell>;
+  if (q.isLoading) return <Shell><div role="status" aria-label="Loading" className="space-y-4"><Skeleton className="mx-auto h-5 w-36" /><Skeleton className="mx-auto h-9 w-64 max-w-full" /><Skeleton className="mx-auto h-6 w-44" /><Skeleton className="mx-auto mt-8 h-10 w-full" /></div></Shell>;
   if (q.isError || !q.data) return <Shell><h1 className="font-serif text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">This link isn't working.</h1><p className="mt-4 text-deep-ink/70">It may have expired. You're still on the waitlist.</p></Shell>;
   if (state === "missed" || (state === "idle" && q.data.status !== "open")) return <Shell><Missed /></Shell>;
   if (typeof state === "object") {

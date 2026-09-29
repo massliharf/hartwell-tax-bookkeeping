@@ -13,10 +13,11 @@ import { DocumentStack } from "@/components/brand/DocumentStack";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
+import { getLeadDraft } from "@/lib/automations.functions";
 import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
-  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional() }),
+  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional() }),
   head: () => ({
     meta: [
       { title: "Book an appointment — Patel Tax & Bookkeeping" },
@@ -50,11 +51,20 @@ function BookPage() {
   const reduce = useReducedMotion();
   const applied = useRef(false);
 
+  const fetchLead = useServerFn(getLeadDraft);
   useEffect(() => {
     if (!loaded || applied.current) return;
     applied.current = true;
+    if (search.resume) {
+      fetchLead({ data: { id: search.resume } }).then((l) => {
+        if (!l) return navigate({ search: {} , replace: true });
+        update({ email: l.email, name: l.name, meetingType: l.meetingType, answers: l.answers as Answers, ...(l.service ? { serviceSlug: l.service } : {}), slot: undefined, date: undefined });
+        navigate({ search: { step: l.service ? 2 : 0 }, replace: true });
+      }).catch(() => {});
+      return;
+    }
     if (search.service && search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
-  }, [loaded, search.service, draft.serviceSlug, update]);
+  }, [loaded, search.service, search.resume, draft.serviceSlug, update, fetchLead, navigate]);
 
   const service = services.data?.find((s) => s.slug === draft.serviceSlug);
   let step = search.step ?? 0;
@@ -353,7 +363,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   const saveLeadNow = () => {
     if (!emailOk(draft.email) || lastLead.current === draft.email + draft.name) return;
     lastLead.current = draft.email + draft.name;
-    lead({ data: { email: draft.email, name: draft.name || undefined, lastStep: "details", partial: { service: draft.serviceSlug, slot: draft.slot, meeting_type: draft.meetingType } } }).catch(() => {});
+    lead({ data: { email: draft.email, name: draft.name || undefined, lastStep: "details", partial: { service: draft.serviceSlug, slot: draft.slot, meeting_type: draft.meetingType, answers: draft.answers } } }).catch(() => {});
   };
 
   const submit = async (slot: string) => {

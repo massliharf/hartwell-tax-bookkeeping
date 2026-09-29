@@ -17,7 +17,7 @@ import { getLeadDraft } from "@/lib/automations.functions";
 import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
-  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional(), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), slot: z.string().datetime({ offset: true }).optional(), meeting: z.enum(["in_person", "video"]).optional(), answers: z.string().max(1000).optional() }),
+  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional() }),
   head: () => ({
     meta: [
       { title: "Book an appointment — Patel Tax & Bookkeeping" },
@@ -63,21 +63,8 @@ function BookPage() {
       }).catch(() => {});
       return;
     }
-    let answers: Answers = search.service && search.service !== draft.serviceSlug ? {} : draft.answers;
-    if (search.answers) {
-      try {
-        const parsed = z.object({ w2_count: z.number().int().min(0).max(20).optional(), freelance: z.boolean().optional(), interest: z.boolean().optional(), mortgage: z.boolean().optional(), student_loans: z.boolean().optional(), dependents: z.boolean().optional(), rental: z.boolean().optional(), irs_letter: z.boolean().optional() }).parse(JSON.parse(search.answers));
-        answers = { ...answers, ...parsed };
-      } catch { /* Ignore malformed prefill; booking stays usable. */ }
-    }
-    if (search.service || search.meeting || search.date || search.answers) update({
-      ...(search.service ? { serviceSlug: search.service } : {}),
-      ...(search.meeting ? { meetingType: search.meeting } : {}),
-      ...(search.date ? { date: search.date } : {}),
-      ...(search.slot ? { slot: search.slot } : {}),
-      answers,
-    });
-  }, [loaded, search.service, search.resume, search.meeting, search.date, search.slot, search.answers, update, fetchLead, navigate]);
+    if (search.service && search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
+  }, [loaded, search.service, search.resume, draft.serviceSlug, update, fetchLead, navigate]);
 
   const service = services.data?.find((s) => s.slug === draft.serviceSlug);
   let step = search.step ?? 0;
@@ -98,17 +85,17 @@ function BookPage() {
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
 
   if (!loaded) {
-    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-[14px] bg-sheet/60" /></BookingShell>;
+    return <BookingShell step={0}><div className="h-64 animate-pulse rounded-2xl bg-sheet/60" /></BookingShell>;
   }
 
   return (
     <BookingShell step={step}>
-      <div className={`mx-auto grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_280px]" : "max-w-2xl"}`}>
+      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[1fr_320px]" : ""}`}>
         <div className="min-w-0">
           {step > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => go(step - 1)} className="mb-6 -ml-3 text-muted-foreground hover:text-ink">
+            <button onClick={() => go(step - 1)} className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-ink">
               <ArrowLeft className="size-4" /> Back
-            </Button>
+            </button>
           )}
           <AnimatePresence mode="wait">
             <motion.div
@@ -171,9 +158,9 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-[14px] bg-sheet/70" />)}</div>}
+      {services.isLoading && <div className="grid gap-4 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-sheet/70" />)}</div>}
       {services.isError && (
-        <div className="rounded-[14px] border border-border bg-sheet p-6 text-sm">
+        <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
@@ -224,7 +211,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
       </div>
       <div className="space-y-3">
         {visible.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-[14px] border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
+          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-medium text-deep-ink">{q.label}</p>
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
@@ -288,12 +275,6 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   return (
     <>
       <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
-      {draft.slot && day?.slots.includes(draft.slot) && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-border bg-sheet p-4">
-          <p className="text-sm text-deep-ink">Your selected time: <strong className="tabular">{fmtDateLong(draft.slot)} · {fmtTime(draft.slot)}</strong></p>
-          <Button size="sm" onClick={onDone}>Continue <ArrowRight /></Button>
-        </div>
-      )}
       <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
@@ -303,9 +284,9 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-[14px] bg-sheet/70" /><div className="h-48 animate-pulse rounded-[14px] bg-sheet/70" /></div>}
+      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-48 animate-pulse rounded-2xl bg-sheet/70" /></div>}
       {(q.isError || q.data?.error) && (
-        <div className="rounded-[14px] border border-border bg-sheet p-6 text-sm">
+        <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
         </div>
       )}
@@ -319,7 +300,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
               const full = !d.closed && d.slots.length === 0;
               return (
                 <button key={d.date} disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-[14px] border px-2 py-2.5 transition-colors ${
+                  className={`flex w-[76px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-colors ${
                     active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
                   <span className="tabular font-serif text-2xl leading-tight">{c.day}</span>
@@ -342,7 +323,7 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
             )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
             {!firstOpen && !draft.date && (
-              <p className="rounded-[14px] border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
+              <p className="rounded-2xl border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
             )}
           </div>
         </>
@@ -358,11 +339,11 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
   const c = fmtDayChip(date);
   if (state === "done") {
-    return <div className="rounded-[14px] border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
+    return <div className="rounded-2xl border border-border bg-sheet p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
   }
   return (
     <form
-      className="rounded-[14px] border border-border bg-sheet p-5 shadow-sheet"
+      className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet"
       onSubmit={async (e) => {
         e.preventDefault();
         setState("saving");
@@ -424,7 +405,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   return (
     <>
       <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-border bg-sage/60 p-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sage/60 p-4">
         <div className="min-w-0">
           <p className="font-medium text-deep-ink">{service.name}</p>
           <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>
@@ -448,7 +429,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
         </div>
 
         {error && (
-          <div className="rounded-[14px] border border-warning/40 bg-sheet p-4" role="alert">
+          <div className="rounded-2xl border border-warning/40 bg-sheet p-4" role="alert">
             <p className="font-medium text-deep-ink">{error}</p>
             {alternatives.length > 0 ? (
               <>

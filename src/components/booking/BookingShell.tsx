@@ -1,33 +1,32 @@
 import { Link } from "@tanstack/react-router";
 import { Check, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 
 export const STEPS = ["Service", "Questions", "Time", "Details"] as const;
 
 export function BookingShell({ step, children }: { step?: number; children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-sheet md:py-8">
-      <div className="mx-auto max-w-5xl bg-background md:overflow-hidden md:rounded-[14px] md:border md:border-border md:shadow-lift">
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-5 sm:px-10">
+    <div className="min-h-screen">
+      <header className="border-b border-border/60 bg-paper/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-5">
           <Link to="/" className="flex min-w-0 items-baseline gap-2">
             <span className="font-serif text-2xl leading-none text-ink">Patel</span>
             <span className="truncate text-[13px] text-muted-foreground">Tax & Bookkeeping</span>
           </Link>
-          <Button asChild size="icon" variant="ghost" className="size-9 rounded-full"><Link to="/" aria-label="Leave booking"><X className="size-4" /></Link></Button>
+          <Link to="/" aria-label="Leave booking" className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-sage hover:text-ink">
+            <X className="size-4" />
+          </Link>
         </div>
       </header>
       {step !== undefined && <Progress step={step} />}
-      <main className="mx-auto min-h-[calc(100dvh-150px)] max-w-5xl px-5 pb-20 pt-8 sm:px-10 sm:pt-12 md:min-h-[590px]">{children}</main>
-      </div>
+      <main className="mx-auto max-w-5xl px-5 pb-24 pt-8 sm:pt-12">{children}</main>
     </div>
   );
 }
 
 function Progress({ step }: { step: number }) {
   return (
-    <div className="mx-auto max-w-5xl px-5 pt-6 sm:px-10">
+    <div className="mx-auto max-w-5xl px-5 pt-6">
       <ol className="flex items-center gap-2" aria-label="Booking progress">
         {STEPS.map((label, i) => {
           const done = i < step;
@@ -58,8 +57,8 @@ function Progress({ step }: { step: number }) {
 export function StepTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <p className="text-xs font-semibold uppercase text-ink">{eyebrow}</p>
-      <h1 tabIndex={-1} className="mt-2 font-serif text-4xl leading-tight text-deep-ink focus:outline-none sm:text-5xl">{title}</h1>
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink/70">{eyebrow}</p>
+      <h1 tabIndex={-1} className="mt-2 text-4xl leading-tight text-deep-ink focus:outline-none sm:text-5xl">{title}</h1>
       {sub && <p className="mt-3 text-[15px] text-deep-ink/70">{sub}</p>}
     </div>
   );

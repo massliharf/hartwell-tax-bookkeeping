@@ -20,7 +20,6 @@ import { Route as BookReturningRouteImport } from './routes/book.returning'
 import { Route as ClaimTokenRouteImport } from './routes/claim.$token'
 import { Route as ManageTokenRouteImport } from './routes/manage.$token'
 import { Route as MoveTokenRouteImport } from './routes/move.$token'
-import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as AuthenticatedOwnerIndexRouteImport } from './routes/_authenticated/owner.index'
 import { Route as AuthenticatedOwnerCalendarRouteImport } from './routes/_authenticated/owner.calendar'
 import { Route as AuthenticatedOwnerInsightsRouteImport } from './routes/_authenticated/owner.insights'
@@ -83,11 +82,6 @@ const ManageTokenRoute = ManageTokenRouteImport.update({
 const MoveTokenRoute = MoveTokenRouteImport.update({
   id: '/move/$token',
   path: '/move/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesSlugRoute = ServicesSlugRouteImport.update({
-  id: '/services/$slug',
-  path: '/services/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedOwnerIndexRoute = AuthenticatedOwnerIndexRouteImport.update({
@@ -153,7 +147,6 @@ export interface FileRoutesByFullPath {
   '/claim/$token': typeof ClaimTokenRoute
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
-  '/services/$slug': typeof ServicesSlugRoute
   '/book/': typeof BookIndexRoute
   '/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
   '/owner/insights': typeof AuthenticatedOwnerInsightsRoute
@@ -174,7 +167,6 @@ export interface FileRoutesByTo {
   '/claim/$token': typeof ClaimTokenRoute
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
-  '/services/$slug': typeof ServicesSlugRoute
   '/book': typeof BookIndexRoute
   '/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
   '/owner/insights': typeof AuthenticatedOwnerInsightsRoute
@@ -198,7 +190,6 @@ export interface FileRoutesById {
   '/claim/$token': typeof ClaimTokenRoute
   '/manage/$token': typeof ManageTokenRoute
   '/move/$token': typeof MoveTokenRoute
-  '/services/$slug': typeof ServicesSlugRoute
   '/book/': typeof BookIndexRoute
   '/_authenticated/owner/calendar': typeof AuthenticatedOwnerCalendarRoute
   '/_authenticated/owner/insights': typeof AuthenticatedOwnerInsightsRoute
@@ -222,7 +213,6 @@ export interface FileRouteTypes {
     | '/claim/$token'
     | '/manage/$token'
     | '/move/$token'
-    | '/services/$slug'
     | '/book/'
     | '/owner/calendar'
     | '/owner/insights'
@@ -243,7 +233,6 @@ export interface FileRouteTypes {
     | '/claim/$token'
     | '/manage/$token'
     | '/move/$token'
-    | '/services/$slug'
     | '/book'
     | '/owner/calendar'
     | '/owner/insights'
@@ -266,7 +255,6 @@ export interface FileRouteTypes {
     | '/claim/$token'
     | '/manage/$token'
     | '/move/$token'
-    | '/services/$slug'
     | '/book/'
     | '/_authenticated/owner/calendar'
     | '/_authenticated/owner/insights'
@@ -289,7 +277,6 @@ export interface RootRouteChildren {
   ClaimTokenRoute: typeof ClaimTokenRoute
   ManageTokenRoute: typeof ManageTokenRoute
   MoveTokenRoute: typeof MoveTokenRoute
-  ServicesSlugRoute: typeof ServicesSlugRoute
   BookIndexRoute: typeof BookIndexRoute
   ApiPublicCronAutomationsRoute: typeof ApiPublicCronAutomationsRoute
 }
@@ -371,13 +358,6 @@ declare module '@tanstack/react-router' {
       path: '/move/$token'
       fullPath: '/move/$token'
       preLoaderRoute: typeof MoveTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/services/$slug': {
-      id: '/services/$slug'
-      path: '/services/$slug'
-      fullPath: '/services/$slug'
-      preLoaderRoute: typeof ServicesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/owner/': {
@@ -492,7 +472,6 @@ const rootRouteChildren: RootRouteChildren = {
   ClaimTokenRoute: ClaimTokenRoute,
   ManageTokenRoute: ManageTokenRoute,
   MoveTokenRoute: MoveTokenRoute,
-  ServicesSlugRoute: ServicesSlugRoute,
   BookIndexRoute: BookIndexRoute,
   ApiPublicCronAutomationsRoute: ApiPublicCronAutomationsRoute,
 }

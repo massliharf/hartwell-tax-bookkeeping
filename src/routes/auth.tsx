@@ -79,7 +79,7 @@ function AuthPage() {
           <Button type="submit" size="lg" className="w-full" disabled={busy || !data}>{busy ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>
         </form>
         <button type="button" onClick={() => { setEmail(DEMO_EMAIL); setPassword(DEMO_PASSWORD); }}
-          className="mt-4 w-full rounded-[14px] border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-sage/50">
+          className="mt-4 w-full rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-sage/50">
           Demo access: <span className="tabular text-deep-ink">{DEMO_EMAIL}</span> / <span className="tabular text-deep-ink">{DEMO_PASSWORD}</span>
           <span className="block text-xs">Tap to fill in.</span>
         </button>

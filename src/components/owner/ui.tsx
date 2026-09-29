@@ -33,12 +33,12 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
 }
 
 export function LoadingRows({ n = 3 }: { n?: number }) {
-  return <div className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="h-28 animate-pulse rounded-[14px] bg-sheet" />)}</div>;
+  return <div className="space-y-4">{Array.from({ length: n }, (_, i) => <div key={i} className="h-28 animate-pulse rounded-2xl bg-sheet" />)}</div>;
 }
 
 export function ErrorNote({ onRetry }: { onRetry?: () => void }) {
   return (
-    <div className="rounded-[14px] border border-warning/40 bg-warning/10 p-5 text-sm text-deep-ink">
+    <div className="rounded-2xl border border-warning/40 bg-warning/10 p-5 text-sm text-deep-ink">
       This didn't load. {onRetry && <button onClick={onRetry} className="font-medium underline underline-offset-4">Try again</button>}
     </div>
   );
@@ -133,7 +133,7 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
   const isPdf = sel?.path.toLowerCase().endsWith(".pdf");
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setSel(null); }}>
-      <DialogContent className="max-w-4xl bg-paper p-0 sm:rounded-[14px]">
+      <DialogContent className="max-w-4xl bg-paper p-0 sm:rounded-2xl">
         <DialogHeader className="border-b border-border px-6 py-4">
           <DialogTitle className="font-serif text-2xl font-normal">{title}</DialogTitle>
           <DialogDescription>Private files. Links expire after a minute.</DialogDescription>

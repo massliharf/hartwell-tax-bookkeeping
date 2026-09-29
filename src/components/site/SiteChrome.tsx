@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { HOURS } from "@/lib/services";
-import { Button } from "@/components/ui/button";
 
 export function AnnouncementBar() {
   return (
@@ -22,18 +21,24 @@ export function AnnouncementBar() {
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
-      <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-5">
-        <Link to="/" className="shrink-0 font-serif text-[27px] leading-none text-ink">Patel Tax</Link>
-        <nav className="hidden items-center gap-8 text-sm font-medium text-deep-ink/80 md:flex">
-          <Link to="/" hash="services" className="hover:text-ink">Services</Link>
-          <Link to="/" hash="about" className="hover:text-ink">About</Link>
-          <Link to="/" hash="reviews" className="hover:text-ink">Reviews</Link>
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-paper/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
+        <Link to="/" className="flex min-w-0 items-baseline gap-2">
+          <span className="font-serif text-2xl leading-none text-ink">Patel</span>
+          <span className="truncate text-[13px] text-muted-foreground">Tax & Bookkeeping</span>
+        </Link>
+        <nav className="hidden items-center gap-7 text-sm text-deep-ink/80 md:flex">
+          <a href="#how" className="hover:text-ink">How it works</a>
+          <a href="#services" className="hover:text-ink">Services</a>
+          <a href="#about" className="hover:text-ink">About</a>
+          <a href="#faq" className="hover:text-ink">FAQ</a>
         </nav>
-        <div className="flex items-center gap-3 sm:gap-6">
-          <Link to="/owner" className="text-xs font-medium text-muted-foreground hover:text-ink sm:text-sm">Owner login</Link>
-          <Button asChild size="sm"><Link to="/book">Book <ArrowRight className="size-4" /></Link></Button>
-        </div>
+        <Link
+          to="/book"
+          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-medium text-paper transition hover:-translate-y-0.5"
+        >
+          Book <ArrowRight className="size-4" />
+        </Link>
       </div>
     </header>
   );
@@ -41,32 +46,32 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-20 bg-deep-ink text-primary-foreground/85">
+    <footer className="mt-24 bg-deep-ink text-paper/85">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
-          <p className="font-serif text-4xl text-primary-foreground">Patel Tax & Bookkeeping</p>
-          <p className="mt-3 max-w-sm text-sm text-primary-foreground/75">Priya Patel, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Edison.</p>
+          <p className="font-serif text-4xl text-paper">Patel Tax & Bookkeeping</p>
+          <p className="mt-3 max-w-sm text-sm text-paper/65">Priya Patel, EA · IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Edison.</p>
         </div>
         <div className="text-sm">
           <p className="mb-3 text-xs uppercase tracking-[0.14em] text-marigold">Visit</p>
           <p>Oak Tree Road</p>
           <p>Edison, NJ 08820</p>
-          <p className="mt-3 text-xs text-primary-foreground/75">Call details provided after booking.</p>
+          <a href="tel:+17325550142" className="tabular mt-3 block hover:text-paper">(732) 555-0142</a>
         </div>
         <div className="text-sm">
           <p className="mb-3 text-xs uppercase tracking-[0.14em] text-marigold">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4">
               <span>{h.days}</span>
-              <span className="text-primary-foreground/75">{h.time}</span>
+              <span className="text-paper/65">{h.time}</span>
             </p>
           ))}
         </div>
       </div>
-      <div className="border-t border-primary-foreground/20">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-primary-foreground/70">
+      <div className="border-t border-paper/10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-paper/50">
           <span>© {new Date().getFullYear()} Patel Tax & Bookkeeping</span>
-          <Link to="/owner" className="hover:text-primary-foreground">Owner login</Link>
+          <Link to="/owner" className="hover:text-paper">Owner login</Link>
         </div>
       </div>
     </footer>

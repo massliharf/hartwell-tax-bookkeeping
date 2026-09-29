@@ -1,5 +1,6 @@
-# Service detail and booking presentation
-- [x] Build service photo gallery, content sections, map, and responsive availability booking card.
-- [x] Restyle booking steps and confirmation without changing their business flow.
-- [x] Verify real availability and selection handoff on phone and desktop.
-- [ ] Replace illustrative portrait, reviews, ratings, and practice statistics before publishing. Blocker: Priya-approved material not supplied.
+# Launch quality pass
+- [ ] Test public booking, portal, waitlist, signature, and owner flows on mobile and desktop.
+- [ ] Repair broken flows and improve empty, loading, and error states.
+- [ ] Fix mobile layout, brand consistency, contrast, focus, and keyboard navigation.
+- [ ] Add route metadata, monogram favicon, social image, and Eastern-time consistency.
+- [ ] Re-test central flows and report remaining launch blockers.

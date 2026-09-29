@@ -11,8 +11,8 @@ Bookkeeping**, Montclair, New Jersey.
 
 ## 2. The client
 
-Claire Hartwell, EA (IRS Enrolled Agent). Solo practice, small office on Bloomfield
-Avenue, Montclair NJ. She prepares individual returns, self-employed returns, rental
+Claire Hartwell, EA (IRS Enrolled Agent). Solo practice, small office at 412 Bloomfield
+Avenue, Montclair, NJ 07042 (phone (973) 555-0142). She prepares individual returns, self-employed returns, rental
 property returns, and does small-business bookkeeping. No staff. Clients meet in
 person or by video call.
 

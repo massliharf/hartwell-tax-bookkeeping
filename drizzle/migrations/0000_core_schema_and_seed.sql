@@ -230,7 +230,7 @@ begin
     insert into clients (name, email, phone, is_returning, created_at)
     values (names[i],
             lower(regexp_replace(fn,'[^A-Za-z]','','g')) || '.' || lower(regexp_replace(ln,'[^A-Za-z]','','g')) || '@example.com',
-            '(732) 555-' || lpad((100 + i)::text, 4, '0'),
+            '(973) 555-' || lpad((100 + i)::text, 4, '0'),
             random() < 0.6,
             now() - (interval '1 day' * (30 + floor(random()*900))))
     returning id into cid;

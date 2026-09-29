@@ -63,11 +63,11 @@ function BookPage() {
       }).catch(() => {});
       return;
     }
-    let answers: Answers = draft.answers;
+    let answers: Answers = search.service && search.service !== draft.serviceSlug ? {} : draft.answers;
     if (search.answers) {
       try {
         const parsed = z.object({ w2_count: z.number().int().min(0).max(20).optional(), freelance: z.boolean().optional(), interest: z.boolean().optional(), mortgage: z.boolean().optional(), student_loans: z.boolean().optional(), dependents: z.boolean().optional(), rental: z.boolean().optional(), irs_letter: z.boolean().optional() }).parse(JSON.parse(search.answers));
-        answers = { ...draft.answers, ...parsed };
+        answers = { ...answers, ...parsed };
       } catch { /* Ignore malformed prefill; booking stays usable. */ }
     }
     if (search.service || search.meeting || search.date || search.answers) update({

@@ -55,6 +55,7 @@ function BookPage() {
   const { draft, update, loaded } = useBookingDraft();
   const services = useServices();
   const reduce = useReducedMotion();
+  const [bookingBusy, setBookingBusy] = useState(false);
   const applied = useRef(false);
 
   const fetchLead = useServerFn(getLeadDraft);
@@ -85,7 +86,7 @@ function BookPage() {
   const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
   const questionsComplete = questionsFor(draft.serviceSlug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean");
   const detailsComplete = draft.name.trim().length > 0 && emailOk(draft.email);
-  const canContinue = step === 0 ? !!service : step === 1 ? questionsComplete : step === 2 ? !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date : detailsComplete && !!draft.slot;
+  const canContinue = step === 0 ? !!service : step === 1 ? questionsComplete : step === 2 ? !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date : detailsComplete && !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date && !bookingBusy;
 
   if (!loaded) {
     return <BookingShell step={0}><div className="h-64  rounded-2xl bg-[#F0F0F0]" /></BookingShell>;
@@ -116,7 +117,7 @@ function BookPage() {
                 <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} />
               )}
               {step === 2 && service && <TimeStep service={service} draft={draft} update={update} />}
-              {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} onPickAgain={() => go(2)} />}
+              {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} busy={bookingBusy} setBusy={setBookingBusy} onPickAgain={() => go(2)} />}
             </motion.div>
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
@@ -286,7 +287,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
               const full = !d.closed && d.slots.length === 0;
               return (
                  <Button key={d.date} variant="secondary" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  className={`flex w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${
+                   className={`flex h-[68px] w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${
                      active ? "bg-primary text-primary-foreground hover:bg-primary" : d.closed ? "text-muted-foreground/50" : "bg-secondary hover:bg-fill-indicator"}`}>
                     <span className="text-[11px] opacity-80">{c.dow}</span>
                   <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
@@ -368,11 +369,10 @@ function BookingSummary({ service, draft, onPickAgain }: { service: Service; dra
   </div>;
 }
 
-function DetailsStep({ service, draft, update, onPickAgain }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void; onPickAgain: () => void }) {
+function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void; busy: boolean; setBusy: (value: boolean) => void; onPickAgain: () => void }) {
   const navigate = useNavigate();
   const book = useServerFn(bookAppointment);
   const lead = useServerFn(saveLead);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<string[]>([]);
   const lastLead = useRef("");
@@ -431,11 +431,11 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
               <>
                 <p className="mt-1 text-sm text-deep-ink/70">Here are the closest open times:</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {alternatives.map((a) => (
-                    <button key={a} type="button" disabled={busy} onClick={() => { update({ slot: a }); submit(a); }}
-                      className="tabular rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors duration-150 hover:bg-secondary/80">
-                      {fmtDayChip(new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(a))).dow} {fmtTime(a)}
-                    </button>
+                   {alternatives.map((a) => (
+                     <Button key={a} variant="secondary" type="button" disabled={busy} onClick={() => { update({ date: nyDay(a), slot: a }); onPickAgain(); }}
+                       className="tabular text-sm">
+                       {fmtDayChip(nyDay(a)).dow} {fmtTime(a)}
+                     </Button>
                   ))}
                 </div>
               </>

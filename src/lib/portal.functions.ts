@@ -53,8 +53,7 @@ export const confirmUpload = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin, appt } = await appointmentByToken(data.token);
     if (!appt || !data.path.startsWith(`${appt.id}/${data.itemId}-`)) throw new Error("Not allowed");
-    const folder = data.path.split("/")[0];
-    const name = data.path.split("/")[1];
+    const [folder = "", name = ""] = data.path.split("/");
     const { data: files } = await supabaseAdmin.storage.from(BUCKET).list(folder, { search: name });
     if (!files?.some((f) => f.name === name)) throw new Error("File not found");
     const { getNow } = await import("./clock.server");

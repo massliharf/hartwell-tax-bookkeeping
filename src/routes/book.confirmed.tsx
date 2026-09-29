@@ -47,7 +47,7 @@ function ConfirmedPage() {
     return (
       <BookingShell>
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-4xl text-deep-ink">We couldn't find that booking</h1>
+          <h1 className="font-serif text-4xl text-deep-ink">We couldn't find that booking</h1>
           <p className="mt-3 text-deep-ink/70">Check the link in your confirmation email, or book again.</p>
           <Button asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
         </div>
@@ -84,7 +84,7 @@ function ConfirmedPage() {
             <Check className="size-8" strokeWidth={2.5} />
           </motion.div>
           <motion.h1 initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-            className="mt-6 text-5xl leading-tight text-deep-ink sm:text-6xl">
+            className="mt-6 font-serif text-5xl leading-tight text-deep-ink sm:text-6xl">
             You're booked{first && `, ${first}`}.
           </motion.h1>
           <motion.p initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-3 text-deep-ink/70">

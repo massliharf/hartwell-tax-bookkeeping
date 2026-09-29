@@ -28,3 +28,4 @@
 - Demo tooling (src/lib/demo.functions.ts, src/components/owner/demo.tsx): "Reset demo data" restores public.demo_snapshot via demo_restore(); re-take with select demo_take_snapshot() after changing seed data. The public demo account (src/lib/demo.ts) is excluded from the one-owner check. _Why: judges need a repeatable live demo._
 - Calm Ledger is the current visual system; it supersedes the brief's old visual palette only, while its booking/privacy rules remain binding. _Why: the client explicitly updated the design direction._
 - Homepage booking prefill uses validated search values persisted in the booking draft; opening times always come from the availability server function. _Why: the homepage must not invent bookable slots._
+- Service detail pages use the shared `ServiceBookingCard` and the same `getAvailabilityWindow` source as booking; service-specific calendar selections enter the existing question step before final booking, so intake is never skipped.

@@ -103,12 +103,12 @@ function BookPage() {
 
   return (
     <BookingShell step={step}>
-      <div className={`grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[1fr_320px]" : ""}`}>
+      <div className={`mx-auto grid gap-10 ${step === 1 || step === 2 ? "lg:grid-cols-[minmax(0,1fr)_280px]" : "max-w-2xl"}`}>
         <div className="min-w-0">
           {step > 0 && (
-            <button onClick={() => go(step - 1)} className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-ink">
+            <Button variant="ghost" size="sm" onClick={() => go(step - 1)} className="mb-6 -ml-3 text-muted-foreground hover:text-ink">
               <ArrowLeft className="size-4" /> Back
-            </button>
+            </Button>
           )}
           <AnimatePresence mode="wait">
             <motion.div
@@ -288,6 +288,12 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   return (
     <>
       <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
+      {draft.slot && day?.slots.includes(draft.slot) && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-border bg-sheet p-4">
+          <p className="text-sm text-deep-ink">Your selected time: <strong className="tabular">{fmtDateLong(draft.slot)} · {fmtTime(draft.slot)}</strong></p>
+          <Button size="sm" onClick={onDone}>Continue <ArrowRight /></Button>
+        </div>
+      )}
       <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}

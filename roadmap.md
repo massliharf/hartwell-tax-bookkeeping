@@ -1,5 +1,5 @@
-# Calm Ledger refresh
-- [x] Apply the new typography, colors, buttons, shadows, and card shapes.
-- [x] Rebuild the homepage, service detail views, live time finder, and situation checklist.
-- [x] Pass selected choices into booking and test at 390px and desktop.
-- [ ] Replace illustrative portrait, reviews, ratings, and practice statistics with Priya-approved material before publishing. Blocker: authentic materials not supplied.
+# Service detail and booking presentation
+- [x] Build service photo gallery, content sections, map, and responsive availability booking card.
+- [x] Restyle booking steps and confirmation without changing their business flow.
+- [x] Verify real availability and selection handoff on phone and desktop.
+- [ ] Replace illustrative portrait, reviews, ratings, and practice statistics before publishing. Blocker: Priya-approved material not supplied.

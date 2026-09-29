@@ -115,7 +115,7 @@ function ConfirmedPage() {
         </motion.div>
 
         <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, type: "spring", damping: 22 }}
-          className="sheet-stack ledger mt-8 p-6">
+          className="sheet-stack mt-8 p-6">
           <div className="flex items-center gap-5">
             <ReadyRing value={a.ready_score} size={84} />
             <div className="min-w-0">

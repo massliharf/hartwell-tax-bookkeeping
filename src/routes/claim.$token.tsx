@@ -27,8 +27,8 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-xl px-5 py-16 sm:py-24">
-        <div className="sheet-stack ledger p-8 text-center">{children}</div>
+      <main className="mx-auto max-w-xl px-5 py-10 sm:py-16">
+        <div className="sheet-stack p-8 text-center">{children}</div>
       </main>
       <SiteFooter />
     </div>

@@ -47,7 +47,7 @@ function ReturningPage() {
         <form onSubmit={submit} className="sheet-stack space-y-4 p-6">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-12 bg-paper" />
+            <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-12 bg-white" />
           </div>
           {state === "notfound" && (
             <p className="text-sm text-deep-ink/80">We couldn't find that email. Try another, or <Link to="/book" className="font-medium text-ink underline">book as a new client</Link> — it only takes two minutes.</p>

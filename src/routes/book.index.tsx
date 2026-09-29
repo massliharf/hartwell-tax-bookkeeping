@@ -171,7 +171,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h2>
-                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-ink" : "border-[rgba(16,16,16,0.2)] bg-sheet"}`} />
+                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-[#1E5B47]" : "border-[rgba(16,16,16,0.2)] bg-sheet"}`} />
               </div>
               <p className="mt-1 text-sm text-deep-ink/70">{s.description}</p>
               <div className="mt-4 flex items-center justify-between text-sm">
@@ -203,7 +203,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
     <>
       <StepTitle eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
       <div className="mb-6 inline-flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink lg:hidden">
-        Your checklist so far: <span className="tabular font-medium">{count} documents</span>
+        Your checklist so far: <span className="tabular font-medium">{count} {count === 1 ? "document" : "documents"}</span>
       </div>
       <div className="space-y-3">
         {visible.map((q) => (
@@ -393,7 +393,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   return (
     <>
       <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-canvas py-2 pl-3 pr-2">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-canvas py-2 pl-3 pr-2">
         <div className="min-w-0">
           <p className="font-medium text-deep-ink">{service.name}</p>
           <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>

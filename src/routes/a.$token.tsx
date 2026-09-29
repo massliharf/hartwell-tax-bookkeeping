@@ -221,7 +221,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-fill-subtle"><X className="size-4" /></button>
         </div>
-        {q.isLoading && <div className="h-32 animate-pulse rounded-xl bg-fill-neutral/50" />}
+        {q.isLoading && <div className="h-32 animate-pulse rounded-lg bg-fill-neutral/50" />}
         {q.data?.error && <p className="text-sm">{q.data.error}</p>}
         {days.length > 0 && (
           <>
@@ -244,7 +244,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <button key={s} disabled={!!busy} onClick={() => pick(s)}
-                    className="tabular inline-flex h-11 items-center justify-center rounded-xl border border-border bg-paper text-sm font-medium hover:border-ink">
+                    className="tabular inline-flex h-11 items-center justify-center rounded-lg border border-border bg-white text-sm font-medium hover:border-ink">
                     {busy === s ? <Loader2 className="size-4 animate-spin" /> : fmtTime(s)}
                   </button>
                 ))}
@@ -337,9 +337,9 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <motion.div key="missing" {...flip}
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-marigold" : ""}`}>
+            className={`sheet-stack p-5 transition-colors ${drag ? "ring-2 ring-[#4F69F2]" : ""}`}>
             <div className="flex items-start gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-fill-neutral text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-deep-ink">{item.document_name}</p>
@@ -384,11 +384,11 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
   const ok = name.trim().length >= 2 && agree;
 
   return (
-    <section className="sheet-stack ledger border-l-4 border-l-marigold p-6">
+    <section className="sheet-stack p-6">
       <p className="text-[11px] font-medium uppercase text-warning">One last step</p>
       <h2 className="mt-1 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
-      <dl className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-paper/70 p-4 text-sm">
+      <dl className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>
         <div><dt className="text-muted-foreground">Tax year</dt><dd className="tabular font-medium text-deep-ink">2025</dd></div>
         <div><dt className="text-muted-foreground">Service</dt><dd className="font-medium text-deep-ink">{appt.services?.name}</dd></div>
@@ -401,7 +401,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-paper font-serif text-2xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-white font-serif text-2xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarCheck, Check, FileUp, KeyRound, Lock, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, CalendarCheck, Check, FileSpreadsheet, FileUp, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Reveal } from "@/components/brand/Reveal";
@@ -7,6 +7,15 @@ import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import claire from "@/assets/claire-portrait.jpg";
+
+const SERVICE_STYLE: Record<string, { icon: typeof Receipt; rgb: string }> = {
+  individual: { icon: Receipt, rgb: "79,105,242" },
+  "self-employed": { icon: Briefcase, rgb: "133,102,220" },
+  rental: { icon: HomeIcon, rgb: "30,91,71" },
+  extension: { icon: FileSpreadsheet, rgb: "196,120,44" },
+  bookkeeping: { icon: Building2, rgb: "33,124,150" },
+};
+
 
 const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
 const DESC = "Book a tax appointment with Claire Hartwell, EA in Montclair, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
@@ -53,20 +62,20 @@ function Home() {
 
 function Hero() {
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 md:grid-cols-[1.15fr_1fr] md:pt-24">
+    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-12 pt-10 md:grid-cols-[1.15fr_1fr] md:gap-14 md:pt-16">
       <Reveal>
         <Eyebrow>Claire Hartwell, EA · Montclair, New Jersey</Eyebrow>
-        <h1 className="mt-3 text-[40px] leading-[48px] tracking-[-0.4px] text-deep-ink sm:text-[56px] sm:leading-[64px]">
+        <h1 className="mt-3 text-[36px] font-medium leading-[44px] tracking-[-0.4px] text-deep-ink sm:text-[52px] sm:leading-[58px]">
           Taxes, without <em className="relative whitespace-nowrap not-italic text-ink">the chase.</em>
         </h1>
-        <p className="mt-5 max-w-md text-base text-[#363636]">
+        <p className="mt-4 max-w-md text-base leading-6 text-[#363636]">
           Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
         </p>
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg"><Link to="/book">Book an appointment <ArrowRight /></Link></Button>
           <Button asChild size="lg" variant="outline"><Link to="/book/returning">I'm a returning client</Link></Button>
         </div>
-        <p className="mt-5 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
       </Reveal>
       <Reveal delay={0.15}><HeroVisual /></Reveal>
     </section>
@@ -77,9 +86,9 @@ function TrustStrip() {
   const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
     <div className="px-2">
-      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-5 py-4">
+      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-5 py-2">
         {items.map((t) => (
-          <li key={t} className="flex h-6 items-center gap-1.5 rounded border border-border bg-fill-subtle px-2 text-xs text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
+          <li key={t} className="flex h-7 items-center gap-1.5 rounded-full border border-border bg-fill-subtle px-3 text-xs font-medium text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
         ))}
       </ul>
     </div>
@@ -90,8 +99,8 @@ function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; 
   return (
     <Reveal className="max-w-2xl">
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-1 text-[28px] leading-[38px] text-deep-ink">{title}</h2>
-      {sub && <p className="mt-2 text-sm text-muted-foreground">{sub}</p>}
+      <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">{title}</h2>
+      {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground">{sub}</p>}
     </Reveal>
   );
 }
@@ -103,20 +112,20 @@ function HowItWorks() {
     { icon: Check, title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need." },
   ];
   return (
-    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
+    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-14">
       <SectionHead eyebrow="How it works" title="Three steps. One appointment." />
-      <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-6">
+      <ol className="mt-8 grid gap-4 md:grid-cols-3">
         {steps.map((s, i) => (
-          <Reveal key={s.title} delay={i * 0.1}>
-            <li className="relative rounded-2xl bg-sheet px-7 py-4">
+          <Reveal key={s.title} delay={i * 0.1} className="h-full">
+            <li className="relative h-full rounded-2xl border border-border bg-sheet p-6">
               <div className="relative mb-4 h-12 w-12">
-                                                <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
+                <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
                   <s.icon className="size-5 text-ink" strokeWidth={1.75} />
                 </div>
                 <span className="tabular absolute -right-2 -top-2 grid size-4 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{i + 1}</span>
               </div>
-              <h3 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.title}</h3>
-              <p className="mt-1 max-w-xs font-serif text-base font-normal text-[#363636]">{s.text}</p>
+              <h3 className="text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.title}</h3>
+              <p className="mt-1.5 text-sm leading-[22px] text-[#363636]">{s.text}</p>
             </li>
           </Reveal>
         ))}
@@ -127,53 +136,68 @@ function HowItWorks() {
 
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24 py-24">
+    <section id="services" className="scroll-mt-24 py-14">
       <div className="mx-auto max-w-6xl px-5">
         <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
-        <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s, i) => (
-            <Reveal key={s.id} delay={(i % 3) * 0.08}>
-              <Link to="/book" search={{ service: s.id }} className="group flex h-full flex-col rounded-2xl bg-sheet p-5 transition-colors duration-200 hover:bg-surface-2">
-                <p className="tabular text-xs font-medium uppercase text-muted-foreground">{s.minutes} min</p>
-                <h3 className="mt-2 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
-                <p className="mt-2 text-sm text-deep-ink/70">{s.blurb}</p>
-                <div className="mt-auto flex items-end justify-between pt-5 mt-6">
-                  <p className="text-deep-ink">
-                    {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                    <span className="tabular text-xl font-semibold">${s.price}</span>
-                  </p>
-                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-ink">
-                    Book <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {SERVICES.map((s, i) => {
+            const style = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
+            const Icon = style.icon;
+            return (
+              <Reveal key={s.id} delay={(i % 3) * 0.08} className="h-full">
+                <Link
+                  to="/book"
+                  search={{ service: s.id }}
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-sheet p-5 transition-colors duration-200 hover:bg-fill-subtle"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
+                      <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />
+                    </span>
+                    <span className="tabular rounded border border-border px-1.5 text-[10px] font-medium uppercase leading-4 tracking-[0.2px] text-muted-foreground">{s.minutes} min</span>
+                  </div>
+                  <h3 className="mt-4 text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.name}</h3>
+                  <p className="mt-1.5 text-sm leading-[22px] text-muted-foreground">{s.blurb}</p>
+                  <div className="mt-auto flex items-end justify-between pt-6">
+                    <p className="text-deep-ink">
+                      {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                      <span className="tabular text-xl font-semibold">${s.price}</span>
+                    </p>
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-ink">
+                      Book <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
+
 function About() {
   return (
-    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-14 px-5 py-24 md:grid-cols-[0.9fr_1.1fr]">
+    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-10 px-5 py-14 md:grid-cols-[0.9fr_1.1fr]">
       <Reveal>
         <figure className="relative mx-auto w-full max-w-xs">
-                    <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
-                        <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
+            <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
           <figcaption className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white backdrop-blur-sm">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>
         <Eyebrow>About Claire</Eyebrow>
-        <h2 className="mt-1 text-[28px] leading-[38px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
-        <div className="mt-4 space-y-3 rounded-2xl bg-sheet px-7 py-4 font-serif text-base font-normal text-[#363636]">
+        <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
+        <div className="mt-4 space-y-3 rounded-2xl border border-border bg-sheet p-6 text-base leading-6 text-[#363636]">
           <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
           <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
         </div>
-        <p className="mt-4 font-serif text-xl text-ink">— Claire</p>
+        <p className="mt-4 text-lg font-medium text-ink">— Claire</p>
+
       </Reveal>
     </section>
   );
@@ -186,15 +210,16 @@ function Testimonials() {
     { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
-    <section className="py-24">
+    <section className="py-14">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal><p className="text-[10px] font-semibold uppercase leading-6 text-muted-foreground">Kind words</p></Reveal>
         <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible [scrollbar-width:none]">
           {t.map((x, i) => (
-            <Reveal key={x.n} delay={i * 0.1}>
-              <figure className="h-full w-[85vw] shrink-0 snap-start rounded-2xl bg-[#2B2B2B] p-6 text-white md:w-auto">
-                <blockquote className="font-serif text-xl font-medium leading-[30px] tracking-[-0.2px]">"{x.q}"</blockquote>
-                <figcaption className="mt-5 text-sm"><span className="text-white">{x.n}</span><span className="block text-white/60">{x.r}</span></figcaption>
+            <Reveal key={x.n} delay={i * 0.1} className="h-full">
+              <figure className="flex h-full w-[85vw] shrink-0 snap-start flex-col rounded-2xl bg-[#2B2B2B] p-6 text-white md:w-auto">
+                <blockquote className="text-lg font-medium leading-[28px] tracking-[-0.2px]">"{x.q}"</blockquote>
+                <figcaption className="mt-auto pt-5 text-sm"><span className="text-white">{x.n}</span><span className="block text-white/60">{x.r}</span></figcaption>
+
               </figure>
             </Reveal>
           ))}
@@ -212,8 +237,8 @@ function Privacy() {
     { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-5 py-24">
-      <div className="rounded-2xl bg-sheet px-7 py-8 sm:p-12">
+    <section className="mx-auto max-w-6xl px-5 py-14">
+      <div className="rounded-2xl border border-border bg-sheet p-6 sm:p-10">
         <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {points.map((p, i) => (
@@ -237,7 +262,7 @@ function Faq() {
     { q: "What are the key deadlines?", a: "Most individual returns are due April 15. Extended returns are due October 15. Estimated taxes are due in April, June, September and January." },
   ];
   return (
-    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-10 px-5 py-16 md:grid-cols-[0.8fr_1.2fr]">
+    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-8 px-5 py-14 md:grid-cols-[0.8fr_1.2fr]">
       <SectionHead eyebrow="Questions" title="Good to know." />
       <Reveal>
         <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-3">

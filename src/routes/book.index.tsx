@@ -172,21 +172,21 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
-      <div className="grid gap-5 sm:grid-cols-2">
+       <div className="grid gap-4">
         {services.data?.map((s) => {
           const active = s.slug === selected;
           return (
             <button
               key={s.id}
               onClick={() => onPick(s.slug)}
-              className={`sheet-stack group p-5 text-left transition-transform duration-300 hover:-translate-y-0.5 ${active ? "ring-2 ring-ink" : ""}`}
+               className={`sheet-stack group w-full p-5 text-left transition-transform duration-200 hover:-translate-y-0.5 ${active ? "ring-2 ring-ink" : ""}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-2xl leading-tight text-deep-ink">{s.name}</h2>
                 <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-ink" : "border-border"}`} />
               </div>
               <p className="mt-1 text-sm text-deep-ink/70">{s.description}</p>
-              <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-sm">
+               <div className="mt-5 flex items-center justify-between text-sm">
                 <span className="tabular text-muted-foreground">{s.duration_min} min</span>
                 <span className="text-deep-ink">
                   {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
@@ -271,6 +271,27 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
+  const [loadingSince] = useState(() => Date.now());
+  const [skeletonDone, setSkeletonDone] = useState(false);
+  useEffect(() => {
+    if (!q.data && !q.isError) return;
+    const timer = window.setTimeout(() => setSkeletonDone(true), Math.max(0, 350 - (Date.now() - loadingSince)));
+    return () => window.clearTimeout(timer);
+  }, [q.data, q.isError, loadingSince]);
+  const waiting = q.isLoading || (!skeletonDone && !q.isError);
+  const visibleSlots = (slots: string[]) => {
+    const halfHours = slots.filter((slot) => {
+      const minute = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", minute: "2-digit" }).format(new Date(slot));
+      return minute === "00" || minute === "30";
+    });
+    if (halfHours.length <= 8) return halfHours;
+    const indexes = Array.from({ length: 8 }, (_, i) => Math.round(i * (halfHours.length - 1) / 7));
+    return indexes.map((i) => halfHours[i]).filter((slot): slot is string => Boolean(slot));
+  };
+  const group = (slot: string) => {
+    const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).format(new Date(slot)));
+    return hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening";
+  };
 
   return (
     <>
@@ -284,14 +305,14 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
         ))}
       </div>
 
-      {q.isLoading && <div className="space-y-4"><div className="h-20 animate-pulse rounded-2xl bg-sheet/70" /><div className="h-48 animate-pulse rounded-2xl bg-sheet/70" /></div>}
+       {waiting && <div className="space-y-5" aria-label="Loading available times"><div className="flex gap-2 overflow-hidden">{[0,1,2,3,4,5].map(i => <div key={i} className="h-[72px] w-[76px] shrink-0 animate-pulse rounded-xl bg-muted" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{[0,1,2,3,4,5,6,7].map(i => <div key={i} className="h-11 animate-pulse rounded-xl bg-muted" />)}</div></div>}
       {(q.isError || q.data?.error) && (
         <div className="rounded-2xl border border-border bg-sheet p-6 text-sm">
           {q.data?.error ?? "We couldn't load times."} <button className="font-medium text-ink underline" onClick={() => q.refetch()}>Try again</button>
         </div>
       )}
 
-      {days.length > 0 && (
+       {!waiting && days.length > 0 && (
         <>
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2" role="listbox" aria-label="Choose a day">
             {days.map((d) => {
@@ -304,23 +325,22 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
                     active ? "border-ink bg-ink text-paper" : d.closed ? "border-transparent text-muted-foreground/50" : "border-border bg-sheet hover:border-ink"}`}>
                   <span className="text-[11px] uppercase tracking-wider opacity-70">{c.dow}</span>
                   <span className="tabular font-sans text-2xl leading-tight">{c.day}</span>
-                  <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
+                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-70"}`}>{d.closed ? "Closed" : full ? "Full" : visibleSlots(d.slots).length <= 2 ? "Only 2 left" : c.month}</span>
                 </button>
               );
             })}
           </div>
 
           <div className="mt-6">
-            {day && day.slots.length > 0 && (
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                {day.slots.map((s) => (
-                  <button key={s} onClick={() => { update({ date: day.date, slot: s }); onDone(); }}
-                    className={`tabular h-11 rounded-xl border text-sm font-medium transition-all hover:-translate-y-0.5 ${draft.slot === s ? "border-ink bg-ink text-paper" : "border-border bg-sheet text-deep-ink hover:border-ink"}`}>
-                    {fmtTime(s)}
-                  </button>
-                ))}
-              </div>
-            )}
+             {day && day.slots.length > 0 && <div className="space-y-6">
+               {(["Morning", "Afternoon", "Evening"] as const).map(period => {
+                 const times = visibleSlots(day.slots).filter(s => group(s) === period);
+                 return times.length ? <div key={period}><h2 className="mb-3 text-sm font-semibold text-muted-foreground">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                   {times.map((s) => <Button key={s} variant={draft.slot === s && draft.date === day.date ? "default" : "outline"} aria-pressed={draft.slot === s && draft.date === day.date} onClick={() => update({ date: day.date, slot: s })} className="tabular h-11 rounded-xl">{fmtTime(s)}</Button>)}
+                 </div></div> : null;
+               })}
+               <Button size="lg" disabled={!draft.slot || draft.date !== day.date} onClick={onDone}>Continue <ArrowRight /></Button>
+             </div>}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
             {!firstOpen && !draft.date && (
               <p className="rounded-2xl border border-border bg-sheet p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
@@ -405,15 +425,7 @@ function DetailsStep({ service, draft, update, onPickAgain }: { service: Service
   return (
     <>
       <StepTitle eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sage/60 p-4">
-        <div className="min-w-0">
-          <p className="font-medium text-deep-ink">{service.name}</p>
-          <p className="text-sm text-deep-ink/70">{draft.slot && `${fmtDateLong(draft.slot)} · ${fmtTime(draft.slot)}`} · {draft.meetingType === "video" ? "Video call" : "In person"}</p>
-        </div>
-        <button onClick={onPickAgain} className="text-sm font-medium text-ink underline underline-offset-4">Change</button>
-      </div>
-
-      <form className="max-w-md space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot) submit(draft.slot); }}>
+       <form className="mx-auto max-w-lg space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot) submit(draft.slot); }}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>
           <Input id="name" autoComplete="name" required value={draft.name} onChange={(e) => update({ name: e.target.value })} onBlur={saveLeadNow} className="h-12 bg-sheet" />

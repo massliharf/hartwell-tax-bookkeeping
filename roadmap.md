@@ -1,4 +1,4 @@
-- [ ] Align homepage sections and trust chips on one grid with 64px/96px section spacing.
-- [ ] Convert services to equal two-column list rows; simplify About and lighten testimonials.
-- [ ] Add a working mobile header menu and keep checklist date/time on one line.
-- [ ] Verify mobile and desktop layouts and menu interaction.
+- [x] Align homepage sections and trust chips on one grid with 64px/96px section spacing.
+- [x] Convert services to equal two-column list rows; simplify About and lighten testimonials.
+- [x] Add a working mobile header menu and keep checklist date/time on one line.
+- [x] Verify mobile and desktop layouts and menu interaction.

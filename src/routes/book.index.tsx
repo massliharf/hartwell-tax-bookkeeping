@@ -288,6 +288,12 @@ function TimeStep({ service, draft, update, onDone }: { service: Service; draft:
   return (
     <>
       <StepTitle eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name} · ${service.duration_min} minutes. All times Eastern.`} />
+      {draft.slot && day?.slots.includes(draft.slot) && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-border bg-sheet p-4">
+          <p className="text-sm text-deep-ink">Your selected time: <strong className="tabular">{fmtDateLong(draft.slot)} · {fmtTime(draft.slot)}</strong></p>
+          <Button size="sm" onClick={onDone}>Continue <ArrowRight /></Button>
+        </div>
+      )}
       <div className="mb-6 inline-flex rounded-full border border-border bg-sheet p-1" role="radiogroup" aria-label="Meeting type">
         {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
           <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}

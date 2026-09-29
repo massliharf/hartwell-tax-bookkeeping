@@ -45,7 +45,7 @@ export function ServiceBookingCard({ service }: { service: Service }) {
   const baseMonth = days[0] ? monthStart(days[0].date) : null;
   const months = baseMonth ? [0,1].map(i=>new Date(Date.UTC(baseMonth.getUTCFullYear(),baseMonth.getUTCMonth()+monthOffset+i,1,12))) : [];
   const docs = previewChecklist(service.id,{});
-  const go = () => { if (!activeSlot) return; setSheetOpen(false); navigate({to:"/book",search:{service:service.id,date:activeDate,slot:activeSlot,meeting,step:2}}); };
+  const go = () => { if (!activeSlot) return; setSheetOpen(false); navigate({to:"/book",search:{service:service.id,date:activeDate,slot:activeSlot,meeting,step:1}}); };
   useEffect(()=>{ if (!sheetOpen) return; const prev=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{document.body.style.overflow=prev;}; },[sheetOpen]);
   const picker = <div className="space-y-6">
     <div className="flex items-center justify-between border-b border-border pb-4"><div><p className="text-xs text-muted-foreground">{service.from ? "From" : "Price"}</p><p className="tabular font-serif text-3xl text-deep-ink">${service.price}</p></div><span className="text-sm text-muted-foreground">{service.minutes} minutes</span></div>

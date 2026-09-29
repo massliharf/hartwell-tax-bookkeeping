@@ -17,7 +17,7 @@ import { getLeadDraft } from "@/lib/automations.functions";
 import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
-  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional() }),
+  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional(), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), slot: z.string().datetime({ offset: true }).optional(), meeting: z.enum(["in_person", "video"]).optional(), answers: z.string().max(1000).optional() }),
   head: () => ({
     meta: [
       { title: "Book an appointment — Patel Tax & Bookkeeping" },
@@ -63,8 +63,21 @@ function BookPage() {
       }).catch(() => {});
       return;
     }
-    if (search.service && search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
-  }, [loaded, search.service, search.resume, draft.serviceSlug, update, fetchLead, navigate]);
+    let answers: Answers = draft.answers;
+    if (search.answers) {
+      try {
+        const parsed = z.object({ w2_count: z.number().int().min(0).max(20).optional(), freelance: z.boolean().optional(), interest: z.boolean().optional(), mortgage: z.boolean().optional(), student_loans: z.boolean().optional(), dependents: z.boolean().optional(), rental: z.boolean().optional(), irs_letter: z.boolean().optional() }).parse(JSON.parse(search.answers));
+        answers = { ...draft.answers, ...parsed };
+      } catch { /* Ignore malformed prefill; booking stays usable. */ }
+    }
+    if (search.service || search.meeting || search.date || search.answers) update({
+      ...(search.service ? { serviceSlug: search.service } : {}),
+      ...(search.meeting ? { meetingType: search.meeting } : {}),
+      ...(search.date ? { date: search.date } : {}),
+      ...(search.slot ? { slot: search.slot } : {}),
+      answers,
+    });
+  }, [loaded, search.service, search.resume, search.meeting, search.date, search.slot, search.answers, update, fetchLead, navigate]);
 
   const service = services.data?.find((s) => s.slug === draft.serviceSlug);
   let step = search.step ?? 0;

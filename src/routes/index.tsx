@@ -111,8 +111,8 @@ function HowItWorks() {
             <li className="relative">
               <div className="relative mb-6 h-28 w-40">
                 <div className="absolute left-6 top-3 h-24 w-28 rotate-6 rounded-xl border border-border bg-paper-deep" />
-                <div className="absolute left-3 top-1.5 h-24 w-28 rotate-2 rounded-xl border border-border bg-sheet shadow-sheet" />
-                <div className="ledger absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet shadow-sheet">
+                <div className="absolute left-3 top-1.5 h-24 w-28 rotate-2 rounded-xl border border-border bg-sheet" />
+                <div className="ledger absolute left-0 top-0 grid h-24 w-28 place-items-center rounded-xl border border-border bg-sheet">
                   <s.icon className="size-8 text-ink" strokeWidth={1.5} />
                 </div>
                 <span className="tabular absolute -right-1 -top-2 grid size-8 place-items-center rounded-full bg-marigold font-serif text-lg text-deep-ink">{i + 1}</span>
@@ -162,12 +162,12 @@ function About() {
     <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-14 px-5 py-24 md:grid-cols-[0.9fr_1.1fr]">
       <Reveal>
         <figure className="relative mx-auto w-full max-w-xs">
-          <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-[1.5rem] border border-ink/20" />
-          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[1.5rem] border border-border bg-sheet shadow-lift">
+          <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-2xl border border-ink/20" />
+          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl border border-border bg-sheet shadow-lift">
             <div className="ledger absolute inset-0 opacity-60" />
             <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           </div>
-          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper shadow-sheet">Claire Hartwell, EA</figcaption>
+          <figcaption className="absolute -bottom-5 left-5 rounded-full bg-ink px-4 py-1.5 text-xs text-paper">Claire Hartwell, EA</figcaption>
         </figure>
       </Reveal>
       <Reveal delay={0.1}>

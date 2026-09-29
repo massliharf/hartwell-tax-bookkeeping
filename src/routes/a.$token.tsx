@@ -216,7 +216,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
 
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-      <div className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet">
+      <div className="rounded-2xl border border-border bg-sheet p-5">
         <div className="mb-4 flex items-center justify-between">
           <p className="font-serif text-2xl text-deep-ink">Pick a new time</p>
           <button onClick={onClose} aria-label="Close" className="grid size-8 place-items-center rounded-full hover:bg-sage"><X className="size-4" /></button>
@@ -314,7 +314,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
     <li style={{ perspective: 900 }}>
       <AnimatePresence mode="wait" initial={false}>
         {item.status === "uploaded" ? (
-          <motion.div key="up" {...flip} className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5 shadow-sheet">
+          <motion.div key="up" {...flip} className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5">
             <motion.span initial={reduce ? false : { scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 500, damping: 16, delay: 0.2 }}
               className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-paper"><Check className="size-5" strokeWidth={3} /></motion.span>
             <div className="min-w-0 flex-1">

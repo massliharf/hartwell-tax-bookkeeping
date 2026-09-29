@@ -43,10 +43,10 @@ export function DemoTools() {
     <>
       <div className="fixed bottom-5 right-5 z-40 flex gap-2">
         <button onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview"
-          className={`grid h-11 w-11 place-items-center rounded-full border border-border shadow-sheet transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-sage"}`}>
+          className={`grid h-11 w-11 place-items-center rounded-full border border-border transition-colors ${phone ? "bg-ink text-primary-foreground" : "bg-sheet text-ink hover:bg-sage"}`}>
           <Smartphone className="h-4 w-4" />
         </button>
-        <button onClick={() => setOpen(true)} className="flex h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm text-primary-foreground shadow-sheet">
+        <button onClick={() => setOpen(true)} className="flex h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm text-primary-foreground">
           <FlaskConical className="h-4 w-4" /> Demo
         </button>
       </div>
@@ -112,9 +112,9 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
           <option value="latest">Follow latest message</option>
           {people.map(([r, n]) => <option key={r} value={r}>{n}</option>)}
         </select>
-        <button onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full bg-sheet shadow-sheet"><X className="h-4 w-4" /></button>
+        <button onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full bg-sheet"><X className="h-4 w-4" /></button>
       </div>
-      <div className="rounded-[44px] bg-deep-ink p-2.5 shadow-sheet">
+      <div className="rounded-[44px] bg-deep-ink p-2.5">
         <div className="relative h-[540px] overflow-hidden rounded-[36px] bg-paper">
           <div className="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-deep-ink" />
           <div className="border-b border-border bg-sheet px-4 pb-2 pt-9 text-center">
@@ -129,7 +129,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   {m.channel === "sms" ? (
                     <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-sage px-3 py-2 text-[13px] leading-snug text-deep-ink [overflow-wrap:anywhere]">{m.body}</div>
                   ) : (
-                    <div className="rounded-2xl border border-border bg-sheet p-3 shadow-sheet">
+                    <div className="rounded-2xl border border-border bg-sheet p-3">
                       <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>
                       <p className="mt-1 font-serif text-[15px] leading-tight text-ink">{m.subject}</p>
                       <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-deep-ink/75">{m.body}</p>

@@ -84,7 +84,7 @@ function ConfirmedPage() {
             initial={reduce ? false : { scale: 0, rotate: -40 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 380, damping: 16, delay: 0.25 }}
-            className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-paper shadow-sheet"
+            className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-paper"
           >
             <Check className="size-8" strokeWidth={2.5} />
           </motion.div>

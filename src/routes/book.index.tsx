@@ -205,7 +205,7 @@ function QuestionsStep({ slug, answers, onChange, onDone, count }: { slug?: stri
       </div>
       <div className="space-y-3">
         {visible.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 shadow-sheet sm:flex-row sm:items-center sm:justify-between">
+          <div key={q.key} className="flex flex-col gap-3 rounded-2xl border border-border bg-sheet p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-medium text-deep-ink">{q.label}</p>
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
@@ -329,7 +329,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   }
   return (
     <form
-      className="rounded-2xl border border-border bg-sheet p-5 shadow-sheet"
+      className="rounded-2xl border border-border bg-sheet p-5"
       onSubmit={async (e) => {
         e.preventDefault();
         setState("saving");

@@ -58,7 +58,7 @@ function OwnerLayout() {
   }
 
   const link = "flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-deep-ink/75 transition-colors hover:bg-sage hover:text-deep-ink";
-  const active = { className: "bg-sheet text-ink font-medium shadow-sheet" };
+  const active = { className: "bg-sheet text-ink font-medium" };
 
   return (
     <div className="min-h-screen bg-paper md:grid md:grid-cols-[232px_1fr]">

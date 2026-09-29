@@ -17,7 +17,7 @@ export function DocumentStack({ docs }: { docs: StackDoc[] }) {
             animate={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            className="flex items-center gap-3 rounded-xl border border-border bg-sheet px-3.5 py-3 shadow-sheet"
+            className="flex items-center gap-3 rounded-xl border border-border bg-sheet px-3.5 py-3"
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sage text-ink">
               <FileText className="size-4" strokeWidth={1.75} />

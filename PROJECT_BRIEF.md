@@ -83,7 +83,7 @@ practice, not a SaaS dashboard and not a dusty accountant.
 | Success green | `#2F7D5B` | success |
 | Warning amber | `#C97B22` | warning |
 
-**Type:** headings in "Instrument Serif" (large, elegant), body and UI in "Inter",
+**Type:** headings in "Figtree" (large, elegant), body and UI in "Inter",
 numbers tabular.
 
 **Visual language:** paper and documents. Cards that feel like neat stacked sheets,

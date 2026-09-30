@@ -41,7 +41,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
         <Wordmark />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-          {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-8 items-center rounded-lg px-3 text-[13px] font-medium text-[#363636] transition-colors duration-150 hover:bg-fill-subtle hover:text-deep-ink">{l.label}</a>)}
+          {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-8 items-center rounded-lg px-3 text-[13px] font-medium text-body transition-colors duration-150 hover:bg-fill-subtle hover:text-deep-ink">{l.label}</a>)}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild variant="ghost"><Link to="/book/returning">My appointment</Link></Button>
@@ -49,7 +49,7 @@ export function SiteHeader() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="md:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-[rgba(16,16,16,0.1)] p-2 shadow-lift">
+          <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-border p-2 shadow-lift">
             {LINKS.map((l) => <DropdownMenuItem key={l.href} asChild className="h-11 rounded-lg px-3 text-sm"><a href={l.href}>{l.label}</a></DropdownMenuItem>)}
             <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">My appointment</Link></DropdownMenuItem>
             <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Book an appointment</Link></Button></div>
@@ -62,7 +62,7 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 bg-surface-2 text-[#363636] lg:mt-24">
+    <footer className="mt-16 bg-surface-2 text-body lg:mt-24">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr]">
         <div>
           <p className="text-base font-semibold text-deep-ink">Hartwell Tax & Bookkeeping</p>

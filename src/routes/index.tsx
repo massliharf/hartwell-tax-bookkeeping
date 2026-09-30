@@ -74,14 +74,14 @@ function Hero() {
     <section className={`${panel} overflow-hidden`}>
       <div className="grid items-center gap-10 px-5 pb-10 pt-10 sm:px-10 md:grid-cols-[1.15fr_1fr] md:gap-12 md:pb-14 md:pt-16">
         <div>
-          <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-[rgba(16,16,16,0.1)] bg-sheet pl-1 pr-3 text-xs text-[#363636] transition-colors duration-150 hover:bg-surface-2">
+          <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-border bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:bg-surface-2">
             <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-primary-foreground">Oct 15</span>
             Extensions are due. <span className="font-medium text-ink group-hover:underline">Book your slot</span>
           </Link>
           <h1 className="mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
             Taxes, without the chase.
           </h1>
-          <p className="mt-5 max-w-md text-base leading-7 text-[#363636] sm:text-lg">
+          <p className="mt-5 max-w-md text-base leading-7 text-body sm:text-lg">
             Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -115,7 +115,7 @@ function Hero() {
         </ul>
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
           {trust.map((t) => (
-            <li key={t} className="flex items-center gap-1.5 text-xs text-[#363636]"><Check className="size-3.5 text-ink" strokeWidth={2.5} />{t}</li>
+            <li key={t} className="flex items-center gap-1.5 text-xs text-body"><Check className="size-3.5 text-ink" strokeWidth={2.5} />{t}</li>
           ))}
         </ul>
       </div>
@@ -145,7 +145,7 @@ function WhatClaireDoes() {
         {who.map((w) => (
           <article key={w.title} className="flex gap-4 rounded-2xl border border-border p-5">
             <ServiceIcon service={w.svc} size={40} />
-            <div><h3 className="text-[15px] font-medium text-deep-ink">{w.title}</h3><p className="mt-1 text-sm leading-[22px] text-[#363636]">{w.text}</p></div>
+            <div><h3 className="text-[15px] font-medium text-deep-ink">{w.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{w.text}</p></div>
           </article>
         ))}
       </div>
@@ -153,7 +153,7 @@ function WhatClaireDoes() {
         <h3 className="text-[15px] font-medium text-deep-ink">Every return includes</h3>
         <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {included.map((x) => (
-            <li key={x} className="flex items-start gap-3 text-sm leading-[22px] text-[#363636]"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-success/10 text-success"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
+            <li key={x} className="flex items-start gap-3 text-sm leading-[22px] text-body"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-success/10 text-success"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
           ))}
         </ul>
       </div>
@@ -200,7 +200,7 @@ function StepPreviewReady() {
   return (
     <div className="flex items-center gap-4">
       <ReadyRing value={100} size={88} stroke={7} />
-      <div className="text-xs leading-5 text-[#363636]">
+      <div className="text-xs leading-5 text-body">
         <p className="font-medium text-deep-ink">All set for Thursday</p>
         <p>Claire has checked every document.</p>
       </div>
@@ -224,7 +224,7 @@ function HowItWorks() {
             <div className="px-3 pb-4 pt-5">
               <p className="tabular text-xs font-medium text-muted-foreground">Step {i + 1}</p>
               <h3 className="mt-1 text-lg font-medium leading-7 text-deep-ink">{s.title}</h3>
-              <p className="mt-1 text-sm leading-[22px] text-[#363636]">{s.text}</p>
+              <p className="mt-1 text-sm leading-[22px] text-body">{s.text}</p>
             </div>
           </li>
         ))}
@@ -305,7 +305,7 @@ function About() {
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
           <h2 className="t-section text-deep-ink">A neighbor who happens to love the tax code.</h2>
-          <div className="mt-5 space-y-3 text-base leading-7 text-[#363636]">
+          <div className="mt-5 space-y-3 text-base leading-7 text-body">
             <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
             <p>My practice is small on purpose. When you book with me, you work with me, from the first document to the final signature.</p>
           </div>
@@ -363,7 +363,7 @@ function Privacy() {
         {points.map((p) => (
           <div key={p.title} className="flex gap-4 rounded-2xl bg-surface-2 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
-            <div><h3 className="text-[15px] font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-[22px] text-[#363636]">{p.text}</p></div>
+            <div><h3 className="text-[15px] font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{p.text}</p></div>
           </div>
         ))}
       </div>
@@ -411,7 +411,7 @@ function Faq() {
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-border">
             <AccordionTrigger className="py-4 text-left text-[15px] font-medium text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
-            <AccordionContent className="pb-4 text-sm leading-[22px] text-[#363636]">{x.a}</AccordionContent>
+            <AccordionContent className="pb-4 text-sm leading-[22px] text-body">{x.a}</AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>

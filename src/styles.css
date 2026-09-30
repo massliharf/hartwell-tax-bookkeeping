@@ -51,6 +51,7 @@
   --color-fill-neutral: var(--fill-neutral);
   --color-fill-subtle: var(--fill-subtle);
   --color-fill-selected: var(--fill-selected);
+  --color-body: #363636;
   --color-paper: var(--paper);
   --color-sheet: var(--sheet);
   --color-paper-deep: var(--paper-deep);

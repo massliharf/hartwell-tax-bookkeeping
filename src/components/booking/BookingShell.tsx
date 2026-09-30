@@ -13,7 +13,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
             <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
             <span className="truncate text-xs text-muted-foreground">& Bookkeeping</span>
           </Link>
-          <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-[#DBDBDB] sm:size-8 sm:rounded-lg">
+          <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
             <X className="size-4" />
           </Link>
         </div>

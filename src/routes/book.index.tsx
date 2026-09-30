@@ -221,11 +221,11 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
             </div>
             {q.type === "count" ? (
               <div className="flex h-10 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
-                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-indicator">
+                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-selected">
                   <Minus className="size-3.5" />
                 </button>
                 <span className="tabular w-6 text-center text-xs font-semibold">{(answers[q.key] as number) ?? 0}</span>
-                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-indicator">
+                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-selected">
                   <Plus className="size-3.5" />
                 </button>
               </div>
@@ -237,7 +237,7 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
-                     className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
+                     className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-fill-selected text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
                   >
                     {v ? "Yes" : "No"}
                   </button>
@@ -325,7 +325,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
                  });
                  return slots.length ? <div key={period}><h2 className="mb-2 text-sm font-medium text-deep-ink">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{slots.map((s) => (
                    <Button key={s} variant="secondary" onClick={() => update({ date: day.date, slot: s })} aria-pressed={draft.slot === s && draft.date === day.date}
-                     className={`tabular h-11 rounded-lg text-sm font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-indicator"}`}>
+                     className={`tabular h-11 rounded-lg text-sm font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-selected"}`}>
                      {fmtTime(s)}
                    </Button>
                  ))}</div></div> : null;

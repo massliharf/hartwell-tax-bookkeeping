@@ -56,8 +56,8 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="mt-16 bg-surface-2 text-[#363636] lg:mt-24">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="lg:col-span-2">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr]">
+        <div>
           <p className="text-base font-semibold text-deep-ink">Hartwell Tax & Bookkeeping</p>
            <p className="mt-2 max-w-sm text-sm text-muted-foreground">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
@@ -70,7 +70,7 @@ export function SiteFooter() {
         <div className="text-sm">
            <p className="mb-2 text-xs font-medium text-muted-foreground">Hours</p>
           {HOURS.map((h) => (
-            <p key={h.days} className="tabular flex justify-between gap-4">
+            <p key={h.days} className="tabular flex justify-between gap-4 whitespace-nowrap">
               <span>{h.days}</span>
               <span className="text-muted-foreground">{h.time}</span>
             </p>

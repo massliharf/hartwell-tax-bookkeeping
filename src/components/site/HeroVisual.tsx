@@ -23,7 +23,7 @@ export function HeroVisual() {
   const docs = [...ALL].reverse().map((doc, i) => ({ ...doc, received: i < shown }));
 
   return (
-    <div className="sheet-stack ledger relative mx-auto h-[365px] w-full max-w-sm p-5 sm:p-6">
+    <div className="relative mx-auto h-[340px] w-full max-w-sm rounded-2xl border border-border bg-sheet p-5 shadow-[0_0_2px_rgba(18,18,18,.08),0_2px_4px_rgba(18,18,18,.08),0_6px_6px_rgba(18,18,18,.04),0_14px_9px_rgba(18,18,18,.02),0_25px_10px_rgba(18,18,18,.02)] sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>

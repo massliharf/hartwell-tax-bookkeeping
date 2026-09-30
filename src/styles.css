@@ -179,3 +179,15 @@
 
 /* Keep motion limited to hover feedback, booking steps, and the readiness ring. */
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* Card surface used by client pages (portal, confirmation, auth). Studio Shell: white, 16px radius, 1px hairline, no heavy shadow. */
+@layer components {
+  .sheet-stack {
+    background: var(--sheet);
+    border: 1px solid rgba(16, 16, 16, 0.1);
+    border-radius: 16px;
+  }
+  .ledger {
+    background-image: none;
+  }
+}

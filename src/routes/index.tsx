@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Briefcase, Building2, CalendarCheck, Check, FileSpreadsheet, FileUp, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2 } from "lucide-react";
+import { Briefcase, Building2, Check, FileSpreadsheet, FileText, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2, Video, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Reveal } from "@/components/brand/Reveal";
+import { ReadyRing } from "@/components/brand/ReadyRing";
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
@@ -36,8 +36,19 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-medium leading-6 text-muted-foreground">{children}</p>;
+
+const panel = "rounded-2xl bg-sheet";
+
+function SectionHead({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-4 [&_h2]:text-balance">
+      <div className="max-w-2xl">
+        <h2 className="font-serif text-[26px] font-medium leading-[34px] tracking-[-0.02em] text-deep-ink sm:text-[32px] sm:leading-[40px]">{title}</h2>
+        {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground sm:text-base sm:leading-6">{sub}</p>}
+      </div>
+      {action}
+    </div>
+  );
 }
 
 function Home() {
@@ -45,14 +56,14 @@ function Home() {
     <div className="min-h-screen overflow-x-clip bg-canvas">
       <AnnouncementBar />
       <SiteHeader />
-      <main className="space-y-16 lg:space-y-24">
+      <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
-        <TrustStrip />
         <HowItWorks />
         <Services />
         <About />
         <Testimonials />
         <Privacy />
+        <DeadlineCta />
         <Faq />
       </main>
       <SiteFooter />
@@ -61,73 +72,123 @@ function Home() {
 }
 
 function Hero() {
+  const trust = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 md:grid-cols-[1.15fr_1fr] md:gap-14 md:pt-16">
-      <Reveal>
-         <Eyebrow>Claire Hartwell, EA, Montclair, New Jersey</Eyebrow>
-         <h1 className="mt-3 text-[36px] font-medium leading-[44px] tracking-[-0.4px] text-deep-ink sm:text-[52px] sm:leading-[58px]">
-           Taxes, without <em className="relative whitespace-nowrap not-italic">the chase.</em>
-        </h1>
-        <p className="mt-4 max-w-md text-base leading-6 text-[#363636]">
-          Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
-        </p>
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-           <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
-          <Button asChild size="lg" variant="outline"><Link to="/book/returning">I'm a returning client</Link></Button>
+    <section className={`${panel} overflow-hidden`}>
+      <div className="grid items-center gap-10 px-5 pb-10 pt-10 sm:px-10 md:grid-cols-[1.15fr_1fr] md:gap-12 md:pb-14 md:pt-16">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-fill-subtle py-1 pl-1 pr-3">
+            <img src={claire} alt="" width={28} height={28} className="size-7 rounded-full object-cover" />
+            <span className="text-xs font-medium text-deep-ink">Claire Hartwell, EA, Montclair NJ</span>
+          </div>
+          <h1 className="mt-5 max-w-[12ch] text-balance font-serif text-[40px] font-medium leading-[44px] tracking-[-0.03em] text-deep-ink sm:text-[60px] sm:leading-[64px]">
+            Taxes, without the chase.
+          </h1>
+          <p className="mt-5 max-w-md text-base leading-7 text-[#363636] sm:text-lg">
+            Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
+            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I'm a returning client</Link></Button>
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
         </div>
-        <p className="mt-4 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
-      </Reveal>
-      <Reveal delay={0.15}><HeroVisual /></Reveal>
+        <HeroVisual />
+      </div>
+      <div className="border-t border-border bg-surface-2 px-5 py-4 sm:px-10">
+        <p className="mb-3 text-xs font-medium text-muted-foreground">Start with what you need</p>
+        <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-5 sm:overflow-visible">
+          {SERVICES.map((s) => {
+            const st = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
+            const Icon = st.icon;
+            return (
+              <li key={s.id} className="shrink-0">
+                <Link to="/book" search={{ service: s.id }} className="flex h-full w-40 items-center gap-3 rounded-xl bg-sheet p-3 transition-colors duration-150 hover:bg-fill-subtle sm:w-auto">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${st.rgb},0.1)` }}>
+                    <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${st.rgb})` }} />
+                  </span>
+                  <span className="min-w-0 text-[13px] font-medium leading-4 text-deep-ink">{s.name}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+          {trust.map((t) => (
+            <li key={t} className="flex items-center gap-1.5 text-xs text-[#363636]"><Check className="size-3.5 text-ink" strokeWidth={2.5} />{t}</li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }
 
-function TrustStrip() {
-  const items = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
+function StepPreviewTime() {
+  const days = [{ d: "Wed", n: 14 }, { d: "Thu", n: 15 }, { d: "Fri", n: 16 }];
+  const times = ["9:30 am", "10:30 am", "1:00 pm", "3:30 pm"];
   return (
-    <div className="mx-auto max-w-6xl px-5">
-      <ul className="flex flex-wrap items-center justify-start gap-2">
-        {items.map((t) => (
-          <li key={t} className="flex h-7 items-center gap-1.5 rounded-full border border-border bg-fill-subtle px-3 text-xs font-medium text-deep-ink"><Check className="size-3 text-ink" strokeWidth={2.5} />{t}</li>
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        {days.map((x, i) => (
+          <span key={x.n} className={`flex h-12 w-12 flex-col items-center justify-center rounded-lg text-[11px] ${i === 1 ? "bg-deep-ink text-white" : "bg-sheet text-deep-ink"}`}>
+            <span className={i === 1 ? "text-white/70" : "text-muted-foreground"}>{x.d}</span><span className="tabular text-sm font-medium">{x.n}</span>
+          </span>
         ))}
-      </ul>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {times.map((t, i) => (
+          <span key={t} className={`tabular grid h-8 place-items-center rounded-lg text-xs ${i === 1 ? "bg-deep-ink text-white" : "bg-sheet text-deep-ink"}`}>{t}</span>
+        ))}
+      </div>
     </div>
   );
 }
 
-function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
+function StepPreviewDocs() {
+  const docs = [{ t: "W-2", ok: true }, { t: "1098 mortgage", ok: true }, { t: "Last year's return", ok: false }];
   return (
-    <Reveal className="max-w-2xl">
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">{title}</h2>
-      {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground">{sub}</p>}
-    </Reveal>
+    <ul className="space-y-2">
+      {docs.map((d) => (
+        <li key={d.t} className="flex h-10 items-center gap-2.5 rounded-lg bg-sheet px-3 text-xs text-deep-ink">
+          <FileText className="size-3.5 text-muted-foreground" /><span className="flex-1">{d.t}</span>
+          {d.ok ? <span className="grid size-4 place-items-center rounded-full bg-ink text-white"><Check className="size-2.5" strokeWidth={3} /></span> : <span className="size-4 rounded-full border border-border" />}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function StepPreviewReady() {
+  return (
+    <div className="flex items-center gap-4">
+      <ReadyRing value={100} size={88} stroke={7} />
+      <div className="text-xs leading-5 text-[#363636]">
+        <p className="font-medium text-deep-ink">All set for Thursday</p>
+        <p>Claire has checked every document.</p>
+      </div>
+    </div>
   );
 }
 
 function HowItWorks() {
   const steps = [
-    { icon: CalendarCheck, title: "Book a time", text: "Pick a service and a slot that suits you. You're confirmed on the spot." },
-    { icon: FileUp, title: "Upload what's on your list", text: "You get a short checklist made for your return. Add documents whenever you have them." },
-    { icon: Check, title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need." },
+    { title: "Book a time", text: "Pick a service and a slot that suits you. You're confirmed on the spot.", preview: <StepPreviewTime /> },
+    { title: "Upload what's on your list", text: "You get a short checklist made for your return. Add documents whenever you have them.", preview: <StepPreviewDocs /> },
+    { title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need.", preview: <StepPreviewReady /> },
   ];
   return (
-    <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5">
-      <SectionHead eyebrow="How it works" title="Three steps. One appointment." />
-      <ol className="mt-8 grid gap-4 md:grid-cols-3">
+    <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="Three steps. One appointment." sub="No back-and-forth emails, no second visit for a missing form." />
+      <ol className="mt-10 grid gap-4 md:grid-cols-3">
         {steps.map((s, i) => (
-          <Reveal key={s.title} delay={i * 0.1} className="h-full">
-            <li className="relative h-full rounded-2xl border border-border bg-sheet p-6">
-              <div className="relative mb-4 h-12 w-12">
-                <div className="grid size-12 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)]">
-                  <s.icon className="size-5 text-ink" strokeWidth={1.75} />
-                </div>
-                <span className="tabular absolute -right-2 -top-2 grid size-4 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{i + 1}</span>
-              </div>
-              <h3 className="text-xl font-medium leading-[30px] tracking-[-0.2px] text-deep-ink">{s.title}</h3>
-              <p className="mt-1.5 text-sm leading-[22px] text-[#363636]">{s.text}</p>
-            </li>
-          </Reveal>
+          <li key={s.title} className="flex flex-col rounded-2xl bg-surface-2 p-2">
+            <div className="flex min-h-[152px] items-center rounded-xl bg-fill-neutral/60 p-4">{s.preview}</div>
+            <div className="px-3 pb-4 pt-5">
+              <p className="tabular text-xs font-medium text-muted-foreground">Step {i + 1}</p>
+              <h3 className="mt-1 text-lg font-medium leading-7 text-deep-ink">{s.title}</h3>
+              <p className="mt-1 text-sm leading-[22px] text-[#363636]">{s.text}</p>
+            </div>
+          </li>
         ))}
       </ol>
     </section>
@@ -136,62 +197,64 @@ function HowItWorks() {
 
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24">
-      <div className="mx-auto max-w-6xl px-5">
-        <SectionHead eyebrow="Services" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
-        <div className="mt-8 grid gap-4 lg:grid-cols-2">
-          {SERVICES.map((s) => {
-            const style = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
-            const Icon = style.icon;
-            return (
-              <Reveal key={s.id} className={`h-full ${s.id === "bookkeeping" ? "lg:col-span-2" : ""}`}>
-                <article className="grid h-full min-h-36 grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border bg-sheet p-4 sm:gap-4 sm:p-5 lg:min-h-28">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${style.rgb},0.1)` }}>
-                    <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${style.rgb})` }} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="text-base font-medium leading-6 text-deep-ink">{s.name}</h3>
-                    <p className="mt-1 truncate text-sm text-muted-foreground" title={s.blurb}>{s.blurb}</p>
-                    <p className="tabular mt-1 text-xs text-muted-foreground">{s.minutes} min</p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2">
-                    <p className="whitespace-nowrap text-deep-ink">
-                      {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                      <span className="tabular text-lg font-semibold">${s.price}</span>
-                    </p>
-                    <Button asChild size="sm"><Link to="/book" search={{ service: s.id }}>Book</Link></Button>
-                  </div>
-                </article>
-              </Reveal>
-            );
-          })}
-        </div>
-      </div>
+    <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
+      <ul className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border">
+        {SERVICES.map((s) => {
+          const st = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
+          const Icon = st.icon;
+          return (
+            <li key={s.id} className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-4 bg-sheet px-4 py-4 transition-colors duration-150 hover:bg-surface-2 sm:grid-cols-[40px_minmax(0,1fr)_90px_110px_auto] sm:px-5">
+              <span className="grid size-10 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${st.rgb},0.1)` }}>
+                <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${st.rgb})` }} />
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[15px] font-medium leading-6 text-deep-ink">{s.name}</h3>
+                <p className="text-sm text-muted-foreground">{s.blurb}<span className="sm:hidden">, {s.minutes} min</span></p>
+              </div>
+              <p className="tabular hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><Clock className="size-3.5" />{s.minutes} min</p>
+              <p className="hidden whitespace-nowrap text-right text-deep-ink sm:block">
+                {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                <span className="tabular text-lg font-semibold">${s.price}</span>
+              </p>
+              <div className="flex flex-col items-end gap-1">
+                <span className="tabular text-sm font-semibold text-deep-ink sm:hidden">{s.from ? "from " : ""}${s.price}</span>
+                <Button asChild size="sm" variant="secondary"><Link to="/book" search={{ service: s.id }}>Book</Link></Button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
 
-
 function About() {
+  const stats = [{ v: "12", l: "years in Montclair" }, { v: "1,800+", l: "returns filed" }, { v: "4.9", l: "average rating" }];
   return (
-    <section id="about" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-10 px-5 md:grid-cols-[0.9fr_1.1fr]">
-      <Reveal>
-        <figure className="w-full max-w-xs">
-          <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-2xl bg-surface-2">
-            <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-          </div>
-        </figure>
-      </Reveal>
-      <Reveal delay={0.1}>
-        <Eyebrow>About Claire</Eyebrow>
-        <h2 className="mt-1 text-[26px] font-medium leading-[34px] tracking-[-0.2px] text-deep-ink">A neighbor who happens to love the tax code.</h2>
-        <div className="mt-4 space-y-3 text-base leading-6 text-[#363636]">
-          <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
-          <p>My practice is small on purpose. When you book with me, you work with me — from the first document to the final signature.</p>
+    <section id="about" className={`${panel} scroll-mt-24 overflow-hidden`}>
+      <div className="grid md:grid-cols-[0.85fr_1.15fr]">
+        <div className="relative min-h-[360px] md:min-h-full">
+          <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         </div>
-        <p className="mt-4 text-lg font-medium text-ink">— Claire</p>
-
-      </Reveal>
+        <div className="px-5 py-12 sm:px-10 sm:py-16">
+          <h2 className="font-serif text-[26px] font-medium leading-[34px] tracking-[-0.02em] text-deep-ink sm:text-[32px] sm:leading-[40px]">A neighbor who happens to love the tax code.</h2>
+          <div className="mt-5 space-y-3 text-base leading-7 text-[#363636]">
+            <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
+            <p>My practice is small on purpose. When you book with me, you work with me, from the first document to the final signature.</p>
+          </div>
+          <p className="mt-5 text-base font-medium text-deep-ink">Claire Hartwell, EA</p>
+          <dl className="mt-8 grid grid-cols-3 gap-2">
+            {stats.map((x) => (
+              <div key={x.l} className="rounded-xl bg-surface-2 p-3 sm:p-4">
+                <dt className="sr-only">{x.l}</dt>
+                <dd className="tabular font-serif text-2xl font-medium text-deep-ink sm:text-[28px]">{x.v}</dd>
+                <dd className="mt-1 text-xs text-muted-foreground">{x.l}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
     </section>
   );
 }
@@ -203,20 +266,18 @@ function Testimonials() {
     { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
   ];
   return (
-    <section>
-      <div className="mx-auto max-w-6xl px-5">
-         <Reveal><p className="text-xs font-medium leading-6 text-muted-foreground">Kind words</p></Reveal>
-        <div className="mt-4 flex snap-x gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible [scrollbar-width:none]">
-          {t.map((x, i) => (
-            <Reveal key={x.n} delay={i * 0.1} className="h-full">
-              <figure className="flex h-full w-[85vw] shrink-0 snap-start flex-col rounded-2xl border border-border bg-sheet p-6 text-deep-ink md:w-auto">
-                <blockquote className="text-lg font-medium leading-[28px] tracking-[-0.2px]">"{x.q}"</blockquote>
-                <figcaption className="mt-auto pt-5 text-sm"><span className="text-deep-ink">{x.n}</span><span className="block text-muted-foreground">{x.r}</span></figcaption>
-
-              </figure>
-            </Reveal>
-          ))}
-        </div>
+    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="What clients say." />
+      <div className="mt-8 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible">
+        {t.map((x) => (
+          <figure key={x.n} className="flex w-[82vw] shrink-0 snap-start flex-col rounded-2xl bg-surface-2 p-6 md:w-auto">
+            <blockquote className="text-base leading-7 text-deep-ink">"{x.q}"</blockquote>
+            <figcaption className="mt-auto flex items-center gap-3 pt-6 text-sm">
+              <span className="grid size-9 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{x.n.charAt(0)}</span>
+              <span><span className="block font-medium text-deep-ink">{x.n}</span><span className="block text-xs text-muted-foreground">{x.r}</span></span>
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </section>
   );
@@ -230,43 +291,61 @@ function Privacy() {
     { icon: Trash2, title: "Only what's needed", text: "Upload what's on your checklist, nothing more. You're always in control." },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-5">
-      <div className="rounded-2xl border border-border bg-sheet p-6 sm:p-10">
-        <SectionHead eyebrow="Your documents are safe" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
-        <div className="mt-10 grid gap-8 sm:grid-cols-2">
-          {points.map((p, i) => (
-            <Reveal key={p.title} delay={i * 0.06} className="flex gap-4">
-              <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
-              <div><h3 className="text-base font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-relaxed text-deep-ink/70">{p.text}</p></div>
-            </Reveal>
-          ))}
+    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
+      <div className="mt-10 grid gap-3 sm:grid-cols-2">
+        {points.map((p) => (
+          <div key={p.title} className="flex gap-4 rounded-2xl bg-surface-2 p-5">
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
+            <div><h3 className="text-[15px] font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-[22px] text-[#363636]">{p.text}</p></div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DeadlineCta() {
+  return (
+    <section className="overflow-hidden rounded-2xl bg-[#1A1A1A] px-5 py-12 text-white sm:px-10 sm:py-16">
+      <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
+        <div>
+          <h2 className="font-serif text-[28px] font-medium leading-[36px] tracking-[-0.02em] sm:text-[36px] sm:leading-[44px]">October 15 is close. Your slot doesn't have to be.</h2>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-white/70 sm:text-base">Extended returns are due on October 15. Book now, upload your documents this week, and file once.</p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
+          <Button asChild size="lg" className="bg-white text-[#1A1A1A] hover:bg-white/90"><Link to="/book" search={{ service: "extension" }}>Book an extension review</Link></Button>
+          <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><a href="#services">See all services</a></Button>
         </div>
       </div>
+      <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6 text-xs text-white/70">
+        <li className="flex items-center gap-1.5"><MapPin className="size-3.5" />412 Bloomfield Avenue, Montclair</li>
+        <li className="flex items-center gap-1.5"><Video className="size-3.5" />Video appointments available</li>
+        <li className="flex items-center gap-1.5"><Clock className="size-3.5" />Mon to Fri 9 to 6, Sat 10 to 2</li>
+      </ul>
     </section>
   );
 }
 
 function Faq() {
   const qs = [
-    { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return — usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Claire will confirm everything is there." },
+    { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return, usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Claire will confirm everything is there." },
     { q: "Video call or in person?", a: "Whichever you prefer. Both work the same way: documents are uploaded beforehand, and we go through your return together. Choose when you book." },
     { q: "Can I reschedule?", a: "Of course. Use the link in your confirmation email to pick a new time. If you can't make it, please let us know so someone waiting can take your slot." },
     { q: "Can you file an extension for me?", a: "Yes. An extension gives you until October 15 to file, but any tax owed is still due in April. Book an Extension review and we'll handle it." },
     { q: "What are the key deadlines?", a: "Most individual returns are due April 15. Extended returns are due October 15. Estimated taxes are due in April, June, September and January." },
   ];
   return (
-    <section id="faq" className="mx-auto grid max-w-6xl scroll-mt-24 gap-8 px-5 md:grid-cols-[0.8fr_1.2fr]">
-      <SectionHead eyebrow="Questions" title="Good to know." />
-      <Reveal>
-        <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-3">
-          {qs.map((x) => (
-            <AccordionItem key={x.q} value={x.q} className="border-border">
-              <AccordionTrigger className="py-4 text-left text-sm font-medium text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
-              <AccordionContent className="pb-4 text-sm text-muted-foreground">{x.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </Reveal>
+    <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
+      <div className="self-start"><SectionHead title="Good to know." sub="Still unsure? Call (973) 555-0142." /></div>
+      <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-4">
+        {qs.map((x) => (
+          <AccordionItem key={x.q} value={x.q} className="border-border">
+            <AccordionTrigger className="py-4 text-left text-[15px] font-medium text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
+            <AccordionContent className="pb-4 text-sm leading-[22px] text-[#363636]">{x.a}</AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
     </section>
   );
 }

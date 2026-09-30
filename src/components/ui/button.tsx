@@ -12,10 +12,9 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         highlight: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive: "bg-secondary text-destructive hover:bg-secondary/80",
-        outline:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        outline: "bg-fill-subtle text-deep-ink hover:bg-fill-selected",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "bg-transparent text-deep-ink hover:bg-fill-subtle",
         link: "text-ink text-sm font-semibold underline-offset-4 hover:underline active:opacity-70",
       },
       size: {

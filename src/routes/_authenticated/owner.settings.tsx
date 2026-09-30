@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { Integrations } from "@/components/owner/integrations";
+import { TimeOff } from "@/components/owner/time-off";
 
 export const Route = createFileRoute("/_authenticated/owner/settings")({ head: () => ({ meta: [{ title: "Settings — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: SettingsPage });
 
@@ -83,6 +84,7 @@ function SettingsPage() {
             <Input type="number" min={0} max={60} step={5} value={buffer} onChange={(e) => setBuffer(Number(e.target.value))} className="w-20 bg-paper" /> min
           </label>
           <Button className="mt-5" disabled={saving === "hours"} onClick={() => save("hours", async () => [await supabase.from("settings").update({ hours, buffer_min: buffer }).eq("id", 1)])}>Save hours</Button>
+          <TimeOff />
         </Card>
 
         <Card title="Services and prices" note="What clients can book, how long it takes, and the starting fee.">

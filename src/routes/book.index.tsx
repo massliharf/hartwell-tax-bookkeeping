@@ -220,12 +220,12 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
             </div>
             {q.type === "count" ? (
-              <div className="flex h-8 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
-                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-6 place-items-center rounded-md hover:bg-[#DBDBDB]">
+              <div className="flex h-10 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
+                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-indicator">
                   <Minus className="size-3.5" />
                 </button>
                 <span className="tabular w-6 text-center text-xs font-semibold">{(answers[q.key] as number) ?? 0}</span>
-                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-6 place-items-center rounded-md hover:bg-[#DBDBDB]">
+                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-indicator">
                   <Plus className="size-3.5" />
                 </button>
               </div>

@@ -116,8 +116,8 @@ function SettingsPage() {
 
 function Card({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   return (
-    <section className="sheet-stack p-6">
-      <h2 className="font-serif text-2xl text-deep-ink">{title}</h2>
+    <section className=" p-6">
+      <h2 className="font-sans text-2xl text-deep-ink">{title}</h2>
       <p className="mb-5 text-sm text-muted-foreground">{note}</p>
       {children}
     </section>

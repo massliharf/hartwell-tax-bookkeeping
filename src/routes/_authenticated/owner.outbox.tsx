@@ -5,18 +5,21 @@ import { Mail, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MSG_LABEL, fmtStamp } from "@/components/owner/lib";
 import { Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
+import { useClientDrawer } from "@/components/owner/drawer-context";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/owner/outbox")({ head: () => ({ meta: [{ title: "Outbox — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Outbox });
 
 function Outbox() {
+  const openClient = useClientDrawer();
   const [type, setType] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const q = useQuery({
     queryKey: ["owner", "outbox"],
     queryFn: async () => {
       const { data, error } = await supabase.from("messages")
-        .select("id, type, channel, subject, body, sent_at, minutes_saved, recipient, delivery, clients(name)")
+        .select("id, type, channel, subject, body, sent_at, minutes_saved, recipient, delivery, client_id, clients(name)")
         .order("sent_at", { ascending: false }).limit(300);
       if (error) throw error;
       return data ?? [];
@@ -58,7 +61,8 @@ function Outbox() {
               </span>
               {m.minutes_saved > 0 && <span className="tabular shrink-0 rounded-full bg-marigold/20 px-2.5 py-1 text-xs font-medium text-deep-ink">saved {m.minutes_saved} min</span>}
             </button>
-            {open === m.id && <pre className="whitespace-pre-wrap border-t border-border px-5 py-4 font-sans text-sm text-deep-ink/80">{m.body}</pre>}
+            {m.client_id && <Button size="sm" variant="ghost" className="ml-4 mb-2 text-ink" onClick={() => openClient({ clientId: m.client_id })}>Open client</Button>}
+             {open === m.id && <pre className="whitespace-pre-wrap border-t border-border px-5 py-4 font-sans text-sm text-deep-ink/80">{m.body}</pre>}
           </li>
         ))}
       </ul>

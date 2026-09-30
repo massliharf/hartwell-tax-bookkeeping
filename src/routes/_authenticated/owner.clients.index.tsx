@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useClientDrawer } from "@/components/owner/drawer-context";
 import { Input } from "@/components/ui/input";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/_authenticated/owner/clients/")({ head: (
 
 function Clients() {
   const [term, setTerm] = useState("");
+  const openClient = useClientDrawer();
   const q = useQuery({
     queryKey: ["owner", "clients"],
     queryFn: async () => {
@@ -38,8 +40,8 @@ function Clients() {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (
             <li key={c.id}>
-              <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-paper">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-fill-neutral font-serif text-lg text-ink">{c.name.charAt(0)}</span>
+              <button onClick={() => openClient({ clientId: c.id })} className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-paper">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-fill-neutral font-sans text-lg text-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-deep-ink">{c.name}</span>
                   <span className="block truncate text-sm text-muted-foreground">{c.email}</span>

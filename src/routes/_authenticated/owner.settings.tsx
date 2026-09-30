@@ -69,9 +69,9 @@ function SettingsPage() {
                   <Switch checked={!!h} onCheckedChange={(on) => setHours({ ...hours, [k]: on ? ["09:00", "17:00"] : null })} aria-label={`Open on ${label}`} />
                   {h ? (
                     <span className="flex items-center gap-2">
-                      <Input type="time" step={900} value={h[0]} onChange={(e) => setHours({ ...hours, [k]: [e.target.value, h[1]] })} className="w-28 bg-paper" />
+                      <Input type="time" step={900} aria-label={`${label} opening time`} value={h[0]} onChange={(e) => setHours({ ...hours, [k]: [e.target.value, h[1]] })} className="w-28 bg-paper" />
                       <span className="text-muted-foreground">–</span>
-                      <Input type="time" step={900} value={h[1]} onChange={(e) => setHours({ ...hours, [k]: [h[0], e.target.value] })} className="w-28 bg-paper" />
+                      <Input type="time" step={900} aria-label={`${label} closing time`} value={h[1]} onChange={(e) => setHours({ ...hours, [k]: [h[0], e.target.value] })} className="w-28 bg-paper" />
                     </span>
                   ) : <span className="text-sm text-muted-foreground">Closed</span>}
                 </li>
@@ -94,7 +94,7 @@ function SettingsPage() {
                   <Input value={s.name} onChange={(e) => set({ name: e.target.value })} className="col-span-2 bg-sheet sm:col-span-1" aria-label="Service name" />
                   <label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Input type="number" min={15} step={15} value={s.duration_min} onChange={(e) => set({ duration_min: Number(e.target.value) })} className="bg-sheet" aria-label="Minutes" />min</label>
                   <label className="flex items-center gap-1.5 text-xs text-muted-foreground">$<Input type="number" min={0} step={5} value={s.price_from} onChange={(e) => set({ price_from: Number(e.target.value) })} className="bg-sheet" aria-label="Price" /></label>
-                  <label className="flex items-center gap-2 text-xs text-muted-foreground"><Switch checked={s.active} onCheckedChange={(v) => set({ active: v })} />Bookable</label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground"><Switch checked={s.active} onCheckedChange={(v) => set({ active: v })} aria-label={`${s.name} bookable`} />Bookable</label>
                 </div>
               );
             })}

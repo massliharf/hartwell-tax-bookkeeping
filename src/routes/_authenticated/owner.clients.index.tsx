@@ -28,7 +28,7 @@ function Clients() {
       </PageHead>
       <div className="relative mb-6">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search by name, email or phone" className="h-9 rounded-lg bg-sheet pl-10 text-sm" />
+        <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search by name, email or phone" aria-label="Search clients" className="h-9 rounded-lg bg-sheet pl-10 text-sm" />
       </div>
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}

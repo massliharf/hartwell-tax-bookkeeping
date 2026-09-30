@@ -12,4 +12,8 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // Pre-bundle late-added deps so Vite doesn't re-optimize mid-session (causes duplicate React → null useContext).
+    optimizeDeps: { include: ["fflate", "pdfjs-dist"] },
+  },
 });

@@ -4,6 +4,8 @@ import { useOwnerCtx } from "@/components/owner/ctx";
 import { addDays, apptsRange, et, etToIso, fmtLong, needsYou, readyToFile } from "@/components/owner/lib";
 import { ApptList, Empty, ErrorNote, LoadingRows, NeedsList, PageHead } from "@/components/owner/ui";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useApptPanel } from "@/components/owner/drawer-context";
 
 export const Route = createFileRoute("/_authenticated/owner/")({ head: () => ({ meta: [{ title: "Today — Hartwell Tax & Bookkeeping" }, { name: "description", content: "Today at Hartwell Tax & Bookkeeping." }, { property: "og:title", content: "Today — Hartwell Tax & Bookkeeping" }, { property: "og:description", content: "Today at Hartwell Tax & Bookkeeping." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Today });
 function Today() {
@@ -15,16 +17,25 @@ function Today() {
   const toFile = useQuery(readyToFile());
   const hi = minutes < 12 * 60 ? "Good morning" : minutes < 17 * 60 ? "Good afternoon" : "Good evening";
   const appts = (q.data ?? []).filter(a => a.status !== "no_show");
+  const openAppt = useApptPanel();
+  const review = needs.data?.filter(i => i.kind === "review") ?? [];
+  const unpaid = needs.data?.filter(i => i.kind === "unpaid") ?? [];
+  const otherNeeds = needs.data?.filter(i => i.kind !== "review" && i.kind !== "unpaid") ?? [];
+  const tiles = [
+    { label: "Today", value: q.data ? appts.length : null, target: "today-appointments", firstId: appts[0]?.id },
+    { label: "Documents to review", value: needs.data ? review.reduce((sum, i) => sum + (i.kind === "review" ? i.count : 0), 0) : null, target: "today-review", firstId: review[0]?.kind === "review" ? review[0].appt.id : undefined },
+    { label: "Unpaid", value: needs.data ? unpaid.length : null, target: "today-unpaid", firstId: unpaid[0]?.kind === "unpaid" ? unpaid[0].appt.id : undefined },
+    { label: "Ready to file", value: toFile.data ? toFile.data.length : null, target: "today-to-file", firstId: toFile.data?.[0]?.id },
+  ];
   return <>
     <PageHead title={`${hi}, Claire.`} meta={fmtLong(now)} />
-    <div className="mb-8 grid grid-cols-3 gap-2">{[
-      { label: "Today", value: q.data ? appts.length : null },
-      { label: "Ready", value: q.data ? appts.filter(a => a.ready_score >= 100).length : null },
-    ].map(tile => <div key={tile.label} className="min-h-[72px] rounded-lg border border-border bg-surface-2 p-2.5 sm:p-3"><p className="text-xs text-muted-foreground">{tile.label}</p>{tile.value === null ? <Skeleton className="mt-2 h-6 w-10" /> : <p className="tabular mt-1 text-xl font-medium text-deep-ink">{tile.value}</p>}</div>)}<button type="button" onClick={() => document.getElementById("today-needs")?.scrollIntoView({ behavior: "smooth" })} className="min-h-[72px] rounded-lg border border-border bg-surface-2 p-2.5 text-left transition-colors duration-150 hover:bg-fill-subtle sm:p-3"><span className="block text-xs text-muted-foreground">Needs you</span>{needs.data ? <span className="tabular mt-1 block text-xl font-medium text-deep-ink">{needs.data.length}</span> : <Skeleton className="mt-2 h-6 w-10" />}</button></div>
+    <div className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4">{tiles.map(tile => <Button key={tile.label} variant="ghost" disabled={tile.value === 0} onClick={() => { if (tile.firstId && !document.getElementById(tile.target)) openAppt({ appointmentId: tile.firstId }); else document.getElementById(tile.target)?.scrollIntoView({ behavior: "smooth" }); }} className="h-auto min-h-[72px] flex-col items-start rounded-lg border border-border bg-surface-2 p-3 text-left hover:bg-fill-selected"><span className="whitespace-normal text-xs text-muted-foreground">{tile.label}</span>{tile.value === null ? <Skeleton className="mt-2 h-6 w-10" /> : <span className="tabular mt-1 text-xl font-medium text-deep-ink">{tile.value}</span>}</Button>)}</div>
     {needs.isError && <ErrorNote onRetry={() => needs.refetch()} />}
-    {needs.data && needs.data.length > 0 && <section id="today-needs" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Needs you</h2><NeedsList items={needs.data} /></section>}
-    {toFile.data && toFile.data.length > 0 && <section className="mb-8"><h2 className="mb-3 text-sm font-medium text-deep-ink">Ready to file</h2><p className="-mt-2 mb-3 text-xs text-muted-foreground">Signed and paid. Open one to mark it filed.</p><ApptList appts={toFile.data} showDate /></section>}
-    <section className="mb-8"><h2 className="mb-3 text-sm font-medium text-deep-ink">Today</h2>{q.isLoading && <LoadingRows />}{q.isError && <ErrorNote onRetry={() => q.refetch()} />}{q.data && !q.data.length && <Empty title="A quiet day.">Nothing on the calendar. New bookings will show up here on their own.</Empty>}{q.data && !!q.data.length && <ApptList appts={q.data} />}</section>
+    {review.length > 0 && <section id="today-review" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Documents to review</h2><NeedsList items={review} /></section>}
+    {unpaid.length > 0 && <section id="today-unpaid" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Unpaid</h2><NeedsList items={unpaid} /></section>}
+    {otherNeeds.length > 0 && <section id="today-needs" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Needs you</h2><NeedsList items={otherNeeds} /></section>}
+    {toFile.data && toFile.data.length > 0 && <section id="today-to-file" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Ready to file</h2><p className="-mt-2 mb-3 text-xs text-muted-foreground">Signed and paid. Open one to mark it filed.</p><ApptList appts={toFile.data} showDate /></section>}
+    <section id="today-appointments" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Today</h2>{q.isLoading && <LoadingRows />}{q.isError && <ErrorNote onRetry={() => q.refetch()} />}{q.data && !q.data.length && <Empty title="A quiet day.">Nothing on the calendar. New bookings will show up here on their own.</Empty>}{q.data && !!q.data.length && <ApptList appts={q.data} />}</section>
     <section><h2 className="mb-3 text-sm font-medium text-deep-ink">Next up</h2>{upcoming.isLoading && <LoadingRows n={3} />}{upcoming.isError && <ErrorNote onRetry={() => upcoming.refetch()} />}{upcoming.data && !upcoming.data.length && <p className="text-sm text-muted-foreground">No upcoming appointments in the next two weeks.</p>}{upcoming.data && !!upcoming.data.length && <ApptList appts={upcoming.data.slice(0, 5)} showDate />}</section>
   </>;
 }

@@ -58,7 +58,7 @@ function ReturningPage() {
                 <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-11 bg-sheet" />
               </div>
               {state === "error" && <p className="text-sm text-destructive">Something went wrong. Please try again.</p>}
-              <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
+              <Button variant="accent" type="submit" size="lg" className="w-full" disabled={state === "busy"}>
                 {state === "busy" && <Loader2 className="animate-spin" />} Email me my link
               </Button>
               <p className="text-center text-xs text-muted-foreground">For your privacy, we never show booking details on this page.</p>

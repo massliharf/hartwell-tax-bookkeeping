@@ -125,7 +125,7 @@ function BookPage() {
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
+            <Button variant="accent" size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
           </div>
         </div>
         <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">

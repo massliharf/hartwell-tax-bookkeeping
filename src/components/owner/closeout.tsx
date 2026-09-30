@@ -93,31 +93,43 @@ const REASONS = ["Blurry or cut off", "Wrong year", "Wrong form", "Missing pages
 
 export function AiTag({ i }: { i: Item }) {
   if (i.status !== "uploaded") return null;
-  if (i.review_status === "needs_fix") return <Tag tone="warning">Needs a fix</Tag>;
-  if (i.review_status === "accepted") return <Tag tone="success">Accepted</Tag>;
-  if (i.ai_check === "warning" || i.ai_check === "kept") return <Tag tone="warning">Check</Tag>;
-  if (i.ai_check === "unreadable") return <Tag>Unreadable</Tag>;
-  if (i.ai_check === "ok") return <Tag tone="success">Looks right</Tag>;
-  return <Tag>To review</Tag>;
+  if (i.review_status === "needs_fix") return <Tag tone="warning">Fix requested</Tag>;
+  if (i.review_status === "accepted") return <Tag tone="success">{i.ai_check === "ok" ? "Auto-checked" : "Accepted"}</Tag>;
+  if (i.ai_check === "warning") return <Tag>Client is replacing it</Tag>;
+  if (i.ai_check === "unreadable") return <Tag tone="warning">Couldn't be read</Tag>;
+  return <Tag tone="warning">Needs your eyes</Tag>;
+}
+
+/** Best guess of why a document needs fixing, from the AI note. */
+function suggestedReason(i: Item): string | null {
+  const n = (i.ai_note ?? "").toLowerCase();
+  if (/20\d\d|year/.test(n)) return "Wrong year";
+  if (/not a|looks like|instead|wrong form/.test(n)) return "Wrong form";
+  if (/blur|read|cut|dark/.test(n) || i.ai_check === "unreadable") return "Blurry or cut off";
+  if (/page/.test(n)) return "Missing pages";
+  return null;
 }
 
 /** Accept / Needs a fix for one uploaded document. */
 export function DocReview({ i, inline = false, onDone }: { i: Item; inline?: boolean; onDone?: () => void }) {
   const review = useServerFn(reviewDocument);
   const [fixing, setFixing] = useState(false);
-  const [reason, setReason] = useState<string | null>(null);
-  const [note, setNote] = useState("");
+  const [reason, setReason] = useState<string | null>(() => suggestedReason(i));
+  const [note, setNote] = useState(() => (i.ai_check === "warning" || i.ai_check === "kept" ? i.ai_note ?? "" : ""));
   const m = useOwnerMutation((v: { decision: "accepted" | "needs_fix"; reason?: string; note?: string }) => review({ data: { itemId: i.id, ...v } }), "Saved.");
   if (i.status !== "uploaded") return null;
   return (
     <div className={inline ? "min-w-0" : "px-4 pb-3"}>
       {!inline && i.ai_note && <p className={cn("text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{i.ai_note}{i.ai_check === "kept" && " The client chose to keep it."}</p>}
       {i.review_status === "needs_fix" && <p className="text-xs text-warning">Asked for a fix: {i.fix_reason}{i.fix_note ? `. ${i.fix_note}` : ""}</p>}
-      {i.review_status === "pending" && !fixing && (
+      {i.review_status === "pending" && i.ai_check !== "warning" && !fixing && (
         <div className={inline ? "flex gap-1" : "mt-2 flex gap-2"}>
-          <Button size="sm" variant="secondary" disabled={m.isPending} onClick={() => m.mutate({ decision: "accepted" }, { onSuccess: (r) => { if (r.ok) onDone?.(); } })}>Accept</Button>
-          <Button size="sm" variant="ghost" disabled={m.isPending} onClick={() => setFixing(true)}>Needs a fix</Button>
+          <Button size="sm" variant="secondary" disabled={m.isPending} onClick={() => m.mutate({ decision: "accepted" }, { onSuccess: (r) => { if (r.ok) onDone?.(); } })}>It's fine</Button>
+          <Button size="sm" variant="ghost" disabled={m.isPending} onClick={() => setFixing(true)}>Ask for a new copy</Button>
         </div>
+      )}
+      {inline && i.review_status === "accepted" && !fixing && (
+        <Button size="sm" variant="ghost" className="mt-1 h-7 px-2 text-xs text-muted-foreground" onClick={() => setFixing(true)}>Ask for a new copy</Button>
       )}
       {fixing && (
         <div className="mt-2 space-y-2 rounded-xl bg-surface-2 p-3">
@@ -126,7 +138,7 @@ export function DocReview({ i, inline = false, onDone }: { i: Item; inline?: boo
           </div>
           <Input aria-label="Note to the client (optional)" placeholder="Note to the client (optional)" value={note} maxLength={400} onChange={(e) => setNote(e.target.value)} className="h-9" />
           <div className="flex gap-2">
-            <Button size="sm" disabled={!reason || m.isPending} onClick={() => { if (reason) m.mutate({ decision: "needs_fix", reason, note }, { onSuccess: (r) => { setFixing(false); if (r.ok) onDone?.(); } }); }}>{m.isPending ? "Sending…" : "Send to client"}</Button>
+            <Button size="sm" disabled={!reason || m.isPending} onClick={() => { if (reason) m.mutate({ decision: "needs_fix", reason, note }, { onSuccess: (r) => { setFixing(false); if (r.ok) onDone?.(); } }); }}>{m.isPending ? "Sending…" : "Email the client"}</Button>
             <Button size="sm" variant="ghost" onClick={() => setFixing(false)}>Cancel</Button>
           </div>
         </div>

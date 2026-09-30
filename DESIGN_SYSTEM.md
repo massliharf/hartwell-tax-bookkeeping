@@ -10,7 +10,7 @@ Only brand-specific items are swapped (see section 0). Everything else is exact.
 | Original element | Use instead |
 |---|---|
 | Logo | Hartwell Tax wordmark (Geist 600) |
-| Brand accent pink #FF57AE | Evergreen #1E5B47, in the same usage slots: Create button, upgrade/primary text link, count badges, accent badges at 15% alpha, active display-tab underline |
+| Brand accent pink #FF57AE | Hartwell blue #2F54EB, in the same usage slots: Create button, upgrade/primary text link, count badges, accent badges at 15% alpha, active display-tab underline |
 | Display font "Klarheit" (commercial license) | "Figtree" 500 (Google Fonts), same sizes and tracking |
 | Category icon hues | Keep the method (icon color + the same color at 10% alpha as tile background) with our service colors |
 
@@ -92,7 +92,7 @@ Only brand-specific items are swapped (see section 0). Everything else is exact.
 
 | Token | Value | Use |
 |---|---|---|
-| accent (swapped) | #1E5B47 | Create button, text links, count badges, active display-tab underline |
+| accent (swapped) | #2F54EB | Create button, text links, count badges, active display-tab underline |
 | accent-tint | accent at 15% alpha | Accent badges, "New" pills |
 | focus | #4F69F2 | Toggle switches, focused input border |
 
@@ -400,7 +400,7 @@ Centered in the panel:
   --border-input: rgba(16,16,16,0.15);
   --border-strong: rgba(16,16,16,0.2);
 
-  --accent: #1E5B47;
+  --accent: #2F54EB;
   --accent-tint: rgba(30,91,71,0.15);
   --focus: #4F69F2;
 

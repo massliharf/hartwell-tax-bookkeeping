@@ -53,7 +53,7 @@ function ConfirmedPage() {
         <div className="mx-auto max-w-md text-center">
           <h1 className="t-page text-deep-ink">We couldn't find that booking</h1>
           <p className="mt-3 text-deep-ink/70">Check the link in your confirmation email, or book again.</p>
-          <Button asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
+          <Button variant="accent" asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
         </div>
       </BookingShell>
     );

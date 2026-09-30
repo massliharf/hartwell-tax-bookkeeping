@@ -85,7 +85,7 @@ function Hero() {
             Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
+            <Button variant="accent" asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I already have a booking</Link></Button>
           </div>
           <div className="mt-6 flex items-center gap-3">
@@ -189,7 +189,7 @@ function StepPreviewDocs() {
       {docs.map((d) => (
         <li key={d.t} className="flex h-10 items-center gap-2.5 rounded-lg bg-sheet px-3 text-xs text-deep-ink">
           <FileText className="size-3.5 text-muted-foreground" /><span className="flex-1">{d.t}</span>
-          {d.ok ? <span className="grid size-4 place-items-center rounded-full bg-ink text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span> : <span className="size-4 rounded-full border border-border" />}
+          {d.ok ? <span className="grid size-4 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span> : <span className="size-4 rounded-full border border-border" />}
         </li>
       ))}
     </ul>

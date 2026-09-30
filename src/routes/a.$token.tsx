@@ -84,7 +84,7 @@ function PortalPage() {
           <h1 className="t-page text-deep-ink">This link isn't working</h1>
           <p className="mt-3 text-muted-foreground">It may be old or mistyped. We can email you a fresh one.</p>
           <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
-            <Button asChild size="lg"><Link to="/book/returning">Email me a new link</Link></Button>
+            <Button variant="accent" asChild size="lg"><Link to="/book/returning">Email me a new link</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button>
           </div>
         </div>
@@ -131,7 +131,7 @@ function PortalPage() {
         {cancelled && (
           <div className="rounded-2xl bg-surface-2 p-6">
             <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
-            <Button asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
+            <Button variant="accent" asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
           </div>
         )}
 
@@ -189,7 +189,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
         ))}
       </div>
       {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
-      <Button className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
+      <Button variant="accent" className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
     </section>
   );
 }
@@ -244,7 +244,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
         {appt.status === "confirmed" ? (
           <span className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-success/10 px-3 text-sm font-medium text-success"><Check className="size-4" /> Confirmed</span>
         ) : (
-          <Button size="lg" onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
+          <Button variant="accent" size="lg" onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
             {busy === "confirm" ? <Loader2 className="" /> : <Check />} I'll be there
           </Button>
         )}
@@ -394,7 +394,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
                 <p className="mt-1 text-sm text-deep-ink/75">{item.fix_reason}{item.fix_note ? `. Claire says: ${item.fix_note}` : "."}</p>
               </div>
             </div>
-            <Button size="sm" className="mt-4" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
+            <Button variant="accent" size="sm" className="mt-4" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
           </div>
         ) : item.status === "uploaded" && item.ai_check === "warning" ? (
           <div key="warn" className="rounded-2xl border border-warning/40 bg-sheet p-5">
@@ -406,7 +406,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button size="sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
+              <Button variant="accent" size="sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
               <Button size="sm" variant="secondary" disabled={busy} onClick={async () => { setBusy(true); try { await keep({ data: { token, itemId: item.id } }); await onChange(); } catch { setErr("Couldn't save that. Please try again."); } setBusy(false); }}>Keep this file</Button>
             </div>
           </div>
@@ -449,13 +449,13 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               <div className="mt-4 space-y-2">
                 <Input autoFocus placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
                 <div className="flex gap-2">
-                  <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Save</Button>
+                  <Button variant="accent" size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Save</Button>
                   <Button size="sm" variant="ghost" onClick={() => setNaOpen(false)}>Never mind</Button>
                 </div>
               </div>
             ) : (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="" /> : <Upload />} Upload</Button>
+                <Button variant="accent" size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
                 <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
               </div>
@@ -509,7 +509,7 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
           <h3 className="t-card text-deep-ink">Pay {money(appt.fee_cents!)}</h3>
           <p className="mt-1 text-sm text-muted-foreground">Online card payments aren't switched on yet. This test button marks your fee as paid, so you can see the whole flow.</p>
           {err && <p className="mt-2 text-sm text-destructive" role="alert">That didn't go through. Please try again.</p>}
-          <Button size="lg" className="mt-4" disabled={busy} onClick={async () => { setBusy(true); setErr(false); try { const r = await pay({ data: { token } }); if (!r.ok) setErr(true); await onDone(); } catch { setErr(true); } setBusy(false); }}>
+          <Button variant="accent" size="lg" className="mt-4" disabled={busy} onClick={async () => { setBusy(true); setErr(false); try { const r = await pay({ data: { token } }); if (!r.ok) setErr(true); await onDone(); } catch { setErr(true); } setBusy(false); }}>
             {busy ? <Loader2 /> : <CreditCard />} Test payment: pay {money(appt.fee_cents!)}
           </Button>
         </div>
@@ -552,7 +552,7 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
-        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="" /> : <PenLine />} Sign</Button>
+        <Button variant="accent" type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="" /> : <PenLine />} Sign</Button>
       </form>
     </section>
   );

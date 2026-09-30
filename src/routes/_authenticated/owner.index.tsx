@@ -24,7 +24,7 @@ function Today() {
   const otherNeeds = needs.data?.filter(i => i.kind !== "review" && i.kind !== "unpaid") ?? [];
   const tiles = [
     { label: "Today", value: q.data ? appts.length : null, target: "today-appointments", tone: undefined as undefined | "warn" | "ok", firstId: appts[0]?.id },
-    { label: "Documents to review", value: needs.data ? review.reduce((sum, i) => sum + (i.kind === "review" ? i.count : 0), 0) : null, target: "today-review", tone: "warn", firstId: review[0]?.kind === "review" ? review[0].appt.id : undefined },
+    { label: "Documents to check", value: needs.data ? review.reduce((sum, i) => sum + (i.kind === "review" ? i.count : 0), 0) : null, target: "today-review", tone: "warn", firstId: review[0]?.kind === "review" ? review[0].appt.id : undefined },
     { label: "Unpaid", value: needs.data ? unpaid.length : null, target: "today-unpaid", tone: "warn", firstId: unpaid[0]?.kind === "unpaid" ? unpaid[0].appt.id : undefined },
     { label: "Ready to file", value: toFile.data ? toFile.data.length : null, target: "today-to-file", tone: "ok", firstId: toFile.data?.[0]?.id },
   ];
@@ -32,7 +32,7 @@ function Today() {
     <PageHead title={`${hi}, Claire.`} meta={fmtLong(now)} actions={<NewAppointmentButton />} />
     <div className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4">{tiles.map(tile => <Button key={tile.label} variant="ghost" disabled={tile.value === 0} onClick={() => { if (tile.firstId && !document.getElementById(tile.target)) openAppt({ appointmentId: tile.firstId }); else document.getElementById(tile.target)?.scrollIntoView({ behavior: "smooth" }); }} className="h-auto min-h-[84px] flex-col items-start justify-between gap-2 rounded-xl border border-border bg-sheet p-3.5 text-left hover:bg-surface-2 disabled:bg-sheet disabled:opacity-60"><span className="flex w-full items-center justify-between gap-2 whitespace-normal text-xs text-muted-foreground">{tile.label}{!!tile.value && tile.tone && <span aria-hidden className={`size-2 shrink-0 rounded-full ${tile.tone === "warn" ? "bg-marigold" : "bg-success"}`} />}</span>{tile.value === null ? <Skeleton className="h-7 w-10" /> : <span className="tabular text-2xl font-medium leading-7 text-deep-ink">{tile.value}</span>}</Button>)}</div>
     {needs.isError && <ErrorNote onRetry={() => needs.refetch()} />}
-    {review.length > 0 && <section id="today-review" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Documents to review</h2><NeedsList items={review} /></section>}
+    {review.length > 0 && <section id="today-review" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Documents to check</h2><NeedsList items={review} /></section>}
     {unpaid.length > 0 && <section id="today-unpaid" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Unpaid</h2><NeedsList items={unpaid} /></section>}
     {otherNeeds.length > 0 && <section id="today-needs" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Needs you</h2><NeedsList items={otherNeeds} /></section>}
     {toFile.data && toFile.data.length > 0 && <section id="today-to-file" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Ready to file</h2><p className="-mt-2 mb-3 text-xs text-muted-foreground">Signed and paid. Open one to mark it filed.</p><ApptList appts={toFile.data} showDate /></section>}

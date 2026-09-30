@@ -54,7 +54,7 @@ export type Appt = {
 export const APPT_SELECT =
   "id, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, fee_cents, paid_at, paid_method, filed_at, finished_at, clients(id, name, email, phone), services(name, duration_min, price_from), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order, ai_check, ai_note, review_status, fix_reason, fix_note)";
 
-export const toReview = (a: Appt) => a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending");
+export const toReview = (a: Appt) => a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok");
 export const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
 
 /** Finished, signed and paid, but not filed yet. */
@@ -121,7 +121,7 @@ export const needsYou = (nowIso: string) =>
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").is("filed_at", null).lt("end_at", ago3).order("end_at"),
         supabase.from("messages").select("id, subject, recipient, error, sent_at, type").eq("delivery", "failed").order("sent_at", { ascending: false }),
         supabase.from("waitlist_offers").select("id, slot_start, services(name), waitlist(clients(name))").eq("status", "claimed").order("slot_start"),
-        supabase.from("checklist_items").select("appointment_id, appointments!inner(start_at, status)").eq("status", "uploaded").eq("review_status", "pending").in("appointments.status", ["booked", "confirmed", "completed"]).is("appointments.filed_at", null),
+        supabase.from("checklist_items").select("appointment_id, appointments!inner(start_at, status)").eq("status", "uploaded").eq("review_status", "pending").or("ai_check.is.null,ai_check.in.(kept,unreadable)").in("appointments.status", ["booked", "confirmed", "completed"]).is("appointments.filed_at", null),
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null).lt("finished_at", ago5).order("finished_at"),
       ]);
       const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error;

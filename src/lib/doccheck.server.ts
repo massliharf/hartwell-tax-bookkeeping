@@ -37,5 +37,7 @@ export async function aiCheckDocument(itemId: string): Promise<void> {
     const args = JSON.parse(j.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ?? "{}");
     const result = ["ok", "warning", "unreadable"].includes(args.result) ? args.result : "unreadable";
     await save(result, String(args.note ?? "").slice(0, 200));
+    // Workflow: documents the AI confirms are auto-accepted, so Claire only sees exceptions.
+    if (result === "ok") await s.from("checklist_items").update({ review_status: "accepted" }).eq("id", itemId).eq("file_path", item.file_path!).eq("review_status", "pending");
   } catch (e) { console.error("AI check error", e); }
 }

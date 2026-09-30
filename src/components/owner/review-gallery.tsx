@@ -89,13 +89,18 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
     return () => { live = false; };
   }, [open, fileKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (!open) { setLoaded({}); setIndex(0); } }, [open]);
+  useEffect(() => {
+    if (!open) { setLoaded({}); setIndex(0); return; }
+    // Start on the first document that actually needs Claire.
+    const first = files.findIndex((f) => f.review_status === "pending" && f.ai_check !== "warning" && f.ai_check !== "ok");
+    setIndex(first >= 0 ? first : 0);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { setZoom("fit"); setRot(0); setPage(0); }, [cur?.id]);
 
   const go = useCallback((d: number) => setIndex((i) => Math.min(Math.max(0, i + d), files.length - 1)), [files.length]);
   const zoomBy = useCallback((f: number) => setZoom((z) => Math.min(4, Math.max(0.25, (z === "fit" ? 1 : z) * f))), []);
   const next = () => {
-    const after = files.findIndex((f, i) => i > index && f.review_status === "pending");
+    const after = files.findIndex((f, i) => i > index && f.review_status === "pending" && f.ai_check !== "warning");
     if (after >= 0) setIndex(after); else if (index < files.length - 1) setIndex(index + 1);
   };
 

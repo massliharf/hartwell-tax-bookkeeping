@@ -89,7 +89,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
         </div>}
         {(() => { const n = items.filter((i) => i.status === "uploaded").length; return <div className="mt-4 flex flex-wrap gap-2">
-          {n > 0 && <Button size="sm" onClick={() => setGallery(true)}>Review documents ({n})</Button>}
+          {n > 0 && (() => { const eyes = items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length; return <Button size="sm" variant={eyes ? "default" : "secondary"} onClick={() => setGallery(true)}>{eyes ? `Check ${eyes} document${eyes === 1 ? "" : "s"}` : `View documents (${n})`}</Button>; })()}
           {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
         </div>; })()}
         <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">

@@ -15,8 +15,8 @@ const STORY: { title: string; actions: { k: string; label: string; hint: string;
     { k: "portal", label: "Open a client's private page", hint: "The page every confirmation email links to.", link: true },
   ] },
   { title: "Documents come in", actions: [
-    { k: "up", label: "Client uploads a document", hint: "Shows up in Documents to review with a sample file." },
-    { k: "wrong", label: "Client uploads last year's W-2", hint: "The AI check flags the wrong year before Claire sees it." },
+    { k: "up", label: "Client uploads a document", hint: "Checked and accepted automatically. Nothing lands on your desk." },
+    { k: "wrong", label: "Client uploads last year's W-2", hint: "The AI warns the client. If they keep it anyway, only then does Claire look." },
   ] },
   { title: "Before the appointment", actions: [
     { k: "j1", label: "Jump ahead 1 day", hint: "Runs reminders and the 48-hour readiness check." },

@@ -61,7 +61,7 @@ function ClaimPage() {
       <Shell>
         <h1 className="t-page text-deep-ink">It's yours.</h1>
         <p className="mt-4 text-deep-ink/70">{fmtDateLong(q.data.slotStart)} at {fmtTime(q.data.slotStart)}. A confirmation is on its way with your document checklist.</p>
-        <Button asChild className="mt-8"><Link to="/a/$token" params={{ token: state.token }}>Open your checklist</Link></Button>
+        <Button variant="accent" asChild className="mt-8"><Link to="/a/$token" params={{ token: state.token }}>Open your checklist</Link></Button>
       </Shell>
     );
   }
@@ -71,7 +71,7 @@ function ClaimPage() {
       <h1 className="mt-3 t-page text-deep-ink">{fmtDateLong(q.data.slotStart)}</h1>
       <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(q.data.slotStart)}, {q.data.service}, {q.data.minutes} min</p>
       <p className="mt-4 text-deep-ink/70">First to claim it gets it. No payment now.</p>
-      <Button size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {
+      <Button variant="accent" size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {
         setState("busy");
         try {
           const r = await claim({ data: { token } });

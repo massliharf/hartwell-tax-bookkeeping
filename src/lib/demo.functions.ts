@@ -81,13 +81,13 @@ async function simulateUpload(context: Parameters<typeof owner>[0], opts: { wron
   const img = await fetch(`${origin}/demo-docs/${slug}.jpg`).then((r) => (r.ok ? r.blob() : null)).catch(() => null);
   if (img) await s.storage.from("client-documents").upload(path, img, { upsert: true, contentType: "image/jpeg" });
   await s.from("checklist_items").update({
-    status: "uploaded", file_path: img ? path : null, uploaded_at: now, review_status: "pending", fix_reason: null, fix_note: null,
-    ai_check: opts.wrongYear ? "warning" : "ok",
+    status: "uploaded", file_path: img ? path : null, uploaded_at: now, review_status: opts.wrongYear ? "pending" : "accepted", fix_reason: null, fix_note: null,
+    ai_check: opts.wrongYear ? "kept" : "ok",
     ai_note: opts.wrongYear ? "This looks like a 2024 W-2. We need the 2025 one." : `Looks like the right ${it.document_name} for this client.`,
   }).eq("id", it.id);
   await s.rpc("compute_ready_score", { _id: it.appointment_id });
   const name = (it.appointments as unknown as { clients: { name: string } | null }).clients?.name ?? "A client";
-  return { message: opts.wrongYear ? `${name} uploaded last year's W-2. The AI flagged it in Documents to review.` : `${name} uploaded "${it.document_name}". It's waiting in Documents to review.` };
+  return { message: opts.wrongYear ? `${name} uploaded last year's W-2 and kept it after the warning. It's the one document that needs your eyes.` : `${name} uploaded "${it.document_name}". The AI checked it and accepted it. Nothing for you to do.` };
 }
 
 export const demoUpload = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => simulateUpload(context, { wrongYear: false }));

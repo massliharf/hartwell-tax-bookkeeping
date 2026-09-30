@@ -21,7 +21,7 @@ export function NewAppointmentButton() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)}><Plus />New appointment</Button>
+      <Button size="sm" variant="accent" onClick={() => setOpen(true)}><Plus />New appointment</Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="block max-h-[92dvh] max-w-[560px] overflow-y-auto p-0">
           {open && <NewAppointmentForm onDone={() => setOpen(false)} />}

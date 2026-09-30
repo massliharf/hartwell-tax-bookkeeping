@@ -27,7 +27,7 @@ export function HeroVisual() {
   return (
     <div className="relative mx-auto w-full max-w-sm pb-12 pt-12">
       <motion.div initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.3, ease: [0, 0, 0.2, 1] }} className="absolute -left-2 top-1 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-left-10">
-        <span className="grid size-7 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><CalendarCheck className="size-3.5" /></span>
+        <span className="grid size-7 place-items-center rounded-lg bg-ink-50 text-ink"><CalendarCheck className="size-3.5" /></span>
         <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">You're booked</span><span className="text-muted-foreground">Thursday, 10:30 am</span></span>
       </motion.div>
     <div className="relative w-full rounded-2xl border border-border bg-sheet p-5 shadow-lift sm:p-6">

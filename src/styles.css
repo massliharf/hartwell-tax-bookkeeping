@@ -92,14 +92,14 @@
   --fill-selected: rgba(115,115,115,0.15);
   --paper: #FAFAFA;
   --paper-deep: #EDEDED;
-  --ink-green: #1E5B47;
-  --ink-50: #EEF4F1;
-  --ink-100: #DCEAE3;
-  --ink-900: #123A2E;
+  --ink-green: #2F54EB;
+  --ink-50: #EEF2FF;
+  --ink-100: #DCE4FF;
+  --ink-900: #172A7A;
   --deep-ink: #1A1A1A;
   --marigold: #E0A13A;
   --sage: #EDEDED;
-  --success: #1E5B47;
+  --success: #17804F;
   --warning: #B26B17;
   --sheet: #FFFFFF;
 
@@ -121,20 +121,20 @@
   --destructive-foreground: #FFFFFF;
   --border: rgba(16,16,16,0.1);
   --input: rgba(16,16,16,0.15);
-  --ring: #4F69F2;
-  --chart-1: #1E5B47;
+  --ring: #2F54EB;
+  --chart-1: #2F54EB;
   --chart-2: #737373;
   --chart-3: #3B8A6E;
   --chart-4: #B26B17;
   --chart-5: #DBDBDB;
   --sidebar: #FFFFFF;
   --sidebar-foreground: #363636;
-  --sidebar-primary: #1E5B47;
+  --sidebar-primary: #2F54EB;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: rgba(115,115,115,0.15);
   --sidebar-accent-foreground: #1A1A1A;
   --sidebar-border: rgba(16,16,16,0.1);
-  --sidebar-ring: #4F69F2;
+  --sidebar-ring: #2F54EB;
 
   --shadow-sheet: none;
   --shadow-lift: 0 0 2px rgba(18,18,18,.08), 0 2px 4px rgba(18,18,18,.08), 0 6px 6px rgba(18,18,18,.04), 0 14px 9px rgba(18,18,18,.02), 0 25px 10px rgba(18,18,18,.02);
@@ -157,10 +157,10 @@
   /* Headings use the UI font by default (Studio Shell). The display font is opt-in via .font-serif or the t-* type styles. */
   h1, h2, h3 { font-family: var(--font-sans); font-weight: 500; }
   .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
-  ::selection { background: rgba(30,91,71,0.15); }
+  ::selection { background: rgba(47,84,235,0.18); }
   /* One consistent, high-contrast focus ring everywhere keyboard users land. */
   :focus-visible {
-    outline: 2px solid #4F69F2;
+    outline: 2px solid #2F54EB;
     outline-offset: 2px;
     border-radius: 6px;
   }

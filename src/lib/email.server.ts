@@ -37,7 +37,7 @@ export function renderEmail(heading: string, blocks: Block[]) {
 <table role="presentation" width="100%" style="background:#F5F5F5"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
 <tr><td style="padding:0 4px 16px"><table role="presentation"><tr>
-<td style="width:28px;height:28px;background:#2F54EB;border-radius:8px;text-align:center;vertical-align:middle;color:#FFFFFF;font-weight:700;font-size:15px;line-height:28px">H</td>
+<td style="width:28px;height:28px;background:#1A1A1A;border-radius:8px;text-align:center;vertical-align:middle;color:#FFFFFF;font-weight:700;font-size:15px;line-height:28px">H</td>
 <td style="padding-left:10px;font-size:15px;font-weight:600;color:#1A1A1A">Hartwell <span style="font-weight:400;color:#737373">Tax &amp; Bookkeeping</span></td>
 </tr></table></td></tr>
 <tr><td style="background:#FFFFFF;border:1px solid rgba(16,16,16,0.06);border-radius:16px;padding:32px 28px">

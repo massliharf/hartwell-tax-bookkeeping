@@ -147,6 +147,7 @@ export function MoreActions({ a, onClosed }: { a: Appt; onClosed: () => void }) 
       <DropdownMenu>
         <DropdownMenuTrigger asChild><Button size="icon" variant="secondary" aria-label="More actions" className="shrink-0"><MoreHorizontal /></Button></DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="top" className="w-60">
+          {a.manage_token && <DropdownMenuItem onSelect={() => window.open(`/a/${a.manage_token}`, "_blank", "noopener")}>See the client's page</DropdownMenuItem>}
           <DropdownMenuItem onSelect={() => send.mutate(() => link({ data: { id: a.id } }))}>Resend the appointment link</DropdownMenuItem>
           {a.status === "no_show" && <DropdownMenuItem onSelect={() => send.mutate(() => rebook({ data: { id: a.id } }))}>Send a rebooking link</DropdownMenuItem>}
           {open && <><DropdownMenuSeparator /><DropdownMenuItem onSelect={() => setConfirm(true)} className="text-alert-negative-fg focus:text-alert-negative-fg">Cancel appointment…</DropdownMenuItem></>}

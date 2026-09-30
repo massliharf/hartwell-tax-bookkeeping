@@ -1,9 +1,12 @@
 import { cn } from "@/lib/utils";
 
-/** Hartwell Tax brand mark: a rounded Hartwell-blue tile with a clean "H" monogram. */
+/**
+ * Hartwell Tax brand mark: a rounded ink tile with a clean "H" monogram.
+ * Ink, not the blue: blue is reserved for actions (buttons, links, focus), so the logo never competes with them.
+ */
 export function LogoMark({ size = 32, className, tone = "brand" }: { size?: number; className?: string; tone?: "brand" | "white" }) {
-  const bg = tone === "brand" ? "#2F54EB" : "#FFFFFF";
-  const fg = tone === "brand" ? "#FFFFFF" : "#2F54EB";
+  const bg = tone === "brand" ? "#1A1A1A" : "#FFFFFF";
+  const fg = tone === "brand" ? "#FFFFFF" : "#1A1A1A";
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className={cn("shrink-0", className)}>
       <rect width="32" height="32" rx="9" fill={bg} />
@@ -20,7 +23,7 @@ export function Logo({ size = 32, variant = "stacked", tone = "dark", className,
   const muted = tone === "dark" ? "text-muted-foreground" : "text-white/60";
   return (
     <span className={cn("flex min-w-0 items-center gap-2.5", className)}>
-      <LogoMark size={size} />
+      <LogoMark size={size} tone={tone === "light" ? "white" : "brand"} />
       {variant === "stacked" && (
         <span className="flex min-w-0 flex-col leading-none">
           <span className={cn("font-serif text-[15px] font-semibold tracking-[-0.01em]", name)}>Hartwell</span>

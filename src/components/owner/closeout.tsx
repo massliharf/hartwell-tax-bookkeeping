@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { EmailCard, type PreviewBlock } from "./email-preview";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tag } from "@/components/ui/tag";
@@ -11,11 +12,11 @@ import { finishAppointment, markFiled, markPaidInOffice, reviewDocument } from "
 import { fmtDay, money, type Appt, type Item } from "./lib";
 import { cn } from "@/lib/utils";
 
-export function useOwnerMutation<T>(fn: (v: T) => Promise<{ ok: boolean }>, success: string) {
+export function useOwnerMutation<T>(fn: (v: T) => Promise<{ ok: boolean }>, success: string | null) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSuccess: (r) => { if (!r.ok) { toast.error("Couldn't save that. Try again."); return; } toast.success(success); void qc.invalidateQueries({ queryKey: ["owner"] }); },
+    onSuccess: (r) => { if (!r.ok) { toast.error("Couldn't save that. Try again."); return; } if (success) toast.success(success); void qc.invalidateQueries({ queryKey: ["owner"] }); },
     onError: () => toast.error("Couldn't save that. Try again."),
   });
 }
@@ -25,9 +26,22 @@ export function FinishForm({ a, onBack, onDone }: { a: Appt; onBack: () => void;
   const finish = useServerFn(finishAppointment);
   const [fee, setFee] = useState(String(a.services?.price_from ?? ""));
   const [note, setNote] = useState("");
-  const m = useOwnerMutation((v: { feeCents: number; note: string }) => finish({ data: { id: a.id, ...v } }), "Finished. The client got a link to review, sign and pay.");
+  const first = a.clients?.name.split(" ")[0] ?? "the client";
+  const m = useOwnerMutation((v: { feeCents: number; note: string }) => finish({ data: { id: a.id, ...v } }), null);
   const cents = Math.round(Number(fee) * 100);
   const valid = fee.trim() !== "" && Number.isFinite(cents) && cents >= 0;
+  const feeText = valid && cents > 0 ? ` The fee is $${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0 })}.` : "";
+  // Same copy as closeout.server.ts, so Claire sees exactly what the client will get.
+  const preview: PreviewBlock[] = [
+    { p: `Hi ${first}, thanks for coming in. Claire has finished your return.${feeText}` },
+    ...(note.trim() ? [{ p: `A note from Claire: ${note.trim()}` }] : []),
+    { p: "One short step left: sign your e-file authorization (Form 8879) and pay. Your return is filed as soon as it's signed and paid." },
+    { button: { label: "Review, sign and pay" } },
+  ];
+  const sent = () => {
+    toast.success(`Sent to ${first}: review, sign and pay.`, a.manage_token ? { action: { label: `See ${first}'s page`, onClick: () => window.open(`/a/${a.manage_token}`, "_blank", "noopener") } } : undefined);
+    onDone?.();
+  };
   return (
     <div className="space-y-4">
         <div><h3 className="t-sub">Finish appointment</h3><p className="mt-1 text-sm text-muted-foreground">{a.clients?.name} gets an email to review, sign Form 8879 and pay.</p></div>
@@ -42,8 +56,13 @@ export function FinishForm({ a, onBack, onDone }: { a: Appt; onBack: () => void;
             <Textarea id="note" value={note} maxLength={600} onChange={(e) => setNote(e.target.value)} className="mt-1.5" rows={3} />
           </div>
         </div>
+        <div>
+          <p className="t-label mb-2">What {first} gets</p>
+          <p className="mb-2 text-xs text-muted-foreground">Email to {a.clients?.email}{a.clients?.phone ? ", plus a text with the link" : ""}. Subject: Review, sign and pay</p>
+          <EmailCard heading="Your return is ready." blocks={preview} />
+        </div>
         <div className="flex gap-2"><Button variant="secondary" onClick={onBack}>Back</Button>
-          <Button disabled={!valid || m.isPending} onClick={() => m.mutate({ feeCents: cents, note }, { onSuccess: (r) => { if (r.ok) onDone?.(); } })}>{m.isPending ? "Saving…" : "Finish and send"}</Button></div>
+          <Button disabled={!valid || m.isPending} onClick={() => m.mutate({ feeCents: cents, note }, { onSuccess: (r) => { if (r.ok) sent(); } })}>{m.isPending ? "Saving…" : "Finish and send"}</Button></div>
     </div>
   );
 }

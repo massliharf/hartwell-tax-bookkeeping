@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
+import { Checkout } from "@/components/booking/Checkout";
 import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -68,7 +69,7 @@ async function checkFile(f: File): Promise<string | null> {
 
 type Appt = {
   service_id: string; start_at: string; end_at: string; meeting_type: "in_person" | "video"; status: string;
-  ready_score: number; signature_status: string; services: { name: string; slug?: string } | null; intake_answers?: Record<string, unknown> | null; clients: { name: string } | null;
+  ready_score: number; signature_status: string; services: { name: string; slug?: string } | null; intake_answers?: Record<string, unknown> | null; clients: { name: string; email?: string } | null;
   fee_cents: number | null; client_note: string | null; paid_at: string | null; filed_at: string | null;
 };
 type Item = { id: string; document_name: string; description: string | null; required: boolean; status: string; na_reason: string | null; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
@@ -118,7 +119,7 @@ function PortalPage() {
         </div>
         {!cancelled && <Stepper steps={["Booked", "Documents", "Appointment", "Sign and pay", "Filed"]} current={a.filed_at ? 4 : postAppointment ? 3 : isPast || progress >= 2 ? 2 : 1} label="Appointment progress" />}
 
-        {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
+        {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
 
         <AppointmentCard appt={a} cancelled={cancelled} postAppointment={postAppointment} videoLink={q.data.videoLink ?? null} />
         {open && !!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
@@ -466,10 +467,9 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
 }
 
 /* ---------- Review, sign and pay ---------- */
-function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; onDone: () => void }) {
+function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; appt: Appt; onDone: () => void; clientEmail: string }) {
   const pay = useServerFn(testPay);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState(false);
+  const [checkout, setCheckout] = useState(false);
   const signed = appt.signature_status === "signed";
   const paid = !!appt.paid_at;
   if (appt.filed_at) return (
@@ -494,19 +494,15 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
         </div>
         {appt.client_note && <p className="mt-4 text-sm text-deep-ink/80"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
         <p className="mt-4 text-sm text-muted-foreground">Your return is filed as soon as it's signed and paid.</p>
-        <ol className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-5 text-sm">
-          <li className={`flex items-center gap-2 ${signed ? "text-success" : "font-medium text-deep-ink"}`}><span className="grid size-7 place-items-center rounded-full border border-current">{signed ? <Check className="size-4" /> : "1"}</span>Sign</li>
-          <li className={`flex items-center gap-2 ${paid ? "text-success" : signed ? "font-medium text-deep-ink" : "text-muted-foreground"}`}><span className="grid size-7 place-items-center rounded-full border border-current">{paid ? <Check className="size-4" /> : "2"}</span>Pay</li>
-        </ol>
+        <div className="mt-5 border-t border-border pt-5"><Stepper steps={["Sign Form 8879", "Pay"]} current={signed ? 1 : 0} label="Sign and pay" className="max-w-xs" /></div>
       {!signed && <SignSection token={token} appt={appt} onDone={onDone} embedded />}
       {signed && !paid && (
         <div className="mt-5 border-t border-border pt-5">
           <h3 className="t-card text-deep-ink">Pay {money(appt.fee_cents!)}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Online card payments aren't switched on yet. This test button marks your fee as paid, so you can see the whole flow.</p>
-          {err && <p className="mt-2 text-sm text-destructive" role="alert">That didn't go through. Please try again.</p>}
-          <Button size="lg" className="mt-4" disabled={busy} onClick={async () => { setBusy(true); setErr(false); try { const r = await pay({ data: { token } }); if (!r.ok) setErr(true); await onDone(); } catch { setErr(true); } setBusy(false); }}>
-            {busy ? <Loader2 className="animate-spin" /> : <CreditCard />} Test payment: pay {money(appt.fee_cents!)}
-          </Button>
+          <p className="mt-1 text-sm text-muted-foreground">Pay by card. You'll get a receipt by email, and Claire files your return right after.</p>
+          <Button size="lg" className="mt-4" onClick={() => setCheckout(true)}><CreditCard />Pay {money(appt.fee_cents!)}</Button>
+          <Checkout open={checkout} onOpenChange={setCheckout} amountCents={appt.fee_cents!} item={`${appt.services?.name ?? "Tax return"}, tax year ${new Date().getFullYear() - 1}`} email={clientEmail}
+            onPay={async () => { const r = await pay({ data: { token } }); return !!r.ok; }} onDone={() => { void onDone(); }} />
         </div>
       )}
     </section>

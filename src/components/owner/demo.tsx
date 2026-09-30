@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, FlaskConical, Mail, Smartphone, X } from "lucide-react";
+import { ChevronLeft, ExternalLink, FlaskConical, Smartphone, X } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { EmailCard, parseEmailText } from "./email-preview";
+import { LogoMark } from "@/components/brand/Logo";
 import { demoAbandon, demoCancelTomorrow, demoClaim, demoClientPays, demoJump, demoPortalLink, demoReset, demoRun, demoUpload, demoWrongDoc, phoneFeed } from "@/lib/demo.functions";
 
 type Msg = { id: string; channel: string; type: string; subject: string | null; body: string; sent_at: string; recipient: string | null; name: string | null };
@@ -126,7 +129,8 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
         </DialogContent>
       </Dialog>
 
-      {phone && <PhonePanel onClose={() => setPhone(false)} />}
+      {/* Portal to <body>: the sidebar is sticky (its own stacking context), so a fixed child would sit under the page. */}
+      {phone && typeof document !== "undefined" && createPortal(<PhonePanel onClose={() => setPhone(false)} />, document.body)}
     </>
   );
 }
@@ -137,54 +141,99 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
   // Never let an unexpected response take the page down; the preview just stays empty.
   const data: Msg[] = Array.isArray(q.data) ? q.data : [];
   const [pick, setPick] = useState<string>("latest");
+  const [tab, setTab] = useState<"mail" | "sms">("mail");
+  const [open, setOpen] = useState<string | null>(null);
   const people = useMemo(() => {
     const m = new Map<string, string>();
     for (const x of data) if (x.recipient && !m.has(x.recipient)) m.set(x.recipient, x.name ?? x.recipient);
     return [...m.entries()].slice(0, 40);
   }, [data]);
   const who = pick === "latest" ? people[0]?.[0] : pick;
-  const thread = data.filter((x) => x.recipient === who).slice(0, 12).reverse();
+  const mine = data.filter((x) => x.recipient === who || (x.channel === "sms" && x.name && x.name === people.find((p) => p[0] === who)?.[1]));
+  const mails = mine.filter((x) => x.channel !== "sms");
+  const texts = mine.filter((x) => x.channel === "sms").slice(0, 20).reverse();
   const name = people.find((p) => p[0] === who)?.[1];
+  const current = mails.find((m) => m.id === open);
+  const stamp = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
+  const linkify = (t: string) => t.split(/(https?:\/\/\S+)/g).map((part, i) => /^https?:\/\//.test(part) ? <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all text-[#0A84FF] underline">{part}</a> : part);
 
   return (
-    <aside
-      className="fixed bottom-36 right-5 z-40 w-[300px] sm:bottom-20">
-      <div className="mb-2 flex items-center gap-2">
-        <select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Client"
-          className="h-9 min-w-0 flex-1 rounded-full border border-border bg-sheet px-3 text-sm">
-          <option value="latest">Follow latest message</option>
+    <aside aria-label="Phone preview" className="enter fixed bottom-24 right-5 z-40 w-[330px] sm:bottom-6">
+      <div className="mb-2 flex items-center gap-2 rounded-2xl border border-line-1 bg-white/90 p-1.5 shadow-[0_0_2px_rgba(18,18,18,0.08),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] backdrop-blur-lg">
+        <select value={pick} onChange={(e) => { setPick(e.target.value); setOpen(null); }} aria-label="Whose phone"
+          className="h-8 min-w-0 flex-1 cursor-pointer rounded-lg bg-transparent px-2 text-[13px] text-deep-ink outline-none hover:bg-tint-1">
+          <option value="latest">{name ? `${name} (latest message)` : "Latest message"}</option>
           {people.map(([r, n]) => <option key={r} value={r}>{n}</option>)}
         </select>
-        <Button onClick={onClose} aria-label="Close" size="icon" variant="secondary" className="h-9 w-9 rounded-full"><X className="h-4 w-4" /></Button>
+        <Button onClick={onClose} aria-label="Close phone preview" size="icon" variant="ghost"><X /></Button>
       </div>
-      <div className="rounded-[44px] bg-deep-ink p-2.5">
-        <div className="relative h-[540px] overflow-hidden rounded-[36px] bg-paper">
-          <div className="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-deep-ink" />
-          <div className="border-b border-border bg-sheet px-4 pb-2 pt-9 text-center">
-            <p className="truncate text-sm font-medium text-deep-ink">{name ?? "No messages yet"}</p>
-            <p className="text-[11px] text-muted-foreground">From Claire Hartwell, EA</p>
+      <div className="rounded-[52px] bg-[#111] p-[10px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.45)] ring-1 ring-black/40">
+        <div className="relative flex h-[620px] flex-col overflow-hidden rounded-[42px] bg-white">
+          <div className="relative flex h-11 shrink-0 items-center justify-between px-7 text-[13px] font-semibold text-black">
+            <span className="tabular">9:41</span>
+            <span className="absolute left-1/2 top-2.5 h-[26px] w-[92px] -translate-x-1/2 rounded-full bg-black" />
+            <span className="flex items-center gap-1"><span className="flex items-end gap-[2px]">{[4, 6, 8, 10].map((h) => <span key={h} className="w-[3px] rounded-sm bg-black" style={{ height: h }} />)}</span><span className="ml-1 h-[11px] w-[22px] rounded-[3px] border border-black/60 p-[1px]"><span className="block h-full w-3/4 rounded-[1px] bg-black" /></span></span>
           </div>
-          <div className="h-[calc(100%-68px)] space-y-3 overflow-y-auto px-3 py-4">
-            {thread.length === 0 && <p className="pt-20 text-center text-sm text-muted-foreground">Messages will appear here as automations run.</p>}
-            
-              {thread.map((m) => (
-                <div key={m.id}>
-                  {m.channel === "sms" ? (
-                    <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-fill-neutral px-3 py-2 text-[13px] leading-snug text-deep-ink [overflow-wrap:anywhere]">{m.body}</div>
-                  ) : (
-                    <div className="rounded-2xl bg-surface-2 p-3">
-                      <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>
-                      <p className="mt-1 font-sans text-[15px] leading-tight text-deep-ink">{m.subject}</p>
-                      <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-deep-ink/75">{m.body}</p>
-                    </div>
-                  )}
-                  <p className="tabular mt-1 px-1 text-[10px] text-muted-foreground">
-                    {new Date(m.sent_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}
-                  </p>
+
+          {current ? (
+            <>
+              <div className="flex h-11 shrink-0 items-center gap-1 border-b border-black/10 px-3">
+                <button type="button" onClick={() => setOpen(null)} className="flex items-center gap-0.5 text-[15px] text-[#0A84FF]"><ChevronLeft className="size-5" />Inbox</button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <div className="px-4 pb-3 pt-3">
+                  <p className="text-[17px] font-semibold leading-snug text-black">{current.subject}</p>
+                  <div className="mt-3 flex items-center gap-2.5">
+                    <LogoMark size={32} />
+                    <div className="min-w-0 text-[12px] leading-4"><p className="font-semibold text-black">Claire Hartwell, EA</p><p className="truncate text-black/50">To: {name} · {stamp(current.sent_at)}</p></div>
+                  </div>
                 </div>
-              ))}
-            
-          </div>
+                {(() => { const e = parseEmailText(current.body ?? ""); return <EmailCard compact heading={e.heading} blocks={e.blocks} />; })()}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="shrink-0 px-4 pb-2">
+                <p className="text-[28px] font-bold leading-9 tracking-[-0.02em] text-black">{tab === "mail" ? "Inbox" : "Messages"}</p>
+                <div className="mt-2 grid grid-cols-2 rounded-lg bg-black/[0.06] p-0.5 text-[13px] font-medium">
+                  {(["mail", "sms"] as const).map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={`h-7 rounded-md transition-colors duration-150 ${tab === t ? "bg-white text-black shadow-sm" : "text-black/60"}`}>{t === "mail" ? `Mail (${mails.length})` : `Texts (${texts.length})`}</button>)}
+                </div>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                {tab === "mail" ? (
+                  mails.length === 0 ? <p className="px-6 pt-16 text-center text-[13px] text-black/50">Emails appear here as they're sent. Try a step in Demo tools.</p> : (
+                    <ul className="divide-y divide-black/10 border-t border-black/10">
+                      {mails.map((m, i) => (
+                        <li key={m.id}>
+                          <button type="button" onClick={() => setOpen(m.id)} className="flex w-full gap-2.5 px-4 py-3 text-left transition-colors duration-150 hover:bg-black/[0.03]">
+                            <span className={`mt-1.5 size-2 shrink-0 rounded-full ${i === 0 ? "bg-[#0A84FF]" : "bg-transparent"}`} />
+                            <span className="min-w-0 flex-1">
+                              <span className="flex items-baseline justify-between gap-2"><span className="truncate text-[14px] font-semibold text-black">Claire Hartwell, EA</span><span className="tabular shrink-0 text-[11px] text-black/45">{stamp(m.sent_at).split(",")[0]}</span></span>
+                              <span className="block truncate text-[13px] text-black">{m.subject}</span>
+                              <span className="line-clamp-2 text-[12.5px] leading-[17px] text-black/50">{(m.body ?? "").split(/\n\n+/).slice(1, 2).join(" ")}</span>
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                ) : (
+                  texts.length === 0 ? <p className="px-6 pt-16 text-center text-[13px] text-black/50">Text messages appear here for clients who gave a phone number.</p> : (
+                    <div className="space-y-3 px-3 pb-4 pt-2">
+                      <p className="text-center text-[11px] text-black/45">Hartwell Tax · Text message</p>
+                      {texts.map((m) => (
+                        <div key={m.id}>
+                          <div className="max-w-[82%] rounded-[18px] rounded-bl-md bg-[#E9E9EB] px-3 py-2 text-[14px] leading-[19px] text-black [overflow-wrap:anywhere]">{linkify(m.body ?? "")}</div>
+                          <p className="tabular mt-1 px-1 text-[10px] text-black/40">{stamp(m.sent_at)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                )}
+              </div>
+            </>
+          )}
+          <span className="absolute bottom-2 left-1/2 h-[5px] w-[120px] -translate-x-1/2 rounded-full bg-black" />
         </div>
       </div>
     </aside>

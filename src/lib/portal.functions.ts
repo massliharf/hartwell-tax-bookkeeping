@@ -16,7 +16,7 @@ async function appointmentByToken(token: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("appointments")
-    .select("id, service_id, start_at, end_at, meeting_type, status, ready_score, signature_status, signed_at, fee_cents, client_note, paid_at, filed_at, finished_at, intake_answers, services(name, duration_min, slug), clients(name)")
+    .select("id, service_id, start_at, end_at, meeting_type, status, ready_score, signature_status, signed_at, fee_cents, client_note, paid_at, filed_at, finished_at, intake_answers, services(name, duration_min, slug), clients(name, email)")
     .eq("manage_token", token)
     .maybeSingle();
   return { supabaseAdmin, appt: data };

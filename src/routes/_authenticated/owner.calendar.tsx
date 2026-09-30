@@ -1,3 +1,4 @@
+import { NewAppointmentButton } from "@/components/owner/new-appointment";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -83,6 +84,7 @@ function CalendarPage() {
 
   const nav = (
     <>
+      <NewAppointmentButton />
       <Button size="sm" variant="secondary" onClick={() => goWeek(mondayOf(today))}>Today</Button>
       <div className="flex">
         <Button size="icon" variant="ghost" aria-label="Previous week" onClick={() => goWeek(addDays(week, -7))}><ChevronLeft /></Button>

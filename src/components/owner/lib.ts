@@ -44,7 +44,7 @@ export const readinessStyle: Record<Readiness, string> = {
 
 export type Item = { id: string; document_name: string; required: boolean; status: "missing" | "uploaded" | "not_applicable"; file_path: string | null; uploaded_at: string | null; na_reason: string | null; sort_order: number; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
 export type Appt = {
-  id: string; start_at: string; end_at: string; status: string; meeting_type: "in_person" | "video"; ready_score: number; manage_token?: string;
+  id: string; start_at: string; end_at: string; status: string; meeting_type: "in_person" | "video"; ready_score: number; manage_token?: string; created_at?: string; signed_at?: string | null;
   signature_status: string; needs_attention: boolean; attention_reason: string | null; client_id: string; service_id: string;
   clients: { id: string; name: string; email: string; phone: string | null } | null;
   services: { name: string; duration_min: number; price_from: number } | null;
@@ -52,7 +52,7 @@ export type Appt = {
   checklist_items: Item[];
 };
 export const APPT_SELECT =
-  "id, manage_token, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, fee_cents, paid_at, paid_method, filed_at, finished_at, clients(id, name, email, phone), services(name, duration_min, price_from), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order, ai_check, ai_note, review_status, fix_reason, fix_note)";
+  "id, manage_token, created_at, signed_at, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, fee_cents, paid_at, paid_method, filed_at, finished_at, clients(id, name, email, phone), services(name, duration_min, price_from), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order, ai_check, ai_note, review_status, fix_reason, fix_note)";
 
 export const toReview = (a: Appt) => a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok");
 export const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
@@ -104,6 +104,7 @@ export type NeedItem =
   | { kind: "signature"; id: string; appt: Appt }
   | { kind: "review"; id: string; count: number; appt: Appt }
   | { kind: "unpaid"; id: string; appt: Appt }
+  | { kind: "wrap"; id: string; appt: Appt }
   | { kind: "failed"; id: string; msg: { id: string; subject: string | null; recipient: string | null; error: string | null; sent_at: string; type: string } }
   | { kind: "claimed"; id: string; offer: { id: string; slot_start: string; name: string; service: string } };
 
@@ -115,7 +116,7 @@ export const needsYou = (nowIso: string) =>
       const in48 = new Date(now + 48 * 3600e3).toISOString();
       const ago3 = new Date(now - 3 * 86400e3).toISOString();
       const ago5 = new Date(now - 5 * 86400e3).toISOString();
-      const [low, sig, failed, claimed, rev, unpaid] = await Promise.all([
+      const [low, sig, failed, claimed, rev, unpaid, wrap] = await Promise.all([
         supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lt("ready_score", 70)
           .gt("start_at", nowIso).lte("start_at", in48).order("start_at"),
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").is("filed_at", null).lt("end_at", ago3).order("end_at"),
@@ -123,8 +124,10 @@ export const needsYou = (nowIso: string) =>
         supabase.from("waitlist_offers").select("id, slot_start, services(name), waitlist(clients(name))").eq("status", "claimed").order("slot_start"),
         supabase.from("checklist_items").select("appointment_id, appointments!inner(start_at, status)").eq("status", "uploaded").eq("review_status", "pending").or("ai_check.is.null,ai_check.in.(kept,unreadable)").in("appointments.status", ["booked", "confirmed", "completed"]).is("appointments.filed_at", null),
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null).lt("finished_at", ago5).order("finished_at"),
+        // Meeting is over but not finished yet: Claire decides Finish, another meeting, or no-show.
+        supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lte("end_at", nowIso).order("end_at"),
       ]);
-      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error;
+      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error ?? wrap.error;
       if (err) throw err;
       const revRows = (rev.data ?? []) as unknown as { appointment_id: string; appointments: { start_at: string } }[];
       let review: NeedItem[] = [];
@@ -134,6 +137,7 @@ export const needsYou = (nowIso: string) =>
         if (fa) review = [{ kind: "review", id: firstId, count: revRows.length, appt: fa as unknown as Appt }];
       }
       return [
+        ...((wrap.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "wrap" as const, id: a.id, appt: a })),
         ...review,
         ...((unpaid.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "unpaid" as const, id: a.id, appt: a })),
         ...((low.data ?? []) as unknown as Appt[]).filter((a) => a.attention_reason !== "handled").map((a) => ({ kind: "low" as const, id: a.id, appt: a })),

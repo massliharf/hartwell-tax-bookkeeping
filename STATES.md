@@ -46,3 +46,16 @@ Today: Needs you (exceptions only), Documents to check, Unpaid, Ready to file, t
 Appointment window: five stages, documents grouped (Needs your eyes / Received / Still to come), Follow-ups (sent, scheduled with
 date, or why it was skipped) with Send now, Finish / No-show, "…" menu for less common actions.
 Report: every message sent, time saved, collected this month, waiting for payment.
+
+## 6. One lifecycle, both sides (src/lib/lifecycle.ts)
+documents → ready → meeting → wrap_up → sign_pay → to_file → filed, with side exits cancelled and no_show.
+The client's page and Claire's window both call stageOf(), so they always agree. Each stage shows only what matters:
+| Stage | Client sees | Claire's footer |
+|---|---|---|
+| documents / ready | When and where, confirm / reschedule / cancel, checklist (collapsed once complete) | Reschedule, … |
+| meeting (10 min before → end) | "Happening now", Join call for video; no reschedule/cancel | Finish appointment, Needs another meeting, … (No-show) |
+| wrap_up (ended, not finished) | "Claire is finishing your return", fixes if any; no meeting details | Same as meeting; also listed in Needs you |
+| another meeting needed | New time on the same appointment; documents and answers carry over; email "Let's finish at your next meeting" | picks a time with the shared slot picker |
+| sign_pay | Review, sign (Form 8879), pay (checkout) | Paid in office, Mark filed (locked until signed + paid) |
+| to_file / filed | Done card | Mark filed / nothing |
+Both sides show a dated timeline: what happened (booked, each upload, each message, meeting, finished, signed, paid, filed) and what's next.

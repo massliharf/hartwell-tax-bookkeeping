@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon } from "lucide-react";
+import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon, Hourglass } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
+import { STEPS, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
 import { Checkout } from "@/components/booking/Checkout";
 import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -71,8 +72,9 @@ type Appt = {
   service_id: string; start_at: string; end_at: string; meeting_type: "in_person" | "video"; status: string;
   ready_score: number; signature_status: string; services: { name: string; slug?: string } | null; intake_answers?: Record<string, unknown> | null; clients: { name: string; email?: string } | null;
   fee_cents: number | null; client_note: string | null; paid_at: string | null; filed_at: string | null;
+  created_at?: string; finished_at?: string | null; signed_at?: string | null;
 };
-type Item = { id: string; document_name: string; description: string | null; required: boolean; status: string; na_reason: string | null; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
+type Item = { id: string; uploaded_at?: string | null; document_name: string; description: string | null; required: boolean; status: string; na_reason: string | null; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
 
 function PortalPage() {
   const { token } = Route.useParams();
@@ -95,17 +97,48 @@ function PortalPage() {
 
   const a = q.data.appointment as Appt;
   const items = q.data.checklist as Item[];
-  const now = new Date(q.data.now!);
-  const isPast = new Date(a.start_at) <= now;
-  const cancelled = a.status === "cancelled";
-  const open = ["booked", "confirmed"].includes(a.status) && !isPast;
+  const nowIso = q.data.now!;
+  const stage = stageOf(a, nowIso);
+  const cancelled = stage === "cancelled";
+  const ahead = meetingAhead(stage);
+  const after = stage === "wrap_up" || stage === "sign_pay" || stage === "to_file" || stage === "filed";
   const first = a.clients?.name?.split(" ")[0] ?? "there";
   const todo = items.filter((i) => i.required && (i.status === "missing" || i.review_status === "needs_fix")).length;
-  const closeout = a.status === "completed" && a.fee_cents != null;
-  const postAppointment = a.status === "completed";
   const fixItems = items.filter((i) => i.review_status === "needs_fix");
-  const sentItems = items.filter((i) => i.status === "uploaded" && i.review_status !== "needs_fix");
-  const progress = a.filed_at ? 5 : postAppointment ? 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
+  const doneCount = items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length;
+  const day = new Date(a.start_at).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" });
+  const sub: Record<Stage, string> = {
+    documents: todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
+    ready: `Everything is in. See you ${day}.`,
+    meeting: a.meeting_type === "video" ? "Your appointment is now. Join the call below." : "Your appointment is now. Claire is expecting you.",
+    wrap_up: "Thanks for meeting with Claire. She's finishing your return.",
+    sign_pay: a.signature_status === "signed" ? "Signed. One payment and your return is filed." : "Your return is ready. Sign and pay to have it filed.",
+    to_file: "All done. Claire will file your return today.",
+    filed: "Your return has been e-filed.",
+    cancelled: "This appointment was cancelled.",
+    no_show: "We missed you at your appointment.",
+  };
+  const checklist = (
+    <section>
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <h2 className="t-card text-deep-ink">Your checklist</h2>
+        <span className="tabular text-sm text-muted-foreground">{doneCount} of {items.length} done</span>
+      </div>
+      <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
+        <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only Claire can see your files. We never ask for your Social Security number.
+      </p>
+      <ul className="space-y-4">{items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
+      <p className="mt-4 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
+    </section>
+  );
+  const sentDocs = (
+    <details className="rounded-2xl border border-border bg-sheet p-5">
+      <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-deep-ink [&::-webkit-details-marker]:hidden">
+        Documents you sent ({doneCount})<ChevronDown className="size-4 text-muted-foreground" />
+      </summary>
+      <ul className="mt-4 space-y-3">{items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
+    </details>
+  );
 
   return (
     <BookingShell>
@@ -113,44 +146,96 @@ function PortalPage() {
         <div>
           <p className="text-[13px] text-muted-foreground">Your appointment</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
-          <p className="mt-2 text-deep-ink/70">
-            {cancelled ? "This appointment was cancelled." : a.filed_at ? "Your return has been e-filed." : postAppointment ? a.signature_status === "signed" && a.paid_at ? "All done. Claire will file your return today." : "Your return is ready. Sign and pay to have it filed." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
-          </p>
+          <p className="mt-2 text-deep-ink/70">{sub[stage]}</p>
         </div>
-        {!cancelled && <Stepper steps={["Booked", "Documents", "Appointment", "Sign and pay", "Filed"]} current={a.filed_at ? 4 : postAppointment ? 3 : isPast || progress >= 2 ? 2 : 1} label="Appointment progress" />}
+        {!cancelled && <Stepper steps={STEPS} current={stepOf(stage)} label="Appointment progress" />}
 
-        {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
+        {/* 1. Before the meeting: when and where, confirm/move/cancel, then the checklist. */}
+        {ahead && <>
+          <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} />
+          {!!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
+          <Actions token={token} appt={a} onChange={refresh} />
+          {stage === "ready" ? sentDocs : checklist}
+        </>}
 
-        <AppointmentCard appt={a} cancelled={cancelled} postAppointment={postAppointment} videoLink={q.data.videoLink ?? null} />
-        {open && !!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
-        {open && <Actions token={token} appt={a} onChange={refresh} />}
-        {cancelled && (
-          <div className="rounded-2xl bg-surface-2 p-6">
-            <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
-            <Button asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
-          </div>
+        {/* 2. The meeting itself. */}
+        {stage === "meeting" && <>
+          <AppointmentCard appt={a} mode="now" videoLink={q.data.videoLink ?? null} />
+          {todo > 0 ? checklist : sentDocs}
+        </>}
+
+        {/* 3. After the meeting, before Claire finishes. */}
+        {stage === "wrap_up" && <>
+          <StatusCard icon={<Hourglass />} title="Claire is finishing your return.">You'll get an email to review, sign and pay, usually the same day. Nothing to do until then.</StatusCard>
+          {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+        </>}
+
+        {/* 4. Sign and pay, then done. */}
+        {(stage === "sign_pay" || stage === "to_file" || stage === "filed") && <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} />}
+        {stage === "sign_pay" && fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+
+        {/* Side exits. */}
+        {(cancelled || stage === "no_show") && (
+          <StatusCard icon={<CalendarClock />} title={cancelled ? "Pick a new time whenever you're ready." : "Let's find you a new time."} action={<Button asChild size="lg"><Link to="/book">Book a new time</Link></Button>}>
+            Your documents and answers are saved, so booking again takes two minutes.
+          </StatusCard>
         )}
 
-        {!cancelled && items.length > 0 && (postAppointment ? <section className="space-y-4">
-          {fixItems.length > 0 && !a.paid_at && !a.filed_at && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
-          <details className="rounded-2xl border border-border bg-sheet p-5"><summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-deep-ink [&::-webkit-details-marker]:hidden">Documents you sent ({sentItems.length}) <ChevronDown className="size-4" /></summary><p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground"><Lock className="size-4 shrink-0" /> Only Claire can see your files. We never ask for your Social Security number.</p><ul className="mt-4 space-y-3">{sentItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></details>
-        </section> : (
-          <section>
-            <div className="mb-4 flex items-end justify-between gap-4">
-              <h2 className="t-card text-deep-ink">Your checklist</h2>
-              <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length} of {items.length} done</span>
-            </div>
-            <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
-              <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only Claire can see your files. We never ask for your Social Security number.
-            </p>
-            <ul className="space-y-4">
-              {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
-            </ul>
-            <p className="mt-4 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
-          </section>
-        ))}
+        {after && items.length > 0 && sentDocs}
+        {!cancelled && <Timeline a={a} items={items} stage={stage} nowIso={nowIso} />}
       </div>
     </BookingShell>
+  );
+}
+
+function StatusCard({ icon, title, children, action }: { icon: React.ReactNode; title: string; children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-border bg-sheet p-6">
+      <div className="flex items-start gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-1 text-deep-ink [&_svg]:size-5">{icon}</span>
+        <div className="min-w-0">
+          <h2 className="t-card text-deep-ink">{title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{children}</p>
+          {action && <div className="mt-4">{action}</div>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** What happened when, and what's next. The same milestones Claire sees. */
+function Timeline({ a, items, stage, nowIso }: { a: Appt; items: Item[]; stage: Stage; nowIso: string }) {
+  const lastUpload = items.map((i) => i.uploaded_at).filter(Boolean).sort().at(-1) ?? null;
+  const allIn = items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix");
+  const metDone = stage === "wrap_up" || stage === "sign_pay" || stage === "to_file" || stage === "filed";
+  const rows: { label: string; at: string | null; done: boolean; note?: string | undefined }[] = [
+    { label: "Booked", at: a.created_at ?? null, done: true },
+    { label: allIn ? "All documents in" : "Documents", at: lastUpload, done: allIn || metDone, note: allIn ? undefined : `${items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length} of ${items.length} sent` },
+    { label: a.meeting_type === "video" ? "Video call with Claire" : "Meeting with Claire", at: a.start_at, done: metDone || stage === "no_show", note: stage === "no_show" ? "Missed" : undefined },
+    { label: "Return finished", at: a.finished_at ?? null, done: !!a.finished_at },
+    { label: "Form 8879 signed", at: a.signed_at ?? null, done: a.signature_status === "signed" },
+    { label: "Paid", at: a.paid_at, done: !!a.paid_at },
+    { label: "E-filed", at: a.filed_at, done: !!a.filed_at },
+  ];
+  const fmt = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
+  const nextIdx = rows.findIndex((r) => !r.done);
+  return (
+    <section>
+      <h2 className="mb-3 t-sub">Timeline</h2>
+      <ol className="relative space-y-0">
+        {rows.map((r, i) => (
+          <li key={r.label} className="relative flex gap-3 pb-4 last:pb-0">
+            {i < rows.length - 1 && <span aria-hidden="true" className={`absolute left-[9px] top-5 h-[calc(100%-12px)] w-px ${r.done ? "bg-ink" : "bg-line-1"}`} />}
+            <span className={`relative mt-0.5 grid size-[19px] shrink-0 place-items-center rounded-full border ${r.done ? "border-ink bg-ink text-white" : i === nextIdx ? "border-ink bg-sheet" : "border-line-2 bg-sheet"}`}>{r.done && <Check className="size-3" strokeWidth={3} />}</span>
+            <div className="min-w-0 text-sm">
+              <p className={r.done ? "text-deep-ink" : i === nextIdx ? "font-medium text-deep-ink" : "text-muted-foreground"}>{r.label}{i === nextIdx && <span className="ml-2 text-xs font-normal text-ink">Next</span>}</p>
+              <p className="tabular text-xs text-muted-foreground">{r.done && r.at ? fmt(r.at) : !r.done && r.label.includes("with Claire") ? fmt(r.at!) : r.note ?? ""}{r.done && r.note ? ` · ${r.note}` : ""}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p className="sr-only">Now: {nowIso}</p>
+    </section>
   );
 }
 
@@ -191,15 +276,16 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
 }
 
 /* ---------- Appointment card ---------- */
-function AppointmentCard({ appt, cancelled, postAppointment, videoLink }: { appt: Appt; cancelled: boolean; postAppointment: boolean; videoLink: string | null }) {
+function AppointmentCard({ appt, mode, videoLink }: { appt: Appt; mode: "upcoming" | "now"; videoLink: string | null }) {
   const video = appt.meeting_type === "video";
+  const cancelled = false, postAppointment = false;
   return (
     <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-[11px] font-medium text-muted-foreground">{appt.services?.name}</p>
-            {appt.status === "confirmed" && <Tag tone="success">Confirmed</Tag>}
+            {mode === "now" ? <Tag tone="accent">Happening now</Tag> : appt.status === "confirmed" && <Tag tone="success">Confirmed</Tag>}
             {cancelled && <Tag tone="danger">Cancelled</Tag>}
           </div>
           <p className={`mt-1 t-card text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
@@ -212,7 +298,7 @@ function AppointmentCard({ appt, cancelled, postAppointment, videoLink }: { appt
           {video ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> {postAppointment ? "Video call" : videoLink ? "Video call. Join from here at your appointment time." : "Video call. Claire will send the link by email."}</span>
-              {videoLink && !postAppointment && <Button size="sm" variant="outline" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
+              {videoLink && !postAppointment && <Button size={mode === "now" ? "md" : "sm"} variant={mode === "now" ? "default" : "outline"} asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">

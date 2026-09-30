@@ -51,23 +51,17 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
   const qc = useQueryClient();
   const openAppt = useApptPanel();
   const book = useServerFn(ownerBookAppointment);
-  const fetchWindow = useServerFn(getAvailabilityWindow);
   const [term, setTerm] = useState("");
   const [picked, setPicked] = useState<Client | null>(null);
   const [newClient, setNewClient] = useState({ name: "", email: "", phone: "" });
   const [serviceId, setServiceId] = useState<string | null>(null);
   const [meeting, setMeeting] = useState<"in_person" | "video">("in_person");
-  const [date, setDate] = useState<string | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const clients = useQuery({ queryKey: ["owner", "clients-lite"], queryFn: async () => { const { data, error } = await supabase.from("clients").select("id, name, email, phone").order("name"); if (error) throw error; return (data ?? []) as Client[]; } });
   const services = useQuery({ queryKey: ["owner", "services-active"], queryFn: async () => { const { data, error } = await supabase.from("services").select("id, name, duration_min").eq("active", true).order("sort_order"); if (error) throw error; return data ?? []; } });
-  const avail = useQuery({ queryKey: ["availability", serviceId], enabled: !!serviceId, staleTime: 15_000, queryFn: () => fetchWindow({ data: { serviceId: serviceId!, days: 14 } }) });
-  const days = (avail.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
-  const selDate = date ?? days.find((d) => d.slots.length)?.date ?? null;
-  const day = days.find((d) => d.date === selDate);
 
   const matches = term.trim().length > 0 ? (clients.data ?? []).filter((c) => `${c.name} ${c.email} ${c.phone ?? ""}`.toLowerCase().includes(term.trim().toLowerCase())).slice(0, 5) : [];
   const who = picked ?? (newClient.name.trim() && /\S+@\S+\.\S+/.test(newClient.email) ? { name: newClient.name.trim(), email: newClient.email.trim(), phone: newClient.phone.trim() } : null);
@@ -79,7 +73,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
     setBusy(true); setErr(null);
     try {
       const r = await book({ data: { serviceId, start: slot, name: who.name, email: who.email, phone: who.phone ?? "", meetingType: meeting } });
-      if (!r.ok) { setErr(r.error); setSlot(null); void avail.refetch(); return; }
+      if (!r.ok) { setErr(r.error); setSlot(null); void qc.invalidateQueries({ queryKey: ["availability", serviceId] }); return; }
       toast.success(`Booked. ${who.name.split(" ")[0]} has been emailed the confirmation and portal link.`);
       await qc.invalidateQueries({ queryKey: ["owner"] });
       onDone();
@@ -126,7 +120,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
           <h3 className="mb-2 t-sub">Service</h3>
           {services.isLoading ? <Skeleton className="h-24 rounded-xl" /> : (
             <div className="grid gap-2 sm:grid-cols-2">{(services.data ?? []).map((s) => (
-              <Button key={s.id} variant="secondary" aria-pressed={serviceId === s.id} onClick={() => { setServiceId(s.id); setDate(null); setSlot(null); }}
+              <Button key={s.id} variant="secondary" aria-pressed={serviceId === s.id} onClick={() => { setServiceId(s.id); setSlot(null); }}
                 className={cn("h-auto justify-between whitespace-normal px-3 py-2.5 text-left", serviceId === s.id && "bg-primary text-primary-foreground hover:bg-primary")}>
                 <span className="text-sm">{s.name}</span><span className={cn("tabular text-xs", serviceId === s.id ? "text-primary-foreground/70" : "text-muted-foreground")}>{s.duration_min} min</span>
               </Button>))}</div>
@@ -138,27 +132,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
         {serviceId && (
           <section>
             <h3 className="mb-2 t-sub">Time <span className="text-xs font-normal text-muted-foreground">All times Eastern</span></h3>
-            {avail.isLoading ? <div className="flex gap-1">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[68px] rounded-lg" />)}</div>
-              : avail.isError || avail.data?.error ? <p className="text-sm text-muted-foreground">Couldn't load times. <button className="font-medium text-ink underline" onClick={() => avail.refetch()}>Try again</button></p>
-              : <>
-                <div className="flex gap-1 overflow-x-auto pb-2 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
-                  {days.map((d) => {
-                    const c = fmtDayChip(d.date); const active = d.date === selDate; const n = d.slots.length; const full = !d.closed && n === 0;
-                    return (
-                      <Button key={d.date} variant="secondary" role="option" aria-selected={active} disabled={d.closed || full} onClick={() => { setDate(d.date); setSlot(null); }}
-                        className={cn("flex h-[68px] w-[68px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border px-1", active ? "border-deep-ink bg-deep-ink text-primary-foreground hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : "border-border bg-sheet text-deep-ink hover:bg-surface-2")}>
-                        <span className={cn("text-[11px]", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{c.dow}</span>
-                        <span className="tabular text-base font-medium leading-tight">{c.day}</span>
-                        <span className={cn("text-[10px] font-medium", active ? "text-primary-foreground/80" : full || d.closed ? "text-muted-foreground" : "text-success")}>{d.closed ? "Closed" : full ? "Full" : `${n} open`}</span>
-                      </Button>
-                    );
-                  })}
-                </div>
-                {day && day.slots.length > 0 ? (
-                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">{day.slots.map((s) => (
-                    <Button key={s} variant={slot === s ? "dark" : "secondary"} aria-pressed={slot === s} onClick={() => setSlot(s)} className="tabular h-10 text-sm">{fmtTime(s)}</Button>))}</div>
-                ) : <p className="mt-3 text-sm text-muted-foreground">No open times in the next two weeks.</p>}
-              </>}
+            <SlotPicker key={serviceId} serviceId={serviceId!} value={slot} onChange={setSlot} />
           </section>
         )}
         {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
@@ -169,5 +143,38 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
         <div className="flex gap-2"><Button variant="secondary" onClick={onDone}>Cancel</Button><Button disabled={!canBook} onClick={submit}>{busy ? "Booking…" : "Book and send confirmation"}</Button></div>
       </footer>
     </div>
+  );
+}
+
+/** Day chips + 30-minute times from the same availability the public booking page uses. Shared by New appointment and "Needs another meeting". */
+export function SlotPicker({ serviceId, value, onChange }: { serviceId: string; value: string | null; onChange: (slot: string | null) => void }) {
+  const fetchWindow = useServerFn(getAvailabilityWindow);
+  const [date, setDate] = useState<string | null>(null);
+  const avail = useQuery({ queryKey: ["availability", serviceId], staleTime: 15_000, queryFn: () => fetchWindow({ data: { serviceId, days: 14 } }) });
+  const days = (avail.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
+  const selDate = date ?? days.find((d) => d.slots.length)?.date ?? null;
+  const day = days.find((d) => d.date === selDate);
+  if (avail.isLoading) return <div className="flex gap-1">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[68px] rounded-lg" />)}</div>;
+  if (avail.isError || avail.data?.error) return <p className="text-sm text-muted-foreground">Couldn't load times. <button className="font-medium text-ink underline" onClick={() => avail.refetch()}>Try again</button></p>;
+  return (
+    <>
+      <div className="flex gap-1 overflow-x-auto pb-2 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
+        {days.map((d) => {
+          const c = fmtDayChip(d.date); const active = d.date === selDate; const n = d.slots.length; const full = !d.closed && n === 0;
+          return (
+            <Button key={d.date} variant="secondary" role="option" aria-selected={active} disabled={d.closed || full} onClick={() => { setDate(d.date); onChange(null); }}
+              className={cn("flex h-[68px] w-[68px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border px-1", active ? "border-deep-ink bg-deep-ink text-primary-foreground hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : "border-line-1 bg-sheet")}>
+              <span className={cn("text-[11px]", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{c.dow}</span>
+              <span className="tabular text-base font-medium leading-tight">{c.day}</span>
+              <span className={cn("text-[10px] font-medium", active ? "text-primary-foreground/80" : full || d.closed ? "text-muted-foreground" : "text-success")}>{d.closed ? "Closed" : full ? "Full" : `${n} open`}</span>
+            </Button>
+          );
+        })}
+      </div>
+      {day && day.slots.length > 0 ? (
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">{day.slots.map((s) => (
+          <Button key={s} variant={value === s ? "dark" : "secondary"} aria-pressed={value === s} onClick={() => onChange(s)} className="tabular h-10 text-sm">{fmtTime(s)}</Button>))}</div>
+      ) : <p className="mt-3 text-sm text-muted-foreground">No open times in the next two weeks.</p>}
+    </>
   );
 }

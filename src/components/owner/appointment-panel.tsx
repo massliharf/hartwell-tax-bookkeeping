@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { ChevronRight, FileText, MapPin, Video } from "lucide-react";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
-import { FollowUps, MoreActions, RequestDocument } from "./follow-ups";
+import { FollowUps, MeetingPicker, MoreActions, RequestDocument } from "./follow-ups";
+import { STEPS, meetingAhead, stageOf, stepOf } from "@/lib/lifecycle";
 import { useOwnerCtx } from "./ctx";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -15,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { APPT_SELECT, fmtLong, fmtTime, missingOf, type Appt } from "./lib";
-import { ApptActionButtons, ErrorNote, StatusPill } from "./ui";
+import { ErrorNote, StatusPill } from "./ui";
 import { ReviewGallery } from "./review-gallery";
 import { AiTag, CloseoutBlock, DocReview, FinishForm } from "./closeout";
 import { reviewDocument } from "@/lib/owner.functions";
@@ -36,6 +37,7 @@ export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget 
 function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }) {
   const [gallery, setGallery] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [picking, setPicking] = useState<"move" | "follow_up" | null>(null);
   const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const [accepting, setAccepting] = useState(false);
   const review = useServerFn(reviewDocument);
@@ -53,6 +55,8 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
   const a = q.data;
   if (!a) return <p className="p-6 text-sm text-muted-foreground">This appointment couldn't be found.</p>;
   const items = [...a.checklist_items].sort((x, y) => x.sort_order - y.sort_order);
+  const stage = stageOf(a, now);
+  const finished = stage === "sign_pay" || stage === "to_file" || stage === "filed";
   const missing = missingOf(a).length;
   const looksRight = items.filter(i => i.status === "uploaded" && i.review_status === "pending" && i.ai_check === "ok");
   const acceptAll = async () => {
@@ -78,7 +82,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           <span className="inline-flex items-center gap-1">{a.meeting_type === "video" ? <Video className="size-3.5" /> : <MapPin className="size-3.5" />}{a.meeting_type === "video" ? "Video" : "In person"}</span>
           <StatusPill status={a.status} />
         </DialogDescription>
-        <Stages a={a} />
+        {stage !== "cancelled" && <Stepper steps={STEPS} current={stepOf(stage)} className="mt-4" />}
         {a.clients && (
           <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose}
             className="mt-4 flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 transition-colors duration-150 hover:bg-surface-2">
@@ -90,6 +94,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
       </header>
 
       <section className="px-6 py-5">
+        <DocsWrap collapsed={finished} count={items.filter((i) => i.status === "uploaded").length}>
         {a.status !== "completed" && <div className="flex items-center gap-3">
           <ReadyRing value={a.ready_score} size={40} stroke={4} />
           <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
@@ -126,25 +131,45 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           );
           return <>{group("Needs your eyes", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}<RequestDocument a={a} /></>;
         })()}
+        </DocsWrap>
         <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
       </section>
       <CloseoutBlock a={a} />
       <FollowUps a={a} now={now} />
 
       <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
-        {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} /> : <div className="flex items-center gap-2"><div className="min-w-0 flex-1"><ApptActionButtons a={a} onDone={onClose} onFinish={() => setFinishing(true)} /></div><MoreActions a={a} onClosed={onClose} /></div>}
-        {!finishing && !(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">{a.filed_at ? "Return filed. Nothing left to do." : a.status === "completed" ? "Appointment finished." : "This appointment is closed."}</p>}
+        {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
+          : picking ? <MeetingPicker a={a} mode={picking} onBack={() => setPicking(null)} onDone={() => { setPicking(null); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
+          : (
+            <div className="flex items-center gap-2">
+              <div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
+                {meetingAhead(stage) && <>
+                  <Button variant="secondary" className="col-span-2" onClick={() => setPicking("move")}>Reschedule</Button>
+                </>}
+                {(stage === "meeting" || stage === "wrap_up") && <>
+                  <Button onClick={() => setFinishing(true)}>Finish appointment</Button>
+                  <Button variant="secondary" onClick={() => setPicking("follow_up")}>Needs another meeting</Button>
+                </>}
+                {(finished || stage === "cancelled" || stage === "no_show") && <p className="col-span-2 text-xs text-muted-foreground">{stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed above when it's submitted." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
+              </div>
+              <MoreActions a={a} onClosed={onClose} canNoShow={stage === "meeting" || stage === "wrap_up"} />
+            </div>
+          )}
       </footer>
     </div>
   );
 }
 
-const STAGES = ["Booked", "Documents", "Appointment", "Sign and pay", "Filed"];
-/** Where this appointment is in the season, the same five steps the client sees on their page. */
-function Stages({ a }: { a: Appt }) {
-  const closed = a.status === "cancelled" || a.status === "no_show";
-  // Same rule as the client's page: 0 booked, 1 documents, 2 appointment, 3 sign and pay, 4 filed.
-  const at = a.filed_at ? 4 : a.status === "completed" ? 3 : a.ready_score >= 100 || Date.parse(a.start_at) < Date.now() ? 2 : 1;
-  if (closed) return null;
-  return <Stepper steps={STAGES} current={at} className="mt-4" />;
+
+/** After the return is finished, documents step back: one collapsed line, open on demand. */
+function DocsWrap({ collapsed, count, children }: { collapsed: boolean; count: number; children: React.ReactNode }) {
+  if (!collapsed) return <>{children}</>;
+  return (
+    <details className="group">
+      <summary className="flex cursor-pointer list-none items-center justify-between text-[13px] font-medium text-deep-ink [&::-webkit-details-marker]:hidden">
+        Documents ({count} received)<ChevronRight className="size-4 text-muted-foreground transition-transform duration-200 group-open:rotate-90" />
+      </summary>
+      <div>{children}</div>
+    </details>
+  );
 }

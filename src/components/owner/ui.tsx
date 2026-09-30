@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Sparkles } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Sparkles, CalendarCheck } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { Tag } from "@/components/ui/tag";
@@ -15,6 +15,8 @@ import { markNoShow, dismissAttention, nudgeSignature, remindPayment } from "@/l
 import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, money, type Appt, type Item, type NeedItem } from "./lib";
 import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
+import { useOwnerCtx } from "./ctx";
+import { stageOf } from "@/lib/lifecycle";
 
 export function PageHead({ title, meta, actions, children }: { eyebrow?: string; title: ReactNode; meta?: ReactNode; actions?: ReactNode; children?: ReactNode }) {
   return (
@@ -96,12 +98,17 @@ export function Readiness({ value }: { value: number }) {
   return <span className="flex w-[58px] shrink-0 items-center gap-1.5"><ReadyRing value={value} size={20} stroke={3} /><span className="tabular text-[11px] text-muted-foreground">{value}%</span></span>;
 }
 
+/** One tag per row saying where the appointment is in its lifecycle (src/lib/lifecycle.ts). */
 export function AppointmentStage({ a }: { a: Appt }) {
-  if (a.status !== "completed") return <Readiness value={a.ready_score} />;
-  if (a.filed_at) return <Tag tone="success">Filed</Tag>;
-  if (a.signature_status !== "signed") return <Tag tone="warning">Waiting for signature</Tag>;
-  if (!a.paid_at) return <Tag tone="warning">Unpaid</Tag>;
-  return <Tag tone="success">Ready to file</Tag>;
+  const now = useOwnerCtx().data?.now ?? new Date().toISOString();
+  const st = stageOf(a, now);
+  if (st === "documents" || st === "ready") return <Readiness value={a.ready_score} />;
+  if (st === "meeting") return <Tag tone="accent">Now</Tag>;
+  if (st === "wrap_up") return <Tag tone="warning">Finish up</Tag>;
+  if (st === "sign_pay") return <Tag tone="warning">{a.signature_status !== "signed" ? "Waiting for signature" : "Unpaid"}</Tag>;
+  if (st === "to_file") return <Tag tone="success">Ready to file</Tag>;
+  if (st === "filed") return <Tag tone="success">Filed</Tag>;
+  return <Tag tone="danger">{st === "no_show" ? "No-show" : "Cancelled"}</Tag>;
 }
 
 /** THE appointment row. Used on Today, Calendar (mobile), client pages and search. Click opens the appointment panel. */
@@ -118,7 +125,7 @@ export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; s
         <span className="block truncate text-xs text-muted-foreground">{showClient ? a.services?.name : a.meeting_type === "video" ? "Video" : "In person"}</span>
       </span>
       <span className="shrink-0"><AppointmentStage a={a} /></span>
-      {a.status !== "completed" && <span className="hidden w-[84px] justify-end sm:flex"><StatusPill status={a.status} /></span>}
+      {(a.status === "booked" || a.status === "confirmed") && Date.parse(a.end_at) > Date.now() && <span className="hidden w-[84px] justify-end sm:flex"><StatusPill status={a.status} /></span>}
       <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
     </button>
   );
@@ -135,6 +142,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
   else if (it.kind === "unpaid") { icon = <CreditCard />; title = `${it.appt.clients?.name} hasn't paid yet`; reason = `${it.appt.fee_cents ? money(it.appt.fee_cents) : "Fee"} due since ${fmtDay(it.appt.finished_at ?? it.appt.end_at)}. Three reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
   else if (it.kind === "low") { icon = <AlertTriangle />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. ${missingOf(it.appt).length} documents missing, a later time was offered.`; action = "Keep appointment"; appointmentId = it.appt.id; }
   else if (it.kind === "signature") { icon = <PenLine />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
+  else if (it.kind === "wrap") { icon = <CalendarCheck />; title = `${it.appt.clients?.name}: meeting has ended`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. Finish the return, or book another meeting if you ran out of time.`; action = "Open"; appointmentId = it.appt.id; }
   else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
   else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
   return (
@@ -151,7 +159,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
 export function NeedsList({ items }: { items: NeedItem[] }) {
   const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature), payNudge = useServerFn(remindPayment); const openAppt = useApptPanel();
   const [all, setAll] = useState(false);
-  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
+  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review" || it.kind === "wrap") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const shown = all ? items : items.slice(0, 3);
   return <div>
     <ul className="overflow-hidden rounded-2xl border border-border">{shown.map((it, i) => <NeedRow idx={i} key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>

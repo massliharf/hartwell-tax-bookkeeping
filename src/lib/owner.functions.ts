@@ -342,3 +342,27 @@ export const sendRebookLink = createServerFn({ method: "POST" }).middleware([req
     });
     return { ok, message: ok ? `Rebooking link sent to ${firstName(c.name)}.` : "Already sent in the last hour." };
   });
+
+/** The meeting ran out of time: book the next one on the same appointment (documents and answers carry over) and tell the client. */
+export const bookFollowUpMeeting = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid(), start: z.string().datetime({ offset: true }), note: z.string().trim().max(300).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { db, a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c || !["booked", "confirmed"].includes(a.status)) return { ok: false, message: "This appointment is already closed." };
+    const previous = a.start_at;
+    const { data: res, error } = await db.rpc("reschedule_appointment", { _id: a.id, _start: new Date(data.start).toISOString(), _now: now.toISOString() });
+    if (error || !(res as { ok: boolean } | null)?.ok) return { ok: false, message: "That time isn't free. Pick another." };
+    await db.from("appointments").update({ status: "booked", needs_attention: false, attention_reason: null }).eq("id", a.id);
+    await sendMessage({
+      dedupeKey: `followup:${a.id}:${data.start}`, type: "booking_confirmation", minutesSaved: 5, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: `Your follow-up with Claire: ${when(data.start)}`, heading: "Let's finish at your next meeting.",
+      blocks: [
+        { p: `Hi ${firstName(c.name)}, thanks for meeting on ${when(previous)}. Claire has booked a follow-up to finish your return: ${when(data.start)}.` },
+        ...(data.note ? [{ p: `Claire's note: ${data.note}` }] : []),
+        { p: "Your documents and answers carry over. If Claire asked for anything else, it's on your checklist." },
+        { button: { label: "Open your appointment", href: `${origin}/a/${a.manage_token}` } },
+      ],
+      sms: `Hartwell Tax: follow-up booked for ${when(data.start)}. ${origin}/a/${a.manage_token}`,
+    });
+    return { ok: true, message: `Follow-up booked for ${when(data.start)}. ${firstName(c.name)} has been emailed.` };
+  });

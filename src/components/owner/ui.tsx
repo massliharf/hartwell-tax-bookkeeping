@@ -15,8 +15,16 @@ import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, type Appt, type Item, ty
 import { useClientDrawer } from "./drawer-context";
 import { cn } from "@/lib/utils";
 
-export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title: ReactNode; children?: ReactNode }) {
-  return <header className="mb-6"><h1 className="t-owner text-deep-ink">{title}</h1>{eyebrow && <p className="mt-1 text-xs text-muted-foreground">{eyebrow}</p>}{children && <div className="mt-2 text-sm text-muted-foreground">{children}</div>}</header>;
+export function PageHead({ title, meta, actions, children }: { eyebrow?: string; title: ReactNode; meta?: ReactNode; actions?: ReactNode; children?: ReactNode }) {
+  return (
+    <header className="mb-6 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+      <div className="min-w-0">
+        <h1 className="t-owner text-deep-ink">{title}</h1>
+        {(meta || children) && <div className="mt-1 text-xs text-muted-foreground">{meta ?? children}</div>}
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+    </header>
+  );
 }
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
   return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-ink" /><h2 className="mt-4 font-sans text-xl font-medium leading-[30px] text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
@@ -55,7 +63,7 @@ export function StatusPill({ status }: { status: string }) {
   return <span className={cn("rounded border border-border bg-fill-subtle px-2 py-0.5 text-[10px] font-medium text-muted-foreground", status === "confirmed" && "border-success/20 bg-success/10 text-success", status === "no_show" && "border-warning/20 bg-warning/10 text-warning")}>{STATUS_LABEL[status] ?? status}</span>;
 }
 
-export function ApptActions({ a }: { a: Appt }) {
+export function ApptActions({ a, variant = "menu" }: { a: Appt; variant?: "menu" | "buttons" }) {
   const [confirm, setConfirm] = useState<"complete" | "noShow" | null>(null);
   const [docs, setDocs] = useState(false);
   const { complete, noShow } = useApptActions();
@@ -64,6 +72,13 @@ export function ApptActions({ a }: { a: Appt }) {
   const pending = complete.isPending || noShow.isPending;
   const act = () => { if (confirm === "complete") complete.mutate(a.id); else if (confirm === "noShow") noShow.mutate(a.id); setConfirm(null); };
   return <>
+    {variant === "buttons" ? (
+      <div className="flex flex-wrap gap-2">
+        {open && <Button size="sm" disabled={pending} onClick={() => setConfirm("complete")}>Mark complete</Button>}
+        {open && <Button size="sm" variant="secondary" disabled={pending} onClick={() => setConfirm("noShow")}>No-show</Button>}
+        <Button size="sm" variant="secondary" disabled={!uploaded.length} onClick={() => setDocs(true)}><FileText />Documents{uploaded.length ? ` (${uploaded.length})` : ""}</Button>
+      </div>
+    ) : (
     <DropdownMenu>
       <DropdownMenuTrigger asChild><Button size="icon" variant="ghost" aria-label={`Actions for ${a.clients?.name ?? "client"}`} title="Appointment actions" disabled={pending}><MoreHorizontal className="size-4" /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 rounded-2xl border-border bg-sheet shadow-lift">
@@ -72,6 +87,7 @@ export function ApptActions({ a }: { a: Appt }) {
         <DropdownMenuItem disabled={!uploaded.length} onSelect={() => setDocs(true)}><FileText className="size-4" />Open documents{uploaded.length ? ` (${uploaded.length})` : ""}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    )}
     <AlertDialog open={!!confirm} onOpenChange={(v) => { if (!v) setConfirm(null); }}>
       <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
         <AlertDialogHeader>
@@ -91,7 +107,7 @@ export function ApptCard({ a, showDate = false, embedded = false }: { a: Appt; s
   const openClient = useClientDrawer();
   const missing = missingOf(a).length;
   return <article className={cn("flex min-h-16 items-center gap-2 border-b border-border px-2 py-2 last:border-0 sm:gap-3 sm:px-3", !embedded && "bg-surface-2")}>
-    <ReadyRing value={a.ready_score} size={40} stroke={4} label="" />
+    <span className="flex w-[58px] shrink-0 items-center gap-1.5"><ReadyRing value={a.ready_score} size={20} stroke={3} /><span className="tabular text-[11px] text-muted-foreground">{a.ready_score}%</span></span>
     <button type="button" disabled={!a.clients} onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg text-left transition-colors duration-150 hover:bg-fill-subtle sm:gap-3">
       <span className="tabular w-[68px] shrink-0 text-[13px] font-medium text-deep-ink">{showDate ? fmtDay(a.start_at) : fmtTime(a.start_at)}</span>
       <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-deep-ink">{a.clients?.name ?? "Client"}</span><span className="block truncate text-xs text-muted-foreground">{a.services?.name}, <MeetingTag type={a.meeting_type} />{showDate ? `, ${fmtTime(a.start_at)}` : ""}</span></span>
@@ -105,24 +121,30 @@ export function ApptCard({ a, showDate = false, embedded = false }: { a: Appt; s
 export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boolean }) {
   const openClient = useClientDrawer();
   let icon: ReactNode, title: string, reason: string, action: string, clientId: string | undefined, appointmentId: string | undefined;
-  if (it.kind === "low") { icon = <AlertTriangle className="size-5" />; title = `${it.appt.clients?.name}, ${it.appt.ready_score}% ready`; reason = `${it.appt.services?.name}, ${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. Missing ${missingOf(it.appt).map(m => m.document_name).join(", ") || "nothing required"}. They were offered later times.`; action = "Keep appointment"; clientId = it.appt.clients?.id; appointmentId = it.appt.id; }
+  if (it.kind === "low") { icon = <AlertTriangle className="size-5" />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${it.appt.services?.name}, ${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. Missing ${missingOf(it.appt).map(m => m.document_name).join(", ") || "nothing required"}. They were offered later times.`; action = "Keep appointment"; clientId = it.appt.clients?.id; appointmentId = it.appt.id; }
   else if (it.kind === "signature") { icon = <PenLine className="size-5" />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send another reminder"; clientId = it.appt.clients?.id; appointmentId = it.appt.id; }
   else if (it.kind === "failed") { icon = <MailX className="size-5" />; title = `An email didn't arrive: ${it.msg.subject}`; reason = `To ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}. Check the address with the client.`; action = "Dismiss"; }
   else { icon = <Sparkles className="size-5" />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Just so you know, nothing to do.`; action = "Dismiss"; }
-  return <li className="flex min-h-16 items-center gap-3 border-b border-border bg-surface-2 px-3 py-2 last:border-0"><span className="shrink-0 text-warning">{icon}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-deep-ink">{clientId ? <button className="text-left hover:text-ink hover:underline" onClick={() => openClient({ clientId, appointmentId })}>{title}</button> : title}</p><p className="truncate text-xs text-muted-foreground" title={reason}>{reason}</p></div><Button size="sm" disabled={busy} onClick={onAct} className="shrink-0">{busy ? "Saving…" : action}</Button></li>;
+  return <li className="grid min-h-16 grid-cols-[32px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-b border-border bg-surface-2 px-3 py-2.5 last:border-0 sm:grid-cols-[32px_minmax(0,1fr)_auto]"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-deep-ink">{clientId ? <button className="text-left hover:text-ink hover:underline" onClick={() => openClient({ clientId, appointmentId })}>{title}</button> : title}</p><p className="truncate text-xs text-muted-foreground" title={reason}>{reason}</p></div><Button size="sm" variant="secondary" disabled={busy} onClick={onAct} className="col-start-2 justify-self-start sm:col-start-auto sm:justify-self-end">{busy ? "Saving…" : action}</Button></li>;
 }
 export function NeedsList({ items }: { items: NeedItem[] }) {
   const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature);
   const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } toast.success(it.kind === "signature" ? "Reminder sent." : "Done."); qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
-  return <ul className="overflow-hidden rounded-2xl border border-border">{items.map(it => <NeedRow key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>;
+  const [all, setAll] = useState(false);
+  const shown = all ? items : items.slice(0, 3);
+  return <div>
+    <ul className="overflow-hidden rounded-2xl border border-border">{shown.map(it => <NeedRow key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>
+    {items.length > 3 && <Button size="sm" variant="ghost" className="mt-2" onClick={() => setAll(v => !v)}>{all ? "Show less" : `Show all ${items.length}`}</Button>}
+  </div>;
 }
 
 /** A fresh one-minute signed URL is requested for each selected private file. */
-export function DocViewer({ open, onOpenChange, title, items }: { open: boolean; onOpenChange: (o: boolean) => void; title: string; items: Item[] }) {
+export function DocViewer({ open, onOpenChange, title, items, startId }: { open: boolean; onOpenChange: (o: boolean) => void; title: string; items: Item[]; startId?: string | undefined }) {
   const getUrl = useServerFn(getDocumentUrl);
   const files = items.filter(i => i.file_path).sort((x, y) => x.sort_order - y.sort_order);
   const [sel, setSel] = useState<{ id: string; url: string | null; loading: boolean; path: string } | null>(null);
   const [index, setIndex] = useState(0);
+  useEffect(() => { if (open) { const i = startId ? files.findIndex((f) => f.id === startId) : 0; setIndex(Math.max(0, i)); } }, [open, startId]); // eslint-disable-line react-hooks/exhaustive-deps
   const fileKey = files.map((f) => `${f.id}:${f.file_path ?? ""}`).join("|");
   const current = files[Math.min(index, Math.max(files.length - 1, 0))];
   const currentId = current?.id;

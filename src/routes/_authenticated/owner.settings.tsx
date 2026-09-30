@@ -55,8 +55,8 @@ function SettingsPage() {
 
   return (
     <>
-      <PageHead eyebrow="Settings" title="How your practice runs" />
-      <div className="space-y-8">
+      <PageHead title="Settings" meta="Office hours, services and reminders" />
+      <div className="space-y-3">
         <Card title="Office hours" note="Bookings only offer times inside these hours.">
           <ul className="divide-y divide-border">
             {DAYS.map(([k, label]) => {
@@ -116,9 +116,9 @@ function SettingsPage() {
 
 function Card({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   return (
-    <section className=" p-6">
-      <h2 className="font-sans text-2xl text-deep-ink">{title}</h2>
-      <p className="mb-5 text-sm text-muted-foreground">{note}</p>
+    <section className="rounded-2xl border border-border p-5 sm:p-6">
+      <h2 className="text-[15px] font-medium text-deep-ink">{title}</h2>
+      <p className="mb-5 mt-0.5 text-xs text-muted-foreground">{note}</p>
       {children}
     </section>
   );
@@ -126,7 +126,7 @@ function Card({ title, note, children }: { title: string; note: string; children
 
 function Num({ label, unit, v, on }: { label: string; unit: string; v: number; on: (n: number) => void }) {
   return (
-    <label className="rounded-xl border border-border bg-paper p-4 text-sm text-deep-ink">
+    <label className="rounded-xl bg-surface-2 p-4 text-sm text-deep-ink">
       {label}
       <span className="mt-2 flex items-center gap-2 text-muted-foreground">
         <Input type="number" min={1} value={v} onChange={(e) => on(Math.max(1, Number(e.target.value)))} className="w-20 bg-sheet" />{unit}

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
-import { ErrorNote, LoadingRows } from "@/components/owner/ui";
+import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Insights — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Insights });
@@ -78,7 +78,7 @@ function Insights() {
     <>
       <Hero hours={hours30} minutes={minutes30} />
 
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Metric title="Arrived fully ready" value={`${ready30}%`} note={`before: ~${BEFORE.ready}%`} good={ready30 >= BEFORE.ready}>
           <AreaSpark data={ready} baseline={BEFORE.ready} max={100} suffix="%" />
         </Metric>
@@ -99,16 +99,16 @@ function Insights() {
         </Metric>
       </div>
 
-      <section className="mt-12 grid overflow-hidden rounded-2xl border border-border md:grid-cols-2">
-        <div className="bg-paper-deep/60 p-7 md:p-9">
+      <section className="mt-6 grid overflow-hidden rounded-2xl border border-border md:grid-cols-2">
+        <div className="bg-surface-2 p-6 md:p-8">
           <p className="text-xs font-medium text-muted-foreground">Before</p>
-          <p className="mt-4 font-sans text-xl leading-[30px] text-deep-ink/60">
+          <p className="mt-3 text-lg leading-7 text-muted-foreground">
             {BEFORE.msgsPerBooking} messages per booking.<br />1 in 3 clients unprepared.
           </p>
         </div>
-        <div className="relative bg-ink p-7 text-primary-foreground md:p-9">
-          <p className="text-xs font-medium text-marigold">Now</p>
-          <p className="mt-4 font-sans text-xl leading-[30px]">
+        <div className="relative bg-[#1A1A1A] p-6 text-white md:p-8">
+          <p className="text-xs font-medium text-white/70">Now</p>
+          <p className="mt-3 text-lg leading-7">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>
         </div>
@@ -120,24 +120,22 @@ function Insights() {
 
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   return (
-    <header className=" relative overflow-hidden rounded-2xl bg-surface-2 px-7 py-12 md:px-12 md:py-16">
-      <p className="text-xs font-medium text-muted-foreground">Insights, last 30 days</p>
-      <h1
-        className="mt-3 font-sans text-[40px] leading-[48px] text-deep-ink md:text-[56px] md:leading-[64px]">
-        <span className="tabular text-ink">{hours}</span> hour{hours === 1 ? "" : "s"} given back<br className="hidden sm:block" /> this month.
-      </h1>
-      <p className="tabular mt-4 max-w-md text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups you didn't have to write.</p>
-      <span aria-hidden
-        className="mt-8 block h-1 w-24 origin-left rounded-full bg-marigold" />
-    </header>
+    <>
+      <PageHead title="Insights" meta="Last 30 days" />
+      <section className="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
+        <p className="text-xs font-medium text-muted-foreground">Hours given back to Claire</p>
+        <p className="tabular mt-2 text-[44px] font-medium leading-[48px] tracking-[-0.02em] text-deep-ink">{hours}<span className="ml-2 text-lg font-normal text-muted-foreground">hour{hours === 1 ? "" : "s"}</span></p>
+        <p className="tabular mt-2 max-w-md text-sm text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups sent automatically.</p>
+      </section>
+    </>
   );
 }
 
 function Metric({ title, value, note, good, children }: { title: string; value: string; note: string; good?: boolean; children: ReactNode }) {
   return (
-    <article className=" flex flex-col p-5">
-      <p className="text-sm text-muted-foreground">{title}</p>
-      <p className="tabular mt-1 font-sans text-[28px] leading-[38px] text-deep-ink">{value}</p>
+    <article className="flex flex-col rounded-2xl border border-border p-5">
+      <p className="text-xs font-medium text-muted-foreground">{title}</p>
+      <p className="tabular mt-1 text-2xl font-medium leading-8 text-deep-ink">{value}</p>
       <p className={`text-xs ${good === undefined ? "text-muted-foreground" : good ? "text-success" : "text-warning"}`}>{note}</p>
       <div className="mt-4 h-24">{children}</div>
     </article>

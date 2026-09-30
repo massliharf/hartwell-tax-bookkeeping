@@ -8,24 +8,46 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
-import { addDays, apptsRange, et, etToIso, fmtTime, readiness, readinessStyle, ymdLabel } from "@/components/owner/lib";
-import { ErrorNote, PageHead } from "@/components/owner/ui";
+import { addDays, apptsRange, et, etToIso, fmtTime, readiness, ymdLabel, type Appt } from "@/components/owner/lib";
+import { ApptCard, ErrorNote, PageHead } from "@/components/owner/ui";
 import { ownerMoveAppointment } from "@/lib/owner.functions";
 import { useClientDrawer } from "@/components/owner/drawer-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: CalendarPage });
 
-const START = 9 * 60, END = 18 * 60, PX = 1.1; // px per minute
+const START = 9 * 60, END = 18 * 60, PX = 1.2; // px per minute
 const mondayOf = (ymd: string) => {
   const dow = new Date(`${ymd}T12:00:00Z`).getUTCDay();
   return addDays(ymd, dow === 0 ? -6 : 1 - dow);
 };
+const hourLabel = (h: number) => `${((h + 11) % 12) + 1} ${h < 12 ? "AM" : "PM"}`;
+const ACCENT = { ready: "bg-success", partial: "bg-marigold", none: "bg-[#C8C8C8]" } as const;
+
+/** Side-by-side lanes for appointments that overlap in time, so blocks never cover each other. */
+function layoutDay(list: Appt[]) {
+  const items = [...list].sort((a, b) => a.start_at.localeCompare(b.start_at));
+  const out: { a: Appt; lane: number; lanes: number }[] = [];
+  let group: { a: Appt; lane: number; end: number }[] = [];
+  let groupEnd = 0;
+  const flush = () => { const lanes = Math.max(1, ...group.map((g) => g.lane + 1)); group.forEach((g) => out.push({ a: g.a, lane: g.lane, lanes })); group = []; };
+  for (const a of items) {
+    const s = new Date(a.start_at).getTime(), e = new Date(a.end_at).getTime();
+    if (group.length && s >= groupEnd) flush();
+    const used = new Set(group.filter((g) => g.end > s).map((g) => g.lane));
+    let lane = 0; while (used.has(lane)) lane++;
+    group.push({ a, lane, end: e }); groupEnd = Math.max(groupEnd, e);
+  }
+  if (group.length) flush();
+  return out;
+}
 
 function CalendarPage() {
   const now = useOwnerCtx().data!.now;
   const openClient = useClientDrawer();
-  const [week, setWeek] = useState(() => mondayOf(et(now).ymd));
+  const today = et(now).ymd;
+  const [week, setWeek] = useState(() => mondayOf(today));
+  const [mobileDay, setMobileDay] = useState(today);
   const days = Array.from({ length: 6 }, (_, i) => addDays(week, i));
   const q = useQuery(apptsRange(etToIso(week, 0), etToIso(addDays(week, 7), 0)));
   const [pending, setPending] = useState<{ id: string; name: string; ymd: string; mins: number } | null>(null);
@@ -42,7 +64,10 @@ function CalendarPage() {
     onError: () => toast.error("Couldn't move it. Try again."),
   });
   const byDay = (d: string) => (q.data ?? []).filter((a) => et(a.start_at).ymd === d);
-  const today = et(now).ymd;
+  const total = (q.data ?? []).length;
+  const nowMins = et(now).minutes;
+  const fmtMins = (m: number) => `${((Math.floor(m / 60) + 11) % 12) + 1}:${String(m % 60).padStart(2, "0")} ${m < 720 ? "AM" : "PM"}`;
+  const goWeek = (w: string) => { setWeek(w); setMobileDay(w <= today && today < addDays(w, 6) ? today : w); };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>, ymd: string) => {
     e.preventDefault();
@@ -50,87 +75,108 @@ function CalendarPage() {
     setDrag(null);
     if (!id) return;
     const y = e.clientY - e.currentTarget.getBoundingClientRect().top;
-    const mins = START + Math.max(0, Math.round(y / PX / 15) * 15);
+    const mins = Math.min(END - 15, START + Math.max(0, Math.round(y / PX / 15) * 15));
     const a = q.data?.find((x) => x.id === id);
     if (!a || (et(a.start_at).ymd === ymd && et(a.start_at).minutes === mins)) return;
-    const clamped = Math.min(mins, END - 15);
-    setPending({ id, name: a.clients?.name ?? "this client", ymd, mins: clamped });
+    setPending({ id, name: a.clients?.name ?? "this client", ymd, mins });
   };
-  const fmtMins = (m: number) => `${((Math.floor(m / 60) + 11) % 12) + 1}:${String(m % 60).padStart(2, "0")} ${m < 720 ? "am" : "pm"}`;
-  const nowMins = et(now).minutes;
+
+  const nav = (
+    <>
+      <Button size="sm" variant="secondary" onClick={() => goWeek(mondayOf(today))}>Today</Button>
+      <div className="flex">
+        <Button size="icon" variant="ghost" aria-label="Previous week" onClick={() => goWeek(addDays(week, -7))}><ChevronLeft /></Button>
+        <Button size="icon" variant="ghost" aria-label="Next week" onClick={() => goWeek(addDays(week, 7))}><ChevronRight /></Button>
+      </div>
+    </>
+  );
 
   return (
     <>
-      <PageHead eyebrow="Calendar" title={`Week of ${ymdLabel(week)}`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button size="icon" variant="outline" aria-label="Previous week" onClick={() => setWeek(addDays(week, -7))}><ChevronLeft /></Button>
-          <Button size="sm" variant="ghost" onClick={() => setWeek(mondayOf(today))}>This week</Button>
-          <Button size="icon" variant="outline" aria-label="Next week" onClick={() => setWeek(addDays(week, 7))}><ChevronRight /></Button>
-          <Legend />
-        </div>
-      </PageHead>
+      <PageHead title={`Week of ${ymdLabel(week)}`} meta={q.data ? `${total} appointment${total === 1 ? "" : "s"}, drag to reschedule` : "Loading…"} actions={nav} />
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
-      <p className="mb-3 hidden text-xs text-muted-foreground md:block">Drag an appointment to move it. You confirm before the client is emailed.</p>
 
       {/* Desktop week grid */}
-      <div className=" hidden overflow-hidden md:block">
-        <div className="grid grid-cols-[52px_repeat(6,1fr)] border-b border-border bg-sheet">
+      <div className="hidden overflow-hidden rounded-2xl border border-border md:block">
+        <div className="grid grid-cols-[56px_repeat(6,minmax(0,1fr))] border-b border-border bg-surface-2">
           <div />
-          {days.map((d) => (
-            <div key={d} className={cn("px-2 py-3 text-center text-xs font-medium text-muted-foreground", d === today && "text-ink")}>{ymdLabel(d)}</div>
-          ))}
+          {days.map((d) => {
+            const [wd, , num] = ymdLabel(d).replace(",", "").split(" ");
+            const isToday = d === today;
+            return (
+              <div key={d} className="flex items-center justify-center gap-1.5 border-l border-border py-2.5 text-xs text-muted-foreground">
+                <span>{wd}</span>
+                <span className={cn("tabular grid size-6 place-items-center rounded-full text-xs font-medium", isToday ? "bg-deep-ink text-white" : "text-deep-ink")}>{num}</span>
+              </div>
+            );
+          })}
         </div>
-        <div className="grid grid-cols-[52px_repeat(6,1fr)]" style={{ height: (END - START) * PX }}>
+        <div className="grid grid-cols-[56px_repeat(6,minmax(0,1fr))]" style={{ height: (END - START) * PX }}>
           <div className="relative">
             {Array.from({ length: (END - START) / 60 }, (_, i) => (
-              <span key={i} className="tabular absolute right-2 -translate-y-1/2 text-[11px] text-muted-foreground" style={{ top: i * 60 * PX }}>{i === 0 ? "" : `${((9 + i - 1) % 12) + 1}${9 + i < 12 ? "a" : "p"}`}</span>
+              <span key={i} className="tabular absolute right-2 top-1 text-[11px] leading-none text-muted-foreground" style={{ top: i * 60 * PX + 4 }}>{hourLabel(9 + i)}</span>
             ))}
           </div>
           {days.map((d) => (
             <div key={d} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(e, d)}
-              className={cn("relative border-l border-border ", drag && "bg-fill-neutral/30", d === today && "bg-marigold/5")}
+              className={cn("relative border-l border-border transition-colors duration-150", drag && "bg-fill-subtle", d === today && "bg-surface-2")}
               style={{ backgroundImage: "linear-gradient(to bottom, rgba(16,16,16,0.06) 1px, transparent 1px)", backgroundSize: `100% ${60 * PX}px` }}>
-              {q.isLoading && <Skeleton className="absolute inset-x-1 top-2 h-16 rounded-lg" />}
-              {d === today && nowMins > START && nowMins < END && <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 z-10 h-px bg-ink" style={{ top: (nowMins - START) * PX }} />}
-              {byDay(d).map((a) => {
+              {q.isLoading && <Skeleton className="absolute inset-x-1.5 top-3 h-14 rounded-lg" />}
+              {d === today && nowMins > START && nowMins < END && (
+                <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 z-20 h-px bg-destructive" style={{ top: (nowMins - START) * PX }}>
+                  <span className="absolute -left-1 -top-1 size-2 rounded-full bg-destructive" />
+                </span>
+              )}
+              {layoutDay(byDay(d)).map(({ a, lane, lanes }) => {
                 const { minutes } = et(a.start_at);
-                const h = (new Date(a.end_at).getTime() - new Date(a.start_at).getTime()) / 60000;
+                const dur = (new Date(a.end_at).getTime() - new Date(a.start_at).getTime()) / 60000;
+                const h = Math.max(24, dur * PX - 3);
+                const tall = h >= 46;
+                const done = a.status === "completed" || a.status === "no_show";
                 return (
-                  <button key={a.id} draggable onDragStart={(e) => { e.dataTransfer.setData("text/plain", a.id); setDrag(a.id); }} onDragEnd={() => setDrag(null)}
+                  <button key={a.id} draggable={!done} onDragStart={(e) => { e.dataTransfer.setData("text/plain", a.id); setDrag(a.id); }} onDragEnd={() => setDrag(null)}
                     onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })}
-                    className={cn("absolute inset-x-1 overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight transition-colors duration-150 hover:bg-fill-subtle",
-                      readinessStyle[readiness(a.ready_score)], a.status === "completed" && "opacity-60", drag === a.id && "opacity-40")}
-                    style={{ top: (minutes - START) * PX, height: Math.max(22, h * PX - 2) }}>
-                    <span className="tabular block font-medium">{fmtTime(a.start_at)}, {a.ready_score}%</span>
-                    <span className="block truncate text-deep-ink">{a.clients?.name}</span>
+                    title={`${a.clients?.name ?? ""}, ${fmtTime(a.start_at)}, ${a.services?.name ?? ""}, ${a.ready_score}% ready`}
+                    className={cn("absolute z-10 flex overflow-hidden rounded-lg border border-border bg-sheet text-left shadow-[0_1px_2px_rgba(16,16,16,0.04)] transition-colors duration-150 hover:bg-surface-2",
+                      done && "bg-surface-2 opacity-60", drag === a.id && "opacity-40")}
+                    style={{ top: (minutes - START) * PX + 1, height: h, left: `calc(${(lane / lanes) * 100}% + 4px)`, width: `calc(${100 / lanes}% - 8px)` }}>
+                    <span className={cn("w-[3px] shrink-0", ACCENT[readiness(a.ready_score)])} />
+                    <span className={cn("min-w-0 flex-1 px-2", tall ? "py-1.5" : "flex items-center")}>
+                      <span className="block truncate text-xs font-medium leading-4 text-deep-ink">{tall ? a.clients?.name : `${fmtTime(a.start_at)} ${a.clients?.name ?? ""}`}</span>
+                      {tall && <span className="tabular block truncate text-[11px] leading-4 text-muted-foreground">{fmtTime(a.start_at)}, {a.ready_score}% ready</span>}
+                    </span>
                   </button>
                 );
               })}
             </div>
           ))}
         </div>
+        <div className="flex flex-wrap items-center gap-4 border-t border-border bg-surface-2 px-4 py-2.5 text-[11px] text-muted-foreground">
+          {(["ready", "partial", "none"] as const).map((k) => (
+            <span key={k} className="inline-flex items-center gap-1.5"><span className={cn("h-3 w-[3px] rounded-full", ACCENT[k])} />{k === "ready" ? "Ready" : k === "partial" ? "Partly ready" : "Not started"}</span>
+          ))}
+          <span className="ml-auto">Click an appointment to open the client</span>
+        </div>
       </div>
 
-      {/* Mobile: day by day */}
-      <div className="space-y-6 md:hidden">
-        {days.map((d) => (
-          <section key={d}>
-            <h2 className={cn("mb-2 text-sm font-medium text-muted-foreground", d === today && "text-ink")}>{ymdLabel(d)}</h2>
-            {byDay(d).length ? (
-              <ul className="space-y-2">
-                {byDay(d).map((a) => (
-                  <li key={a.id}>
-                    <button onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })} className={cn("flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left", readinessStyle[readiness(a.ready_score)])}>
-                      <span className="tabular w-16 text-xs font-medium">{fmtTime(a.start_at)}</span>
-                      <span className="flex-1 truncate text-sm text-deep-ink">{a.clients?.name}</span>
-                      <span className="tabular text-xs">{a.ready_score}%</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : q.isLoading ? <div aria-hidden="true" className="h-12 rounded-xl bg-muted" /> : <p className="text-sm text-muted-foreground/70">Nothing booked</p>}
-          </section>
-        ))}
+      {/* Mobile: day picker + one list */}
+      <div className="md:hidden">
+        <div className="mb-4 grid grid-cols-6 gap-1">
+          {days.map((d) => {
+            const [wd, , num] = ymdLabel(d).replace(",", "").split(" ");
+            const active = d === mobileDay;
+            return (
+              <button key={d} onClick={() => setMobileDay(d)} className={cn("flex h-14 flex-col items-center justify-center rounded-lg text-[11px] transition-colors duration-150", active ? "bg-deep-ink text-white" : "bg-fill-subtle text-deep-ink")}>
+                <span className={active ? "text-white/70" : "text-muted-foreground"}>{wd}</span>
+                <span className="tabular text-sm font-medium">{num}</span>
+                <span className={cn("mt-0.5 size-1 rounded-full", byDay(d).length ? (active ? "bg-white" : "bg-deep-ink") : "bg-transparent")} />
+              </button>
+            );
+          })}
+        </div>
+        {q.isLoading ? <Skeleton className="h-40 rounded-2xl" /> : byDay(mobileDay).length ? (
+          <div className="overflow-hidden rounded-2xl border border-border">{byDay(mobileDay).map((a) => <ApptCard key={a.id} a={a} />)}</div>
+        ) : <p className="rounded-2xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">Nothing booked on {ymdLabel(mobileDay)}.</p>}
       </div>
 
       <AlertDialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>
@@ -146,18 +192,5 @@ function CalendarPage() {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
-}
-
-function Legend() {
-  return (
-    <div className="flex gap-3 text-xs text-muted-foreground">
-      {(["ready", "partial", "none"] as const).map((k) => (
-        <span key={k} className="inline-flex items-center gap-1.5">
-          <span className={cn("h-3 w-3 rounded border", readinessStyle[k])} />
-          {k === "ready" ? "Ready" : k === "partial" ? "Partly ready" : "Not started"}
-        </span>
-      ))}
-    </div>
   );
 }

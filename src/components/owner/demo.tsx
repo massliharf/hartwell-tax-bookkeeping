@@ -9,7 +9,7 @@ import { demoAbandon, demoCancelTomorrow, demoClaim, demoJump, demoReset, demoRu
 
 type Msg = { id: string; channel: string; type: string; subject: string | null; body: string; sent_at: string; recipient: string | null; name: string | null };
 
-export function DemoTools() {
+export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -40,12 +40,12 @@ export function DemoTools() {
 
   return (
     <>
-      <div className="fixed bottom-20 right-5 z-40 sm:bottom-5 flex gap-2">
-        <Button size="icon" variant={phone ? "default" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className="h-11 w-11 rounded-full">
+      <div className={inline ? "flex gap-2" : "fixed bottom-20 right-5 z-40 flex gap-2"}>
+        <Button size="icon" variant={phone ? "default" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className={inline ? "size-8 rounded-lg" : "h-11 w-11 rounded-full"}>
           <Smartphone className="h-4 w-4" />
         </Button>
-        <Button onClick={() => setOpen(true)} className="h-11 gap-2 rounded-full px-4 text-sm">
-          <FlaskConical className="h-4 w-4" /> Demo
+        <Button onClick={() => setOpen(true)} className={inline ? "h-8 flex-1 gap-2 rounded-lg px-3 text-xs" : "h-11 gap-2 rounded-full px-4 text-sm"}>
+          <FlaskConical className="h-4 w-4" /> {inline ? "Demo tools" : "Demo"}
         </Button>
       </div>
 

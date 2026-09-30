@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ClientDrawer } from "@/components/owner/client-drawer";
 import { ClientDrawerContext, type ClientDrawerTarget } from "@/components/owner/drawer-context";
 import { useLocation } from "@tanstack/react-router";
-import { BarChart3, CalendarDays, Inbox, LogOut, Settings, Sun, Users, Bell, PanelLeft, MoreHorizontal, Search } from "lucide-react";
+import { BarChart3, CalendarDays, Inbox, LogOut, Settings, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,7 +31,6 @@ const NAV = [
   { to: "/owner", label: "Today", icon: Sun, exact: true },
   { to: "/owner/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/owner/clients", label: "Clients", icon: Users },
-  { to: "/owner/needs", label: "Needs you", icon: Bell },
   { to: "/owner/outbox", label: "Outbox", icon: Inbox },
   { to: "/owner/insights", label: "Insights", icon: BarChart3 },
   { to: "/owner/settings", label: "Settings", icon: Settings },
@@ -95,15 +94,16 @@ function OwnerLayout() {
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} title={collapsed ? n.label : undefined} className={item} activeProps={{ className: "bg-fill-selected text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
               <span className="relative grid size-8 shrink-0 place-items-center"><n.icon className="size-3.5" />
-                {collapsed && n.to === "/owner/needs" && count > 0 && <span className="absolute right-0.5 top-0.5 grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
+                {collapsed && n.to === "/owner" && count > 0 && <span className="absolute right-0.5 top-0.5 grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
               </span>
               {!collapsed && <span className="flex-1 truncate">{n.label}</span>}
-              {!collapsed && n.to === "/owner/needs" && count > 0 && <span className="tabular grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
+              {!collapsed && n.to === "/owner" && count > 0 && <span className="tabular grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
             </Link>
           ))}
         </nav>
         <div className="h-px bg-border" />
         <div className="flex-1" />
+        {!collapsed && <DemoTools inline />}
         <div className={`flex ${collapsed ? "flex-col" : ""} gap-1`}>
           <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-9 w-full justify-start gap-2 px-1" title="Claire Hartwell"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs">CH</span>{!collapsed && <span className="truncate text-xs">Claire Hartwell</span>}</Button></DropdownMenuTrigger><DropdownMenuContent side="top" align="start" className="w-56 rounded-2xl shadow-lift"><DropdownMenuItem onSelect={signOut}><LogOut className="size-4" />Sign out</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
         </div>
@@ -120,9 +120,10 @@ function OwnerLayout() {
           </button>
           <Button size="icon" variant="ghost" aria-label="Search" onClick={() => setPaletteOpen(true)} className="sm:hidden"><Search className="size-4" /></Button>
         </header>
-        <main className="min-h-[calc(100vh-76px)] rounded-t-2xl bg-sheet px-6 pb-28 pt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:pb-10">
-          <div className="mx-auto max-w-5xl">
+        <main className="min-h-[calc(100vh-76px)] rounded-t-2xl bg-sheet px-5 pb-28 pt-6 sm:rounded-2xl sm:px-8 sm:pb-12 sm:pt-8">
+          <div className={path.startsWith("/owner/calendar") ? "mx-auto max-w-6xl" : "mx-auto max-w-4xl"}>
             <Outlet />
+            <div className="mt-12 border-t border-border pt-4 sm:hidden"><DemoTools inline /></div>
           </div>
         </main>
       </div>
@@ -131,7 +132,7 @@ function OwnerLayout() {
         {mobileMain.map((n) => (
           <Link key={n.to} to={n.to} className="relative flex flex-col items-center gap-0.5 text-[10px] leading-[15px] text-muted-foreground" activeProps={{ className: "text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
             <n.icon className="size-5" />{n.label}
-            {n.to === "/owner/needs" && count > 0 && <span className="absolute -top-1 right-1 grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
+            {n.to === "/owner" && count > 0 && <span className="absolute -top-1 right-1 grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
           </Link>
         ))}
         <DropdownMenu>
@@ -173,7 +174,6 @@ function OwnerLayout() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
-      <DemoTools />
       <ClientDrawer target={clientTarget} onClose={() => setClientTarget(null)} />
     </div></ClientDrawerContext.Provider>
   );

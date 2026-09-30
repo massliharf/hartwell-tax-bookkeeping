@@ -27,13 +27,13 @@ export function ReadyRing({ value, size = 120, stroke = 8, label = "Ready", clas
           transition={reduce ? { duration: 0 } : { duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      {size >= 48 && <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="tabular font-serif leading-none text-deep-ink" style={{ fontSize: size * 0.28 }}>
           {Math.round(pct)}
           <span style={{ fontSize: size * 0.14 }}>%</span>
         </span>
         <span className="mt-1 text-[10px] font-medium text-muted-foreground">{label}</span>
-      </div>
+      </div>}
     </div>
   );
 }

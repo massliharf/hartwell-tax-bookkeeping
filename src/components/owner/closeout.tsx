@@ -11,7 +11,7 @@ import { finishAppointment, markFiled, markPaidInOffice, reviewDocument } from "
 import { fmtDay, money, type Appt, type Item } from "./lib";
 import { cn } from "@/lib/utils";
 
-function useOwnerMutation<T>(fn: (v: T) => Promise<{ ok: boolean }>, success: string) {
+export function useOwnerMutation<T>(fn: (v: T) => Promise<{ ok: boolean }>, success: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: fn,
@@ -102,7 +102,7 @@ export function AiTag({ i }: { i: Item }) {
 }
 
 /** Accept / Needs a fix for one uploaded document. */
-export function DocReview({ i, inline = false }: { i: Item; inline?: boolean }) {
+export function DocReview({ i, inline = false, onDone }: { i: Item; inline?: boolean; onDone?: () => void }) {
   const review = useServerFn(reviewDocument);
   const [fixing, setFixing] = useState(false);
   const [reason, setReason] = useState<string | null>(null);
@@ -115,7 +115,7 @@ export function DocReview({ i, inline = false }: { i: Item; inline?: boolean }) 
       {i.review_status === "needs_fix" && <p className="text-xs text-warning">Asked for a fix: {i.fix_reason}{i.fix_note ? `. ${i.fix_note}` : ""}</p>}
       {i.review_status === "pending" && !fixing && (
         <div className={inline ? "flex gap-1" : "mt-2 flex gap-2"}>
-          <Button size="sm" variant="secondary" disabled={m.isPending} onClick={() => m.mutate({ decision: "accepted" })}>Accept</Button>
+          <Button size="sm" variant="secondary" disabled={m.isPending} onClick={() => m.mutate({ decision: "accepted" }, { onSuccess: (r) => { if (r.ok) onDone?.(); } })}>Accept</Button>
           <Button size="sm" variant="ghost" disabled={m.isPending} onClick={() => setFixing(true)}>Needs a fix</Button>
         </div>
       )}
@@ -126,7 +126,7 @@ export function DocReview({ i, inline = false }: { i: Item; inline?: boolean }) 
           </div>
           <Input aria-label="Note to the client (optional)" placeholder="Note to the client (optional)" value={note} maxLength={400} onChange={(e) => setNote(e.target.value)} className="h-9" />
           <div className="flex gap-2">
-            <Button size="sm" disabled={!reason || m.isPending} onClick={() => { if (reason) m.mutate({ decision: "needs_fix", reason, note }, { onSuccess: () => setFixing(false) }); }}>{m.isPending ? "Sending…" : "Send to client"}</Button>
+            <Button size="sm" disabled={!reason || m.isPending} onClick={() => { if (reason) m.mutate({ decision: "needs_fix", reason, note }, { onSuccess: (r) => { setFixing(false); if (r.ok) onDone?.(); } }); }}>{m.isPending ? "Sending…" : "Send to client"}</Button>
             <Button size="sm" variant="ghost" onClick={() => setFixing(false)}>Cancel</Button>
           </div>
         </div>

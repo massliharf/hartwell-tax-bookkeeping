@@ -4,6 +4,7 @@ import { ChevronDown, Mail, MessageSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Segmented } from "@/components/ui/segmented";
 import { MSG_LABEL, fmtStamp } from "./lib";
 import { ErrorNote, LoadingRows } from "./ui";
 import { cn } from "@/lib/utils";
@@ -29,13 +30,8 @@ export function MessageLog() {
     <section>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-sm font-medium text-deep-ink">Sent automatically</h2>
-        <div className="flex gap-1 overflow-x-auto rounded-lg bg-fill-neutral p-1 [scrollbar-width:none]">
-          {[null, ...types].map((t) => (
-            <button key={t ?? "all"} onClick={() => setType(t)} className={cn("h-6 shrink-0 rounded-md px-3 text-xs font-medium transition-colors duration-150", type === t ? "bg-sheet text-deep-ink shadow-[0_1px_2px_rgba(16,16,16,0.08)]" : "text-muted-foreground hover:text-deep-ink")}>
-              {t ? MSG_LABEL[t] ?? t : "All"}
-            </button>
-          ))}
-        </div>
+        <Segmented size="sm" label="Filter messages" value={type ?? "all"} onChange={(v) => setType(v === "all" ? null : v)}
+          options={[{ value: "all", label: "All" }, ...types.map((t) => ({ value: t, label: MSG_LABEL[t] ?? t }))]} className="max-w-full" />
       </div>
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}

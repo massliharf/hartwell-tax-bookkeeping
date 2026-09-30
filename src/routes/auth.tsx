@@ -60,7 +60,7 @@ function AuthPage() {
       <div className="w-full max-w-sm">
         <Link to="/" className="flex items-baseline gap-2"><span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span><span className="text-xs text-muted-foreground">&amp; Bookkeeping</span></Link>
         <form onSubmit={submit} className="sheet-stack mt-8 space-y-5 p-7">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-ink"><Lock className="h-4 w-4" /></span>
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-deep-ink"><Lock className="h-4 w-4" /></span>
           <div>
             <h1 className="t-card text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
             <p className="mt-1 text-sm text-muted-foreground">

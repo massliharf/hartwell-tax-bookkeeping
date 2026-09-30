@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, Check, ChevronLeft, ChevronRight, MailX, PenLine, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
+import { Tag } from "@/components/ui/tag";
 import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,7 +28,7 @@ export function PageHead({ title, meta, actions, children }: { eyebrow?: string;
   );
 }
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
-  return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-ink" /><h2 className="mt-3 text-base font-medium text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
+  return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 text-base font-medium text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
 }
 export function LoadingRows({ n = 3 }: { n?: number }) {
   return <div role="status" aria-label="Loading" className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface-2">{Array.from({ length: n }, (_, i) => <div key={i} className="flex h-16 items-center gap-3 px-3"><Skeleton className="size-10 shrink-0 rounded-full" /><Skeleton className="h-4 w-16 shrink-0" /><div className="min-w-0 flex-1"><Skeleton className="h-4 w-32 max-w-full" /><Skeleton className="mt-1 h-3 w-40 max-w-full" /></div><Skeleton className="hidden h-6 w-16 sm:block" /><Skeleton className="size-8 shrink-0" /></div>)}</div>;
@@ -60,7 +61,8 @@ export function useApptActions() {
 }
 const STATUS_LABEL: Record<string, string> = { booked: "Booked", confirmed: "Confirmed", completed: "Completed", no_show: "No-show", cancelled: "Cancelled", rescheduled: "Moved" };
 export function StatusPill({ status }: { status: string }) {
-  return <span className={cn("rounded border border-border bg-fill-subtle px-2 py-0.5 text-[10px] font-medium text-muted-foreground", status === "confirmed" && "border-success/20 bg-success/10 text-success", status === "no_show" && "border-warning/20 bg-warning/10 text-warning")}>{STATUS_LABEL[status] ?? status}</span>;
+  const tone = status === "confirmed" ? "success" : status === "no_show" || status === "cancelled" ? "danger" : "neutral";
+  return <Tag tone={tone}>{STATUS_LABEL[status] ?? status}</Tag>;
 }
 
 /** The two appointment actions, always shown the same way, each confirmed first. */

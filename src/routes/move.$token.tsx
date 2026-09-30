@@ -50,7 +50,7 @@ function MovePage() {
             </>
           ) : (
             <>
-              <p className="text-sm text-ink/70">Move to</p>
+              <p className="text-sm text-muted-foreground">Move to</p>
               <h1 className="mt-3 t-page text-deep-ink">{fmtDateLong(to)}</h1>
               <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(to)}</p>
               <Button size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {

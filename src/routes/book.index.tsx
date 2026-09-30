@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Segmented } from "@/components/ui/segmented";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DocumentStack } from "@/components/brand/DocumentStack";
 import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
@@ -104,7 +105,7 @@ function BookPage() {
               initial={reduce ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.15 }}
+              transition={{ duration: reduce ? 0 : 0.2, ease: [0, 0, 0.2, 1] }}
             >
               {step === 0 && (
                 <ServiceStep
@@ -133,9 +134,9 @@ function BookPage() {
         </div></aside>
       </div>
       <div className="fixed inset-x-0 bottom-[64px] z-30 border-t border-border bg-sheet px-5 py-2 lg:hidden">
-        <Sheet><SheetTrigger asChild><Button variant="secondary" className="w-full justify-between">Your checklist ({service ? preview.length : 0}) <ChevronRight className="size-4" /></Button></SheetTrigger>
-          <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl border-border bg-sheet pt-10"><SheetHeader className="sr-only"><SheetTitle>Your checklist</SheetTitle></SheetHeader><ChecklistPreview docs={preview} hasService={!!service} /></SheetContent>
-        </Sheet>
+        <Dialog><DialogTrigger asChild><Button variant="secondary" className="w-full justify-between">Your checklist ({service ? preview.length : 0}) <ChevronRight className="size-4" /></Button></DialogTrigger>
+          <DialogContent className="max-w-md"><DialogTitle className="sr-only">Your checklist</DialogTitle><ChecklistPreview docs={preview} hasService={!!service} /></DialogContent>
+        </Dialog>
       </div>
     </BookingShell>
   );
@@ -263,14 +264,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   return (
     <>
         <StepTitle hideEyebrow eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
-      <div className="mb-6 inline-flex h-8 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label="Meeting type">
-        {([["in_person", "In person", Users], ["video", "Video call", Video]] as const).map(([v, label, Icon]) => (
-          <button key={v} role="radio" aria-checked={draft.meetingType === v} onClick={() => update({ meetingType: v })}
-             className={`inline-flex h-6 items-center gap-2 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${draft.meetingType === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}>
-            <Icon className="size-3.5" /> {label}
-          </button>
-        ))}
-      </div>
+      <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
+        options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />
 
        {q.isLoading && <div className="space-y-6"><div className="flex gap-1 overflow-hidden">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[72px] shrink-0 rounded-lg" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-8 rounded-lg" />)}</div></div>}
       {(q.isError || q.data?.error) && (

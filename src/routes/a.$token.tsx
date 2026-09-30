@@ -5,6 +5,7 @@ import { Camera, Check, FileText, Loader2, Lock, MapPin, Upload, Video, Users, C
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Tag } from "@/components/ui/tag";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -80,7 +81,7 @@ function PortalPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
-          <p className="text-xs font-medium text-ink/70">Your private page</p>
+          <p className="text-xs font-medium text-muted-foreground">Your private page</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
@@ -105,7 +106,7 @@ function PortalPage() {
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
             </div>
             <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
-              <Lock className="mt-0.5 size-4 shrink-0 text-ink" /> Only Claire can see your files. We never ask for your Social Security number.
+              <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only Claire can see your files. We never ask for your Social Security number.
             </p>
             <ul className="space-y-4">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
@@ -127,8 +128,8 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-[11px] font-medium text-muted-foreground">{appt.services?.name}</p>
-            {appt.status === "confirmed" && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">Confirmed</span>}
-            {cancelled && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Cancelled</span>}
+            {appt.status === "confirmed" && <Tag tone="success">Confirmed</Tag>}
+            {cancelled && <Tag tone="danger">Cancelled</Tag>}
           </div>
           <p className={`mt-1 t-card text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
@@ -139,12 +140,12 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
         <div className="mt-5 border-t border-border pt-4 text-sm">
           {video ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-ink" /> Video call. Your join link arrives by email the day before.</span>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> Video call. Your join link arrives by email the day before.</span>
               <Button size="sm" variant="outline" disabled><Video /> Join call</Button>
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-ink" /> In person, {ADDRESS}</span>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-muted-foreground" /> In person, {ADDRESS}</span>
               <Button size="sm" variant="outline" asChild><a href={MAP_URL} target="_blank" rel="noreferrer"><MapPin /> Open map</a></Button>
             </div>
           )}
@@ -314,7 +315,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               <p className="truncate font-medium text-deep-ink">{item.document_name}</p>
               <p className="text-sm text-success">Received</p>
             </div>
-            <button onClick={() => fileRef.current?.click()} className="text-xs text-muted-foreground underline underline-offset-4 hover:text-ink">Replace</button>
+            <Button size="sm" variant="ghost" onClick={() => fileRef.current?.click()}>Replace</Button>
           </div>
         ) : item.status === "not_applicable" ? (
           <div key="na" className="flex items-center gap-4 rounded-2xl bg-surface-2/70 p-5">
@@ -332,11 +333,11 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
             className={`sheet-stack p-5 ${drag ? "ring-2 ring-[#4F69F2]" : ""}`}>
             <div className="flex items-start gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-deep-ink">{item.document_name}</p>
-                  {!item.required && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">If you have it</span>}
+                  {!item.required && <Tag>If you have it</Tag>}
                 </div>
                 <p className="mt-1 text-sm text-deep-ink/70">{docGuide(item.document_name, item.description)}</p>
               </div>
@@ -353,7 +354,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
-                <button onClick={() => setNaOpen(true)} className="ml-auto text-sm text-muted-foreground underline underline-offset-4 hover:text-ink">Doesn't apply to me</button>
+                <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
               </div>
             )}
             <p className="mt-3 hidden text-xs text-muted-foreground sm:block">Or drag a file onto this card.</p>

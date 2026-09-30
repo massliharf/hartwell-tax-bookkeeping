@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronRight, MapPin, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
@@ -15,11 +15,11 @@ import { cn } from "@/lib/utils";
 /** One appointment: when, who, how ready, and the two things Claire can do. Nothing else. */
 export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget | null; onClose: () => void }) {
   return (
-    <Sheet open={!!target} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <SheetContent side="right" className="inset-x-0 bottom-0 top-auto h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-2xl border-border bg-sheet p-0 sm:inset-y-0 sm:left-auto sm:h-full sm:w-[440px] sm:max-w-[440px] sm:rounded-none sm:rounded-l-2xl">
+    <Dialog open={!!target} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="block max-w-[520px] gap-0 p-0">
         {target && <AppointmentContent id={target.appointmentId} onClose={onClose} />}
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -33,7 +33,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
       return data as unknown as Appt | null;
     },
   });
-  if (q.isLoading) return <div className="space-y-4 p-6"><Skeleton className="h-6 w-40" /><Skeleton className="h-4 w-56" /><Skeleton className="h-40 w-full rounded-2xl" /></div>;
+  if (q.isLoading) return <div className="space-y-4 p-6"><DialogTitle className="sr-only">Appointment</DialogTitle><Skeleton className="h-6 w-40" /><Skeleton className="h-4 w-56" /><Skeleton className="h-40 w-full rounded-2xl" /></div>;
   if (q.isError) return <div className="p-6"><ErrorNote onRetry={() => q.refetch()} /></div>;
   const a = q.data;
   if (!a) return <p className="p-6 text-sm text-muted-foreground">This appointment couldn't be found.</p>;
@@ -41,15 +41,15 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
   const missing = missingOf(a).length;
 
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="border-b border-border px-6 pb-5 pt-6">
+    <div className="flex flex-col">
+      <header className="border-b border-border px-6 pb-5 pr-14 pt-6">
         <p className="text-xs text-muted-foreground">Appointment</p>
-        <SheetTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</SheetTitle>
-        <SheetDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <DialogTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</DialogTitle>
+        <DialogDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span>{a.services?.name}</span>
           <span className="inline-flex items-center gap-1">{a.meeting_type === "video" ? <Video className="size-3.5" /> : <MapPin className="size-3.5" />}{a.meeting_type === "video" ? "Video" : "In person"}</span>
           <StatusPill status={a.status} />
-        </SheetDescription>
+        </DialogDescription>
         {a.clients && (
           <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose}
             className="mt-4 flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 transition-colors duration-150 hover:bg-surface-2">
@@ -60,7 +60,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
         )}
       </header>
 
-      <section className="flex-1 px-6 py-5">
+      <section className="px-6 py-5">
         <div className="flex items-center gap-3">
           <ReadyRing value={a.ready_score} size={40} stroke={4} />
           <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
@@ -81,7 +81,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
         <DocViewer open={viewer.open} startId={viewer.startId} onOpenChange={(o) => setViewer((v) => ({ ...v, open: o }))} title={a.clients?.name ?? "Documents"} items={items} />
       </section>
 
-      <footer className="sticky bottom-0 border-t border-border bg-sheet px-6 py-4">
+      <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
         <ApptActionButtons a={a} onDone={onClose} />
         {!(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">This appointment is closed.</p>}
       </footer>

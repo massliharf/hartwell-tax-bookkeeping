@@ -13,7 +13,7 @@ export function DocumentStack({ docs }: { docs: StackDoc[] }) {
             key={d.id}
             className="flex items-center gap-3 rounded-lg border border-border bg-sheet px-3.5 py-3"
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-fill-neutral text-ink">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink">
               <FileText className="size-4" strokeWidth={1.75} />
             </span>
             <span className="min-w-0 flex-1">

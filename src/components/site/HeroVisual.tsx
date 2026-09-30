@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { DocumentStack, type StackDoc } from "@/components/brand/DocumentStack";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { BellRing, CalendarCheck } from "lucide-react";
@@ -16,7 +16,8 @@ export function HeroVisual() {
 
   useEffect(() => {
     if (reduce) return;
-    const t = setTimeout(() => setStep((s) => (s >= 5 ? 0 : s + 1)), step === 0 ? 700 : step >= 3 ? 2200 : 1300);
+    if (step >= 3) return; // play once, then rest
+    const t = setTimeout(() => setStep((s) => s + 1), step === 0 ? 600 : 700);
     return () => clearTimeout(t);
   }, [step, reduce]);
 
@@ -25,11 +26,11 @@ export function HeroVisual() {
 
   return (
     <div className="relative mx-auto w-full max-w-sm pb-12 pt-12">
-      <div className="absolute -left-2 top-1 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-left-10">
+      <motion.div initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.3, ease: [0, 0, 0.2, 1] }} className="absolute -left-2 top-1 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-left-10">
         <span className="grid size-7 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><CalendarCheck className="size-3.5" /></span>
         <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">You're booked</span><span className="text-muted-foreground">Thursday, 10:30 am</span></span>
-      </div>
-    <div className="relative h-[340px] w-full rounded-2xl border border-border bg-sheet p-5 shadow-lift sm:p-6">
+      </motion.div>
+    <div className="relative w-full rounded-2xl border border-border bg-sheet p-5 shadow-lift sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>
@@ -41,14 +42,11 @@ export function HeroVisual() {
       <div className="mt-5">
         <DocumentStack docs={docs} />
       </div>
-      <p className={`mt-3 text-center text-xs font-medium transition-opacity duration-150 ${shown === 3 ? "text-success opacity-100" : "opacity-0"}`}>
-        All set. Claire has checked everything.
-      </p>
     </div>
-      <div className="absolute -right-2 bottom-1 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-right-8">
+      <motion.div initial={reduce ? false : { opacity: 0, y: 6 }} animate={step >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }} transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }} className="absolute -right-2 bottom-0 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-right-8">
         <span className="grid size-7 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><BellRing className="size-3.5" /></span>
-        <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">Reminder sent</span><span className="text-muted-foreground">1 document left</span></span>
-      </div>
+        <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">Claire checked everything</span><span className="text-muted-foreground">All documents in</span></span>
+      </motion.div>
     </div>
   );
 }

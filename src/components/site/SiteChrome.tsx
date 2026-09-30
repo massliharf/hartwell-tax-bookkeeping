@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
 
@@ -21,33 +21,40 @@ export function AnnouncementBar() {
   );
 }
 
+function Wordmark() {
+  return (
+    <Link to="/" className="flex min-w-0 items-center gap-2.5">
+      <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-lg bg-deep-ink font-serif text-base text-white">H</span>
+      <span className="flex min-w-0 flex-col leading-tight">
+        <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
+        <span className="truncate text-[11px] text-muted-foreground">& Bookkeeping, Montclair NJ</span>
+      </span>
+    </Link>
+  );
+}
+
+const LINKS = [{ href: "/#how", label: "How it works" }, { href: "/#services", label: "Services" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
+
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 bg-canvas/90 backdrop-blur-md">
-      <div className="mx-auto grid h-[60px] max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 sm:flex sm:justify-between">
-        <Link to="/" className="flex min-w-0 items-baseline gap-2">
-          <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
-          <span className="truncate text-xs text-muted-foreground">& Bookkeeping</span>
-        </Link>
-        <nav className="hidden items-center gap-1 text-xs font-medium text-deep-ink sm:flex">
-          <a href="#how" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">How it works</a>
-          <a href="#services" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">Services</a>
-          <a href="#about" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">About</a>
-          <a href="#faq" className="rounded-lg px-3 py-1.5 hover:bg-fill-subtle">FAQ</a>
+    <header className="sticky top-0 z-40 bg-canvas/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
+        <Wordmark />
+        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+          {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-8 items-center rounded-lg px-3 text-[13px] font-medium text-[#363636] transition-colors duration-150 hover:bg-fill-subtle hover:text-deep-ink">{l.label}</a>)}
         </nav>
-        <Button asChild className="hidden sm:inline-flex"><Link to="/book">Book</Link></Button>
-        <Sheet>
-          <SheetTrigger asChild><Button variant="secondary" size="icon" className="size-10 shrink-0 sm:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></SheetTrigger>
-          <SheetContent side="right" className="w-[min(85vw,320px)] border-border bg-sheet pt-14 sm:hidden">
-            <SheetHeader className="text-left"><SheetTitle>Hartwell Tax</SheetTitle></SheetHeader>
-            <nav aria-label="Mobile navigation" className="mt-8 flex flex-col gap-1 text-sm font-medium text-deep-ink">
-              {[{ href: "/#how", label: "How it works" }, { href: "/#services", label: "Services" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }].map((item) => (
-                <SheetClose asChild key={item.href}><a href={item.href} className="rounded-lg px-3 py-3 hover:bg-fill-neutral">{item.label}</a></SheetClose>
-              ))}
-              <SheetClose asChild><Link to="/book" className={buttonVariants({ className: "mt-4" })}>Book</Link></SheetClose>
-            </nav>
-          </SheetContent>
-        </Sheet>
+        <div className="hidden items-center gap-2 md:flex">
+          <Button asChild variant="ghost"><Link to="/book/returning">Returning client</Link></Button>
+          <Button asChild><Link to="/book">Book an appointment</Link></Button>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="md:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-[rgba(16,16,16,0.1)] p-2 shadow-lift">
+            {LINKS.map((l) => <DropdownMenuItem key={l.href} asChild className="h-11 rounded-lg px-3 text-sm"><a href={l.href}>{l.label}</a></DropdownMenuItem>)}
+            <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">Returning client</Link></DropdownMenuItem>
+            <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Book an appointment</Link></Button></div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

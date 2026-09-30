@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { FlaskConical, Mail, Smartphone, X } from "lucide-react";
 import { toast } from "sonner";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { demoAbandon, demoCancelTomorrow, demoClaim, demoJump, demoReset, demoRun, demoUpload, phoneFeed } from "@/lib/demo.functions";
 
@@ -49,13 +49,13 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
         </Button>
       </div>
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className="overflow-y-auto bg-paper">
-          <SheetHeader>
-            <SheetTitle className="font-sans text-2xl font-normal">Test controls</SheetTitle>
-            <SheetDescription>Show the follow-through live. Only you can see this.</SheetDescription>
-          </SheetHeader>
-          <div className="mt-6 space-y-6">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="t-owner">Test controls</DialogTitle>
+            <DialogDescription>Show the follow-through live. Only you can see this.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
             <section className="space-y-2">
               <Row k="run" label="Run automations now" variant="default" fn={() => fns.run()} />
             </section>
@@ -80,8 +80,8 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
               <Row k="rs" label="Reset demo data" fn={() => fns.reset()} />
             </section>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {phone && <PhonePanel onClose={() => setPhone(false)} />}
     </>
@@ -129,7 +129,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   ) : (
                     <div className="rounded-2xl bg-surface-2 p-3">
                       <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>
-                      <p className="mt-1 font-sans text-[15px] leading-tight text-ink">{m.subject}</p>
+                      <p className="mt-1 font-sans text-[15px] leading-tight text-deep-ink">{m.subject}</p>
                       <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-deep-ink/75">{m.body}</p>
                     </div>
                   )}

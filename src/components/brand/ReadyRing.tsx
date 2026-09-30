@@ -24,7 +24,7 @@ export function ReadyRing({ value, size = 120, stroke = 8, label = "Ready", clas
           strokeDasharray={c}
           initial={false}
           animate={{ strokeDashoffset: c - (pct / 100) * c }}
-          transition={reduce ? { duration: 0 } : { duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={reduce ? { duration: 0 } : { duration: 0.6, ease: [0, 0, 0.2, 1] }}
         />
       </svg>
       {size >= 64 && <div className="absolute inset-0 flex flex-col items-center justify-center">

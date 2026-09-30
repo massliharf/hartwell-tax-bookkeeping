@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { HeroVisual } from "@/components/site/HeroVisual";
-import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
 import claire from "@/assets/claire-portrait.jpg";
@@ -49,7 +49,6 @@ function SectionHead({ title, sub, action }: { title: string; sub?: string; acti
 function Home() {
   return (
     <div className="min-h-screen overflow-x-clip bg-canvas">
-      <AnnouncementBar />
       <SiteHeader />
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
@@ -73,10 +72,10 @@ function Hero() {
     <section className={`${panel} overflow-hidden`}>
       <div className="grid items-center gap-10 px-5 pb-10 pt-10 sm:px-10 md:grid-cols-[1.15fr_1fr] md:gap-12 md:pb-14 md:pt-16">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-fill-subtle py-1 pl-1 pr-3">
-            <img src={claire} alt="" width={28} height={28} className="size-7 rounded-full object-cover" />
-            <span className="text-xs font-medium text-deep-ink">Claire Hartwell, EA, Montclair NJ</span>
-          </div>
+          <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-[rgba(16,16,16,0.1)] bg-sheet pl-1 pr-3 text-xs text-[#363636] transition-colors duration-150 hover:bg-surface-2">
+            <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-white">Oct 15</span>
+            Extensions are due. <span className="font-medium text-ink group-hover:underline">Book your slot</span>
+          </Link>
           <h1 className="mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
             Taxes, without the chase.
           </h1>
@@ -87,7 +86,10 @@ function Hero() {
             <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I'm a returning client</Link></Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">Confirmed instantly. No payment until you file.</p>
+          <div className="mt-6 flex items-center gap-3">
+            <img src={claire} alt="" width={36} height={36} className="size-9 rounded-full object-cover" />
+            <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span><br />Confirmed instantly. No payment until you file.</p>
+          </div>
         </div>
         <HeroVisual />
       </div>
@@ -320,7 +322,7 @@ function Privacy() {
       <div className="mt-10 grid gap-3 sm:grid-cols-2">
         {points.map((p) => (
           <div key={p.title} className="flex gap-4 rounded-2xl bg-surface-2 p-5">
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
             <div><h3 className="text-[15px] font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-[22px] text-[#363636]">{p.text}</p></div>
           </div>
         ))}

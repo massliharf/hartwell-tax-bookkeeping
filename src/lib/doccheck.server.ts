@@ -1,20 +1,20 @@
 // AI check of an uploaded document: right form, right tax year, right name.
-export async function aiCheckDocument(itemId: string) {
+export async function aiCheckDocument(itemId: string): Promise<void> {
   const { supabaseAdmin: s } = await import("@/integrations/supabase/client.server");
   const { data: item } = await s.from("checklist_items")
     .select("id, document_name, file_path, appointments(start_at, clients(name))").eq("id", itemId).maybeSingle();
   const appt = item?.appointments as unknown as { start_at: string; clients: { name: string } | null } | null;
   if (!item?.file_path || !appt) return;
-  const save = (ai_check: string, ai_note: string) => s.from("checklist_items").update({ ai_check, ai_note }).eq("id", itemId).eq("file_path", item.file_path!);
+  const save = async (ai_check: string, ai_note: string) => { await s.from("checklist_items").update({ ai_check, ai_note }).eq("id", itemId).eq("file_path", item.file_path!); };
   const ext = item.file_path.split(".").pop()?.toLowerCase() ?? "";
   const mime = ext === "pdf" ? "application/pdf" : ext === "png" ? "image/png" : ext === "jpg" || ext === "jpeg" ? "image/jpeg" : null;
-  if (!mime) return save("unreadable", "This file type can't be read automatically. Claire will look at it.");
+  if (!mime) return void await save("unreadable", "This file type can't be read automatically. Claire will look at it.");
   const key = process.env["LOVABLE_API_KEY"];
   if (!key) return;
   const year = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric" }).format(new Date(appt.start_at))) - 1;
   try {
     const { data: blob } = await s.storage.from("client-documents").download(item.file_path);
-    if (!blob) return save("unreadable", "We couldn't open this file. Claire will look at it.");
+    if (!blob) return void await save("unreadable", "We couldn't open this file. Claire will look at it.");
     const b64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

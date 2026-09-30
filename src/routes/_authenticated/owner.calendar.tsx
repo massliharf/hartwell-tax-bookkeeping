@@ -140,7 +140,7 @@ function CalendarPage() {
               {offOn(d).map(({ o, top, bottom }) => (
                 <div key={o.id} className="pointer-events-none absolute inset-x-0 z-[5] overflow-hidden border-y border-border px-2 py-1 text-[11px] text-muted-foreground"
                   style={{ top: (top - START) * PX, height: Math.max(18, (bottom - top) * PX), backgroundColor: "var(--fill-neutral)", backgroundImage: "repeating-linear-gradient(135deg, rgba(16,16,16,0.07) 0 6px, transparent 6px 12px)" }}>
-                  <span className="rounded bg-sheet/90 px-1">{o.label || "Time off"}</span>
+                  <span className="absolute bottom-1 left-2 rounded bg-sheet/90 px-1">{o.label || "Time off"}</span>
                 </div>
               ))}
               {layoutDay(byDay(d)).map(({ a, lane, lanes }) => {

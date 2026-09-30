@@ -451,8 +451,7 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
     </section>
   );
   return (
-    <section className="space-y-4">
-      <div className="rounded-2xl border border-border bg-sheet p-6">
+    <section className="rounded-2xl border border-border bg-sheet p-6">
         <p className="text-[11px] font-medium text-warning">One last step</p>
         <h2 className="mt-1 t-section text-deep-ink">Review, sign and pay</h2>
         <div className="mt-4 flex items-baseline justify-between gap-4 rounded-lg bg-canvas p-4">
@@ -461,14 +460,13 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
         </div>
         {appt.client_note && <p className="mt-4 text-sm text-deep-ink/80"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
         <p className="mt-4 text-sm text-muted-foreground">Your return is filed as soon as it's signed and paid.</p>
-        <ol className="mt-4 flex gap-2 text-xs">
-          <li><Tag tone={signed ? "success" : "neutral"}>1. Sign {signed && <Check className="size-3" />}</Tag></li>
-          <li><Tag tone={paid ? "success" : "neutral"}>2. Pay {paid && <Check className="size-3" />}</Tag></li>
+        <ol className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-5 text-sm">
+          <li className={`flex items-center gap-2 ${signed ? "text-success" : "font-medium text-deep-ink"}`}><span className="grid size-7 place-items-center rounded-full border border-current">{signed ? <Check className="size-4" /> : "1"}</span>Sign</li>
+          <li className={`flex items-center gap-2 ${paid ? "text-success" : signed ? "font-medium text-deep-ink" : "text-muted-foreground"}`}><span className="grid size-7 place-items-center rounded-full border border-current">{paid ? <Check className="size-4" /> : "2"}</span>Pay</li>
         </ol>
-      </div>
-      {!signed && <SignSection token={token} appt={appt} onDone={onDone} />}
+      {!signed && <SignSection token={token} appt={appt} onDone={onDone} embedded />}
       {signed && !paid && (
-        <div className="rounded-2xl border border-border bg-sheet p-6">
+        <div className="mt-5 border-t border-border pt-5">
           <h3 className="t-card text-deep-ink">Pay {money(appt.fee_cents!)}</h3>
           <p className="mt-1 text-sm text-muted-foreground">Online card payments aren't switched on yet. This test button marks your fee as paid, so you can see the whole flow.</p>
           {err && <p className="mt-2 text-sm text-destructive" role="alert">That didn't go through. Please try again.</p>}
@@ -482,7 +480,7 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
 }
 
 /* ---------- Form 8879 e-sign ---------- */
-function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDone: () => void }) {
+function SignSection({ token, appt, onDone, embedded = false }: { token: string; appt: Appt; onDone: () => void; embedded?: boolean }) {
   const sign = useServerFn(signForm8879);
   const [name, setName] = useState("");
   const [agree, setAgree] = useState(false);
@@ -491,9 +489,9 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
   const ok = name.trim().length >= 2 && agree;
 
   return (
-    <section className="sheet-stack p-6">
-      <p className="text-[11px] font-medium text-warning">One last step</p>
-      <h2 className="mt-1 text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
+    <section className={embedded ? "mt-5 border-t border-border pt-5" : "sheet-stack p-6"}>
+      {!embedded && <p className="text-[11px] font-medium text-warning">One last step</p>}
+      <h2 className="text-xl leading-[30px] text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>

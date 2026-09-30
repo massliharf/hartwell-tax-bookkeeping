@@ -256,7 +256,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   const fetchWindow = useServerFn(getAvailabilityWindow);
   const strip = useRef<HTMLDivElement>(null);
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 14 } }), staleTime: 30_000 });
-  const days = q.data?.days ?? [];
+  // Clients see 30-minute starts only; every label, chip and "Next available" uses the same list.
+  const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
@@ -294,7 +295,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
             {days.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
-              const open = d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0).length;
+              const open = d.slots.length;
               const full = !d.closed && open === 0;
               return (
                  <Button key={d.date} variant="secondary" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}

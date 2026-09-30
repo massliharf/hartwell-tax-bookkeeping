@@ -169,7 +169,7 @@ function CalendarPage() {
               <button key={d} onClick={() => setMobileDay(d)} className={cn("flex h-14 flex-col items-center justify-center rounded-lg text-[11px] transition-colors duration-150", active ? "bg-deep-ink text-primary-foreground" : "bg-fill-subtle text-deep-ink")}>
                 <span className={active ? "text-primary-foreground/70" : "text-muted-foreground"}>{wd}</span>
                 <span className="tabular text-sm font-medium">{num}</span>
-                <span className={cn("mt-0.5 size-1 rounded-full", byDay(d).length ? (active ? "bg-white" : "bg-deep-ink") : "bg-transparent")} />
+                <span className={cn("mt-0.5 size-1 rounded-full", byDay(d).length ? (active ? "bg-primary-foreground" : "bg-deep-ink") : "bg-transparent")} />
               </button>
             );
           })}

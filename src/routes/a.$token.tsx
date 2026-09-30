@@ -397,7 +397,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-white font-serif text-2xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-sheet font-serif text-2xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />

@@ -50,7 +50,7 @@ function ClaimPage() {
   const { token } = Route.useParams();
   const fetchOffer = useServerFn(getOffer);
   const claim = useServerFn(claimOffer);
-  const q = useQuery({ queryKey: ["offer", token], queryFn: () => fetchOffer({ data: { token } }) });
+  const q = useQuery({ queryKey: ["offer", token], queryFn: () => fetchOffer({ data: { token } }), retry: false });
   const [state, setState] = useState<"idle" | "busy" | "missed" | { token: string }>("idle");
 
   if (q.isLoading) return <Shell><div role="status" aria-label="Loading" className="space-y-4"><Skeleton className="mx-auto h-5 w-36" /><Skeleton className="mx-auto h-9 w-64 max-w-full" /><Skeleton className="mx-auto h-6 w-44" /><Skeleton className="mx-auto mt-8 h-10 w-full" /></div></Shell>;

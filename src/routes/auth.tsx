@@ -7,7 +7,6 @@ import { useState, type FormEvent } from "react";
 import { Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createOwnerAccount, ownerSetupStatus } from "@/lib/owner.functions";
@@ -59,7 +58,7 @@ function AuthPage() {
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-sm">
         <Link to="/" className="flex items-baseline gap-2"><span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span><span className="text-xs text-muted-foreground">&amp; Bookkeeping</span></Link>
-        <form onSubmit={submit} className="sheet-stack mt-8 space-y-5 p-7">
+        <form onSubmit={submit} className="mt-8 space-y-5 rounded-2xl border border-border bg-sheet p-7">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-deep-ink"><Lock className="h-4 w-4" /></span>
           <div>
             <h1 className="t-card text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
@@ -76,8 +75,8 @@ function AuthPage() {
             <Input id="pw" type="password" autoComplete={setup ? "new-password" : "current-password"} minLength={setup ? 10 : undefined} required value={password} onChange={(e) => setPassword(e.target.value)} />
             {setup && <p className="text-xs text-muted-foreground">At least 10 characters.</p>}
           </div>
-          {err && <p className="text-sm text-warning" role="alert">{err}</p>}
-           {!data ? <Skeleton className="h-10 w-full rounded-lg" /> : <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>}
+          {err && <p className="text-sm text-destructive" role="alert">{err}</p>}
+          <Button type="submit" size="lg" className="w-full" disabled={busy || !data}>{busy || !data ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>
         </form>
         <button type="button" onClick={() => { setEmail(DEMO_EMAIL); setPassword(DEMO_PASSWORD); }}
           className="mt-4 w-full rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-fill-subtle/50">

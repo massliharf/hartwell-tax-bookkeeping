@@ -220,24 +220,24 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
               {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
             </div>
             {q.type === "count" ? (
-              <div className="flex h-8 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
-                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-6 place-items-center rounded-md hover:bg-[#DBDBDB]">
+              <div className="flex h-10 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
+                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-selected">
                   <Minus className="size-3.5" />
                 </button>
                 <span className="tabular w-6 text-center text-xs font-semibold">{(answers[q.key] as number) ?? 0}</span>
-                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-6 place-items-center rounded-md hover:bg-[#DBDBDB]">
+                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-selected">
                   <Plus className="size-3.5" />
                 </button>
               </div>
             ) : (
-              <div className="flex h-8 shrink-0 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label={q.label}>
+              <div className="flex h-10 shrink-0 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label={q.label}>
                 {[true, false].map((v) => (
                   <button
                     key={String(v)}
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
-                     className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-[#DBDBDB] text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
+                     className={`h-8 min-w-16 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-deep-ink"}`}
                   >
                     {v ? "Yes" : "No"}
                   </button>
@@ -256,7 +256,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   const fetchWindow = useServerFn(getAvailabilityWindow);
   const strip = useRef<HTMLDivElement>(null);
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 14 } }), staleTime: 30_000 });
-  const days = q.data?.days ?? [];
+  // Clients see 30-minute starts only; every label, chip and "Next available" uses the same list.
+  const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
@@ -294,15 +295,15 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
             {days.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
-              const open = d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0).length;
+              const open = d.slots.length;
               const full = !d.closed && open === 0;
               return (
                  <Button key={d.date} variant="secondary" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
                    className={`flex h-[76px] w-[76px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border px-2 transition-colors duration-150 ${
-                     active ? "border-deep-ink bg-deep-ink text-white hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : full ? "border-transparent bg-fill-subtle text-muted-foreground" : "border-border bg-sheet text-deep-ink hover:bg-surface-2"}`}>
-                  <span className={`text-[11px] ${active ? "text-white/70" : "text-muted-foreground"}`}>{c.dow} {c.month}</span>
+                     active ? "border-deep-ink bg-deep-ink text-primary-foreground hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : full ? "border-transparent bg-fill-subtle text-muted-foreground" : "border-border bg-sheet text-deep-ink hover:bg-surface-2"}`}>
+                  <span className={`text-[11px] ${active ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{c.dow} {c.month}</span>
                   <span className={`tabular text-lg font-medium leading-tight ${full && !active ? "line-through decoration-1" : ""}`}>{c.day}</span>
-                  <span className={`text-[10px] font-medium ${active ? "text-white/80" : d.closed ? "" : full ? "text-muted-foreground" : "text-success"}`}>{d.closed ? "Closed" : full ? "Full" : `${open} open`}</span>
+                  <span className={`text-[10px] font-medium ${active ? "text-primary-foreground/80" : d.closed ? "" : full ? "text-muted-foreground" : "text-success"}`}>{d.closed ? "Closed" : full ? "Full" : `${open} open`}</span>
                  </Button>
               );
             })}
@@ -324,7 +325,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
                  });
                  return slots.length ? <div key={period}><h2 className="mb-2 text-sm font-medium text-deep-ink">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{slots.map((s) => (
                    <Button key={s} variant="secondary" onClick={() => update({ date: day.date, slot: s })} aria-pressed={draft.slot === s && draft.date === day.date}
-                     className={`tabular h-11 rounded-lg text-sm font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-indicator"}`}>
+                     className={`tabular h-11 rounded-lg text-sm font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-selected"}`}>
                      {fmtTime(s)}
                    </Button>
                  ))}</div></div> : null;

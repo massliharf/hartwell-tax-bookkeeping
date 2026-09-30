@@ -106,7 +106,7 @@ function CalendarPage() {
             return (
               <div key={d} className="flex items-center justify-center gap-1.5 border-l border-border py-2.5 text-xs text-muted-foreground">
                 <span>{wd}</span>
-                <span className={cn("tabular grid size-6 place-items-center rounded-full text-xs font-medium", isToday ? "bg-deep-ink text-white" : "text-deep-ink")}>{num}</span>
+                <span className={cn("tabular grid size-6 place-items-center rounded-full text-xs font-medium", isToday ? "bg-deep-ink text-primary-foreground" : "text-deep-ink")}>{num}</span>
               </div>
             );
           })}
@@ -166,10 +166,10 @@ function CalendarPage() {
             const [wd, , num] = ymdLabel(d).replace(",", "").split(" ");
             const active = d === mobileDay;
             return (
-              <button key={d} onClick={() => setMobileDay(d)} className={cn("flex h-14 flex-col items-center justify-center rounded-lg text-[11px] transition-colors duration-150", active ? "bg-deep-ink text-white" : "bg-fill-subtle text-deep-ink")}>
-                <span className={active ? "text-white/70" : "text-muted-foreground"}>{wd}</span>
+              <button key={d} onClick={() => setMobileDay(d)} className={cn("flex h-14 flex-col items-center justify-center rounded-lg text-[11px] transition-colors duration-150", active ? "bg-deep-ink text-primary-foreground" : "bg-fill-subtle text-deep-ink")}>
+                <span className={active ? "text-primary-foreground/70" : "text-muted-foreground"}>{wd}</span>
                 <span className="tabular text-sm font-medium">{num}</span>
-                <span className={cn("mt-0.5 size-1 rounded-full", byDay(d).length ? (active ? "bg-white" : "bg-deep-ink") : "bg-transparent")} />
+                <span className={cn("mt-0.5 size-1 rounded-full", byDay(d).length ? (active ? "bg-primary-foreground" : "bg-deep-ink") : "bg-transparent")} />
               </button>
             );
           })}

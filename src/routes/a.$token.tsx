@@ -50,7 +50,7 @@ type Item = { id: string; document_name: string; description: string | null; req
 function PortalPage() {
   const { token } = Route.useParams();
   const fetchAppt = useServerFn(getAppointmentByToken);
-  const q = useQuery({ queryKey: ["portal", token], queryFn: () => fetchAppt({ data: { token } }) });
+  const q = useQuery({ queryKey: ["portal", token], queryFn: () => fetchAppt({ data: { token } }), retry: false });
   const refresh = () => q.refetch();
 
   if (q.isError || (q.data && !q.data.appointment)) {
@@ -204,7 +204,8 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
   const [date, setDate] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [alts, setAlts] = useState<string[] | null>(null);
-  const days = q.data?.days ?? [];
+  // Same 30-minute starts as the booking page, so days and times always agree.
+  const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const sel = date ?? days.find((d) => d.slots.length)?.date;
   const day = days.find((d) => d.date === sel);
 
@@ -234,10 +235,10 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 const off = d.closed || d.slots.length === 0;
                 return (
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
-                    className={`flex w-[68px] shrink-0 flex-col items-center rounded-lg px-2 py-2 ${active ? "bg-fill-selected text-deep-ink" : off ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-[#DBDBDB]"}`}>
-                    <span className="text-[10px] tracking-wider opacity-70">{c.dow}</span>
+                    aria-pressed={active} className={`flex w-[68px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${active ? "bg-primary text-primary-foreground" : off ? "text-muted-foreground/50" : "bg-fill-neutral text-deep-ink hover:bg-fill-selected"}`}>
+                    <span className="text-[10px] opacity-70">{c.dow} {c.month}</span>
                     <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
-                    <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
+                    <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : `${d.slots.length} open`}</span>
                   </button>
                 );
               })}
@@ -334,7 +335,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <div key="missing"
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 ${drag ? "ring-2 ring-[#4F69F2]" : ""}`}>
+            className={`sheet-stack p-5 ${drag ? "ring-2 ring-ring" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
@@ -397,7 +398,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-white font-serif text-2xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-sheet font-serif text-2xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />

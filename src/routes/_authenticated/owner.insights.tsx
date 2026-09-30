@@ -107,8 +107,8 @@ function Insights() {
             {BEFORE.msgsPerBooking} messages per booking.<br />1 in 3 clients unprepared.
           </p>
         </div>
-        <div className="relative bg-[#1A1A1A] p-6 text-white md:p-8">
-          <p className="text-xs font-medium text-white/70">Now</p>
+        <div className="relative bg-primary p-6 text-primary-foreground md:p-8">
+          <p className="text-xs font-medium text-primary-foreground/70">Now</p>
           <p className="mt-3 text-lg leading-7">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>

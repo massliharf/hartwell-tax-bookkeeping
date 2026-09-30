@@ -30,6 +30,8 @@ export const Route = createFileRoute("/a/$token")({
       { name: "description", content: "Manage your appointment and send your documents privately." },
       { property: "og:title", content: "Your appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Your private appointment page." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -105,7 +107,7 @@ function PortalPage() {
   const postAppointment = a.status === "completed";
   const fixItems = items.filter((i) => i.review_status === "needs_fix");
   const sentItems = items.filter((i) => i.status === "uploaded" && i.review_status !== "needs_fix");
-  const progress = a.filed_at ? 5 : postAppointment ? 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
+  const progress = a.filed_at ? 6 : postAppointment ? a.signature_status === "signed" && a.paid_at ? 5 : 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
 
   return (
     <BookingShell>
@@ -117,8 +119,8 @@ function PortalPage() {
             {cancelled ? "This appointment was cancelled." : a.filed_at ? "Your return has been e-filed." : postAppointment ? a.signature_status === "signed" && a.paid_at ? "All done. Claire will file your return today." : "Your return is ready. Sign and pay to have it filed." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
           </p>
         </div>
-        <ol aria-label="Appointment progress" className="-mb-3 flex gap-1 overflow-x-auto border-b border-border pb-4 sm:gap-2">
-          {["Booked", "Documents", "Appointment", "Sign and pay", "Filed"].map((label, index) => <li key={label} aria-current={index + 1 === progress ? "step" : undefined} className={`flex min-w-max flex-1 items-center gap-1.5 rounded-lg px-2 py-2 text-xs sm:px-3 ${index + 1 === progress ? "bg-primary text-primary-foreground" : index + 1 < progress ? "text-success" : "text-muted-foreground"}`}><span className={`grid size-5 shrink-0 place-items-center rounded-full border ${index + 1 === progress ? "border-primary-foreground" : "border-current"}`}>{index + 1 < progress ? <Check className="size-3" /> : index + 1}</span>{label}</li>)}
+        <ol aria-label="Appointment progress" className="-mb-3 grid grid-cols-3 gap-1 border-b border-border pb-4 sm:grid-cols-5 sm:gap-2">
+          {["Booked", "Documents", "Appointment", "Sign and pay", "Filed"].map((label, index) => <li key={label} aria-current={index + 1 === progress ? "step" : undefined} className={`flex min-w-0 items-center gap-1 rounded-lg px-1 py-2 text-[11px] sm:gap-1.5 sm:px-3 sm:text-xs ${index + 1 === progress ? "bg-primary text-primary-foreground" : index + 1 < progress ? "text-success" : "text-muted-foreground"}`}><span className={`grid size-5 shrink-0 place-items-center rounded-full border ${index + 1 === progress ? "border-primary-foreground" : "border-current"}`}>{index + 1 < progress ? <Check className="size-3" /> : index + 1}</span>{label}</li>)}
         </ol>
 
         {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}

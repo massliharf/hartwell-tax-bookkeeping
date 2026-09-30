@@ -38,7 +38,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
   onAcceptAll: () => void; accepting: boolean;
 }) {
   const getUrl = useServerFn(getDocumentUrl);
-  const files = items.filter((i) => i.status === "uploaded" && i.file_path).sort((x, y) => x.sort_order - y.sort_order);
+  const files = items.filter((i) => i.status === "uploaded").sort((x, y) => x.sort_order - y.sort_order);
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState<Record<string, Loaded>>({});
   const [zoom, setZoom] = useState<number | "fit">("fit");
@@ -56,6 +56,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
     for (const f of files) {
       const k = `${f.id}:${f.file_path}`;
       if (loaded[k]) continue;
+      if (!f.file_path) { setLoaded((m) => ({ ...m, [k]: { error: true } })); continue; }
       (async () => {
         try {
           const r = await getUrl({ data: { itemId: f.id } });
@@ -170,7 +171,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
             <div className="min-h-0 flex-1 overflow-auto p-4">
               {!cur ? <p className="grid h-full place-items-center text-sm text-muted-foreground">No files uploaded yet.</p>
                 : !curLoaded ? <Skeleton className="mx-auto h-full min-h-[40vh] w-full max-w-xl rounded-xl" />
-                : "error" in curLoaded || !view ? <p className="grid h-full place-items-center text-sm text-warning">This file couldn't be opened here. Try Download all.</p>
+                : "error" in curLoaded || !view ? <p className="grid h-full place-items-center text-sm text-warning">There's no file to preview for this document.</p>
                 : <div className={cn("flex min-h-full", zoom === "fit" ? "items-center justify-center" : "items-start justify-start")}>
                     <img key={view} src={view} alt={cur.document_name}
                       className={cn("rounded-lg border border-border bg-sheet shadow-[0_1px_2px_rgba(16,16,16,0.06)] transition-transform duration-150", zoom === "fit" && "max-h-[calc(100dvh-260px)] max-w-full object-contain md:max-h-[calc(100dvh-140px)]")}

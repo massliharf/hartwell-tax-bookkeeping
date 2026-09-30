@@ -88,7 +88,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           <ReadyRing value={a.ready_score} size={40} stroke={4} />
           <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
         </div>}
-        {(() => { const n = items.filter((i) => i.status === "uploaded" && i.file_path).length; return <div className="mt-4 flex flex-wrap gap-2">
+        {(() => { const n = items.filter((i) => i.status === "uploaded").length; return <div className="mt-4 flex flex-wrap gap-2">
           {n > 0 && <Button size="sm" onClick={() => setGallery(true)}>Review documents ({n})</Button>}
           {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
         </div>; })()}

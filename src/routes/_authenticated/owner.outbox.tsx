@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Mail, MessageSquare } from "lucide-react";
+import { ChevronDown, Mail, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MSG_LABEL, fmtStamp } from "@/components/owner/lib";
 import { Empty, ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
@@ -44,7 +44,7 @@ function Outbox() {
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
       {q.data && !list.length && <Empty title="Nothing sent yet.">Messages appear here the moment they go out.</Empty>}
-      <ul className="space-y-3">
+      <ul className="space-y-2">
         {list.map((m) => (
           <li key={m.id} className="rounded-2xl bg-surface-2">
             <button onClick={() => setOpen(open === m.id ? null : m.id)} className="flex w-full items-start gap-4 p-4 text-left">
@@ -59,10 +59,15 @@ function Outbox() {
                   {m.channel === "sms" && ", Text (simulated)"}
                 </span>
               </span>
-              {m.minutes_saved > 0 && <span className="tabular shrink-0 rounded-full bg-marigold/20 px-2.5 py-1 text-xs font-medium text-deep-ink">saved {m.minutes_saved} min</span>}
+              {m.minutes_saved > 0 && <span className="tabular shrink-0 rounded border border-border bg-fill-subtle px-2 py-0.5 text-[11px] text-muted-foreground">saved {m.minutes_saved} min</span>}
+              <ChevronDown className={cn("mt-1 size-4 shrink-0 text-muted-foreground transition-transform duration-150", open === m.id && "rotate-180")} />
             </button>
-            {m.client_id && <Button size="sm" variant="ghost" className="ml-4 mb-2 text-ink" onClick={() => openClient({ clientId: m.client_id! })}>Open client</Button>}
-             {open === m.id && <pre className="whitespace-pre-wrap border-t border-border px-5 py-4 font-sans text-sm text-deep-ink/80">{m.body}</pre>}
+            {open === m.id && (
+              <div className="border-t border-border px-5 py-4">
+                <pre className="whitespace-pre-wrap font-sans text-sm leading-[22px] text-deep-ink/80">{m.body}</pre>
+                {m.client_id && <Button size="sm" variant="outline" className="mt-3" onClick={() => openClient({ clientId: m.client_id! })}>Open client</Button>}
+              </div>
+            )}
           </li>
         ))}
       </ul>

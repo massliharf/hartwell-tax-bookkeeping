@@ -29,8 +29,8 @@ function Clients() {
         {q.data && <p className="tabular">{q.data.length} clients</p>}
       </PageHead>
       <div className="relative mb-6">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search by name, email or phone" className="h-12 rounded-full bg-sheet pl-11" />
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search by name, email or phone" className="h-9 rounded-lg bg-sheet pl-10 text-sm" />
       </div>
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
@@ -47,7 +47,13 @@ function Clients() {
                   <span className="block truncate text-sm text-muted-foreground">{c.email}</span>
                 </span>
                 <span className="tabular hidden text-right text-xs text-muted-foreground sm:block">
-                  {appts.length} appointment{appts.length === 1 ? "" : "s"}{c.is_returning ? ", Returning" : ""}
+                  {(() => {
+                    const nowIso = new Date().toISOString();
+                    const next = appts.filter((a) => a.start_at >= nowIso).sort((a, b) => a.start_at.localeCompare(b.start_at))[0];
+                    const last = appts.find((a) => a.start_at < nowIso);
+                    const d = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
+                    return next ? <>Next: <span className="text-deep-ink">{d(next.start_at)}</span></> : last ? <>Last: {d(last.start_at)}</> : "No appointments";
+                  })()}{c.is_returning ? ", Returning" : ""}
                 </span>
               </button>
             </li>

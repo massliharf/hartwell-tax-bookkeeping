@@ -334,7 +334,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <div key="missing"
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 ${drag ? "ring-2 ring-[#4F69F2]" : ""}`}>
+            className={`sheet-stack p-5 ${drag ? "ring-2 ring-ring" : ""}`}>
             <div className="flex items-start gap-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">

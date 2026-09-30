@@ -107,7 +107,7 @@ function PortalPage() {
   const postAppointment = a.status === "completed";
   const fixItems = items.filter((i) => i.review_status === "needs_fix");
   const sentItems = items.filter((i) => i.status === "uploaded" && i.review_status !== "needs_fix");
-  const progress = a.filed_at ? 6 : postAppointment ? a.signature_status === "signed" && a.paid_at ? 5 : 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
+  const progress = a.filed_at ? 5 : postAppointment ? 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
 
   return (
     <BookingShell>
@@ -120,7 +120,7 @@ function PortalPage() {
           </p>
         </div>
         <ol aria-label="Appointment progress" className="-mb-3 grid grid-cols-3 gap-1 border-b border-border pb-4 sm:grid-cols-5 sm:gap-2">
-          {["Booked", "Documents", "Appointment", "Sign and pay", "Filed"].map((label, index) => <li key={label} aria-current={index + 1 === progress ? "step" : undefined} className={`flex min-w-0 items-center gap-1 rounded-lg px-1 py-2 text-[11px] sm:gap-1.5 sm:px-3 sm:text-xs ${index + 1 === progress ? "bg-primary text-primary-foreground" : index + 1 < progress ? "text-success" : "text-muted-foreground"}`}><span className={`grid size-5 shrink-0 place-items-center rounded-full border ${index + 1 === progress ? "border-primary-foreground" : "border-current"}`}>{index + 1 < progress ? <Check className="size-3" /> : index + 1}</span>{label}</li>)}
+          {["Booked", "Documents", "Appointment", "Sign and pay", "Filed"].map((label, index) => <li key={label} aria-current={index + 1 === progress ? "step" : undefined} className={`flex min-w-0 items-center gap-1 rounded-lg px-1 py-2 text-[11px] sm:gap-1.5 sm:px-3 sm:text-xs ${index + 1 === progress ? "bg-primary text-primary-foreground" : index + 1 < progress ? "text-success" : "text-muted-foreground"}`}><span className={`grid size-5 shrink-0 place-items-center rounded-full border ${index + 1 === progress ? "border-primary-foreground" : "border-current"}`}>{index + 1 < progress || index === 3 && !!a.paid_at && a.signature_status === "signed" ? <Check className="size-3" /> : index + 1}</span>{label}</li>)}
         </ol>
 
         {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}

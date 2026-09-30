@@ -59,7 +59,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
       if (!f.file_path) { setLoaded((m) => ({ ...m, [k]: { error: true } })); continue; }
       (async () => {
         try {
-          const r = await getUrl({ data: { itemId: f.id } });
+          const r = await getUrl({ data: { itemId: f.id } }); console.log("gallery url", f.document_name, !!r.url);
           if (!r.url) throw new Error();
           const blob = await (await fetch(r.url)).blob();
           const ext = (f.file_path!.split(".").pop() ?? "").toLowerCase();

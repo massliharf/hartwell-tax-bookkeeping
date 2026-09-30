@@ -58,8 +58,11 @@ function PortalPage() {
       <BookingShell>
         <div className="mx-auto max-w-md text-center">
           <h1 className="t-page text-deep-ink">This link isn't working</h1>
-          <p className="mt-3 text-deep-ink/70">Use the link in your confirmation email, or call the office at (973) 555-0142.</p>
-          <Button asChild size="lg" className="mt-6"><Link to="/">Back to home</Link></Button>
+          <p className="mt-3 text-muted-foreground">It may be old or mistyped. We can email you a fresh one.</p>
+          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
+            <Button asChild size="lg"><Link to="/book/returning">Email me a new link</Link></Button>
+            <Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button>
+          </div>
         </div>
       </BookingShell>
     );

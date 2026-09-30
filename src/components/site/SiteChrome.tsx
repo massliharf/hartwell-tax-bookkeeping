@@ -33,7 +33,7 @@ function Wordmark() {
   );
 }
 
-const LINKS = [{ href: "/#how", label: "How it works" }, { href: "/#services", label: "Services" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
+const LINKS = [{ href: "/#what", label: "What we do" }, { href: "/#how", label: "How it works" }, { href: "/#services", label: "Prices" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
 
 export function SiteHeader() {
   return (
@@ -44,14 +44,14 @@ export function SiteHeader() {
           {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-8 items-center rounded-lg px-3 text-[13px] font-medium text-[#363636] transition-colors duration-150 hover:bg-fill-subtle hover:text-deep-ink">{l.label}</a>)}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
-          <Button asChild variant="ghost"><Link to="/book/returning">Returning client</Link></Button>
+          <Button asChild variant="ghost"><Link to="/book/returning">My appointment</Link></Button>
           <Button asChild><Link to="/book">Book an appointment</Link></Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="md:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-[rgba(16,16,16,0.1)] p-2 shadow-lift">
             {LINKS.map((l) => <DropdownMenuItem key={l.href} asChild className="h-11 rounded-lg px-3 text-sm"><a href={l.href}>{l.label}</a></DropdownMenuItem>)}
-            <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">Returning client</Link></DropdownMenuItem>
+            <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">My appointment</Link></DropdownMenuItem>
             <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Book an appointment</Link></Button></div>
           </DropdownMenuContent>
         </DropdownMenu>

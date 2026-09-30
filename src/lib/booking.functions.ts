@@ -170,21 +170,52 @@ export const joinWaitlist = createServerFn({ method: "POST" })
   });
 
 /** Returning client lookup. Returns only what's needed to prefill; phone is masked. */
-export const lookupReturning = createServerFn({ method: "POST" })
+
+/**
+ * Returning clients and "find my appointment": we email private links instead of showing anything on screen,
+ * so typing someone else's email reveals nothing. The email lists upcoming appointments (manage links)
+ * and a one-tap link to book again with last year's answers.
+ */
+export const sendReturningLinks = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ email: z.string().trim().email().max(200) }).parse(d))
   .handler(async ({ data }) => {
+    const email = data.email.toLowerCase();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: client } = await supabaseAdmin
-      .from("clients").select("id, name, phone").eq("email", data.email.toLowerCase()).maybeSingle();
-    if (!client) return { found: false as const };
-    const { data: last } = await supabaseAdmin
-      .from("appointments").select("intake_answers, services(slug)")
-      .eq("client_id", client.id).order("start_at", { ascending: false }).limit(1).maybeSingle();
-    return {
-      found: true as const,
-      name: client.name,
-      phoneHint: client.phone ? `ending in ${client.phone.slice(-4)}` : null,
-      intake: JSON.parse(JSON.stringify(last?.intake_answers ?? {})) as Record<string, string | number | boolean | string[] | null>,
-      serviceSlug: (last?.services as { slug: string } | null)?.slug ?? null,
-    };
+    const { data: client } = await supabaseAdmin.from("clients").select("id, name").eq("email", email).maybeSingle();
+    if (!client) return { ok: true };
+    const { getNow } = await import("./clock.server");
+    const { sendMessage } = await import("./email.server");
+    const { requestOrigin } = await import("./origin.server");
+    const { fromIntakePayload } = await import("./intake");
+    const now = await getNow();
+    const origin = requestOrigin();
+    const [{ data: upcoming }, { data: last }] = await Promise.all([
+      supabaseAdmin.from("appointments").select("start_at, manage_token, services(name)").eq("client_id", client.id)
+        .in("status", ["booked", "confirmed"]).gt("start_at", now.toISOString()).order("start_at").limit(3),
+      supabaseAdmin.from("appointments").select("intake_answers, meeting_type, services(slug)").eq("client_id", client.id)
+        .order("start_at", { ascending: false }).limit(1).maybeSingle(),
+    ]);
+    const slug = (last?.services as { slug: string } | null)?.slug ?? null;
+    const { data: lead } = await supabaseAdmin.from("leads").insert({
+      email, name: client.name, last_step: "returning", nudged_at: now.toISOString(),
+      partial_booking: { service: slug, meeting_type: last?.meeting_type ?? "in_person", answers: fromIntakePayload((last?.intake_answers ?? {}) as Record<string, unknown>) } as never,
+    }).select("id").maybeSingle();
+    const tz = { timeZone: "America/New_York" } as const;
+    const when = (iso: string) => `${new Date(iso).toLocaleDateString("en-US", { ...tz, weekday: "long", month: "long", day: "numeric" })} at ${new Date(iso).toLocaleTimeString("en-US", { ...tz, hour: "numeric", minute: "2-digit" })}`;
+    const first = client.name.split(" ")[0] ?? "";
+    const blocks: import("./email.server").Block[] = [{ p: `Hi ${first}, here are your private links.` }];
+    for (const a of upcoming ?? []) {
+      blocks.push({ p: `${(a.services as { name: string } | null)?.name ?? "Appointment"}, ${when(a.start_at)}. Upload documents, move it or cancel here:` });
+      blocks.push({ button: { label: "Manage this appointment", href: `${origin}/a/${a.manage_token}` } });
+    }
+    if (lead) {
+      blocks.push({ p: (upcoming ?? []).length ? "Booking something else? Your answers from last time are already filled in." : "Book your next appointment. Your answers from last time are already filled in." });
+      blocks.push({ button: { label: "Book again", href: `${origin}/book?resume=${lead.id}` } });
+    }
+    const hour = now.toISOString().slice(0, 13);
+    await sendMessage({
+      dedupeKey: `access:${client.id}:${hour}`, type: "booking_confirmation", minutesSaved: 3, clientId: client.id, to: email,
+      subject: "Your Hartwell Tax links", heading: "Welcome back.", blocks,
+    });
+    return { ok: true };
   });

@@ -163,7 +163,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
     <>
        <StepTitle hideEyebrow eyebrow="Step 1 of 4" title="What can Claire help with?" sub="Pick the closest fit. You can add details in the next step." />
       <div className="mb-6 text-sm text-muted-foreground">
-        Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
+        Already booked, or booking again? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Get your private link</Link>
       </div>
        {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
@@ -276,20 +276,33 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
       {days.length > 0 && (
         <>
+          {firstOpen && (() => {
+            const fd = days.find((d) => d.date === firstOpen)!;
+            const first = fd.slots[0]!;
+            const picked = draft.slot === first;
+            return (
+              <button type="button" onClick={() => update({ date: fd.date, slot: first })}
+                className={`mb-4 flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors duration-150 sm:w-auto sm:min-w-[320px] ${picked ? "border-deep-ink bg-surface-2" : "border-border bg-sheet hover:bg-surface-2"}`}>
+                <span><span className="block text-xs text-muted-foreground">Next available</span><span className="block text-sm font-medium text-deep-ink">{fmtDateLong(first)}, {fmtTime(first)}</span></span>
+                <span className="text-xs font-medium text-ink">{picked ? "Selected" : "Pick this"}</span>
+              </button>
+            );
+          })()}
            <div className="relative">
-              <div className="pointer-events-none absolute right-0 top-0 z-10 h-[68px] w-10 bg-gradient-to-l from-sheet to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 z-10 h-[76px] w-10 bg-gradient-to-l from-sheet to-transparent" />
              <div ref={strip} className="flex gap-1 overflow-x-auto pb-2 pr-9 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
             {days.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
-              const full = !d.closed && d.slots.length === 0;
+              const open = d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0).length;
+              const full = !d.closed && open === 0;
               return (
                  <Button key={d.date} variant="secondary" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                   className={`flex h-[68px] w-[72px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${
-                     active ? "bg-primary text-primary-foreground hover:bg-primary" : d.closed ? "text-muted-foreground/50" : "bg-secondary hover:bg-fill-indicator"}`}>
-                    <span className="text-[11px] opacity-80">{c.dow}</span>
-                  <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
-                   <span className={`text-[10px] ${full && !active ? "text-warning" : "opacity-80"}`}>{d.closed ? "Closed" : full ? "Full" : c.month}</span>
+                   className={`flex h-[76px] w-[76px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border px-2 transition-colors duration-150 ${
+                     active ? "border-deep-ink bg-deep-ink text-white hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : full ? "border-transparent bg-fill-subtle text-muted-foreground" : "border-border bg-sheet text-deep-ink hover:bg-surface-2"}`}>
+                  <span className={`text-[11px] ${active ? "text-white/70" : "text-muted-foreground"}`}>{c.dow} {c.month}</span>
+                  <span className={`tabular text-lg font-medium leading-tight ${full && !active ? "line-through decoration-1" : ""}`}>{c.day}</span>
+                  <span className={`text-[10px] font-medium ${active ? "text-white/80" : d.closed ? "" : full ? "text-muted-foreground" : "text-success"}`}>{d.closed ? "Closed" : full ? "Full" : `${open} open`}</span>
                  </Button>
               );
             })}
@@ -301,6 +314,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
           </div>
 
           <div className="mt-6">
+            {day && day.slots.length > 0 && <p className="mb-4 text-xs text-muted-foreground">{fmtDateLong(day.slots[0]!)}. Only open times are shown.</p>}
             {day && day.slots.length > 0 && (
                <div className="space-y-6">{(["Morning", "Afternoon", "Evening"] as const).map((period) => {
                  const slots = day.slots.filter((s) => {

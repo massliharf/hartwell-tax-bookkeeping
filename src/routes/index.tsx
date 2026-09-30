@@ -7,6 +7,7 @@ import { HeroVisual } from "@/components/site/HeroVisual";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
+import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import claire from "@/assets/claire-portrait.jpg";
 
 
@@ -52,6 +53,7 @@ function Home() {
       <SiteHeader />
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
+        <WhatClaireDoes />
         <HowItWorks />
         <BeforeAfter />
         <Services />
@@ -84,7 +86,7 @@ function Hero() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
-            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I'm a returning client</Link></Button>
+            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I already have a booking</Link></Button>
           </div>
           <div className="mt-6 flex items-center gap-3">
             <img src={claire} alt="" width={36} height={36} className="size-9 rounded-full object-cover" />
@@ -114,6 +116,44 @@ function Hero() {
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
           {trust.map((t) => (
             <li key={t} className="flex items-center gap-1.5 text-xs text-[#363636]"><Check className="size-3.5 text-ink" strokeWidth={2.5} />{t}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function WhatClaireDoes() {
+  const who = [
+    { svc: "individual", title: "Families and employees", text: "W-2 income, mortgage interest, child and education credits, and the deductions most people miss." },
+    { svc: "self-employed", title: "Freelancers and 1099 workers", text: "Schedule C, home office, quarterly estimated payments, and a plan so April isn't a surprise." },
+    { svc: "rental", title: "Landlords", text: "Rental income and expenses, depreciation, and records that hold up if you sell." },
+    { svc: "bookkeeping", title: "Small businesses", text: "Clean monthly books, sales tax questions, and a return that matches them." },
+  ];
+  const included = [
+    "Federal and New Jersey returns, e-filed with confirmation",
+    "A look at last year's return for anything missed",
+    "Help if the IRS or the NJ Division of Taxation writes to you",
+    "Answers to tax questions all year, not just in April",
+    "Private document upload, no Social Security number online",
+    "One flat price, agreed before any work starts",
+  ];
+  return (
+    <section id="what" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="An Enrolled Agent for your whole tax year." sub="Enrolled Agents are licensed by the IRS to prepare returns and to represent you if the IRS has questions. Claire prepares every return herself." />
+      <div className="mt-10 grid gap-3 sm:grid-cols-2">
+        {who.map((w) => (
+          <article key={w.title} className="flex gap-4 rounded-2xl border border-border p-5">
+            <ServiceIcon service={w.svc} size={40} />
+            <div><h3 className="text-[15px] font-medium text-deep-ink">{w.title}</h3><p className="mt-1 text-sm leading-[22px] text-[#363636]">{w.text}</p></div>
+          </article>
+        ))}
+      </div>
+      <div className="mt-3 rounded-2xl bg-surface-2 p-5 sm:p-6">
+        <h3 className="text-[15px] font-medium text-deep-ink">Every return includes</h3>
+        <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+          {included.map((x) => (
+            <li key={x} className="flex items-start gap-3 text-sm leading-[22px] text-[#363636]"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-success/10 text-success"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
           ))}
         </ul>
       </div>
@@ -355,6 +395,9 @@ function DeadlineCta() {
 
 function Faq() {
   const qs = [
+    { q: "What is an Enrolled Agent?", a: "An Enrolled Agent is licensed by the IRS itself to prepare tax returns and to represent taxpayers in audits, collections and appeals. It is the highest credential the IRS awards, and it requires ongoing education every year." },
+    { q: "How much will my return cost?", a: "Prices start at the amounts listed above and are confirmed before any work starts. You pay once your return is ready to file, never at booking." },
+    { q: "Do you prepare New York returns too?", a: "Yes. Many Montclair clients work in New York, so non-resident New York returns are included when you need one." },
     { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return, usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Claire will confirm everything is there." },
     { q: "Video call or in person?", a: "Whichever you prefer. Both work the same way: documents are uploaded beforehand, and we go through your return together. Choose when you book." },
     { q: "Can I reschedule?", a: "Of course. Use the link in your confirmation email to pick a new time. If you can't make it, please let us know so someone waiting can take your slot." },

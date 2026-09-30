@@ -28,6 +28,7 @@ import { Route as AuthenticatedOwnerOutboxRouteImport } from './routes/_authenti
 import { Route as AuthenticatedOwnerSettingsRouteImport } from './routes/_authenticated/owner.settings'
 import { Route as AuthenticatedOwnerClientsIndexRouteImport } from './routes/_authenticated/owner.clients.index'
 import { Route as AuthenticatedOwnerClientsIdRouteImport } from './routes/_authenticated/owner.clients.$id'
+import { Route as ApiPublicCalendarTokenRouteImport } from './routes/api/public/calendar/$token'
 import { Route as ApiPublicCronAutomationsRouteImport } from './routes/api/public/cron/automations'
 
 const IndexRoute = IndexRouteImport.update({
@@ -130,6 +131,11 @@ const AuthenticatedOwnerClientsIdRoute =
     path: '/clients/$id',
     getParentRoute: () => AuthenticatedOwnerRoute,
   } as any)
+const ApiPublicCalendarTokenRoute = ApiPublicCalendarTokenRouteImport.update({
+  id: '/api/public/calendar/$token',
+  path: '/api/public/calendar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronAutomationsRoute =
   ApiPublicCronAutomationsRouteImport.update({
     id: '/api/public/cron/automations',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/owner/settings': typeof AuthenticatedOwnerSettingsRoute
   '/owner/': typeof AuthenticatedOwnerIndexRoute
   '/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
+  '/api/public/calendar/$token': typeof ApiPublicCalendarTokenRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
   '/owner/clients/': typeof AuthenticatedOwnerClientsIndexRoute
 }
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/owner/settings': typeof AuthenticatedOwnerSettingsRoute
   '/owner': typeof AuthenticatedOwnerIndexRoute
   '/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
+  '/api/public/calendar/$token': typeof ApiPublicCalendarTokenRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
   '/owner/clients': typeof AuthenticatedOwnerClientsIndexRoute
 }
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/_authenticated/owner/settings': typeof AuthenticatedOwnerSettingsRoute
   '/_authenticated/owner/': typeof AuthenticatedOwnerIndexRoute
   '/_authenticated/owner/clients/$id': typeof AuthenticatedOwnerClientsIdRoute
+  '/api/public/calendar/$token': typeof ApiPublicCalendarTokenRoute
   '/api/public/cron/automations': typeof ApiPublicCronAutomationsRoute
   '/_authenticated/owner/clients/': typeof AuthenticatedOwnerClientsIndexRoute
 }
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/owner/settings'
     | '/owner/'
     | '/owner/clients/$id'
+    | '/api/public/calendar/$token'
     | '/api/public/cron/automations'
     | '/owner/clients/'
   fileRoutesByTo: FileRoutesByTo
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/owner/settings'
     | '/owner'
     | '/owner/clients/$id'
+    | '/api/public/calendar/$token'
     | '/api/public/cron/automations'
     | '/owner/clients'
   id:
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/_authenticated/owner/settings'
     | '/_authenticated/owner/'
     | '/_authenticated/owner/clients/$id'
+    | '/api/public/calendar/$token'
     | '/api/public/cron/automations'
     | '/_authenticated/owner/clients/'
   fileRoutesById: FileRoutesById
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   ManageTokenRoute: typeof ManageTokenRoute
   MoveTokenRoute: typeof MoveTokenRoute
   BookIndexRoute: typeof BookIndexRoute
+  ApiPublicCalendarTokenRoute: typeof ApiPublicCalendarTokenRoute
   ApiPublicCronAutomationsRoute: typeof ApiPublicCronAutomationsRoute
 }
 
@@ -416,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOwnerClientsIdRouteImport
       parentRoute: typeof AuthenticatedOwnerRoute
     }
+    '/api/public/calendar/$token': {
+      id: '/api/public/calendar/$token'
+      path: '/api/public/calendar/$token'
+      fullPath: '/api/public/calendar/$token'
+      preLoaderRoute: typeof ApiPublicCalendarTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/automations': {
       id: '/api/public/cron/automations'
       path: '/api/public/cron/automations'
@@ -473,6 +493,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManageTokenRoute: ManageTokenRoute,
   MoveTokenRoute: MoveTokenRoute,
   BookIndexRoute: BookIndexRoute,
+  ApiPublicCalendarTokenRoute: ApiPublicCalendarTokenRoute,
   ApiPublicCronAutomationsRoute: ApiPublicCronAutomationsRoute,
 }
 export const routeTree = rootRouteImport

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
+import { Integrations } from "@/components/owner/integrations";
 
 export const Route = createFileRoute("/_authenticated/owner/settings")({ head: () => ({ meta: [{ title: "Settings — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: SettingsPage });
 
@@ -55,8 +56,9 @@ function SettingsPage() {
 
   return (
     <>
-      <PageHead title="Settings" meta="Office hours, services and reminders" />
+      <PageHead title="Settings" meta="Connections, office hours, services and reminders" />
       <div className="space-y-3">
+        <Card title="Integrations" note="Where your bookings and messages go."><Integrations /></Card>
         <Card title="Office hours" note="Bookings only offer times inside these hours.">
           <ul className="divide-y divide-border">
             {DAYS.map(([k, label]) => {

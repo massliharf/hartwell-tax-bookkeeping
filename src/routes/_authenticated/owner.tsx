@@ -103,9 +103,8 @@ function OwnerLayout() {
           </button>
         </div>
         <nav className="flex flex-col gap-0.5" aria-label="Main">
-          {NAV.map((n, i) => (
+          {NAV.map((n) => (
             <div key={n.to} className="contents">
-              {i === 3 && <div className="mx-2 my-2 h-px bg-line-1" />}
               <Link to={n.to} title={collapsed ? n.label : undefined} className={item} activeProps={{ className: "bg-tint-2 font-medium text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
                 <span className="relative grid size-5 shrink-0 place-items-center"><n.icon className="size-4" strokeWidth={1.75} />
                   {collapsed && n.to === "/owner" && count > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-ink px-1 text-[9px] font-bold leading-4 text-white">{count}</span>}
@@ -139,7 +138,7 @@ function OwnerLayout() {
           </div>
           <div className="px-5 pb-28 pt-4 sm:px-8 sm:pb-12 sm:pt-2">
             <div className={wide ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
-              <div key={path} className="enter"><Outlet /></div>
+              <div><Outlet /></div>
             </div>
           </div>
         </main>

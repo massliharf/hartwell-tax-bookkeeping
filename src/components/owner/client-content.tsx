@@ -58,7 +58,7 @@ export function ClientProfile({ id }: { id: string }) {
             </div>
             <dl className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {stats.map(([k, v, tone]) => (
-                <div key={k} className="rounded-xl border border-line-1 px-3.5 py-3">
+                 <div key={k} className="rounded-2xl border border-border bg-sheet px-3.5 py-3">
                   <dt className="text-xs text-muted-foreground">{k}</dt>
                   <dd className={`mt-1 text-sm font-medium ${tone === "warning" ? "text-alert-warning-fg" : tone === "success" ? "text-alert-success-fg" : "text-deep-ink"}`}>{v}</dd>
                 </div>
@@ -67,7 +67,7 @@ export function ClientProfile({ id }: { id: string }) {
           </header>
         );
       })()}
-      {client.notes && <Section title="Notes"><p className="rounded-xl border border-line-1 px-4 py-3 text-sm text-deep-ink">{client.notes}</p></Section>}
+       {client.notes && <Section title="Notes"><p className="rounded-2xl border border-border bg-sheet px-4 py-3 text-sm text-deep-ink">{client.notes}</p></Section>}
       <Section title={`Appointments (${appts.length})`}>
         {appts.length ? <ApptList appts={appts} showDate showClient={false} /> : <p className="text-sm text-muted-foreground">No appointments yet.</p>}
       </Section>

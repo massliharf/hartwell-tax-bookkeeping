@@ -315,7 +315,7 @@ function BeforeAfter() {
             ))}
           </ul>
         </div>
-        <div className="rounded-2xl bg-ink-900 p-6 text-primary-foreground">
+         <div className="rounded-2xl bg-[#2c0000] p-6 text-primary-foreground">
           <p className="text-sm font-medium text-primary-foreground/70">With Hartwell Tax</p>
           <ul className="mt-4 space-y-3">
             {after.map((x) => (
@@ -440,7 +440,7 @@ function Privacy() {
 
 function DeadlineCta() {
   return (
-    <section id="deadline" className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
+     <section id="deadline" className="overflow-hidden rounded-2xl bg-[#2c0000] px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="t-section text-white">October 15 is close. Your slot doesn't have to be.</h2>

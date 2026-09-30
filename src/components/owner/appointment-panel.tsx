@@ -142,15 +142,15 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           : picking ? <MeetingPicker a={a} mode={picking} onBack={() => setPicking(null)} onDone={() => { setPicking(null); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
           : (
             <div className="flex items-center gap-2">
-              <div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
+              <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
                 {meetingAhead(stage) && <>
-                  <Button variant="secondary" className="col-span-2" onClick={() => setPicking("move")}>Reschedule</Button>
+                  <Button variant="secondary" className="sm:col-span-2" onClick={() => setPicking("move")}>Reschedule</Button>
                 </>}
                 {(stage === "meeting" || stage === "wrap_up") && <>
                   <Button onClick={() => setFinishing(true)}>Finish appointment</Button>
                   <Button variant="secondary" onClick={() => setPicking("follow_up")}>Needs another meeting</Button>
                 </>}
-                {(finished || stage === "cancelled" || stage === "no_show") && <p className="col-span-2 text-xs text-muted-foreground">{stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed above when it's submitted." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
+                {(finished || stage === "cancelled" || stage === "no_show") && <p className="text-xs text-muted-foreground sm:col-span-2">{stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed above when it's submitted." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
               </div>
               <MoreActions a={a} onClosed={onClose} canNoShow={stage === "meeting" || stage === "wrap_up"} />
             </div>

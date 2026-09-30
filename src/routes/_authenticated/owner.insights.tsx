@@ -134,10 +134,10 @@ function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   return (
     <>
       <PageHead title="Report" meta="Last 30 days, and every message sent for you" />
-      <section className="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
-        <p className="text-xs font-medium text-muted-foreground">Hours given back to Claire</p>
-        <p className="tabular mt-2 text-[44px] font-medium leading-[48px] tracking-[-0.02em] text-deep-ink">{hours}<span className="ml-2 text-lg font-normal text-muted-foreground">hour{hours === 1 ? "" : "s"}</span></p>
-        <p className="tabular mt-2 max-w-md text-sm text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups sent automatically.</p>
+      <section className="relative overflow-hidden rounded-[22px] bg-ink-900 p-6 text-white sm:p-8">
+        <p className="text-[13px] font-medium text-white/70">Hours given back to Claire</p>
+        <p className="tabular mt-3 font-serif text-[64px] font-semibold leading-none tracking-[-0.04em]">{hours}<span className="ml-3 font-sans text-lg font-normal tracking-normal text-white/70">hour{hours === 1 ? "" : "s"}</span></p>
+        <p className="tabular mt-4 max-w-md text-sm leading-6 text-white/75">{minutes.toLocaleString()} minutes of confirmations, reminders, follow-ups and payment chases that went out on their own instead of by hand.</p>
       </section>
     </>
   );

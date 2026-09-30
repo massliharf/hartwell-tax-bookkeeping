@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, CreditCard, FileSearch, Plus, Send, Users, type LucideIcon } from "lucide-react";
+import { ChevronRight, CalendarDays, CreditCard, FileSearch, Plus, Send, Users, type LucideIcon } from "lucide-react";
 import { useOwnerCtx } from "@/components/owner/ctx";
+import { supabase } from "@/integrations/supabase/client";
 import { addDays, apptsRange, et, etToIso, fmtLong, needsYou, readyToFile } from "@/components/owner/lib";
 import { ApptList, Empty, ErrorNote, LoadingRows, NeedsList } from "@/components/owner/ui";
 import { useApptPanel } from "@/components/owner/drawer-context";
@@ -58,6 +59,8 @@ function Today() {
         ))}
       </ul>
 
+      <SavedBanner now={now} />
+
       <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-6">
         <div className="min-w-0 space-y-8">
           <section id="today-needs" className="scroll-mt-20">
@@ -92,5 +95,27 @@ function Today() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Owner-effort, up front: what went out on its own this week, linking to the Report. */
+function SavedBanner({ now }: { now: string }) {
+  const q = useQuery({
+    queryKey: ["owner", "saved-week", now.slice(0, 13)],
+    queryFn: async () => {
+      const from = new Date(Date.parse(now) - 7 * 86400e3).toISOString();
+      const { data, error } = await supabase.from("messages").select("minutes_saved").gte("sent_at", from).lte("sent_at", now);
+      if (error) throw error;
+      return { count: data?.length ?? 0, minutes: (data ?? []).reduce((n, m) => n + (m.minutes_saved ?? 0), 0) };
+    },
+  });
+  if (!q.data || q.data.count === 0) return null;
+  const h = q.data.minutes / 60;
+  return (
+    <Link to="/owner/insights" className="enter-tile group mt-6 flex items-center gap-4 rounded-[22px] lg:max-w-[760px] bg-ink-900 px-5 py-4 text-white transition-opacity duration-150 hover:opacity-95" style={{ animationDelay: "650ms" }}>
+      <span className="tabular font-serif text-[34px] font-semibold leading-none tracking-[-0.03em]">{h >= 1 ? `${Math.round(h * 10) / 10}h` : `${q.data.minutes}m`}</span>
+      <span className="min-w-0 flex-1 text-sm leading-5 text-white/80"><span className="font-medium text-white">given back to you this week.</span> {q.data.count} confirmations, reminders and follow-ups went out on their own.</span>
+      <ChevronRight className="size-4 shrink-0 text-white/60 transition-transform duration-150 group-hover:translate-x-0.5" />
+    </Link>
   );
 }

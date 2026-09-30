@@ -178,11 +178,11 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
               type="button"
               onClick={() => onPick(s.slug)}
               aria-pressed={active}
-              className={`flex min-h-36 w-full flex-col rounded-2xl border bg-sheet p-4 text-left transition-colors duration-150 ${active ? "border-deep-ink ring-1 ring-deep-ink" : "border-border hover:bg-surface-2"}`}
+              className={`flex min-h-36 w-full flex-col rounded-[22px] border p-5 text-left transition-[background-color,border-color,box-shadow] duration-150 ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <ServiceIcon service={s.slug} size={40} />
-                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-deep-ink" : "border-border bg-sheet"}`} />
+                <span className={`mt-1 size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] duration-150 ${active ? "border-[6px] border-ink" : "border-line-2 bg-sheet"}`} />
               </div>
               <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">{s.description}</p>

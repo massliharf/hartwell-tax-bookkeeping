@@ -8,7 +8,7 @@ export const STEPS = ["Service", "Questions", "Time", "Details"] as const;
 
 export function BookingShell({ step, children }: { step?: number; children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-paper sm:bg-canvas sm:p-2">
+    <div className="min-h-screen bg-canvas sm:p-2">
       <header>
         <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-6 sm:px-4">
           <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="min-w-0"><Logo /></Link>
@@ -45,7 +45,7 @@ export function ResultPanel({ icon, tone = "neutral", eyebrow, title, children, 
 }) {
   const ring = tone === "success" ? "bg-alert-success text-alert-success-fg" : tone === "warning" ? "bg-alert-warning text-alert-warning-fg" : "bg-tint-1 text-deep-ink";
   return (
-    <div className="enter mx-auto max-w-md py-6 text-center sm:py-10">
+    <div className="mx-auto max-w-md py-6 text-center sm:py-10">
       {icon && <span className={`mx-auto grid size-12 place-items-center rounded-full [&_svg]:size-5 ${ring}`}>{icon}</span>}
       {eyebrow && <p className={`${icon ? "mt-5" : ""} text-[13px] text-muted-foreground`}>{eyebrow}</p>}
       <h1 className={`${icon && !eyebrow ? "mt-5" : eyebrow ? "mt-1" : ""} t-page text-balance text-deep-ink`}>{title}</h1>

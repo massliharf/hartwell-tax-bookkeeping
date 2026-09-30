@@ -65,11 +65,11 @@ function SettingsPage() {
       <PageHead title="Settings" meta="Connections, office hours, services and reminders" />
       {/* magnific.com settings pattern: sub-navigation on the left, one section at a time on the right. */}
       <div className="grid gap-6 md:grid-cols-[200px_minmax(0,1fr)] md:gap-8">
-        <nav aria-label="Settings sections" className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:flex-col md:overflow-visible md:px-0">
+        <nav aria-label="Settings sections" className="grid grid-cols-2 gap-1 sm:grid-cols-4 md:flex md:flex-col">
           {SECTIONS.map(([k, label, Icon]) => (
             <button key={k} type="button" onClick={() => setTab(k)} aria-current={tab === k ? "page" : undefined}
-              className={`flex h-8 shrink-0 items-center gap-2.5 rounded-lg px-2.5 text-[13px] transition-colors duration-150 ${tab === k ? "bg-tint-2 font-medium text-deep-ink" : "text-[#353535] hover:bg-tint-1"}`}>
-              <Icon className="size-4" strokeWidth={1.75} />{label}
+              className={`flex min-h-10 min-w-0 items-center gap-2 rounded-lg px-2.5 text-left text-[13px] leading-4 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${tab === k ? "bg-tint-2 font-medium text-deep-ink" : "text-body hover:bg-tint-1"}`}>
+              <Icon className="size-4 shrink-0" strokeWidth={1.75} /><span>{label}</span>
             </button>
           ))}
         </nav>

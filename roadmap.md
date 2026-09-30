@@ -14,3 +14,5 @@
 - [ ] Update owner navigation, search, and remaining owner visual styling.
 - [ ] Verify the full owner journey on mobile and desktop.
 - [ ] Full product QA: list issues, fix by severity, re-test affected flows, reset demo data.
+- [ ] Audit information hierarchy and placement across public, booking, portal, and owner screens; align with Studio Shell without changing features.
+- [ ] Verify changed screens at phone and desktop widths and check for overflow.

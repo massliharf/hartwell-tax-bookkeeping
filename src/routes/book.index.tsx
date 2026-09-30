@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -124,6 +124,9 @@ function BookPage() {
             </motion.div>
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            <Dialog><DialogTrigger asChild><Button variant="ghost" size="icon" className="relative shrink-0 lg:hidden" aria-label={`Your checklist, ${service ? preview.length : 0} documents`}><FileText className="size-4" /><span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-fill-selected text-[10px] text-deep-ink">{service ? preview.length : 0}</span></Button></DialogTrigger>
+              <DialogContent className="max-w-md"><DialogTitle className="sr-only">Your checklist</DialogTitle><ChecklistPreview docs={preview} hasService={!!service} /></DialogContent>
+            </Dialog>
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
             <Button size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
           </div>
@@ -132,11 +135,6 @@ function BookPage() {
           {step === 3 && service && <BookingSummary service={service} draft={draft} onPickAgain={() => go(2)} />}
           <ChecklistPreview docs={preview} hasService={!!service} />
         </div></aside>
-      </div>
-      <div className="fixed inset-x-0 bottom-[64px] z-30 border-t border-border bg-sheet px-5 py-2 lg:hidden">
-        <Dialog><DialogTrigger asChild><Button variant="secondary" size="md" className="w-full justify-between">Your checklist ({service ? preview.length : 0}) <ChevronRight className="size-4" /></Button></DialogTrigger>
-          <DialogContent className="max-w-md"><DialogTitle className="sr-only">Your checklist</DialogTitle><ChecklistPreview docs={preview} hasService={!!service} /></DialogContent>
-        </Dialog>
       </div>
     </BookingShell>
   );

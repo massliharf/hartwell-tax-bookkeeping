@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Check, ChevronRight, MapPin, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -9,7 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { APPT_SELECT, fmtLong, fmtTime, missingOf, type Appt } from "./lib";
 import { ApptActionButtons, DocViewer, ErrorNote, StatusPill } from "./ui";
-import { AiTag, CloseoutBlock, DocReview } from "./closeout";
+import { AiTag, CloseoutBlock, DocReview, FinishForm } from "./closeout";
+import { reviewDocument } from "@/lib/owner.functions";
 import type { ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +30,10 @@ export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget 
 
 function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }) {
   const [viewer, setViewer] = useState<{ open: boolean; startId?: string | undefined }>({ open: false });
+  const [finishing, setFinishing] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const review = useServerFn(reviewDocument);
+  const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["owner", "appt", id],
     queryFn: async () => {
@@ -40,6 +48,19 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
   if (!a) return <p className="p-6 text-sm text-muted-foreground">This appointment couldn't be found.</p>;
   const items = [...a.checklist_items].sort((x, y) => x.sort_order - y.sort_order);
   const missing = missingOf(a).length;
+  const looksRight = items.filter(i => i.status === "uploaded" && i.review_status === "pending" && i.ai_check === "ok");
+  const acceptAll = async () => {
+    setAccepting(true);
+    try {
+      for (const i of looksRight) {
+        const result = await review({ data: { itemId: i.id, decision: "accepted" } });
+        if (!result.ok) throw new Error("Review failed");
+      }
+      toast.success("Documents accepted.");
+      await qc.invalidateQueries({ queryKey: ["owner"] });
+    } catch { toast.error("Some documents couldn't be accepted. Please try again."); await qc.invalidateQueries({ queryKey: ["owner"] }); }
+    finally { setAccepting(false); }
+  };
 
   return (
     <div className="flex flex-col">
@@ -62,22 +83,24 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
       </header>
 
       <section className="px-6 py-5">
-        <div className="flex items-center gap-3">
+        {a.status !== "completed" && <div className="flex items-center gap-3">
           <ReadyRing value={a.ready_score} size={40} stroke={4} />
           <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
-        </div>
+        </div>}
+        {looksRight.length >= 2 && <Button size="sm" variant="secondary" className="mt-4" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
         <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">
           {items.map((i) => (
-            <li key={i.id}><div className="flex h-11 items-center gap-2.5 px-4 text-sm">
+            <li key={i.id} className="px-4 py-2.5"><div className="flex flex-wrap items-center gap-2.5 text-sm">
               {i.status === "uploaded"
                 ? <span className="grid size-4 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span>
                 : <span className={cn("size-4 rounded-full border", i.status === "not_applicable" ? "border-border bg-fill-subtle" : "border-warning/60")} />}
-              <span className={cn("min-w-0 flex-1 truncate", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
+              <span className={cn("min-w-[100px] flex-1", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
               <AiTag i={i} />
+              {i.status === "uploaded" && i.review_status === "pending" && <span className="order-last w-full sm:order-none sm:w-auto"><DocReview i={i} inline /></span>}
               {i.status === "uploaded"
                 ? <Button size="sm" variant="ghost" onClick={() => setViewer({ open: true, startId: i.id })}>View</Button>
                 : <span className={cn("text-xs", i.status === "not_applicable" ? "text-muted-foreground" : "text-warning")}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</span>}
-            </div><DocReview i={i} /></li>
+            </div>{i.ai_note && <p className={cn("mt-1 pl-6 text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{i.ai_note}</p>}{!(i.status === "uploaded" && i.review_status === "pending") && <DocReview i={i} />}</li>
           ))}
         </ul>
         <DocViewer open={viewer.open} startId={viewer.startId} onOpenChange={(o) => setViewer((v) => ({ ...v, open: o }))} title={a.clients?.name ?? "Documents"} items={items} />
@@ -85,8 +108,8 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
       <CloseoutBlock a={a} />
 
       <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
-        <ApptActionButtons a={a} onDone={onClose} />
-        {!(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">{a.filed_at ? "Return filed. Nothing left to do." : a.status === "completed" ? "Appointment finished." : "This appointment is closed."}</p>}
+        {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} /> : <ApptActionButtons a={a} onDone={onClose} onFinish={() => setFinishing(true)} />}
+        {!finishing && !(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">{a.filed_at ? "Return filed. Nothing left to do." : a.status === "completed" ? "Appointment finished." : "This appointment is closed."}</p>}
       </footer>
     </div>
   );

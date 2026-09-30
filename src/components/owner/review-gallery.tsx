@@ -24,7 +24,7 @@ async function pdfPages(blob: Blob): Promise<string[]> {
     const vp = page.getViewport({ scale: 2 });
     const canvas = document.createElement("canvas");
     canvas.width = vp.width; canvas.height = vp.height;
-    await page.render({ canvas, canvasContext: canvas.getContext("2d")!, viewport: vp }).promise;
+    await page.render({ canvasContext: canvas.getContext("2d")!, viewport: vp }).promise;
     const png = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
     if (png) out.push(URL.createObjectURL(png));
   }
@@ -59,7 +59,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
       if (!f.file_path) { setLoaded((m) => ({ ...m, [k]: { error: true } })); continue; }
       (async () => {
         try {
-          const r = await getUrl({ data: { itemId: f.id } }); console.log("gallery url", f.document_name, !!r.url);
+          const r = await getUrl({ data: { itemId: f.id } });
           if (!r.url) throw new Error();
           const blob = await (await fetch(r.url)).blob();
           const ext = (f.file_path!.split(".").pop() ?? "").toLowerCase();

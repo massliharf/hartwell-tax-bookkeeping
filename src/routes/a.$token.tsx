@@ -107,7 +107,7 @@ function PortalPage() {
   const postAppointment = a.status === "completed";
   const fixItems = items.filter((i) => i.review_status === "needs_fix");
   const sentItems = items.filter((i) => i.status === "uploaded" && i.review_status !== "needs_fix");
-  const progress = a.filed_at ? 6 : postAppointment ? a.signature_status === "signed" && a.paid_at ? 5 : 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
+  const progress = a.filed_at ? 5 : postAppointment ? 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
 
   return (
     <BookingShell>

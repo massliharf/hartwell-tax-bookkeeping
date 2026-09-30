@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Download, Maximize, Printer, RotateCw, ZoomIn, ZoomOut } from "lucide-react";
@@ -44,7 +44,6 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
   const [zoom, setZoom] = useState<number | "fit">("fit");
   const [rot, setRot] = useState(0);
   const [page, setPage] = useState(0);
-  const keyRef = useRef("");
   const cur = files[Math.min(index, Math.max(0, files.length - 1))];
   const curLoaded = cur ? loaded[`${cur.id}:${cur.file_path}`] : undefined;
   const looksRight = files.filter((i) => i.review_status === "pending" && i.ai_check === "ok");
@@ -173,7 +172,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
                 : !curLoaded ? <Skeleton className="mx-auto h-full min-h-[40vh] w-full max-w-xl rounded-xl" />
                 : "error" in curLoaded || !view ? <p className="grid h-full place-items-center text-sm text-warning">This file couldn't be opened here. Try Download all.</p>
                 : <div className={cn("flex min-h-full", zoom === "fit" ? "items-center justify-center" : "items-start justify-start")}>
-                    <img key={view} src={view} alt={cur.document_name} ref={(el) => { keyRef.current = cur.id; void el; }}
+                    <img key={view} src={view} alt={cur.document_name}
                       className={cn("rounded-lg border border-border bg-sheet shadow-[0_1px_2px_rgba(16,16,16,0.06)] transition-transform duration-150", zoom === "fit" && "max-h-[calc(100dvh-260px)] max-w-full object-contain md:max-h-[calc(100dvh-140px)]")}
                       style={{ transform: `rotate(${rot}deg)`, ...(zoom === "fit" ? {} : { width: `${zoom * 100}%`, maxWidth: "none" }) }} />
                   </div>}

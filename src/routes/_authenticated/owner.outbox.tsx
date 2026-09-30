@@ -61,7 +61,7 @@ function Outbox() {
               </span>
               {m.minutes_saved > 0 && <span className="tabular shrink-0 rounded-full bg-marigold/20 px-2.5 py-1 text-xs font-medium text-deep-ink">saved {m.minutes_saved} min</span>}
             </button>
-            {m.client_id && <Button size="sm" variant="ghost" className="ml-4 mb-2 text-ink" onClick={() => openClient({ clientId: m.client_id })}>Open client</Button>}
+            {m.client_id && <Button size="sm" variant="ghost" className="ml-4 mb-2 text-ink" onClick={() => openClient({ clientId: m.client_id! })}>Open client</Button>}
              {open === m.id && <pre className="whitespace-pre-wrap border-t border-border px-5 py-4 font-sans text-sm text-deep-ink/80">{m.body}</pre>}
           </li>
         ))}

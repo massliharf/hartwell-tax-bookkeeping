@@ -40,7 +40,7 @@ function Clients() {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (
             <li key={c.id}>
-              <button onClick={() => openClient({ clientId: c.id })} className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-paper">
+              <button onClick={() => openClient({ clientId: c.id })} className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors duration-150 hover:bg-fill-subtle">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-fill-neutral font-sans text-lg text-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-deep-ink">{c.name}</span>
@@ -49,7 +49,7 @@ function Clients() {
                 <span className="tabular hidden text-right text-xs text-muted-foreground sm:block">
                   {appts.length} appointment{appts.length === 1 ? "" : "s"}{c.is_returning ? ", Returning" : ""}
                 </span>
-              </Link>
+              </button>
             </li>
           );
         })}

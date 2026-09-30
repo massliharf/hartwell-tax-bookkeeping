@@ -111,12 +111,14 @@ function OwnerLayout() {
 
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-20 flex h-[60px] items-center justify-between bg-paper px-6 sm:static sm:bg-transparent sm:px-4">
-          <span className="text-sm font-semibold text-deep-ink sm:hidden">Hartwell Tax</span>
+          <span className="text-sm font-medium text-deep-ink sm:hidden">{current.label}</span>
           <nav aria-label="Breadcrumb" className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
             <span>Practice</span><span>›</span><span className="text-deep-ink">{current.label}</span>
           </nav>
-          <span className="text-xs text-deep-ink sm:hidden">{current.label}</span>
-          <button onClick={signOut} aria-label="Sign out" className="grid size-10 place-items-center rounded-[10px] bg-fill-neutral sm:hidden"><LogOut className="size-4" /></button>
+          <button onClick={() => setPaletteOpen(true)} className="hidden h-8 items-center gap-2 rounded-lg border border-border bg-sheet px-3 text-xs text-muted-foreground transition-colors duration-150 hover:bg-fill-subtle sm:flex">
+            <Search className="size-3.5" />Search clients or pages<kbd className="ml-4 text-[10px]">⌘K</kbd>
+          </button>
+          <Button size="icon" variant="ghost" aria-label="Search" onClick={() => setPaletteOpen(true)} className="sm:hidden"><Search className="size-4" /></Button>
         </header>
         <main className="min-h-[calc(100vh-76px)] rounded-t-2xl bg-sheet px-6 pb-28 pt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:pb-10">
           <div className="mx-auto max-w-5xl">
@@ -142,6 +144,7 @@ function OwnerLayout() {
                 <Link to={n.to}><n.icon className="size-3.5" />{n.label}</Link>
               </DropdownMenuItem>
             ))}
+            <DropdownMenuItem onSelect={signOut} className="h-8 gap-2.5 rounded-lg text-xs"><LogOut className="size-3.5" />Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>
@@ -149,7 +152,7 @@ function OwnerLayout() {
       <CommandDialog open={paletteOpen} onOpenChange={setPaletteOpen}>
         <CommandInput placeholder="Search pages or clients…" value={paletteTerm} onValueChange={setPaletteTerm} />
         <CommandList>
-          <CommandEmpty>No page found.</CommandEmpty>
+          <CommandEmpty>Nothing matches.</CommandEmpty>
           <CommandGroup heading="Pages">
             {NAV.map((n) => (
               <CommandItem key={n.to} onSelect={() => { setPaletteOpen(false); navigate({ to: n.to }); }} className="h-10 gap-3 rounded-lg text-[15px]">
@@ -157,9 +160,21 @@ function OwnerLayout() {
               </CommandItem>
             ))}
           </CommandGroup>
+          <CommandGroup heading="Clients">
+            {(clients.data ?? [])
+              .filter((c) => `${c.name} ${c.email}`.toLowerCase().includes(paletteTerm.trim().toLowerCase()))
+              .slice(0, 20)
+              .map((c) => (
+                <CommandItem key={c.id} value={`${c.name} ${c.email}`} onSelect={() => { setPaletteOpen(false); setPaletteTerm(""); setClientTarget({ clientId: c.id }); }} className="h-10 gap-3 rounded-lg text-[15px]">
+                  <span className="grid size-7 place-items-center rounded-lg bg-fill-neutral"><Users className="size-3.5" /></span>
+                  <span className="min-w-0 truncate">{c.name} <span className="text-xs text-muted-foreground">{c.email}</span></span>
+                </CommandItem>
+              ))}
+          </CommandGroup>
         </CommandList>
       </CommandDialog>
       <DemoTools />
-    </div>
+      <ClientDrawer target={clientTarget} onClose={() => setClientTarget(null)} />
+    </div></ClientDrawerContext.Provider>
   );
 }

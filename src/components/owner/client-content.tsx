@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { APPT_SELECT, MSG_LABEL, fmtStamp, type Appt } from "./lib";
 import { ApptCard, DocViewer, ErrorNote, LoadingRows } from "./ui";
 
-export function ClientContent({ id, appointmentId }: { id: string; appointmentId?: string }) {
+export function ClientContent({ id, appointmentId }: { id: string; appointmentId?: string | undefined }) {
   const [docs, setDocs] = useState(false);
   const q = useQuery({
     queryKey: ["owner", "client", id],

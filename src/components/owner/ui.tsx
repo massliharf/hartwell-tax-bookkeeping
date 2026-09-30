@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getDocumentUrl } from "@/lib/portal.functions";
 import { markComplete, markNoShow, dismissAttention, nudgeSignature } from "@/lib/owner.functions";
 import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, type Appt, type Item, type NeedItem } from "./lib";
@@ -29,22 +29,26 @@ export function ErrorNote({ onRetry }: { onRetry?: () => void }) {
 }
 export function MeetingTag({ type }: { type: Appt["meeting_type"] }) { return <span>{type === "video" ? "Video" : "In person"}</span>; }
 
-export function useApptActions() {
+function useStatusMutation(fn: (args: { data: { id: string } }) => Promise<unknown>, status: string, success: string) {
   const qc = useQueryClient();
-  const complete = useServerFn(markComplete), noShow = useServerFn(markNoShow);
-  const make = (fn: typeof complete, status: string, success: string) => useMutation({
+  return useMutation({
     mutationFn: (id: string) => fn({ data: { id } }),
     onMutate: async (id: string) => {
       await qc.cancelQueries({ queryKey: ["owner"] });
       const previous = qc.getQueriesData({ queryKey: ["owner"] });
-      qc.setQueriesData<Appt[]>({ queryKey: ["owner", "appts"] }, old => old?.map(a => a.id === id ? { ...a, status } : a));
-      qc.setQueriesData<{ appts: Appt[] }>({ queryKey: ["owner", "client"] }, old => old?.appts ? { ...old, appts: old.appts.map(a => a.id === id ? { ...a, status } : a) } : old);
+      qc.setQueriesData<Appt[]>({ queryKey: ["owner", "appts"] }, (old) => old?.map((a) => (a.id === id ? { ...a, status } : a)));
+      qc.setQueriesData<{ appts: Appt[] }>({ queryKey: ["owner", "client"] }, (old) => (old?.appts ? { ...old, appts: old.appts.map((a) => (a.id === id ? { ...a, status } : a)) } : old));
       return { previous };
     },
-    onSuccess: () => { toast.success(success); qc.invalidateQueries({ queryKey: ["owner"] }); },
+    onSuccess: () => { toast.success(success); void qc.invalidateQueries({ queryKey: ["owner"] }); },
     onError: (_error, _id, context) => { context?.previous.forEach(([key, data]) => qc.setQueryData(key, data)); toast.error("Couldn't save that. Try again."); },
   });
-  return { complete: make(complete, "completed", "Marked complete. Signature request is on its way."), noShow: make(noShow, "no_show", "Marked as no-show.") };
+}
+
+export function useApptActions() {
+  const complete = useStatusMutation(useServerFn(markComplete), "completed", "Marked complete. Signature request is on its way.");
+  const noShow = useStatusMutation(useServerFn(markNoShow), "no_show", "Marked as no-show.");
+  return { complete, noShow };
 }
 const STATUS_LABEL: Record<string, string> = { booked: "Booked", confirmed: "Confirmed", completed: "Completed", no_show: "No-show", cancelled: "Cancelled", rescheduled: "Moved" };
 export function StatusPill({ status }: { status: string }) {
@@ -68,7 +72,18 @@ export function ApptActions({ a }: { a: Appt }) {
         <DropdownMenuItem disabled={!uploaded.length} onSelect={() => setDocs(true)}><FileText className="size-4" />Open documents{uploaded.length ? ` (${uploaded.length})` : ""}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-    <Popover open={!!confirm} onOpenChange={v => { if (!v) setConfirm(null); }}><PopoverTrigger asChild><span className="sr-only" aria-hidden="true" /></PopoverTrigger><PopoverContent className="w-64 rounded-2xl border-border bg-sheet shadow-lift" align="end"><p className="text-sm text-deep-ink">{confirm === "complete" ? `Mark ${a.clients?.name ?? "client"} complete? A signature request will be sent.` : `Mark ${a.clients?.name ?? "client"} as a no-show?`}</p><div className="mt-3 flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => setConfirm(null)}>Cancel</Button><Button size="sm" disabled={pending} onClick={act}>{pending ? "Saving…" : "Confirm"}</Button></div></PopoverContent></Popover>
+    <AlertDialog open={!!confirm} onOpenChange={(v) => { if (!v) setConfirm(null); }}>
+      <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-sans text-base font-medium">{confirm === "complete" ? `Mark ${a.clients?.name ?? "this client"} complete?` : `Mark ${a.clients?.name ?? "this client"} as a no-show?`}</AlertDialogTitle>
+          <AlertDialogDescription>{confirm === "complete" ? "A signature request for Form 8879 will be sent automatically." : "The appointment is closed and the client gets a link to book again."}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={act}>{confirm === "complete" ? "Mark complete" : "Mark no-show"}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     <DocViewer open={docs} onOpenChange={setDocs} title={a.clients?.name ?? "Documents"} items={a.checklist_items} />
   </>;
 }
@@ -108,15 +123,18 @@ export function DocViewer({ open, onOpenChange, title, items }: { open: boolean;
   const files = items.filter(i => i.file_path).sort((x, y) => x.sort_order - y.sort_order);
   const [sel, setSel] = useState<{ id: string; url: string | null; loading: boolean; path: string } | null>(null);
   const [index, setIndex] = useState(0);
+  const fileKey = files.map((f) => `${f.id}:${f.file_path ?? ""}`).join("|");
+  const current = files[Math.min(index, Math.max(files.length - 1, 0))];
+  const currentId = current?.id;
+  const currentPath = current?.file_path ?? null;
   useEffect(() => {
-    if (!open || !files.length) { setSel(null); setIndex(0); return; }
-    let current = true;
-    const file = files[Math.min(index, files.length - 1)];
-    if (!file?.file_path) return;
-    setSel({ id: file.id, url: null, loading: true, path: file.file_path });
-    getUrl({ data: { itemId: file.id } }).then(r => { if (current) setSel({ id: file.id, url: r.url, loading: false, path: file.file_path ?? "" }); }).catch(() => { if (current) setSel({ id: file.id, url: null, loading: false, path: file.file_path ?? "" }); });
-    return () => { current = false; };
-  // File identity, not the array instance, controls refresh.
-  }, [open, index, files.map(f => f.id + f.file_path).join("|")]);
+    if (!open || !currentId || !currentPath) { setSel(null); if (!open) setIndex(0); return; }
+    let live = true;
+    setSel({ id: currentId, url: null, loading: true, path: currentPath });
+    getUrl({ data: { itemId: currentId } })
+      .then((r) => { if (live) setSel({ id: currentId, url: r.url, loading: false, path: currentPath }); })
+      .catch(() => { if (live) setSel({ id: currentId, url: null, loading: false, path: currentPath }); });
+    return () => { live = false; };
+  }, [open, currentId, currentPath, fileKey, getUrl]);
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[90dvh] max-w-4xl overflow-auto bg-sheet p-0 sm:rounded-2xl"><DialogHeader className="border-b border-border px-6 py-4"><DialogTitle className="font-sans text-lg font-normal">{title}</DialogTitle><DialogDescription>Private files. Links expire after a minute.</DialogDescription></DialogHeader><div className="grid md:grid-cols-[220px_1fr]"><ul className="max-h-[60vh] overflow-auto border-b border-border p-3 md:border-b-0 md:border-r">{files.map((f, i) => <li key={f.id}><Button variant="ghost" onClick={() => setIndex(i)} className={cn("h-auto w-full justify-start whitespace-normal py-2 text-left", index === i && "bg-fill-selected")}><span><span className="block text-sm text-deep-ink">{f.document_name}</span>{f.uploaded_at && <span className="text-xs text-muted-foreground">Received {fmtLong(f.uploaded_at)}</span>}</span></Button></li>)}</ul><div className="min-h-[50vh] bg-sheet p-4"><div className="flex items-center justify-end gap-2 pb-2"><Button size="icon" variant="outline" aria-label="Previous document" disabled={index === 0} onClick={() => setIndex(i => i - 1)}><ChevronLeft /></Button><span className="tabular text-xs text-muted-foreground">{files.length ? index + 1 : 0} / {files.length}</span><Button size="icon" variant="outline" aria-label="Next document" disabled={index >= files.length - 1} onClick={() => setIndex(i => i + 1)}><ChevronRight /></Button></div><div className="grid min-h-[40vh] place-items-center">{sel?.loading && <Skeleton className="h-[40vh] w-full" />}{sel && !sel.loading && !sel.url && <p className="text-sm text-warning">This file couldn't be opened.</p>}{sel?.url && (sel.path.toLowerCase().endsWith(".pdf") ? <iframe title="Document" src={sel.url} className="h-[55vh] w-full rounded-lg border border-border" /> : <img src={sel.url} alt="Uploaded document" className="max-h-[55vh] rounded-lg border border-border object-contain" />)}{sel?.url && <a href={sel.url} target="_blank" rel="noreferrer" className="mt-3 text-xs text-ink underline">Open in a new tab</a>}</div></div></div></DialogContent></Dialog>;
 }

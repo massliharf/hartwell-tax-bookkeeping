@@ -178,7 +178,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
             <div className="flex flex-wrap gap-2">
               {open && <Button size="sm" onClick={() => complete.mutate(a.id, { onSuccess: onClose })}>Mark complete</Button>}
               {open && <Button size="sm" variant="outline" onClick={() => noShow.mutate(a.id, { onSuccess: onClose })}>No-show</Button>}
-              {a.clients && <Button size="sm" variant="ghost" onClick={() => { onClose(); openClient({ clientId: a.clients.id, appointmentId: a.id }); }}>Client details</Button>}
+              {a.clients && <Button size="sm" variant="ghost" onClick={() => { onClose(); openClient({ clientId: a.clients!.id, appointmentId: a.id }); }}>Client details</Button>}
             </div>
           </>
         )}

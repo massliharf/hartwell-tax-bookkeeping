@@ -4,7 +4,7 @@ import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Cl
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { HeroVisual } from "@/components/site/HeroVisual";
+import { InquiryVisual } from "@/components/site/InquiryVisual";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
@@ -34,13 +34,13 @@ export const Route = createFileRoute("/")({
 });
 
 
-const panel = "rounded-2xl bg-sheet";
+const panel = "rounded-[28px] bg-sheet";
 
 function SectionHead({ title, sub, action, eyebrow }: { title: string; sub?: string; action?: React.ReactNode; eyebrow?: string }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 [&_h2]:text-balance">
       <div className="max-w-2xl">
-        {eyebrow && <p className="mb-3 text-sm font-medium text-muted-foreground">{eyebrow}</p>}
+        {eyebrow && <p className="mb-4 inline-flex h-7 items-center rounded-full border border-line-1 bg-surface-2 px-3 text-[12px] font-medium text-body">{eyebrow}</p>}
         <h2 className="t-section text-deep-ink">{title}</h2>
         {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground sm:text-base sm:leading-6">{sub}</p>}
       </div>
@@ -55,6 +55,7 @@ function Home() {
       <SiteHeader warm />
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
+        <Quirks />
         <WhatClaireDoes />
         <HowItWorks />
         <BeforeAfter />
@@ -98,18 +99,18 @@ function StickyCta() {
 function Hero() {
   const trust = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
-    <section className={`${panel} enter overflow-hidden`}>
-      <div className="grid items-center gap-10 px-5 pb-10 pt-10 sm:px-10 md:grid-cols-[1.15fr_1fr] md:gap-12 md:pb-14 md:pt-16">
+    <section className="enter overflow-hidden">
+      <div className="grid items-center gap-6 px-1 pb-10 pt-6 sm:px-4 md:grid-cols-[1.1fr_1fr] md:gap-12 md:pb-16 md:pt-14">
         <div>
           <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-border bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:bg-surface-2">
             <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-primary-foreground">Oct 15</span>
             Extensions are due. <span className="font-medium text-ink group-hover:underline">Book your slot</span>
           </Link>
-          <h1 className="enter-title mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
-            Taxes, without the chase.
+          <h1 className="enter-title mt-6 max-w-[13ch] text-balance t-hero text-deep-ink">
+            From “can I book?” to “you’re booked.”
           </h1>
-          <p className="mt-5 max-w-md text-base leading-7 text-body sm:text-lg">
-            Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
+          <p className="mt-6 max-w-[34rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
+            Claire Hartwell is a one-person tax practice in Montclair, NJ. Pick a time in two minutes, get a checklist of exactly what to bring, and arrive with everything already checked.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
@@ -120,9 +121,9 @@ function Hero() {
             <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span><br />Confirmed instantly. No payment until you file.</p>
           </div>
         </div>
-        <div className="enter-spot min-w-0 rounded-2xl bg-ink-50 px-4 py-2 sm:px-8" style={{ animationDelay: "150ms" }}><HeroVisual /></div>
+        <div className="min-w-0 rounded-[28px] bg-ink-50 px-4 sm:px-8"><InquiryVisual /></div>
       </div>
-      <div className="border-t border-border bg-surface-2 px-5 py-4 sm:px-10">
+      <div className="rounded-[24px] bg-sheet px-5 py-5 sm:px-8">
         <p className="mb-3 text-xs font-medium text-muted-foreground">Start with what you need</p>
         <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-5 sm:overflow-visible">
           {SERVICES.map((s, si) => {
@@ -130,7 +131,7 @@ function Hero() {
             const Icon = st.icon;
             return (
               <li key={s.id} className="enter-tile shrink-0" style={{ animationDelay: `${300 + si * 80}ms` }}>
-                <Link to="/book" search={{ service: s.id }} className="flex h-full w-40 items-center gap-3 rounded-xl bg-sheet p-3 transition-colors duration-150 hover:bg-fill-subtle sm:w-auto">
+                <Link to="/book" search={{ service: s.id }} className="group flex h-full w-40 items-center gap-3 rounded-2xl border border-line-1 bg-sheet p-3 transition-colors duration-150 hover:border-line-2 hover:bg-surface-2 sm:w-auto">
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${st.rgb},0.1)` }}>
                     <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${st.rgb})` }} />
                   </span>
@@ -146,6 +147,30 @@ function Hero() {
           ))}
         </ul>
       </div>
+    </section>
+  );
+}
+
+/** The client brief: a real solo practice with real problems, and what the product does about each. */
+function Quirks() {
+  const rows = [
+    { stat: "40+", unit: "calls a week", when: "every April and October", before: "Claire answered them between returns, then played phone tag to find a time.", after: "Clients pick an open slot themselves and are confirmed on the spot." },
+    { stat: "1 in 6", unit: "appointments stalled", when: "last season", before: "A no-show, or a client who arrived without their W-2 and needed a second visit.", after: "A checklist made for each client, reminders until it's done, and a later time offered if it isn't." },
+    { stat: "0", unit: "receptionists", when: "it's just Claire", before: "Every confirmation, reminder, reschedule and payment chase was hers to do.", after: "They go out on their own. Claire only sees the exceptions." },
+  ];
+  return (
+    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-20`}>
+      <SectionHead eyebrow="The brief" title="A busy solo practice, and the three things eating Claire's day." sub="Hartwell Tax & Bookkeeping, 412 Bloomfield Avenue, Montclair, NJ. One Enrolled Agent, two deadline peaks a year." />
+      <ul className="mt-12 grid gap-4 md:grid-cols-3">
+        {rows.map((r) => (
+          <li key={r.unit} className="flex flex-col rounded-[22px] border border-line-1 p-6">
+            <p className="font-serif text-[56px] font-semibold leading-none tracking-[-0.04em] text-ink">{r.stat}</p>
+            <p className="mt-2 text-[15px] font-medium text-deep-ink">{r.unit} <span className="font-normal text-muted-foreground">{r.when}</span></p>
+            <p className="mt-5 text-sm leading-6 text-muted-foreground"><span className="font-medium text-deep-ink">Before. </span>{r.before}</p>
+            <p className="mt-3 border-t border-line-1 pt-3 text-sm leading-6 text-body"><span className="font-medium text-alert-success-fg">Now. </span>{r.after}</p>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -315,7 +340,7 @@ function BeforeAfter() {
             ))}
           </ul>
         </div>
-         <div className="rounded-2xl bg-[#2c0000] p-6 text-primary-foreground">
+         <div className="rounded-2xl bg-ink-900 p-6 text-primary-foreground">
           <p className="text-sm font-medium text-primary-foreground/70">With Hartwell Tax</p>
           <ul className="mt-4 space-y-3">
             {after.map((x) => (
@@ -440,7 +465,7 @@ function Privacy() {
 
 function DeadlineCta() {
   return (
-     <section id="deadline" className="overflow-hidden rounded-2xl bg-[#2c0000] px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
+     <section id="deadline" className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="t-section text-white">October 15 is close. Your slot doesn't have to be.</h2>

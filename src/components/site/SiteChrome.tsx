@@ -62,7 +62,7 @@ export function SiteFooter() {
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
         <div className="text-sm">
-          <p className="mb-3 font-serif text-base font-semibold text-[#8FA3FF]">Book</p>
+          <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Book</p>
           <ul className="space-y-2">
             <li><Link to="/book" className="hover:text-white">Book an appointment</Link></li>
             <li><Link to="/book/returning" className="hover:text-white">My appointment</Link></li>
@@ -71,13 +71,13 @@ export function SiteFooter() {
           </ul>
         </div>
         <div className="text-sm">
-          <p className="mb-3 font-serif text-base font-semibold text-[#8FA3FF]">Visit</p>
+          <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
           <a href="tel:+19735550142" className="tabular mt-1 flex min-h-10 items-center hover:text-white">(973) 555-0142</a>
         </div>
         <div className="text-sm">
-          <p className="mb-3 font-serif text-base font-semibold text-[#8FA3FF]">Hours</p>
+          <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4 whitespace-nowrap">
               <span>{h.days}</span>

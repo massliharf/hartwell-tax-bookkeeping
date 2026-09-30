@@ -29,12 +29,12 @@ function Today() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const shortcuts: Shortcut[] = [
-    { label: "New appointment", icon: Plus, rgb: "47,84,235", onClick: openNewAppointment },
-    { label: "Calendar", icon: CalendarDays, rgb: "124,92,219", onClick: () => navigate({ to: "/owner/calendar" }) },
-    { label: "Clients", icon: Users, rgb: "13,148,136", onClick: () => navigate({ to: "/owner/clients" }) },
-    { label: "Documents to check", icon: FileSearch, rgb: "217,119,6", count: reviewCount, disabled: !reviewCount, onClick: () => { const r = review[0]; if (r) openAppt({ appointmentId: r.id }); } },
-    { label: "Unpaid", icon: CreditCard, rgb: "194,58,32", count: unpaid.length, disabled: !unpaid.length, onClick: () => scrollTo("today-needs") },
-    { label: "Ready to file", icon: Send, rgb: "23,128,79", count: toFile.data?.length ?? 0, disabled: !toFile.data?.length, onClick: () => scrollTo("today-to-file") },
+    { label: "New appointment", icon: Plus, rgb: "122,31,31", onClick: openNewAppointment },
+    { label: "Calendar", icon: CalendarDays, rgb: "125,91,166", onClick: () => navigate({ to: "/owner/calendar" }) },
+    { label: "Clients", icon: Users, rgb: "62,125,96", onClick: () => navigate({ to: "/owner/clients" }) },
+    { label: "Documents to check", icon: FileSearch, rgb: "196,128,20", count: reviewCount, disabled: !reviewCount, onClick: () => { const r = review[0]; if (r) openAppt({ appointmentId: r.id }); } },
+    { label: "Unpaid", icon: CreditCard, rgb: "179,38,30", count: unpaid.length, disabled: !unpaid.length, onClick: () => scrollTo("today-needs") },
+    { label: "Ready to file", icon: Send, rgb: "30,107,69", count: toFile.data?.length ?? 0, disabled: !toFile.data?.length, onClick: () => scrollTo("today-to-file") },
   ];
   return (
     <div className="pb-6">

@@ -1,3 +1,24 @@
+# DESIGN_SYSTEM v3 — "Warm Ledger" (supersedes the colour and type sections below)
+
+Direction: Magnific's marketing language (warm paper, oxblood, bold grotesk display) applied to the whole product,
+so the site and the app feel like one brand. Layout, spacing, motion and component rules from v2 still apply.
+
+Colour
+- Paper #F4F3EF (canvas everywhere) · Sheet #FFFFFF (panels) · Surface-2 #FAF9F6 · Fill #EDEAE3
+- Ink #1C1714 (text) · Body #3B332E · Muted #6E655F · Lines rgba(44,20,10, .06/.10/.18/.28)
+- Oxblood #2C0000 = the one action colour (primary buttons, links, focus, counts, dark panels); hover #3F0808, pressed #1F0000; tint #F6ECE8
+- Logo stays ink (#1A1A1A) so it never competes with actions
+- Status (soft bg / text): success #E8F2EA/#1E6B45 · warning #FBF2DC/#8A5A00 · negative #FBE9E6/#B3261E · info #F6ECE8/#7A1F1F
+- Services: oxblood 122,31,31 · plum 125,91,166 · sage 62,125,96 · amber 196,128,20 · slate 79,106,168 (icons 100%, tiles 10%)
+
+Type
+- Display: Bricolage Grotesque 600, tight tracking (hero 72/72 −0.035em, section 44/48 −0.03em, page 32/38, card 20/28, owner page 28/34)
+- UI: Geist 400/500/600. Sub-heads t-sub 15/22 500; group labels t-label 11px caps
+Shape
+- Panels 28px, cards 22px, lists 16px, buttons 8px; large buttons (h48) are pills
+Eyebrows
+- Small outlined pill above section titles ("The brief", "How it works")
+
 # DESIGN_SYSTEM v2 — "Studio Shell", re-extracted from magnific.com
 
 Source: live extraction on 30 Sep 2026 from the full stylesheet (app-initial.css, 757 KB: 239 theme tokens, 40 keyframes,

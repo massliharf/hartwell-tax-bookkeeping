@@ -46,7 +46,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-2xl border border-line-0 bg-[#FCFCFC] p-1.5 text-deep-ink shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_7px_rgba(18,18,18,0.02),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] data-[state=open]:animate-[menu-in_150ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 origin-(--radix-dropdown-menu-content-transform-origin)",
+      "z-50 min-w-[8rem] overflow-hidden rounded-2xl border border-line-0 bg-surface-2 p-1.5 text-deep-ink shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_7px_rgba(18,18,18,0.02),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] data-[state=open]:animate-[menu-in_150ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 origin-(--radix-dropdown-menu-content-transform-origin)",
       className,
     )}
     {...props}
@@ -63,7 +63,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto z-50 min-w-[8rem] overflow-hidden rounded-2xl border border-line-0 bg-[#FCFCFC] p-1.5 text-deep-ink shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_7px_rgba(18,18,18,0.02),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] data-[state=open]:animate-[menu-in_150ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
+        "max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto z-50 min-w-[8rem] overflow-hidden rounded-2xl border border-line-0 bg-surface-2 p-1.5 text-deep-ink shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_7px_rgba(18,18,18,0.02),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] data-[state=open]:animate-[menu-in_150ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
         "          origin-(--radix-dropdown-menu-content-transform-origin)",
         className,
       )}

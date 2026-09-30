@@ -85,7 +85,7 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
         <div className="flex flex-col gap-0.5">
           {([[FlaskConical, "Demo tools", () => setOpen(true), false], [Smartphone, "Phone preview", () => setPhone((p) => !p), phone]] as const).map(([Icon, label, onClick, on]) => (
             <button key={label} type="button" onClick={onClick} aria-pressed={label === "Phone preview" ? on : undefined} title={collapsed ? label : undefined}
-              className={`flex h-8 items-center gap-2.5 rounded-lg text-[13px] transition-colors duration-150 hover:bg-tint-1 ${collapsed ? "justify-center px-0" : "px-2"} ${on ? "bg-tint-2 font-medium text-deep-ink" : "text-[#616161]"}`}>
+              className={`flex h-8 items-center gap-2.5 rounded-lg text-[13px] transition-colors duration-150 hover:bg-tint-1 ${collapsed ? "justify-center px-0" : "px-2"} ${on ? "bg-tint-2 font-medium text-deep-ink" : "text-muted-foreground"}`}>
               <Icon className="size-4 shrink-0" strokeWidth={1.75} />{!collapsed && label}
             </button>
           ))}

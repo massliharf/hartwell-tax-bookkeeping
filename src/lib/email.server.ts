@@ -30,18 +30,18 @@ export function renderEmail(heading: string, blocks: Block[]) {
     if ("list" in b) return `<table role="presentation" width="100%" style="margin:0 0 20px;border-collapse:collapse;border:1px solid #EAEAEA;border-radius:12px">${b.list.map((i, n) =>
       `<tr><td style="padding:12px 14px;${n ? "border-top:1px solid #EAEAEA;" : ""}font-size:14px;color:#1A1A1A"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E7AD16;margin-right:10px;vertical-align:middle"></span>${esc(i)}</td></tr>`).join("")}</table>`;
     const btns = "button" in b ? [b.button] : b.buttons;
-    return btns.map((x, i) => `<a href="${esc(x.href)}" style="display:block;text-align:center;margin:0 0 10px;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;${i === 0 ? "background:#2F54EB;color:#FFFFFF" : "background:#F0F0F0;color:#1A1A1A"}">${esc(x.label)}</a>`).join("");
+    return btns.map((x, i) => `<a href="${esc(x.href)}" style="display:block;text-align:center;margin:0 0 10px;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;${i === 0 ? "background:#2C0000;color:#FFFFFF" : "background:#F0F0F0;color:#1A1A1A"}">${esc(x.label)}</a>`).join("");
   }).join("");
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#F5F5F5;font-family:Geist,Inter,Helvetica,Arial,sans-serif">
-<table role="presentation" width="100%" style="background:#F5F5F5"><tr><td align="center" style="padding:32px 16px">
+<body style="margin:0;padding:0;background:#F4F3EF;font-family:Geist,Inter,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" style="background:#F4F3EF"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
 <tr><td style="padding:0 4px 16px"><table role="presentation"><tr>
 <td style="width:28px;height:28px;background:#1A1A1A;border-radius:8px;text-align:center;vertical-align:middle;color:#FFFFFF;font-weight:700;font-size:15px;line-height:28px">H</td>
 <td style="padding-left:10px;font-size:15px;font-weight:600;color:#1A1A1A">Hartwell <span style="font-weight:400;color:#737373">Tax &amp; Bookkeeping</span></td>
 </tr></table></td></tr>
 <tr><td style="background:#FFFFFF;border:1px solid rgba(16,16,16,0.06);border-radius:16px;padding:32px 28px">
-<h1 style="margin:0 0 18px;font-family:Figtree,Geist,Helvetica,Arial,sans-serif;font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-0.01em;color:#1A1A1A">${esc(heading)}</h1>
+<h1 style="margin:0 0 18px;font-family:"Bricolage Grotesque",Geist,Helvetica,Arial,sans-serif;font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-0.01em;color:#1A1A1A">${esc(heading)}</h1>
 ${body}
 <p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:#353535">Warmly,<br><strong style="color:#1A1A1A">Claire Hartwell, EA</strong></p>
 </td></tr>

@@ -64,7 +64,7 @@
   --color-paper-warm: var(--paper-warm);
   --color-night: var(--night);
   --color-overlay-light: var(--overlay-light);
-  --color-body: #363636;
+  --color-body: #3B332E;
   --color-paper: var(--paper);
   --color-sheet: var(--sheet);
   --color-paper-deep: var(--paper-deep);
@@ -77,7 +77,7 @@
   --color-sage: var(--sage);
   --color-success: var(--success);
   --color-warning: var(--warning);
-  --font-serif: "Figtree", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Bricolage Grotesque", "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --shadow-sheet: var(--shadow-sheet);
   --shadow-lift: var(--shadow-lift);
@@ -98,70 +98,70 @@
 
 :root {
   --radius: 8px;
-  --canvas: #F5F5F5;
+  --canvas: #F4F3EF;
   /* DESIGN_SYSTEM v2: 3-step fills (rest / hover / pressed) */
-  --ink-hover: #2441C9;
-  --ink-pressed: #1B33A6;
+  --ink-hover: #3F0808;
+  --ink-pressed: #1F0000;
   --dark-0: #1A1A1A; --dark-1: #424242; --dark-2: #616161;
-  --tint-0: rgba(115,115,115,0.05); --tint-1: rgba(115,115,115,0.10); --tint-2: rgba(115,115,115,0.15);
-  --line-0: rgba(16,16,16,0.05); --line-1: rgba(16,16,16,0.10); --line-2: rgba(16,16,16,0.20); --line-3: rgba(16,16,16,0.30);
-  --form-border: rgba(16,16,16,0.15); --form-focus: #93A6F5;
-  --alert-success: #E7F5F0; --alert-success-fg: #107A56;
-  --alert-info: #EDF0FD; --alert-info-fg: #2F54EB;
-  --alert-warning: #FDF8EA; --alert-warning-fg: #9A6B00;
-  --alert-negative: #FEF0ED; --alert-negative-fg: #C23A20;
+  --tint-0: rgba(60,36,24,0.04); --tint-1: rgba(60,36,24,0.07); --tint-2: rgba(60,36,24,0.11);
+  --line-0: rgba(44,20,10,0.06); --line-1: rgba(44,20,10,0.10); --line-2: rgba(44,20,10,0.18); --line-3: rgba(44,20,10,0.28);
+  --form-border: rgba(44,20,10,0.16); --form-focus: #B98A80;
+  --alert-success: #E8F2EA; --alert-success-fg: #1E6B45;
+  --alert-info: #F6ECE8; --alert-info-fg: #7A1F1F;
+  --alert-warning: #FBF2DC; --alert-warning-fg: #8A5A00;
+  --alert-negative: #FBE9E6; --alert-negative-fg: #B3261E;
   --paper-warm: #F4F3EF;
   --night: #0F0F0F;
-  --overlay-light: rgba(229,231,235,0.7);
-  --surface-2: #FCFCFC;
-  --fill-neutral: #EDEDED;
+  --overlay-light: rgba(236,232,224,0.72);
+  --surface-2: #FAF9F6;
+  --fill-neutral: #EDEAE3;
   --fill-subtle: rgba(115,115,115,0.05);
   --fill-selected: rgba(115,115,115,0.15);
-  --paper: #FAFAFA;
-  --paper-deep: #EDEDED;
-  --ink-green: #2F54EB;
-  --ink-50: #EEF2FF;
-  --ink-100: #DCE4FF;
-  --ink-900: #172A7A;
-  --deep-ink: #1A1A1A;
+  --paper: #F4F3EF;
+  --paper-deep: #EDEAE3;
+  --ink-green: #2C0000;
+  --ink-50: #F6ECE8;
+  --ink-100: #EBD8D1;
+  --ink-900: #2C0000;
+  --deep-ink: #1C1714;
   --marigold: #E0A13A;
   --sage: #EDEDED;
-  --success: #17804F;
+  --success: #1E6B45;
   --warning: #B26B17;
   --sheet: #FFFFFF;
 
   --background: var(--paper);
-  --foreground: #0D0D0D;
+  --foreground: #1C1714;
   --card: #FFFFFF;
   --card-foreground: #1A1A1A;
   --popover: #FFFFFF;
   --popover-foreground: #1A1A1A;
   --primary: #1A1A1A;
   --primary-foreground: #FFFFFF;
-  --secondary: #EDEDED;
+  --secondary: #EDEAE3;
   --secondary-foreground: #1A1A1A;
-  --muted: #F0F0F0;
-  --muted-foreground: #616161;
-  --accent: #EDEDED;
+  --muted: #F1EFEA;
+  --muted-foreground: #6E655F;
+  --accent: #EDEAE3;
   --accent-foreground: #1A1A1A;
   --destructive: #C2412D;
   --destructive-foreground: #FFFFFF;
-  --border: rgba(16,16,16,0.1);
-  --input: rgba(16,16,16,0.15);
-  --ring: #2F54EB;
-  --chart-1: #2F54EB;
+  --border: rgba(44,20,10,0.10);
+  --input: rgba(44,20,10,0.16);
+  --ring: #7A1F1F;
+  --chart-1: #2C0000;
   --chart-2: #737373;
   --chart-3: #3B8A6E;
   --chart-4: #B26B17;
   --chart-5: #DBDBDB;
   --sidebar: #FFFFFF;
   --sidebar-foreground: #363636;
-  --sidebar-primary: #2F54EB;
+  --sidebar-primary: #2C0000;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: rgba(115,115,115,0.15);
   --sidebar-accent-foreground: #1A1A1A;
   --sidebar-border: rgba(16,16,16,0.1);
-  --sidebar-ring: #2F54EB;
+  --sidebar-ring: #7A1F1F;
 
   --shadow-sheet: none;
   --shadow-lift: 0 0 2px rgba(18,18,18,.08), 0 2px 4px rgba(18,18,18,.08), 0 6px 6px rgba(18,18,18,.04), 0 14px 9px rgba(18,18,18,.02), 0 25px 10px rgba(18,18,18,.02);
@@ -184,10 +184,10 @@
   /* Headings use the UI font by default (Studio Shell). The display font is opt-in via .font-serif or the t-* type styles. */
   h1, h2, h3 { font-family: var(--font-sans); font-weight: 500; }
   .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
-  ::selection { background: rgba(47,84,235,0.18); }
+  ::selection { background: rgba(44,0,0,0.14); }
   /* One consistent, high-contrast focus ring everywhere keyboard users land. */
   :focus-visible {
-    outline: 2px solid #2F54EB;
+    outline: 2px solid #7A1F1F;
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -217,11 +217,11 @@
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 
 /* Type scale (DESIGN_SYSTEM.md section 1). One class per role keeps every page consistent. */
-@utility t-hero { font-family: var(--font-serif); font-weight: 600; font-size: 40px; line-height: 44px; letter-spacing: -0.03em; @media (width >= 40rem) { font-size: 60px; line-height: 64px; } }
-@utility t-page { font-family: var(--font-serif); font-weight: 500; font-size: 24px; line-height: 32px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 28px; line-height: 36px; } }
-@utility t-section { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 34px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 32px; line-height: 40px; } }
-@utility t-card { font-family: var(--font-serif); font-weight: 500; font-size: 20px; line-height: 30px; letter-spacing: -0.2px; }
-@utility t-owner { font-family: var(--font-serif); font-weight: 500; font-size: 22px; line-height: 30px; letter-spacing: -0.01em; @media (width >= 40rem) { font-size: 24px; line-height: 32px; } }
+@utility t-hero { font-family: var(--font-serif); font-weight: 600; font-size: 44px; line-height: 46px; letter-spacing: -0.035em; @media (width >= 40rem) { font-size: 72px; line-height: 72px; } }
+@utility t-page { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 32px; letter-spacing: -0.025em; @media (width >= 40rem) { font-size: 32px; line-height: 38px; } }
+@utility t-section { font-family: var(--font-serif); font-weight: 600; font-size: 32px; line-height: 36px; letter-spacing: -0.03em; @media (width >= 40rem) { font-size: 44px; line-height: 48px; } }
+@utility t-card { font-family: var(--font-serif); font-weight: 600; font-size: 20px; line-height: 28px; letter-spacing: -0.02em; }
+@utility t-owner { font-family: var(--font-serif); font-weight: 600; font-size: 24px; line-height: 30px; letter-spacing: -0.025em; @media (width >= 40rem) { font-size: 28px; line-height: 34px; } }
 
 /* Page-level entrance (DESIGN_SYSTEM.md: fade in, 200ms, decelerate). Disabled for reduced motion by the global rule. */
 @utility enter { animation: enter-fade 200ms cubic-bezier(0, 0, 0.2, 1) both; }
@@ -251,4 +251,4 @@
 /* Sub-heading for every section inside a page, card or window (owner app and client pages). */
 @utility t-sub { font-family: var(--font-sans); font-weight: 500; font-size: 15px; line-height: 22px; letter-spacing: 0; color: var(--color-deep-ink, #1A1A1A); }
 /* Small group label above a list (e.g. "Received · 2"). */
-@utility t-label { font-family: var(--font-sans); font-weight: 500; font-size: 11px; line-height: 16px; letter-spacing: 0.04em; text-transform: uppercase; color: #737373; }
+@utility t-label { font-family: var(--font-sans); font-weight: 500; font-size: 11px; line-height: 16px; letter-spacing: 0.04em; text-transform: uppercase; color: #7A716B; }

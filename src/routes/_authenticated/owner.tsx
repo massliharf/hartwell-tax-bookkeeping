@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ClientDrawer } from "@/components/owner/client-drawer";
-import { ClientDrawerContext, type ClientDrawerTarget } from "@/components/owner/drawer-context";
+import { AppointmentPanel } from "@/components/owner/appointment-panel";
+import { ApptPanelContext, type ApptPanelTarget } from "@/components/owner/drawer-context";
 import { useLocation } from "@tanstack/react-router";
 import { BarChart3, CalendarDays, Inbox, LogOut, Settings, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -31,10 +31,9 @@ const NAV = [
   { to: "/owner", label: "Today", icon: Sun, exact: true },
   { to: "/owner/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/owner/clients", label: "Clients", icon: Users },
-  { to: "/owner/outbox", label: "Outbox", icon: Inbox },
-  { to: "/owner/insights", label: "Insights", icon: BarChart3 },
-  { to: "/owner/settings", label: "Settings", icon: Settings },
+  { to: "/owner/insights", label: "Report", icon: BarChart3 },
 ] as const;
+const PAGES = [...NAV, { to: "/owner/settings", label: "Settings", icon: Settings }] as const;
 
 function OwnerLayout() {
   const ctx = useOwnerCtx();
@@ -45,7 +44,7 @@ function OwnerLayout() {
   const path = useLocation({ select: (l) => l.pathname.replace(/\/$/, "") || "/" });
   const [collapsed, setCollapsed] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [clientTarget, setClientTarget] = useState<ClientDrawerTarget | null>(null);
+  const [panel, setPanel] = useState<ApptPanelTarget | null>(null);
   const [paletteTerm, setPaletteTerm] = useState("");
   const clients = useQuery({ queryKey: ["owner", "clients"], enabled: !!ctx.data?.isOwner && paletteOpen, queryFn: async () => { const { data, error } = await supabase.from("clients").select("id, name, email, phone, is_returning, appointments(start_at, status)").order("name"); if (error) throw error; return data ?? []; } });
   useEffect(() => { setCollapsed(localStorage.getItem("owner-sidebar") === "1"); }, []);
@@ -76,13 +75,13 @@ function OwnerLayout() {
     );
   }
 
-  const current = NAV.find((n) => ("exact" in n ? path === n.to : path.startsWith(n.to))) ?? NAV[0];
-  const mobileMain = NAV.slice(0, 4);
-  const mobileMore = NAV.slice(4);
+  const current = PAGES.find((n) => ("exact" in n ? path === n.to : path.startsWith(n.to))) ?? PAGES[0];
+  const mobileMain = NAV;
+  const mobileMore = [PAGES[4]];
   const item = "flex h-8 items-center gap-2.5 rounded-lg pr-2 text-xs text-sidebar-foreground transition-colors duration-150 hover:bg-fill-subtle";
 
   return (
-    <ClientDrawerContext.Provider value={setClientTarget}><div className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2">
+    <ApptPanelContext.Provider value={setPanel}><div className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2">
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-4 rounded-2xl bg-sheet py-4  sm:flex ${collapsed ? "w-[72px] px-5" : "w-56 px-5"}`}>
         <div className="flex h-8 items-center justify-between">
           {!collapsed && <Link to="/" className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</Link>}
@@ -105,7 +104,7 @@ function OwnerLayout() {
         <div className="flex-1" />
         {!collapsed && <DemoTools inline />}
         <div className={`flex ${collapsed ? "flex-col" : ""} gap-1`}>
-          <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-9 w-full justify-start gap-2 px-1" title="Claire Hartwell"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs">CH</span>{!collapsed && <span className="truncate text-xs">Claire Hartwell</span>}</Button></DropdownMenuTrigger><DropdownMenuContent side="top" align="start" className="w-56 rounded-2xl shadow-lift"><DropdownMenuItem onSelect={signOut}><LogOut className="size-4" />Sign out</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+          <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-9 w-full justify-start gap-2 px-1" title="Claire Hartwell"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs">CH</span>{!collapsed && <span className="truncate text-xs">Claire Hartwell</span>}</Button></DropdownMenuTrigger><DropdownMenuContent side="top" align="start" className="w-56 rounded-2xl shadow-lift"><DropdownMenuItem asChild><Link to="/owner/settings"><Settings className="size-4" />Settings</Link></DropdownMenuItem><DropdownMenuItem onSelect={signOut}><LogOut className="size-4" />Sign out</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
         </div>
       </aside>
 
@@ -121,7 +120,7 @@ function OwnerLayout() {
           <Button size="icon" variant="ghost" aria-label="Search" onClick={() => setPaletteOpen(true)} className="sm:hidden"><Search className="size-4" /></Button>
         </header>
         <main className="min-h-[calc(100vh-76px)] rounded-t-2xl bg-sheet px-5 pb-28 pt-6 sm:rounded-2xl sm:px-8 sm:pb-12 sm:pt-8">
-          <div className={path.startsWith("/owner/calendar") ? "mx-auto max-w-6xl" : "mx-auto max-w-4xl"}>
+          <div className={path.startsWith("/owner/calendar") ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
             <Outlet />
             <div className="mt-12 border-t border-border pt-4 sm:hidden"><DemoTools inline /></div>
           </div>
@@ -155,7 +154,7 @@ function OwnerLayout() {
         <CommandList>
           <CommandEmpty>Nothing matches.</CommandEmpty>
           <CommandGroup heading="Pages">
-            {NAV.map((n) => (
+            {PAGES.map((n) => (
               <CommandItem key={n.to} onSelect={() => { setPaletteOpen(false); navigate({ to: n.to }); }} className="h-10 gap-3 rounded-lg text-[15px]">
                 <span className="grid size-7 place-items-center rounded-lg bg-fill-neutral"><n.icon className="size-3.5" /></span>{n.label}
               </CommandItem>
@@ -166,7 +165,7 @@ function OwnerLayout() {
               .filter((c) => `${c.name} ${c.email}`.toLowerCase().includes(paletteTerm.trim().toLowerCase()))
               .slice(0, 20)
               .map((c) => (
-                <CommandItem key={c.id} value={`${c.name} ${c.email}`} onSelect={() => { setPaletteOpen(false); setPaletteTerm(""); setClientTarget({ clientId: c.id }); }} className="h-10 gap-3 rounded-lg text-[15px]">
+                <CommandItem key={c.id} value={`${c.name} ${c.email}`} onSelect={() => { setPaletteOpen(false); setPaletteTerm(""); navigate({ to: "/owner/clients/$id", params: { id: c.id } }); }} className="h-10 gap-3 rounded-lg text-[15px]">
                   <span className="grid size-7 place-items-center rounded-lg bg-fill-neutral"><Users className="size-3.5" /></span>
                   <span className="min-w-0 truncate">{c.name} <span className="text-xs text-muted-foreground">{c.email}</span></span>
                 </CommandItem>
@@ -174,7 +173,7 @@ function OwnerLayout() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
-      <ClientDrawer target={clientTarget} onClose={() => setClientTarget(null)} />
-    </div></ClientDrawerContext.Provider>
+      <AppointmentPanel target={panel} onClose={() => setPanel(null)} />
+    </div></ApptPanelContext.Provider>
   );
 }

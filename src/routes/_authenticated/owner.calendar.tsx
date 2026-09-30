@@ -9,9 +9,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { addDays, apptsRange, et, etToIso, fmtTime, readiness, ymdLabel, type Appt } from "@/components/owner/lib";
-import { ApptCard, ErrorNote, PageHead } from "@/components/owner/ui";
+import { ApptList, ErrorNote, PageHead } from "@/components/owner/ui";
 import { ownerMoveAppointment } from "@/lib/owner.functions";
-import { useClientDrawer } from "@/components/owner/drawer-context";
+import { useApptPanel } from "@/components/owner/drawer-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: CalendarPage });
@@ -44,7 +44,7 @@ function layoutDay(list: Appt[]) {
 
 function CalendarPage() {
   const now = useOwnerCtx().data!.now;
-  const openClient = useClientDrawer();
+  const openAppt = useApptPanel();
   const today = et(now).ymd;
   const [week, setWeek] = useState(() => mondayOf(today));
   const [mobileDay, setMobileDay] = useState(today);
@@ -135,7 +135,7 @@ function CalendarPage() {
                 const done = a.status === "completed" || a.status === "no_show";
                 return (
                   <button key={a.id} draggable={!done} onDragStart={(e) => { e.dataTransfer.setData("text/plain", a.id); setDrag(a.id); }} onDragEnd={() => setDrag(null)}
-                    onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })}
+                    onClick={() => openAppt({ appointmentId: a.id })}
                     title={`${a.clients?.name ?? ""}, ${fmtTime(a.start_at)}, ${a.services?.name ?? ""}, ${a.ready_score}% ready`}
                     className={cn("absolute z-10 flex overflow-hidden rounded-lg border border-border bg-sheet text-left shadow-[0_1px_2px_rgba(16,16,16,0.04)] transition-colors duration-150 hover:bg-surface-2",
                       done && "bg-surface-2 opacity-60", drag === a.id && "opacity-40")}
@@ -155,7 +155,7 @@ function CalendarPage() {
           {(["ready", "partial", "none"] as const).map((k) => (
             <span key={k} className="inline-flex items-center gap-1.5"><span className={cn("h-3 w-[3px] rounded-full", ACCENT[k])} />{k === "ready" ? "Ready" : k === "partial" ? "Partly ready" : "Not started"}</span>
           ))}
-          <span className="ml-auto">Click an appointment to open the client</span>
+          <span className="ml-auto">Click an appointment to see its checklist</span>
         </div>
       </div>
 
@@ -175,7 +175,7 @@ function CalendarPage() {
           })}
         </div>
         {q.isLoading ? <Skeleton className="h-40 rounded-2xl" /> : byDay(mobileDay).length ? (
-          <div className="overflow-hidden rounded-2xl border border-border">{byDay(mobileDay).map((a) => <ApptCard key={a.id} a={a} />)}</div>
+          <ApptList appts={byDay(mobileDay)} />
         ) : <p className="rounded-2xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">Nothing booked on {ymdLabel(mobileDay)}.</p>}
       </div>
 

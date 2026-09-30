@@ -5,9 +5,10 @@ import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Too
 import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
+import { MessageLog } from "@/components/owner/messages";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Insights — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Insights });
+export const Route = createFileRoute("/_authenticated/owner/insights")({ head: () => ({ meta: [{ title: "Report — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Insights });
 
 // Baselines from the practice before the new system (from the brief / Claire's estimate).
 const BEFORE = { ready: 65, noShow: 12, msgsPerBooking: 6 };
@@ -113,7 +114,8 @@ function Insights() {
           </p>
         </div>
       </section>
-      <p className="mt-3 text-xs text-muted-foreground">Last 30 days. "Before" figures are the practice's typical numbers before online booking.</p>
+      <p className="mt-3 text-xs text-muted-foreground">"Before" figures are the practice's typical numbers before online booking.</p>
+      <div className="mt-10"><MessageLog /></div>
     </>
   );
 }
@@ -121,7 +123,7 @@ function Insights() {
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   return (
     <>
-      <PageHead title="Insights" meta="Last 30 days" />
+      <PageHead title="Report" meta="Last 30 days, and every message sent for you" />
       <section className="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
         <p className="text-xs font-medium text-muted-foreground">Hours given back to Claire</p>
         <p className="tabular mt-2 text-[44px] font-medium leading-[48px] tracking-[-0.02em] text-deep-ink">{hours}<span className="ml-2 text-lg font-normal text-muted-foreground">hour{hours === 1 ? "" : "s"}</span></p>

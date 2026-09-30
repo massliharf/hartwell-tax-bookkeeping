@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 
-export type ClientDrawerTarget = { clientId: string; appointmentId?: string | undefined };
-export const ClientDrawerContext = createContext<(target: ClientDrawerTarget) => void>(() => {});
-export const useClientDrawer = () => useContext(ClientDrawerContext);
+/** The only side panel in the owner app: one appointment. */
+export type ApptPanelTarget = { appointmentId: string };
+export const ApptPanelContext = createContext<(target: ApptPanelTarget) => void>(() => {});
+export const useApptPanel = () => useContext(ApptPanelContext);

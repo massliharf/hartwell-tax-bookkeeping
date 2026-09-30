@@ -1,9 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useClientDrawer } from "@/components/owner/drawer-context";
 import { Input } from "@/components/ui/input";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 
@@ -11,7 +10,6 @@ export const Route = createFileRoute("/_authenticated/owner/clients/")({ head: (
 
 function Clients() {
   const [term, setTerm] = useState("");
-  const openClient = useClientDrawer();
   const q = useQuery({
     queryKey: ["owner", "clients"],
     queryFn: async () => {
@@ -25,7 +23,7 @@ function Clients() {
 
   return (
     <>
-      <PageHead eyebrow="Clients" title="Everyone you work with">
+      <PageHead title="Clients">
         {q.data && <p className="tabular">{q.data.length} clients</p>}
       </PageHead>
       <div className="relative mb-6">
@@ -35,16 +33,16 @@ function Clients() {
       {q.isLoading && <LoadingRows n={5} />}
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
       {q.data && !list.length && <p className="py-10 text-center text-sm text-muted-foreground">No one matches "{term}".</p>}
-      <ul className="divide-y divide-border overflow-hidden rounded-2xl bg-surface-2">
+      <ul className="overflow-hidden rounded-2xl border border-border">
         {list.map((c) => {
           const appts = (c.appointments ?? []).filter((a) => a.status !== "cancelled").sort((a, b) => b.start_at.localeCompare(a.start_at));
           return (
-            <li key={c.id}>
-              <button onClick={() => openClient({ clientId: c.id })} className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors duration-150 hover:bg-fill-subtle">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-fill-neutral font-sans text-lg text-ink">{c.name.charAt(0)}</span>
+            <li key={c.id} className="border-b border-border last:border-0">
+              <Link to="/owner/clients/$id" params={{ id: c.id }} className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left transition-colors duration-150 hover:bg-surface-2">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{c.name.charAt(0)}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium text-deep-ink">{c.name}</span>
-                  <span className="block truncate text-sm text-muted-foreground">{c.email}</span>
+                  <span className="block truncate text-sm font-medium text-deep-ink">{c.name}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{c.email}</span>
                 </span>
                 <span className="tabular hidden text-right text-xs text-muted-foreground sm:block">
                   {(() => {
@@ -55,7 +53,8 @@ function Clients() {
                     return next ? <>Next: <span className="text-deep-ink">{d(next.start_at)}</span></> : last ? <>Last: {d(last.start_at)}</> : "No appointments";
                   })()}{c.is_returning ? ", Returning" : ""}
                 </span>
-              </button>
+                <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+              </Link>
             </li>
           );
         })}

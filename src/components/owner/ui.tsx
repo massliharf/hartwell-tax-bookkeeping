@@ -1,18 +1,17 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, FileText, MailX, MoreHorizontal, PenLine, Sparkles } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, MailX, PenLine, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getDocumentUrl } from "@/lib/portal.functions";
 import { markComplete, markNoShow, dismissAttention, nudgeSignature } from "@/lib/owner.functions";
 import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, type Appt, type Item, type NeedItem } from "./lib";
-import { useClientDrawer } from "./drawer-context";
+import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
 
 export function PageHead({ title, meta, actions, children }: { eyebrow?: string; title: ReactNode; meta?: ReactNode; actions?: ReactNode; children?: ReactNode }) {
@@ -27,7 +26,7 @@ export function PageHead({ title, meta, actions, children }: { eyebrow?: string;
   );
 }
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
-  return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-ink" /><h2 className="mt-4 font-sans text-xl font-medium leading-[30px] text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
+  return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-ink" /><h2 className="mt-3 text-base font-medium text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
 }
 export function LoadingRows({ n = 3 }: { n?: number }) {
   return <div role="status" aria-label="Loading" className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface-2">{Array.from({ length: n }, (_, i) => <div key={i} className="flex h-16 items-center gap-3 px-3"><Skeleton className="size-10 shrink-0 rounded-full" /><Skeleton className="h-4 w-16 shrink-0" /><div className="min-w-0 flex-1"><Skeleton className="h-4 w-32 max-w-full" /><Skeleton className="mt-1 h-3 w-40 max-w-full" /></div><Skeleton className="hidden h-6 w-16 sm:block" /><Skeleton className="size-8 shrink-0" /></div>)}</div>;
@@ -63,36 +62,29 @@ export function StatusPill({ status }: { status: string }) {
   return <span className={cn("rounded border border-border bg-fill-subtle px-2 py-0.5 text-[10px] font-medium text-muted-foreground", status === "confirmed" && "border-success/20 bg-success/10 text-success", status === "no_show" && "border-warning/20 bg-warning/10 text-warning")}>{STATUS_LABEL[status] ?? status}</span>;
 }
 
-export function ApptActions({ a, variant = "menu" }: { a: Appt; variant?: "menu" | "buttons" }) {
+/** The two appointment actions, always shown the same way, each confirmed first. */
+export function ApptActionButtons({ a, onDone }: { a: Appt; onDone?: () => void }) {
   const [confirm, setConfirm] = useState<"complete" | "noShow" | null>(null);
-  const [docs, setDocs] = useState(false);
   const { complete, noShow } = useApptActions();
   const open = a.status === "booked" || a.status === "confirmed";
-  const uploaded = a.checklist_items.filter(i => i.file_path);
   const pending = complete.isPending || noShow.isPending;
-  const act = () => { if (confirm === "complete") complete.mutate(a.id); else if (confirm === "noShow") noShow.mutate(a.id); setConfirm(null); };
+  const name = a.clients?.name ?? "this client";
+  if (!open) return null;
+  const act = () => {
+    if (confirm === "complete") complete.mutate(a.id, { onSuccess: () => onDone?.() });
+    else if (confirm === "noShow") noShow.mutate(a.id, { onSuccess: () => onDone?.() });
+    setConfirm(null);
+  };
   return <>
-    {variant === "buttons" ? (
-      <div className="flex flex-wrap gap-2">
-        {open && <Button size="sm" disabled={pending} onClick={() => setConfirm("complete")}>Mark complete</Button>}
-        {open && <Button size="sm" variant="secondary" disabled={pending} onClick={() => setConfirm("noShow")}>No-show</Button>}
-        <Button size="sm" variant="secondary" disabled={!uploaded.length} onClick={() => setDocs(true)}><FileText />Documents{uploaded.length ? ` (${uploaded.length})` : ""}</Button>
-      </div>
-    ) : (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild><Button size="icon" variant="ghost" aria-label={`Actions for ${a.clients?.name ?? "client"}`} title="Appointment actions" disabled={pending}><MoreHorizontal className="size-4" /></Button></DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 rounded-2xl border-border bg-sheet shadow-lift">
-        {open && <DropdownMenuItem onSelect={() => setConfirm("complete")}>Mark complete</DropdownMenuItem>}
-        {open && <DropdownMenuItem onSelect={() => setConfirm("noShow")}>No-show</DropdownMenuItem>}
-        <DropdownMenuItem disabled={!uploaded.length} onSelect={() => setDocs(true)}><FileText className="size-4" />Open documents{uploaded.length ? ` (${uploaded.length})` : ""}</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-    )}
+    <div className="grid grid-cols-2 gap-2">
+      <Button disabled={pending} onClick={() => setConfirm("complete")}>Mark complete</Button>
+      <Button variant="secondary" disabled={pending} onClick={() => setConfirm("noShow")}>No-show</Button>
+    </div>
     <AlertDialog open={!!confirm} onOpenChange={(v) => { if (!v) setConfirm(null); }}>
       <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
         <AlertDialogHeader>
-          <AlertDialogTitle className="font-sans text-base font-medium">{confirm === "complete" ? `Mark ${a.clients?.name ?? "this client"} complete?` : `Mark ${a.clients?.name ?? "this client"} as a no-show?`}</AlertDialogTitle>
-          <AlertDialogDescription>{confirm === "complete" ? "A signature request for Form 8879 will be sent automatically." : "The appointment is closed and the client gets a link to book again."}</AlertDialogDescription>
+          <AlertDialogTitle className="text-base font-medium">{confirm === "complete" ? `Mark ${name} complete?` : `Mark ${name} as a no-show?`}</AlertDialogTitle>
+          <AlertDialogDescription>{confirm === "complete" ? "A signature request for Form 8879 is sent automatically." : "The appointment is closed and the client gets a link to book again."}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -100,37 +92,59 @@ export function ApptActions({ a, variant = "menu" }: { a: Appt; variant?: "menu"
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-    <DocViewer open={docs} onOpenChange={setDocs} title={a.clients?.name ?? "Documents"} items={a.checklist_items} />
   </>;
 }
-export function ApptCard({ a, showDate = false, embedded = false }: { a: Appt; showDate?: boolean; embedded?: boolean }) {
-  const openClient = useClientDrawer();
-  const missing = missingOf(a).length;
-  return <article className={cn("flex min-h-16 items-center gap-2 border-b border-border px-2 py-2 last:border-0 sm:gap-3 sm:px-3", !embedded && "bg-surface-2")}>
-    <span className="flex w-[58px] shrink-0 items-center gap-1.5"><ReadyRing value={a.ready_score} size={20} stroke={3} /><span className="tabular text-[11px] text-muted-foreground">{a.ready_score}%</span></span>
-    <button type="button" disabled={!a.clients} onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg text-left transition-colors duration-150 hover:bg-fill-subtle sm:gap-3">
-      <span className="tabular w-[68px] shrink-0 text-[13px] font-medium text-deep-ink">{showDate ? fmtDay(a.start_at) : fmtTime(a.start_at)}</span>
-      <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-deep-ink">{a.clients?.name ?? "Client"}</span><span className="block truncate text-xs text-muted-foreground">{a.services?.name}, <MeetingTag type={a.meeting_type} />{showDate ? `, ${fmtTime(a.start_at)}` : ""}</span></span>
+
+/** Readiness shown the same way everywhere: small ring + percentage. */
+export function Readiness({ value }: { value: number }) {
+  return <span className="flex w-[58px] shrink-0 items-center gap-1.5"><ReadyRing value={value} size={20} stroke={3} /><span className="tabular text-[11px] text-muted-foreground">{value}%</span></span>;
+}
+
+/** THE appointment row. Used on Today, Calendar (mobile), client pages and search. Click opens the appointment panel. */
+export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; showDate?: boolean; showClient?: boolean }) {
+  const openAppt = useApptPanel();
+  const done = a.status === "completed" || a.status === "no_show" || a.status === "cancelled";
+  return (
+    <button type="button" onClick={() => openAppt({ appointmentId: a.id })}
+      className={cn("flex min-h-14 w-full items-center gap-3 border-b border-border px-3 py-2 text-left transition-colors duration-150 last:border-0 hover:bg-surface-2", done && "opacity-60")}>
+      <span className={cn("tabular shrink-0 text-[13px] font-medium text-deep-ink", showDate ? "w-[92px]" : "w-[76px]")}>{showDate ? fmtDay(a.start_at) : fmtTime(a.start_at)}{showDate && <span className="block text-[11px] font-normal text-muted-foreground">{fmtTime(a.start_at)}</span>}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium text-deep-ink">{showClient ? a.clients?.name ?? "Client" : a.services?.name}</span>
+        <span className="block truncate text-xs text-muted-foreground">{showClient ? a.services?.name : a.meeting_type === "video" ? "Video" : "In person"}</span>
+      </span>
+      <Readiness value={a.ready_score} />
+      <span className="hidden w-[84px] justify-end sm:flex"><StatusPill status={a.status} /></span>
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
     </button>
-    {missing > 0 && <span title={`${missing} missing documents`} className="hidden shrink-0 rounded border border-warning/20 bg-warning/10 px-1.5 py-0.5 text-[10px] text-warning sm:inline">{missing} missing</span>}
-    <span className="hidden sm:inline"><StatusPill status={a.status} /></span>
-    <ApptActions a={a} />
-  </article>;
+  );
+}
+
+export function ApptList({ appts, showDate = false, showClient = true }: { appts: Appt[]; showDate?: boolean; showClient?: boolean }) {
+  return <div className="overflow-hidden rounded-2xl border border-border">{appts.map((a) => <ApptRow key={a.id} a={a} showDate={showDate} showClient={showClient} />)}</div>;
 }
 
 export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boolean }) {
-  const openClient = useClientDrawer();
-  let icon: ReactNode, title: string, reason: string, action: string, clientId: string | undefined, appointmentId: string | undefined;
-  if (it.kind === "low") { icon = <AlertTriangle className="size-5" />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${it.appt.services?.name}, ${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. Missing ${missingOf(it.appt).map(m => m.document_name).join(", ") || "nothing required"}. They were offered later times.`; action = "Keep appointment"; clientId = it.appt.clients?.id; appointmentId = it.appt.id; }
-  else if (it.kind === "signature") { icon = <PenLine className="size-5" />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send another reminder"; clientId = it.appt.clients?.id; appointmentId = it.appt.id; }
-  else if (it.kind === "failed") { icon = <MailX className="size-5" />; title = `An email didn't arrive: ${it.msg.subject}`; reason = `To ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}. Check the address with the client.`; action = "Dismiss"; }
-  else { icon = <Sparkles className="size-5" />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Just so you know, nothing to do.`; action = "Dismiss"; }
-  return <li className="grid min-h-16 grid-cols-[32px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border-b border-border bg-surface-2 px-3 py-2.5 last:border-0 sm:grid-cols-[32px_minmax(0,1fr)_auto]"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-deep-ink">{clientId ? <button className="text-left hover:text-ink hover:underline" onClick={() => openClient({ clientId, appointmentId })}>{title}</button> : title}</p><p className="truncate text-xs text-muted-foreground" title={reason}>{reason}</p></div><Button size="sm" variant="secondary" disabled={busy} onClick={onAct} className="col-start-2 justify-self-start sm:col-start-auto sm:justify-self-end">{busy ? "Saving…" : action}</Button></li>;
+  const openAppt = useApptPanel();
+  let icon: ReactNode, title: string, reason: string, action: string, appointmentId: string | undefined;
+  if (it.kind === "low") { icon = <AlertTriangle />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. ${missingOf(it.appt).length} documents missing, a later time was offered.`; action = "Keep appointment"; appointmentId = it.appt.id; }
+  else if (it.kind === "signature") { icon = <PenLine />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
+  else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
+  else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
+  return (
+    <li className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-3 py-2.5 last:border-0 sm:flex-nowrap">
+      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span>
+      <button type="button" disabled={!appointmentId} onClick={() => appointmentId && openAppt({ appointmentId })} className="min-w-0 flex-1 basis-[calc(100%-44px)] text-left disabled:cursor-default sm:basis-auto">
+        <span className="block truncate text-sm font-medium text-deep-ink">{title}</span>
+        <span className="block truncate text-xs text-muted-foreground" title={reason}>{reason}</span>
+      </button>
+      <Button size="sm" variant="secondary" disabled={busy} onClick={onAct} className="ml-11 shrink-0 sm:ml-0">{busy ? "Saving…" : action}</Button>
+    </li>
+  );
 }
 export function NeedsList({ items }: { items: NeedItem[] }) {
   const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature);
-  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } toast.success(it.kind === "signature" ? "Reminder sent." : "Done."); qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const [all, setAll] = useState(false);
+  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } toast.success(it.kind === "signature" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const shown = all ? items : items.slice(0, 3);
   return <div>
     <ul className="overflow-hidden rounded-2xl border border-border">{shown.map(it => <NeedRow key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>

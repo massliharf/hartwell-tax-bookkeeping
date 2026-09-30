@@ -42,16 +42,32 @@ export const readinessStyle: Record<Readiness, string> = {
   none: "border-border bg-muted text-muted-foreground",
 };
 
-export type Item = { id: string; document_name: string; required: boolean; status: "missing" | "uploaded" | "not_applicable"; file_path: string | null; uploaded_at: string | null; na_reason: string | null; sort_order: number };
+export type Item = { id: string; document_name: string; required: boolean; status: "missing" | "uploaded" | "not_applicable"; file_path: string | null; uploaded_at: string | null; na_reason: string | null; sort_order: number; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
 export type Appt = {
   id: string; start_at: string; end_at: string; status: string; meeting_type: "in_person" | "video"; ready_score: number;
   signature_status: string; needs_attention: boolean; attention_reason: string | null; client_id: string; service_id: string;
   clients: { id: string; name: string; email: string; phone: string | null } | null;
-  services: { name: string; duration_min: number } | null;
+  services: { name: string; duration_min: number; price_from: number } | null;
+  fee_cents: number | null; paid_at: string | null; paid_method: string | null; filed_at: string | null; finished_at: string | null;
   checklist_items: Item[];
 };
 export const APPT_SELECT =
-  "id, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, clients(id, name, email, phone), services(name, duration_min), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order)";
+  "id, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, fee_cents, paid_at, paid_method, filed_at, finished_at, clients(id, name, email, phone), services(name, duration_min, price_from), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order, ai_check, ai_note, review_status, fix_reason, fix_note)";
+
+export const toReview = (a: Appt) => a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending");
+export const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
+
+/** Finished, signed and paid, but not filed yet. */
+export const readyToFile = () =>
+  queryOptions({
+    queryKey: ["owner", "ready-to-file"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("appointments").select(APPT_SELECT)
+        .eq("status", "completed").eq("signature_status", "signed").not("paid_at", "is", null).is("filed_at", null).order("paid_at");
+      if (error) throw error;
+      return (data ?? []) as unknown as Appt[];
+    },
+  });
 
 export const missingOf = (a: Appt) => a.checklist_items.filter((i) => i.required && i.status === "missing").sort((x, y) => x.sort_order - y.sort_order);
 
@@ -77,11 +93,17 @@ export const MSG_LABEL: Record<string, string> = {
   signature_reminder: "Signature reminder",
   missing_docs_after: "Missing documents",
   new_season: "New season",
+  payment_reminder: "Payment reminder",
+  doc_fix_request: "Document needs a fix",
+  review_sign_pay: "Review, sign and pay",
+  return_filed: "Return filed",
 };
 
 export type NeedItem =
   | { kind: "low"; id: string; appt: Appt }
   | { kind: "signature"; id: string; appt: Appt }
+  | { kind: "review"; id: string; count: number; appt: Appt }
+  | { kind: "unpaid"; id: string; appt: Appt }
   | { kind: "failed"; id: string; msg: { id: string; subject: string | null; recipient: string | null; error: string | null; sent_at: string; type: string } }
   | { kind: "claimed"; id: string; offer: { id: string; slot_start: string; name: string; service: string } };
 
@@ -92,16 +114,28 @@ export const needsYou = (nowIso: string) =>
       const now = new Date(nowIso).getTime();
       const in48 = new Date(now + 48 * 3600e3).toISOString();
       const ago3 = new Date(now - 3 * 86400e3).toISOString();
-      const [low, sig, failed, claimed] = await Promise.all([
+      const ago5 = new Date(now - 5 * 86400e3).toISOString();
+      const [low, sig, failed, claimed, rev, unpaid] = await Promise.all([
         supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lt("ready_score", 70)
           .gt("start_at", nowIso).lte("start_at", in48).order("start_at"),
-        supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").lt("end_at", ago3).order("end_at"),
+        supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").is("filed_at", null).lt("end_at", ago3).order("end_at"),
         supabase.from("messages").select("id, subject, recipient, error, sent_at, type").eq("delivery", "failed").order("sent_at", { ascending: false }),
         supabase.from("waitlist_offers").select("id, slot_start, services(name), waitlist(clients(name))").eq("status", "claimed").order("slot_start"),
+        supabase.from("checklist_items").select("appointment_id, appointments!inner(start_at, status)").eq("status", "uploaded").eq("review_status", "pending").neq("appointments.status", "cancelled"),
+        supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null).lt("finished_at", ago5).order("finished_at"),
       ]);
-      const err = low.error ?? sig.error ?? failed.error ?? claimed.error;
+      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error;
       if (err) throw err;
+      const revRows = (rev.data ?? []) as unknown as { appointment_id: string; appointments: { start_at: string } }[];
+      let review: NeedItem[] = [];
+      if (revRows.length) {
+        const firstId = [...revRows].sort((x, y) => Math.abs(new Date(x.appointments.start_at).getTime() - now) - Math.abs(new Date(y.appointments.start_at).getTime() - now))[0]!.appointment_id;
+        const { data: fa } = await supabase.from("appointments").select(APPT_SELECT).eq("id", firstId).maybeSingle();
+        if (fa) review = [{ kind: "review", id: firstId, count: revRows.length, appt: fa as unknown as Appt }];
+      }
       return [
+        ...review,
+        ...((unpaid.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "unpaid" as const, id: a.id, appt: a })),
         ...((low.data ?? []) as unknown as Appt[]).filter((a) => a.attention_reason !== "handled").map((a) => ({ kind: "low" as const, id: a.id, appt: a })),
         ...((sig.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "signature" as const, id: a.id, appt: a })),
         ...(failed.data ?? []).map((m) => ({ kind: "failed" as const, id: m.id, msg: m })),

@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { DocumentStack } from "@/components/brand/DocumentStack";
+import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
@@ -163,36 +164,37 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
       <div className="mb-6 text-sm text-muted-foreground">
         Booked with us before? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Use the 30-second returning client path</Link>
       </div>
-       {services.isLoading && <div className="grid gap-5 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
+       {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
-       <div className="grid gap-5 sm:grid-cols-2">
+       <div className="grid gap-3 sm:grid-cols-2">
         {services.data?.map((s) => {
           const active = s.slug === selected;
           return (
-             <Button
+             <button
               key={s.id}
-               variant="secondary"
+              type="button"
               onClick={() => onPick(s.slug)}
-               aria-pressed={active}
-                className={`group h-auto min-h-36 w-full flex-col items-stretch whitespace-normal rounded-2xl p-4 text-left transition-colors duration-150 ${active ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary hover:bg-fill-indicator"}`}
+              aria-pressed={active}
+              className={`flex min-h-36 w-full flex-col rounded-2xl border bg-sheet p-4 text-left transition-colors duration-150 ${active ? "border-deep-ink ring-1 ring-deep-ink" : "border-border hover:bg-surface-2"}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <h2 className={`t-card ${active ? "text-primary-foreground" : "text-deep-ink"}`}>{s.name}</h2>
-                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-primary-foreground" : "border-border bg-sheet"}`} />
+                <ServiceIcon service={s.slug} size={40} />
+                <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-deep-ink" : "border-border bg-sheet"}`} />
               </div>
-              <p className={`mt-1 text-sm ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{s.description}</p>
-              <div className="mt-4 flex items-center justify-between text-sm">
-                <span className={`tabular ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{s.duration_min} min</span>
-                <span className={active ? "text-primary-foreground" : "text-deep-ink"}>
-                  {s.is_from_price && <span className={`mr-1 text-xs ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>from</span>}
+              <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
+              <p className="mt-0.5 text-sm text-muted-foreground">{s.description}</p>
+              <div className="mt-auto flex items-center justify-between pt-4 text-sm">
+                <span className="tabular text-muted-foreground">{s.duration_min} min</span>
+                <span className="text-deep-ink">
+                  {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
                   <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
                 </span>
               </div>
-             </Button>
+             </button>
           );
         })}
       </div>
@@ -255,7 +257,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 14 } }), staleTime: 30_000 });
   const days = q.data?.days ?? [];
   const firstOpen = days.find((d) => d.slots.length)?.date;
-  const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : undefined;
+  const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
 
   return (
@@ -313,7 +315,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
                  });
                  return slots.length ? <div key={period}><h2 className="mb-2 text-sm font-medium text-deep-ink">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{slots.map((s) => (
                    <Button key={s} variant="secondary" onClick={() => update({ date: day.date, slot: s })} aria-pressed={draft.slot === s && draft.date === day.date}
-                     className={`tabular h-8 rounded-lg text-xs font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-indicator"}`}>
+                     className={`tabular h-11 rounded-lg text-sm font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-indicator"}`}>
                      {fmtTime(s)}
                    </Button>
                  ))}</div></div> : null;

@@ -164,17 +164,17 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {appt.status === "confirmed" ? (
-          <span className="inline-flex h-10 items-center gap-2 rounded-full bg-success/15 px-4 text-sm font-medium text-success"><Check className="size-4" /> You'll be there</span>
+          <span className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-success/10 px-3 text-sm font-medium text-success"><Check className="size-4" /> Confirmed</span>
         ) : (
-          <Button onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
+          <Button size="lg" onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
             {busy === "confirm" ? <Loader2 className="" /> : <Check />} I'll be there
           </Button>
         )}
-        <Button variant="outline" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
+        <Button size="lg" variant="secondary" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="ghost" className="text-muted-foreground">Cancel</Button></AlertDialogTrigger>
+          <AlertDialogTrigger asChild><Button size="lg" variant="secondary" className="text-destructive">Cancel</Button></AlertDialogTrigger>
           <AlertDialogContent className="rounded-2xl bg-sheet">
             <AlertDialogHeader>
               <AlertDialogTitle className="t-card">Cancel this appointment?</AlertDialogTitle>

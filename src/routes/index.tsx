@@ -1,20 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Briefcase, Building2, Check, FileSpreadsheet, FileText, Home as HomeIcon, KeyRound, Lock, Receipt, ShieldCheck, Trash2, Video, MapPin, Clock } from "lucide-react";
+import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { AnnouncementBar, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
+import { serviceStyle } from "@/lib/service-style";
 import claire from "@/assets/claire-portrait.jpg";
 
-const SERVICE_STYLE: Record<string, { icon: typeof Receipt; rgb: string }> = {
-  individual: { icon: Receipt, rgb: "79,105,242" },
-  "self-employed": { icon: Briefcase, rgb: "133,102,220" },
-  rental: { icon: HomeIcon, rgb: "30,91,71" },
-  extension: { icon: FileSpreadsheet, rgb: "196,120,44" },
-  bookkeeping: { icon: Building2, rgb: "33,124,150" },
-};
+
 
 
 const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
@@ -100,7 +95,7 @@ function Hero() {
         <p className="mb-3 text-xs font-medium text-muted-foreground">Start with what you need</p>
         <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-5 sm:overflow-visible">
           {SERVICES.map((s) => {
-            const st = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
+            const st = serviceStyle(s.id);
             const Icon = st.icon;
             return (
               <li key={s.id} className="shrink-0">
@@ -230,7 +225,7 @@ function Services() {
       <SectionHead title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
       <ul className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border">
         {SERVICES.map((s) => {
-          const st = SERVICE_STYLE[s.id] ?? { icon: Receipt, rgb: "30,91,71" };
+          const st = serviceStyle(s.id);
           const Icon = st.icon;
           return (
             <li key={s.id} className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-4 bg-sheet px-4 py-4 transition-colors duration-150 hover:bg-surface-2 sm:grid-cols-[40px_minmax(0,1fr)_90px_110px_auto] sm:px-5">

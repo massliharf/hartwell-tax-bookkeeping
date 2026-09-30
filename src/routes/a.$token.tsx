@@ -50,7 +50,7 @@ type Item = { id: string; document_name: string; description: string | null; req
 function PortalPage() {
   const { token } = Route.useParams();
   const fetchAppt = useServerFn(getAppointmentByToken);
-  const q = useQuery({ queryKey: ["portal", token], queryFn: () => fetchAppt({ data: { token } }) });
+  const q = useQuery({ queryKey: ["portal", token], queryFn: () => fetchAppt({ data: { token } }), retry: false });
   const refresh = () => q.refetch();
 
   if (q.isError || (q.data && !q.data.appointment)) {

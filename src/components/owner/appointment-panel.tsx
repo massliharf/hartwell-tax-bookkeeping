@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { APPT_SELECT, fmtLong, fmtTime, missingOf, type Appt } from "./lib";
-import { ApptActionButtons, DocViewer, ErrorNote, StatusPill } from "./ui";
+import { ApptActionButtons, ErrorNote, StatusPill } from "./ui";
+import { ReviewGallery } from "./review-gallery";
 import { AiTag, CloseoutBlock, DocReview, FinishForm } from "./closeout";
 import { reviewDocument } from "@/lib/owner.functions";
 import type { ApptPanelTarget } from "./drawer-context";
@@ -29,7 +30,7 @@ export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget 
 }
 
 function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }) {
-  const [viewer, setViewer] = useState<{ open: boolean; startId?: string | undefined }>({ open: false });
+  const [gallery, setGallery] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const review = useServerFn(reviewDocument);
@@ -87,7 +88,10 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           <ReadyRing value={a.ready_score} size={40} stroke={4} />
           <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
         </div>}
-        {looksRight.length >= 2 && <Button size="sm" variant="secondary" className="mt-4" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
+        {(() => { const n = items.filter((i) => i.status === "uploaded").length; return <div className="mt-4 flex flex-wrap gap-2">
+          {n > 0 && <Button size="sm" onClick={() => setGallery(true)}>Review documents ({n})</Button>}
+          {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
+        </div>; })()}
         <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">
           {items.map((i) => (
             <li key={i.id} className="px-4 py-2.5"><div className="flex flex-wrap items-center gap-2.5 text-sm">
@@ -97,13 +101,11 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
               <span className={cn("min-w-[100px] flex-1", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
               <AiTag i={i} />
               {i.status === "uploaded" && i.review_status === "pending" && <div className="order-last w-full sm:order-none sm:w-auto"><DocReview i={i} inline /></div>}
-              {i.status === "uploaded"
-                ? <Button size="sm" variant="ghost" onClick={() => setViewer({ open: true, startId: i.id })}>View</Button>
-                : <span className={cn("text-xs", i.status === "not_applicable" ? "text-muted-foreground" : "text-warning")}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</span>}
+              {i.status !== "uploaded" && <span className={cn("text-xs", i.status === "not_applicable" ? "text-muted-foreground" : "text-warning")}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</span>}
             </div>{i.ai_note && <p className={cn("mt-1 pl-6 text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{i.ai_note}</p>}{!(i.status === "uploaded" && i.review_status === "pending") && <DocReview i={i} />}</li>
           ))}
         </ul>
-        <DocViewer open={viewer.open} startId={viewer.startId} onOpenChange={(o) => setViewer((v) => ({ ...v, open: o }))} title={a.clients?.name ?? "Documents"} items={items} />
+        <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
       </section>
       <CloseoutBlock a={a} />
 

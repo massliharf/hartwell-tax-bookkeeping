@@ -1,3 +1,4 @@
+import { NewAppointmentButton } from "@/components/owner/new-appointment";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useOwnerCtx } from "@/components/owner/ctx";
@@ -28,7 +29,7 @@ function Today() {
     { label: "Ready to file", value: toFile.data ? toFile.data.length : null, target: "today-to-file", firstId: toFile.data?.[0]?.id },
   ];
   return <>
-    <PageHead title={`${hi}, Claire.`} meta={fmtLong(now)} />
+    <PageHead title={`${hi}, Claire.`} meta={fmtLong(now)} actions={<NewAppointmentButton />} />
     <div className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4">{tiles.map(tile => <Button key={tile.label} variant="ghost" disabled={tile.value === 0} onClick={() => { if (tile.firstId && !document.getElementById(tile.target)) openAppt({ appointmentId: tile.firstId }); else document.getElementById(tile.target)?.scrollIntoView({ behavior: "smooth" }); }} className="h-auto min-h-[72px] flex-col items-start rounded-lg border border-border bg-surface-2 p-3 text-left hover:bg-fill-selected"><span className="whitespace-normal text-xs text-muted-foreground">{tile.label}</span>{tile.value === null ? <Skeleton className="mt-2 h-6 w-10" /> : <span className="tabular mt-1 text-xl font-medium text-deep-ink">{tile.value}</span>}</Button>)}</div>
     {needs.isError && <ErrorNote onRetry={() => needs.refetch()} />}
     {review.length > 0 && <section id="today-review" className="mb-8 scroll-mt-20"><h2 className="mb-3 text-sm font-medium text-deep-ink">Documents to review</h2><NeedsList items={review} /></section>}

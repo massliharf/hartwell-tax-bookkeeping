@@ -16,7 +16,7 @@ async function appointmentByToken(token: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("appointments")
-    .select("id, service_id, start_at, end_at, meeting_type, status, ready_score, signature_status, signed_at, fee_cents, client_note, paid_at, filed_at, finished_at, services(name, duration_min), clients(name)")
+    .select("id, service_id, start_at, end_at, meeting_type, status, ready_score, signature_status, signed_at, fee_cents, client_note, paid_at, filed_at, finished_at, intake_answers, services(name, duration_min, slug), clients(name)")
     .eq("manage_token", token)
     .maybeSingle();
   return { supabaseAdmin, appt: data };
@@ -207,5 +207,21 @@ export const testPay = createServerFn({ method: "POST" })
     if (!appt || appt.status !== "completed" || appt.paid_at || !appt.fee_cents) return { ok: false };
     const { getNow } = await import("./clock.server");
     await supabaseAdmin.from("appointments").update({ paid_at: (await getNow()).toISOString(), paid_method: "test" }).eq("id", appt.id).is("paid_at", null);
+    return { ok: true };
+  });
+
+/** Phone-in bookings: the client answers the intake questions from their link; the checklist is rebuilt. */
+export const saveIntake = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ token: tokenSchema, intake: z.record(z.string(), z.unknown()) }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin, appt } = await appointmentByToken(data.token);
+    if (!appt) throw new Error("Link not found");
+    const cur = (appt.intake_answers ?? {}) as Record<string, unknown>;
+    if (!cur["intake_pending"] || !["booked", "confirmed"].includes(appt.status)) return { ok: false };
+    const intake = { ...data.intake };
+    delete intake["intake_pending"];
+    await supabaseAdmin.from("appointments").update({ intake_answers: intake as never }).eq("id", appt.id);
+    await supabaseAdmin.rpc("generate_checklist", { _appointment_id: appt.id });
+    await supabaseAdmin.rpc("compute_ready_score", { _id: appt.id });
     return { ok: true };
   });

@@ -5,7 +5,8 @@ import { AppointmentPanel } from "@/components/owner/appointment-panel";
 import { ApptPanelContext, type ApptPanelTarget } from "@/components/owner/drawer-context";
 import { useLocation } from "@tanstack/react-router";
 import { BarChart3, CalendarDays, Inbox, LogOut, Settings, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -32,8 +33,9 @@ const NAV = [
   { to: "/owner/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/owner/clients", label: "Clients", icon: Users },
   { to: "/owner/insights", label: "Report", icon: BarChart3 },
+  { to: "/owner/settings", label: "Settings", icon: Settings },
 ] as const;
-const PAGES = [...NAV, { to: "/owner/settings", label: "Settings", icon: Settings }] as const;
+const PAGES = NAV;
 
 function OwnerLayout() {
   const ctx = useOwnerCtx();
@@ -47,7 +49,8 @@ function OwnerLayout() {
   const [panel, setPanel] = useState<ApptPanelTarget | null>(null);
   const [paletteTerm, setPaletteTerm] = useState("");
   const clients = useQuery({ queryKey: ["owner", "clients"], enabled: !!ctx.data?.isOwner && paletteOpen, queryFn: async () => { const { data, error } = await supabase.from("clients").select("id, name, email, phone, is_returning, appointments(start_at, status)").order("name"); if (error) throw error; return data ?? []; } });
-  useEffect(() => { setCollapsed(localStorage.getItem("owner-sidebar") === "1"); }, []);
+  const [email, setEmail] = useState("");
+  useEffect(() => { setCollapsed(localStorage.getItem("owner-sidebar") === "1"); void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
   const toggle = () => setCollapsed((c) => { localStorage.setItem("owner-sidebar", c ? "0" : "1"); return !c; });
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setPaletteOpen((o) => !o); } };
@@ -76,12 +79,12 @@ function OwnerLayout() {
   }
 
   const current = PAGES.find((n) => ("exact" in n ? path === n.to : path.startsWith(n.to))) ?? PAGES[0];
-  const mobileMain = NAV;
-  const mobileMore = [PAGES[4]];
+  const mobileMain = NAV.slice(0, 4);
+  const mobileMore = NAV.slice(4);
   const item = "flex h-8 items-center gap-2.5 rounded-lg pr-2 text-xs text-sidebar-foreground transition-colors duration-150 hover:bg-fill-subtle";
 
   return (
-    <ApptPanelContext.Provider value={setPanel}><div className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2">
+    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2">
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-4 rounded-2xl bg-sheet py-4  sm:flex ${collapsed ? "w-[72px] px-5" : "w-56 px-5"}`}>
         <div className="flex h-8 items-center justify-between">
           {!collapsed && <Link to="/" className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</Link>}
@@ -103,8 +106,10 @@ function OwnerLayout() {
         <div className="h-px bg-border" />
         <div className="flex-1" />
         {!collapsed && <DemoTools inline />}
-        <div className={`flex ${collapsed ? "flex-col" : ""} gap-1`}>
-          <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-9 w-full justify-start gap-2 px-1" title="Claire Hartwell"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs">CH</span>{!collapsed && <span className="truncate text-xs">Claire Hartwell</span>}</Button></DropdownMenuTrigger><DropdownMenuContent side="top" align="start" className="w-56 rounded-2xl shadow-lift"><DropdownMenuItem asChild><Link to="/owner/settings"><Settings className="size-4" />Settings</Link></DropdownMenuItem><DropdownMenuItem onSelect={signOut}><LogOut className="size-4" />Sign out</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+        <div className={`flex items-center gap-2 border-t border-border pt-3 ${collapsed ? "flex-col" : ""}`}>
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink" title={collapsed ? `Claire Hartwell, ${email}` : undefined}>CH</span>
+          {!collapsed && <span className="min-w-0 flex-1"><span className="block truncate text-xs font-medium text-deep-ink">Claire Hartwell</span><span className="block truncate text-[11px] text-muted-foreground">{email}</span></span>}
+          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="ghost" aria-label="Sign out" onClick={signOut}><LogOut className="size-3.5" /></Button></TooltipTrigger><TooltipContent side={collapsed ? "right" : "top"}>Sign out</TooltipContent></Tooltip>
         </div>
       </aside>
 
@@ -144,6 +149,7 @@ function OwnerLayout() {
                 <Link to={n.to}><n.icon className="size-3.5" />{n.label}</Link>
               </DropdownMenuItem>
             ))}
+            <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={signOut} className="h-8 gap-2.5 rounded-lg text-xs"><LogOut className="size-3.5" />Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -174,6 +180,6 @@ function OwnerLayout() {
         </CommandList>
       </CommandDialog>
       <AppointmentPanel target={panel} onClose={() => setPanel(null)} />
-    </div></ApptPanelContext.Provider>
+    </div></TooltipProvider></ApptPanelContext.Provider>
   );
 }

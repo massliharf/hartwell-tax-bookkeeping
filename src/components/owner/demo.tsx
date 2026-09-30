@@ -1,13 +1,37 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { FlaskConical, Mail, Smartphone, X } from "lucide-react";
+import { ExternalLink, FlaskConical, Mail, Smartphone, X } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { demoAbandon, demoCancelTomorrow, demoClaim, demoJump, demoReset, demoRun, demoUpload, phoneFeed } from "@/lib/demo.functions";
+import { demoAbandon, demoCancelTomorrow, demoClaim, demoClientPays, demoJump, demoPortalLink, demoReset, demoRun, demoUpload, demoWrongDoc, phoneFeed } from "@/lib/demo.functions";
 
 type Msg = { id: string; channel: string; type: string; subject: string | null; body: string; sent_at: string; recipient: string | null; name: string | null };
+
+const STORY: { title: string; actions: { k: string; label: string; hint: string; link?: boolean }[] }[] = [
+  { title: "A client books", actions: [
+    { k: "book", label: "Open the booking page", hint: "Book as a client in a new tab. It appears in Today right away.", link: true },
+    { k: "portal", label: "Open a client's private page", hint: "The page every confirmation email links to.", link: true },
+  ] },
+  { title: "Documents come in", actions: [
+    { k: "up", label: "Client uploads a document", hint: "Shows up in Documents to review with a sample file." },
+    { k: "wrong", label: "Client uploads last year's W-2", hint: "The AI check flags the wrong year before Claire sees it." },
+  ] },
+  { title: "Before the appointment", actions: [
+    { k: "j1", label: "Jump ahead 1 day", hint: "Runs reminders and the 48-hour readiness check." },
+    { k: "j7", label: "Jump ahead 7 days", hint: "Sends document reminders for next week's clients." },
+    { k: "run", label: "Run automations now", hint: "Sends anything due. Nothing is ever sent twice." },
+  ] },
+  { title: "Someone cancels", actions: [
+    { k: "cx", label: "A client cancels tomorrow", hint: "The waitlist is offered the freed slot by email." },
+    { k: "cl", label: "Waitlist client claims it", hint: "The slot refills with no work from Claire." },
+    { k: "ab", label: "Someone leaves a booking half-done", hint: "A friendly nudge goes out an hour later." },
+  ] },
+  { title: "After the appointment", actions: [
+    { k: "pays", label: "Client signs and pays", hint: "Use after Finish appointment. The return moves to Ready to file." },
+  ] },
+];
 
 export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
   const [open, setOpen] = useState(false);
@@ -17,6 +41,7 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
   const fns = {
     run: useServerFn(demoRun), jump: useServerFn(demoJump), upload: useServerFn(demoUpload),
     cancel: useServerFn(demoCancelTomorrow), claim: useServerFn(demoClaim), abandon: useServerFn(demoAbandon), reset: useServerFn(demoReset),
+    wrong: useServerFn(demoWrongDoc), pays: useServerFn(demoClientPays), portal: useServerFn(demoPortalLink),
   };
 
   const act = async (key: string, fn: () => Promise<{ message: string }>) => {
@@ -32,11 +57,17 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
     }
   };
 
-  const Row = ({ k, label, fn, variant = "outline" }: { k: string; label: string; fn: () => Promise<{ message: string }>; variant?: "outline" | "default" }) => (
-    <Button variant={variant} className="w-full justify-start" disabled={!!busy} onClick={() => act(k, fn)}>
-      {busy === k ? "Working…" : label}
-    </Button>
-  );
+
+  const openTab = (url: string) => window.open(url, "_blank", "noopener");
+  const run = (k: string) => {
+    if (k === "book") return openTab("/book");
+    if (k === "portal") return act(k, async () => { const r = await fns.portal(); if (r.token) openTab(`/a/${r.token}`); return { message: r.token ? "Opened the client's private page in a new tab." : "No upcoming appointment to open." }; });
+    const map: Record<string, () => Promise<{ message: string }>> = {
+      run: () => fns.run(), j1: () => fns.jump({ data: { days: 1 } }), j2: () => fns.jump({ data: { days: 2 } }), j7: () => fns.jump({ data: { days: 7 } }),
+      up: () => fns.upload(), wrong: () => fns.wrong(), cx: () => fns.cancel(), cl: () => fns.claim(), ab: () => fns.abandon(), pays: () => fns.pays(), rs: () => fns.reset(),
+    };
+    return act(k, map[k]!);
+  };
 
   return (
     <>
@@ -44,41 +75,35 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
         <Button size="icon" variant={phone ? "default" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className={inline ? "size-8 rounded-lg" : "h-11 w-11 rounded-full"}>
           <Smartphone className="h-4 w-4" />
         </Button>
-        <Button onClick={() => setOpen(true)} className={inline ? "h-8 flex-1 gap-2 rounded-lg px-3 text-xs" : "h-11 gap-2 rounded-full px-4 text-sm"}>
+        <Button variant={inline ? "secondary" : "default"} onClick={() => setOpen(true)} className={inline ? "h-8 flex-1 gap-2 rounded-lg px-3 text-xs" : "h-11 gap-2 rounded-full px-4 text-sm"}>
           <FlaskConical className="h-4 w-4" /> {inline ? "Demo tools" : "Demo"}
         </Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="t-owner">Test controls</DialogTitle>
-            <DialogDescription>Show the follow-through live. Only you can see this.</DialogDescription>
+            <DialogDescription>Walk through a whole season in a few clicks. Only you can see this.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-6">
-            <section className="space-y-2">
-              <Row k="run" label="Run automations now" variant="default" fn={() => fns.run()} />
-            </section>
-            <section className="space-y-2">
-              <h3 className="text-xs text-muted-foreground">Jump forward</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {([1, 2, 7] as const).map((d) => (
-                  <Button key={d} variant="outline" disabled={!!busy} onClick={() => act(`j${d}`, () => fns.jump({ data: { days: d } }))}>
-                    {busy === `j${d}` ? "…" : `+${d} day${d > 1 ? "s" : ""}`}
-                  </Button>
-                ))}
-              </div>
-            </section>
-            <section className="space-y-2">
-              <h3 className="text-xs text-muted-foreground">Simulate</h3>
-              <Row k="up" label="Client uploads a document" fn={() => fns.upload()} />
-              <Row k="cx" label="Client cancels an appointment tomorrow" fn={() => fns.cancel()} />
-              <Row k="cl" label="Waitlist client claims the slot" fn={() => fns.claim()} />
-              <Row k="ab" label="Abandoned booking" fn={() => fns.abandon()} />
-            </section>
-            <section className="border-t border-border pt-4">
-              <Row k="rs" label="Reset demo data" fn={() => fns.reset()} />
-            </section>
+          <ol className="space-y-5">
+            {STORY.map((step, n) => (
+              <li key={step.title}>
+                <p className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground"><span className="tabular grid size-5 place-items-center rounded-full bg-fill-neutral text-[11px] text-deep-ink">{n + 1}</span>{step.title}</p>
+                <ul className="divide-y divide-border rounded-xl border border-border">
+                  {step.actions.map((x) => (
+                    <li key={x.k} className="flex items-center gap-3 px-3 py-2.5">
+                      <span className="min-w-0 flex-1"><span className="block text-sm text-deep-ink">{x.label}</span><span className="block text-xs text-muted-foreground">{x.hint}</span></span>
+                      <Button size="sm" variant="secondary" disabled={!!busy} onClick={() => run(x.k)}>{busy === x.k ? "Working…" : x.link ? <><ExternalLink />Open</> : "Run"}</Button>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+          <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
+            <span className="text-xs text-muted-foreground">Puts every appointment, message and document back to the start.</span>
+            <Button size="sm" variant="secondary" className="text-destructive" disabled={!!busy} onClick={() => run("rs")}>{busy === "rs" ? "Resetting…" : "Reset demo data"}</Button>
           </div>
         </DialogContent>
       </Dialog>

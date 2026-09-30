@@ -56,6 +56,9 @@
   --color-sheet: var(--sheet);
   --color-paper-deep: var(--paper-deep);
   --color-ink: var(--ink-green);
+  --color-ink-50: var(--ink-50);
+  --color-ink-100: var(--ink-100);
+  --color-ink-900: var(--ink-900);
   --color-deep-ink: var(--deep-ink);
   --color-marigold: var(--marigold);
   --color-sage: var(--sage);
@@ -90,6 +93,9 @@
   --paper: #FAFAFA;
   --paper-deep: #EDEDED;
   --ink-green: #1E5B47;
+  --ink-50: #EEF4F1;
+  --ink-100: #DCEAE3;
+  --ink-900: #123A2E;
   --deep-ink: #1A1A1A;
   --marigold: #E0A13A;
   --sage: #EDEDED;
@@ -189,3 +195,7 @@
 @utility t-section { font-family: var(--font-serif); font-weight: 500; font-size: 26px; line-height: 34px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 32px; line-height: 40px; } }
 @utility t-card { font-family: var(--font-serif); font-weight: 500; font-size: 20px; line-height: 30px; letter-spacing: -0.2px; }
 @utility t-owner { font-family: var(--font-sans); font-weight: 400; font-size: 18px; line-height: 26px; letter-spacing: 0; }
+
+/* Page-level entrance (DESIGN_SYSTEM.md: fade in, 200ms, decelerate). Disabled for reduced motion by the global rule. */
+@utility enter { animation: enter-fade 200ms cubic-bezier(0, 0, 0.2, 1) both; }
+@keyframes enter-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }

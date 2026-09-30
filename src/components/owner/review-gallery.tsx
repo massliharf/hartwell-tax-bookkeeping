@@ -10,7 +10,16 @@ import { AiTag, DocReview } from "./closeout";
 import type { Item } from "./lib";
 import { cn } from "@/lib/utils";
 
-type Loaded = { url: string; blob: Blob; pdf: boolean; ext: string; pages: string[] } | { error: true };
+type Loaded = { url: string; blob: Blob; pdf: boolean; ext: string; pages: string[]; sample?: boolean } | { error: true };
+
+/** Demo data has checklist items marked "uploaded" without a stored file. Show a clearly labelled sample instead of an empty frame. */
+const SAMPLES: [RegExp, string][] = [
+  [/photo id/i, "photo-id"], [/last year|prior year/i, "last-year"], [/w-2/i, "w-2"], [/1099-nec|1099-k/i, "1099-nec"],
+  [/income & expense|income and expense/i, "income-expense"], [/home office/i, "home-office"], [/1099-int/i, "1099-int"],
+  [/1099-b/i, "1099-b"], [/1098-e/i, "1098-e"], [/1098/i, "1098"], [/childcare|dependent care/i, "childcare"],
+  [/rental/i, "rental"], [/property tax/i, "property-tax"], [/irs letter|notice/i, "irs-letter"],
+];
+const sampleFor = (name: string) => `/demo-docs/${SAMPLES.find(([re]) => re.test(name))?.[1] ?? "generic"}.jpg`;
 
 /** Renders every page of a PDF into PNG object URLs (lazy-loaded pdf.js, browser only). */
 async function pdfPages(blob: Blob): Promise<string[]> {
@@ -56,7 +65,15 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
     for (const f of files) {
       const k = `${f.id}:${f.file_path}`;
       if (loaded[k]) continue;
-      if (!f.file_path) { setLoaded((m) => ({ ...m, [k]: { error: true } })); continue; }
+      if (!f.file_path) {
+        (async () => {
+          try {
+            const blob = await (await fetch(sampleFor(f.document_name))).blob();
+            if (live) setLoaded((m) => ({ ...m, [k]: { url: URL.createObjectURL(blob), blob, pdf: false, ext: "jpg", pages: [], sample: true } }));
+          } catch { if (live) setLoaded((m) => ({ ...m, [k]: { error: true } })); }
+        })();
+        continue;
+      }
       (async () => {
         try {
           const r = await getUrl({ data: { itemId: f.id } });
@@ -205,6 +222,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
           <aside className="sticky bottom-0 shrink-0 border-t border-border bg-sheet p-4 md:static md:overflow-y-auto md:border-l md:border-t-0 md:p-5">
             {cur && <>
               <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-deep-ink">{cur.document_name}</p><AiTag i={cur} /></div>
+              {curLoaded && !("error" in curLoaded) && curLoaded.sample && <p className="mt-2 rounded-lg bg-fill-subtle px-2.5 py-1.5 text-[11px] text-muted-foreground">Demo data: a sample document is shown in place of the client's file.</p>}
               {cur.ai_note && <p className={cn("mt-2 text-xs", cur.ai_check === "warning" || cur.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{cur.ai_note}{cur.ai_check === "kept" && " The client chose to keep it."}</p>}
               <div className="mt-3"><DocReview key={cur.id} i={cur} inline onDone={next} /></div>
               {cur.review_status === "accepted" && <p className="mt-2 text-xs text-muted-foreground">Accepted. Use the arrows to keep going.</p>}

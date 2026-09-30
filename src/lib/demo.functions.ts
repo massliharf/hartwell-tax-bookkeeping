@@ -58,21 +58,60 @@ export const demoJump = createServerFn({ method: "POST" }).middleware([requireSu
     return { message: `Jumped ${data.days} day${data.days > 1 ? "s" : ""} ahead. ${n} message${n === 1 ? "" : "s"} went out.` };
   });
 
-export const demoUpload = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
-  const { s, getNow } = await owner(context);
+const SAMPLE_FILES: [RegExp, string][] = [
+  [/photo id/i, "photo-id"], [/last year|prior year/i, "last-year"], [/w-2/i, "w-2"], [/1099-nec|1099-k/i, "1099-nec"],
+  [/income & expense/i, "income-expense"], [/home office/i, "home-office"], [/1099-int/i, "1099-int"], [/1099-b/i, "1099-b"],
+  [/1098-e/i, "1098-e"], [/1098/i, "1098"], [/childcare/i, "childcare"], [/rental/i, "rental"], [/property tax/i, "property-tax"], [/irs letter/i, "irs-letter"],
+];
+
+/** Simulates a client upload with a realistic sample image (stored privately like a real upload). */
+async function simulateUpload(context: Parameters<typeof owner>[0], opts: { wrongYear: boolean }) {
+  const { s, getNow, origin } = await owner(context);
   const now = (await getNow()).toISOString();
-  const { data: items } = await s.from("checklist_items")
+  let q = s.from("checklist_items")
     .select("id, document_name, appointment_id, appointments!inner(start_at, status, clients(name))")
     .eq("status", "missing").eq("required", true).in("appointments.status", ["booked", "confirmed"])
-    .gt("appointments.start_at", now).order("start_at", { referencedTable: "appointments" }).limit(1);
+    .gt("appointments.start_at", now);
+  if (opts.wrongYear) q = q.ilike("document_name", "%W-2%");
+  const { data: items } = await q.order("start_at", { referencedTable: "appointments" }).limit(1);
   const it = items?.[0];
-  if (!it) return { message: "No missing documents left to upload." };
-  const path = `${it.appointment_id}/${it.id}-demo.pdf`;
-  const pdf = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 200]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF";
-  await s.storage.from("client-documents").upload(path, new Blob([pdf], { type: "application/pdf" }), { upsert: true });
-  await s.from("checklist_items").update({ status: "uploaded", file_path: path, uploaded_at: now }).eq("id", it.id);
+  if (!it) return { message: opts.wrongYear ? "No missing W-2 left to simulate." : "No missing documents left to upload." };
+  const slug = SAMPLE_FILES.find(([re]) => re.test(it.document_name))?.[1] ?? "generic";
+  const path = `${it.appointment_id}/${it.id}-demo.jpg`;
+  const img = await fetch(`${origin}/demo-docs/${slug}.jpg`).then((r) => (r.ok ? r.blob() : null)).catch(() => null);
+  if (img) await s.storage.from("client-documents").upload(path, img, { upsert: true, contentType: "image/jpeg" });
+  await s.from("checklist_items").update({
+    status: "uploaded", file_path: img ? path : null, uploaded_at: now, review_status: "pending", fix_reason: null, fix_note: null,
+    ai_check: opts.wrongYear ? "warning" : "ok",
+    ai_note: opts.wrongYear ? "This looks like a 2024 W-2. We need the 2025 one." : `Looks like the right ${it.document_name} for this client.`,
+  }).eq("id", it.id);
+  await s.rpc("compute_ready_score", { _id: it.appointment_id });
   const name = (it.appointments as unknown as { clients: { name: string } | null }).clients?.name ?? "A client";
-  return { message: `${name} uploaded "${it.document_name}".` };
+  return { message: opts.wrongYear ? `${name} uploaded last year's W-2. The AI flagged it in Documents to review.` : `${name} uploaded "${it.document_name}". It's waiting in Documents to review.` };
+}
+
+export const demoUpload = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => simulateUpload(context, { wrongYear: false }));
+export const demoWrongDoc = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => simulateUpload(context, { wrongYear: true }));
+
+/** A finished, unpaid return: the client signs Form 8879 and pays, so it lands in Ready to file. */
+export const demoClientPays = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { s, getNow } = await owner(context);
+  const now = (await getNow()).toISOString();
+  const { data: a } = await s.from("appointments").select("id, fee_cents, clients(name)")
+    .eq("status", "completed").is("paid_at", null).is("filed_at", null).not("fee_cents", "is", null)
+    .order("finished_at", { ascending: false }).limit(1).maybeSingle();
+  if (!a) return { message: "No finished return is waiting for payment. Finish an appointment first." };
+  await s.from("appointments").update({ signature_status: "signed", signed_at: now, paid_at: now, paid_method: "test" }).eq("id", a.id);
+  const name = (a.clients as { name: string } | null)?.name ?? "The client";
+  return { message: `${name} signed Form 8879 and paid $${Math.round((a.fee_cents ?? 0) / 100)}. It's in Ready to file.` };
+});
+
+/** Opens the client's private page for the next upcoming appointment (for showing the client side). */
+export const demoPortalLink = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { s, getNow } = await owner(context);
+  const now = (await getNow()).toISOString();
+  const { data: a } = await s.from("appointments").select("manage_token").in("status", ["booked", "confirmed"]).gt("start_at", now).order("start_at").limit(1).maybeSingle();
+  return { token: a?.manage_token ?? null };
 });
 
 export const demoCancelTomorrow = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {

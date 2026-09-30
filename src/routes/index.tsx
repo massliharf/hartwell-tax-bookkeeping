@@ -71,7 +71,7 @@ function Home() {
 function Hero() {
   const trust = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
-    <section className={`${panel} overflow-hidden`}>
+    <section className={`${panel} enter overflow-hidden`}>
       <div className="grid items-center gap-10 px-5 pb-10 pt-10 sm:px-10 md:grid-cols-[1.15fr_1fr] md:gap-12 md:pb-14 md:pt-16">
         <div>
           <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-border bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:bg-surface-2">
@@ -93,7 +93,7 @@ function Hero() {
             <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span><br />Confirmed instantly. No payment until you file.</p>
           </div>
         </div>
-        <HeroVisual />
+        <div className="rounded-2xl bg-ink-50 px-4 py-2 sm:px-8"><HeroVisual /></div>
       </div>
       <div className="border-t border-border bg-surface-2 px-5 py-4 sm:px-10">
         <p className="mb-3 text-xs font-medium text-muted-foreground">Start with what you need</p>
@@ -149,7 +149,7 @@ function WhatClaireDoes() {
           </article>
         ))}
       </div>
-      <div className="mt-3 rounded-2xl bg-surface-2 p-5 sm:p-6">
+      <div className="mt-3 rounded-2xl bg-ink-50 p-5 sm:p-6">
         <h3 className="text-[15px] font-medium text-deep-ink">Every return includes</h3>
         <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {included.map((x) => (
@@ -220,7 +220,7 @@ function HowItWorks() {
       <ol className="mt-10 grid gap-4 md:grid-cols-3">
         {steps.map((s, i) => (
           <li key={s.title} className="flex flex-col rounded-2xl bg-surface-2 p-2">
-            <div className="flex min-h-[152px] items-center rounded-xl bg-fill-neutral/60 p-4">{s.preview}</div>
+            <div className="flex min-h-[152px] items-center rounded-xl bg-ink-50 p-4">{s.preview}</div>
             <div className="px-3 pb-4 pt-5">
               <p className="tabular text-xs font-medium text-muted-foreground">Step {i + 1}</p>
               <h3 className="mt-1 text-lg font-medium leading-7 text-deep-ink">{s.title}</h3>
@@ -248,7 +248,7 @@ function BeforeAfter() {
             ))}
           </ul>
         </div>
-        <div className="rounded-2xl bg-primary p-6 text-primary-foreground">
+        <div className="rounded-2xl bg-ink-900 p-6 text-primary-foreground">
           <p className="text-sm font-medium text-primary-foreground/70">With Hartwell Tax</p>
           <ul className="mt-4 space-y-3">
             {after.map((x) => (
@@ -373,7 +373,7 @@ function Privacy() {
 
 function DeadlineCta() {
   return (
-    <section className="overflow-hidden rounded-2xl bg-primary px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
+    <section className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="font-serif text-[28px] font-medium leading-[36px] tracking-[-0.02em] sm:text-[36px] sm:leading-[44px]">October 15 is close. Your slot doesn't have to be.</h2>

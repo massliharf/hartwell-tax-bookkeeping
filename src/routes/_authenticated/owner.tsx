@@ -126,7 +126,7 @@ function OwnerLayout() {
         </header>
         <main className="min-h-[calc(100vh-76px)] rounded-t-2xl bg-sheet px-5 pb-28 pt-6 sm:rounded-2xl sm:px-8 sm:pb-12 sm:pt-8">
           <div className={path.startsWith("/owner/calendar") ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
-            <Outlet />
+            <div key={path} className="enter"><Outlet /></div>
             <div className="mt-12 border-t border-border pt-4 sm:hidden"><DemoTools inline /></div>
           </div>
         </main>

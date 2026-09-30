@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget | null; onClose: () => void }) {
   return (
     <Dialog open={!!target} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="block max-w-[520px] gap-0 p-0">
+      <DialogContent className="block max-h-[92dvh] max-w-[520px] gap-0 overflow-y-auto p-0">
         {target && <AppointmentContent id={target.appointmentId} onClose={onClose} />}
       </DialogContent>
     </Dialog>

@@ -103,7 +103,7 @@ function Clients() {
                   <span className="hidden justify-end md:flex"><ChevronRight className="size-4 text-muted-foreground" /></span>
                 </Link>
                 <a href={`mailto:${c.email}`} aria-label={`Email ${c.name}`} title="Email"
-                  className="absolute right-12 top-1/2 hidden size-8 -translate-y-1/2 place-items-center rounded-lg text-muted-foreground opacity-60 transition-opacity duration-150 hover:bg-tint-1 hover:text-deep-ink focus-visible:opacity-100 group-hover:opacity-100 md:grid">
+                  className="absolute right-12 top-1/2 hidden size-8 -translate-y-1/2 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:grid">
                   <Mail className="size-4" />
                 </a>
               </li>

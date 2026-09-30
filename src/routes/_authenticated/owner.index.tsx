@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, CreditCard, FileSearch, Plus, Search, Send, Users, type LucideIcon } from "lucide-react";
+import { CalendarDays, CreditCard, FileSearch, Plus, Send, Users, type LucideIcon } from "lucide-react";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { addDays, apptsRange, et, etToIso, fmtLong, needsYou, readyToFile } from "@/components/owner/lib";
 import { ApptList, Empty, ErrorNote, LoadingRows, NeedsList } from "@/components/owner/ui";
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/owner/")({ head: () => ({ 
 
 type Shortcut = { label: string; icon: LucideIcon; rgb: string; count?: number | undefined; onClick: () => void; disabled?: boolean };
 
-/** Layout follows magnific.com/app Home: greeting, spotlight search, shortcut tiles, then the work in two columns. */
+/** Home base: greeting, shortcuts, then the work in two columns. Search stays in the owner navigation. */
 function Today() {
   const now = useOwnerCtx().data!.now;
   const navigate = useNavigate();
@@ -36,8 +36,6 @@ function Today() {
     { label: "Unpaid", icon: CreditCard, rgb: "194,58,32", count: unpaid.length, disabled: !unpaid.length, onClick: () => scrollTo("today-needs") },
     { label: "Ready to file", icon: Send, rgb: "23,128,79", count: toFile.data?.length ?? 0, disabled: !toFile.data?.length, onClick: () => scrollTo("today-to-file") },
   ];
-  const openPalette = () => window.dispatchEvent(new Event("owner:palette"));
-
   return (
     <div className="pb-6">
       <header className="pt-2 text-left sm:pt-4">
@@ -46,7 +44,7 @@ function Today() {
       </header>
 
       <ul className="mt-5 grid grid-cols-3 gap-1 sm:mt-6 sm:grid-cols-6 lg:max-w-[760px]">
-        {shortcuts.map((s, i) => (
+        {shortcuts.map((s) => (
           <li key={s.label}>
             <button type="button" onClick={s.onClick} disabled={s.disabled}
               className="group relative flex w-full flex-col items-center gap-2.5 rounded-2xl px-1 py-3 text-center transition-colors duration-150 hover:bg-tint-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent">

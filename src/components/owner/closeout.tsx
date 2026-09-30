@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tag } from "@/components/ui/tag";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { finishAppointment, markFiled, markPaidInOffice, reviewDocument } from "@/lib/owner.functions";
 import { fmtDay, money, type Appt, type Item } from "./lib";
@@ -22,7 +21,7 @@ function useOwnerMutation<T>(fn: (v: T) => Promise<{ ok: boolean }>, success: st
 }
 
 /** Finish appointment: final fee (prefilled with the service price) and an optional note. */
-export function FinishDialog({ a, open, onOpenChange, onDone }: { a: Appt; open: boolean; onOpenChange: (o: boolean) => void; onDone?: (() => void) | undefined }) {
+export function FinishForm({ a, onBack, onDone }: { a: Appt; onBack: () => void; onDone?: (() => void) | undefined }) {
   const finish = useServerFn(finishAppointment);
   const [fee, setFee] = useState(String(a.services?.price_from ?? ""));
   const [note, setNote] = useState("");
@@ -30,12 +29,8 @@ export function FinishDialog({ a, open, onOpenChange, onDone }: { a: Appt; open:
   const cents = Math.round(Number(fee) * 100);
   const valid = fee.trim() !== "" && Number.isFinite(cents) && cents >= 0;
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle className="text-base font-medium">Finish appointment</DialogTitle>
-          <DialogDescription>{a.clients?.name} gets an email to review, sign Form 8879 and pay.</DialogDescription>
-        </DialogHeader>
+    <div className="space-y-4">
+        <div><h3 className="text-base font-medium text-deep-ink">Finish appointment</h3><p className="mt-1 text-sm text-muted-foreground">{a.clients?.name} gets an email to review, sign Form 8879 and pay.</p></div>
         <div className="space-y-4">
           <div>
             <label htmlFor="fee" className="text-sm font-medium text-deep-ink">Final fee</label>
@@ -47,12 +42,9 @@ export function FinishDialog({ a, open, onOpenChange, onDone }: { a: Appt; open:
             <Textarea id="note" value={note} maxLength={600} onChange={(e) => setNote(e.target.value)} className="mt-1.5" rows={3} />
           </div>
         </div>
-        <DialogFooter className="gap-2">
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button disabled={!valid || m.isPending} onClick={() => m.mutate({ feeCents: cents, note }, { onSuccess: (r) => { if (r.ok) { onOpenChange(false); onDone?.(); } } })}>{m.isPending ? "Saving…" : "Finish and send"}</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="flex gap-2"><Button variant="secondary" onClick={onBack}>Back</Button>
+          <Button disabled={!valid || m.isPending} onClick={() => m.mutate({ feeCents: cents, note }, { onSuccess: (r) => { if (r.ok) onDone?.(); } })}>{m.isPending ? "Saving…" : "Finish and send"}</Button></div>
+    </div>
   );
 }
 
@@ -110,7 +102,7 @@ export function AiTag({ i }: { i: Item }) {
 }
 
 /** Accept / Needs a fix for one uploaded document. */
-export function DocReview({ i }: { i: Item }) {
+export function DocReview({ i, inline = false }: { i: Item; inline?: boolean }) {
   const review = useServerFn(reviewDocument);
   const [fixing, setFixing] = useState(false);
   const [reason, setReason] = useState<string | null>(null);
@@ -118,11 +110,11 @@ export function DocReview({ i }: { i: Item }) {
   const m = useOwnerMutation((v: { decision: "accepted" | "needs_fix"; reason?: string; note?: string }) => review({ data: { itemId: i.id, ...v } }), "Saved.");
   if (i.status !== "uploaded") return null;
   return (
-    <div className="px-4 pb-3">
-      {i.ai_note && <p className={cn("text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{i.ai_note}{i.ai_check === "kept" && " The client chose to keep it."}</p>}
+    <div className={inline ? "min-w-0" : "px-4 pb-3"}>
+      {!inline && i.ai_note && <p className={cn("text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{i.ai_note}{i.ai_check === "kept" && " The client chose to keep it."}</p>}
       {i.review_status === "needs_fix" && <p className="text-xs text-warning">Asked for a fix: {i.fix_reason}{i.fix_note ? `. ${i.fix_note}` : ""}</p>}
       {i.review_status === "pending" && !fixing && (
-        <div className="mt-2 flex gap-2">
+        <div className={inline ? "flex gap-1" : "mt-2 flex gap-2"}>
           <Button size="sm" variant="secondary" disabled={m.isPending} onClick={() => m.mutate({ decision: "accepted" })}>Accept</Button>
           <Button size="sm" variant="ghost" disabled={m.isPending} onClick={() => setFixing(true)}>Needs a fix</Button>
         </div>
@@ -130,12 +122,11 @@ export function DocReview({ i }: { i: Item }) {
       {fixing && (
         <div className="mt-2 space-y-2 rounded-xl bg-surface-2 p-3">
           <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Reason">
-            {REASONS.map((r) => <button key={r} type="button" role="radio" aria-checked={reason === r} onClick={() => setReason(r)}
-              className={cn("h-8 rounded-full px-3 text-xs font-medium transition-colors duration-150", reason === r ? "bg-primary text-primary-foreground" : "bg-fill-neutral text-deep-ink hover:bg-fill-selected")}>{r}</button>)}
+            {REASONS.map((r) => <Button key={r} type="button" size="sm" variant={reason === r ? "default" : "secondary"} role="radio" aria-checked={reason === r} onClick={() => setReason(r)}>{r}</Button>)}
           </div>
           <Input aria-label="Note to the client (optional)" placeholder="Note to the client (optional)" value={note} maxLength={400} onChange={(e) => setNote(e.target.value)} className="h-9" />
           <div className="flex gap-2">
-            <Button size="sm" disabled={!reason || m.isPending} onClick={() => m.mutate({ decision: "needs_fix", reason: reason!, note }, { onSuccess: () => setFixing(false) })}>{m.isPending ? "Sending…" : "Send to client"}</Button>
+            <Button size="sm" disabled={!reason || m.isPending} onClick={() => { if (reason) m.mutate({ decision: "needs_fix", reason, note }, { onSuccess: () => setFixing(false) }); }}>{m.isPending ? "Sending…" : "Send to client"}</Button>
             <Button size="sm" variant="ghost" onClick={() => setFixing(false)}>Cancel</Button>
           </div>
         </div>

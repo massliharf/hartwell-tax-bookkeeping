@@ -124,6 +124,21 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
   };
 
   const view = curLoaded && !("error" in curLoaded) ? (curLoaded.pdf ? curLoaded.pages[page] : curLoaded.url) : undefined;
+  // Rotation is baked into the pixels so zoom and scrolling keep working naturally.
+  const [shown, setShown] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (!view || rot === 0) { setShown(view); return; }
+    let live = true; let made: string | null = null;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas"); const side = rot % 180 !== 0;
+      c.width = side ? img.naturalHeight : img.naturalWidth; c.height = side ? img.naturalWidth : img.naturalHeight;
+      const ctx = c.getContext("2d")!; ctx.translate(c.width / 2, c.height / 2); ctx.rotate((rot * Math.PI) / 180); ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+      c.toBlob((b) => { if (b && live) { made = URL.createObjectURL(b); setShown(made); } });
+    };
+    img.src = view;
+    return () => { live = false; if (made) URL.revokeObjectURL(made); };
+  }, [view, rot]);
   const pageCount = curLoaded && !("error" in curLoaded) && curLoaded.pdf ? curLoaded.pages.length : 0;
   const thumb = (f: Item) => { const l = loaded[`${f.id}:${f.file_path}`]; return l && !("error" in l) ? (l.pdf ? l.pages[0] : l.url) : undefined; };
 
@@ -173,9 +188,9 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
                 : !curLoaded ? <Skeleton className="mx-auto h-full min-h-[40vh] w-full max-w-xl rounded-xl" />
                 : "error" in curLoaded || !view ? <p className="grid h-full place-items-center text-sm text-warning">There's no file to preview for this document.</p>
                 : <div className={cn("flex min-h-full", zoom === "fit" ? "items-center justify-center" : "items-start justify-start")}>
-                    <img key={view} src={view} alt={cur.document_name}
-                      className={cn("rounded-lg border border-border bg-sheet shadow-[0_1px_2px_rgba(16,16,16,0.06)] transition-transform duration-150", zoom === "fit" && "max-h-[calc(100dvh-260px)] max-w-full object-contain md:max-h-[calc(100dvh-140px)]")}
-                      style={{ transform: `rotate(${rot}deg)`, ...(zoom === "fit" ? {} : { width: `${zoom * 100}%`, maxWidth: "none" }) }} />
+                    <img src={shown ?? view} alt={cur.document_name}
+                      className={cn("rounded-lg border border-border bg-sheet shadow-[0_1px_2px_rgba(16,16,16,0.06)]", zoom === "fit" && "max-h-[calc(100dvh-260px)] max-w-full object-contain md:max-h-[calc(100dvh-140px)]")}
+                      style={zoom === "fit" ? undefined : { width: `${zoom * 100}%`, maxWidth: "none" }} />
                   </div>}
             </div>
             {pageCount > 1 && (

@@ -435,6 +435,33 @@ export type Database = {
         }
         Relationships: []
       }
+      time_off: {
+        Row: {
+          all_day: boolean
+          created_at: string
+          ends_at: string
+          id: string
+          label: string | null
+          starts_at: string
+        }
+        Insert: {
+          all_day?: boolean
+          created_at?: string
+          ends_at: string
+          id?: string
+          label?: string | null
+          starts_at: string
+        }
+        Update: {
+          all_day?: boolean
+          created_at?: string
+          ends_at?: string
+          id?: string
+          label?: string | null
+          starts_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

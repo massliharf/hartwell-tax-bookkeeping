@@ -252,7 +252,7 @@ function BeforeAfter() {
           <p className="text-sm font-medium text-primary-foreground/70">With Hartwell Tax</p>
           <ul className="mt-4 space-y-3">
             {after.map((x) => (
-              <li key={x} className="flex items-start gap-3 text-[15px] leading-6"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-white text-[#1A1A1A]"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
+              <li key={x} className="flex items-start gap-3 text-[15px] leading-6"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary-foreground text-primary"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
             ))}
           </ul>
         </div>
@@ -380,7 +380,7 @@ function DeadlineCta() {
           <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">Extended returns are due on October 15. Book now, upload your documents this week, and file once.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
-          <Button asChild size="lg" className="bg-white text-[#1A1A1A] hover:bg-white/90"><Link to="/book" search={{ service: "extension" }}>Book an extension review</Link></Button>
+          <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"><Link to="/book" search={{ service: "extension" }}>Book an extension review</Link></Button>
           <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><a href="#services">See all services</a></Button>
         </div>
       </div>

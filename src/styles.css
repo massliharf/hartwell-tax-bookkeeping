@@ -233,9 +233,9 @@
 @keyframes tile-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes item-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes modal-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes modal-in { from { opacity: 0; scale: 0.96; } to { opacity: 1; scale: 1; } }
 @keyframes menu-in { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
-@keyframes pop-in { from { opacity: 0; transform: scale(0.96) translateY(2px); } to { opacity: 1; transform: none; } }
+@keyframes pop-in { from { opacity: 0; scale: 0.96; } to { opacity: 1; scale: 1; } }
 @keyframes skeleton-fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 @utility enter-title { animation: title-enter 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @utility enter-spot { animation: spot-enter 0.8s cubic-bezier(0.4, 0, 0.2, 1) both; }

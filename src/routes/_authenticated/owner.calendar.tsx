@@ -1,10 +1,10 @@
-import { NewAppointmentButton } from "@/components/owner/new-appointment";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -72,8 +72,10 @@ function CalendarPage() {
     },
     onError: () => toast.error("Couldn't move it. Try again."),
   });
-  const byDay = (d: string) => (q.data ?? []).filter((a) => et(a.start_at).ymd === d);
-  const total = (q.data ?? []).length;
+  const [show, setShow] = useState<"all" | "attention" | "confirmed">("all");
+  const visible = (q.data ?? []).filter((a) => show === "all" || (show === "attention" ? (a.status === "booked" || a.status === "confirmed") && a.ready_score < 100 : a.status === "confirmed"));
+  const byDay = (d: string) => visible.filter((a) => et(a.start_at).ymd === d);
+  const total = visible.length;
   const nowMins = et(now).minutes;
   const fmtMins = (m: number) => `${((Math.floor(m / 60) + 11) % 12) + 1}:${String(m % 60).padStart(2, "0")} ${m < 720 ? "AM" : "PM"}`;
   const goWeek = (w: string) => { setWeek(w); setMobileDay(w <= today && today < addDays(w, 6) ? today : w); };
@@ -90,9 +92,22 @@ function CalendarPage() {
     setPending({ id, name: a.clients?.name ?? "this client", ymd, mins });
   };
 
+  const SHOW = [["all", "All appointments"], ["attention", "Not ready yet"], ["confirmed", "Confirmed only"]] as const;
   const nav = (
     <>
-      <NewAppointmentButton />
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button size="sm" variant="secondary"><SlidersHorizontal />Filters{show !== "all" && <span className="size-1.5 rounded-full bg-ink" aria-hidden="true" />}</Button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-60 p-1.5">
+          <p className="px-2.5 pb-1 pt-1.5 text-[11px] font-medium text-muted-foreground">Show</p>
+          {SHOW.map(([k, label]) => (
+            <button key={k} type="button" onClick={() => setShow(k)} className="flex h-8 w-full items-center justify-between rounded-lg px-2.5 text-[13px] text-deep-ink transition-colors duration-150 hover:bg-tint-1">
+              {label}{show === k && <Check className="size-4" />}
+            </button>
+          ))}
+        </PopoverContent>
+      </Popover>
       <Button size="sm" variant="secondary" onClick={() => goWeek(mondayOf(today))}>Today</Button>
       <div className="flex">
         <Button size="icon" variant="ghost" aria-label="Previous week" onClick={() => goWeek(addDays(week, -7))}><ChevronLeft /></Button>
@@ -103,7 +118,7 @@ function CalendarPage() {
 
   return (
     <>
-      <PageHead title={`Week of ${ymdLabel(week)}`} meta={q.data ? `${total} appointment${total === 1 ? "" : "s"}, drag to reschedule` : "Loading…"} actions={nav} />
+      <PageHead title={`Week of ${ymdLabel(week)}`} meta={q.data ? `${total} appointment${total === 1 ? "" : "s"}${show === "all" ? "" : show === "attention" ? " not ready yet" : " confirmed"}, drag to reschedule` : "Loading…"} actions={nav} />
       {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
 
       {/* Desktop week grid */}

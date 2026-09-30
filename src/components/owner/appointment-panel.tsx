@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, ChevronRight, MapPin, Video } from "lucide-react";
+import { ChevronRight, FileText, MapPin, Video } from "lucide-react";
+import { Tag } from "@/components/ui/tag";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           <span className="inline-flex items-center gap-1">{a.meeting_type === "video" ? <Video className="size-3.5" /> : <MapPin className="size-3.5" />}{a.meeting_type === "video" ? "Video" : "In person"}</span>
           <StatusPill status={a.status} />
         </DialogDescription>
+        <Stages a={a} />
         {a.clients && (
           <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose}
             className="mt-4 flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 transition-colors duration-150 hover:bg-surface-2">
@@ -92,19 +94,34 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           {n > 0 && (() => { const eyes = items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length; return <Button size="sm" variant={eyes ? "default" : "secondary"} onClick={() => setGallery(true)}>{eyes ? `Check ${eyes} document${eyes === 1 ? "" : "s"}` : `View documents (${n})`}</Button>; })()}
           {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
         </div>; })()}
-        <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">
-          {items.map((i) => (
-            <li key={i.id} className="px-4 py-2.5"><div className="flex flex-wrap items-center gap-2.5 text-sm">
-              {i.status === "uploaded"
-                ? <span className="grid size-4 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span>
-                : <span className={cn("size-4 rounded-full border", i.status === "not_applicable" ? "border-border bg-fill-subtle" : "border-warning/60")} />}
-              <span className={cn("min-w-[100px] flex-1", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
-              <AiTag i={i} />
-              {i.status === "uploaded" && i.review_status === "pending" && <div className="order-last w-full sm:order-none sm:w-auto"><DocReview i={i} inline /></div>}
-              {i.status !== "uploaded" && <span className={cn("text-xs", i.status === "not_applicable" ? "text-muted-foreground" : "text-warning")}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</span>}
-            </div>{i.ai_note && <p className={cn("mt-1 pl-6 text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{i.ai_note}</p>}{!(i.status === "uploaded" && i.review_status === "pending") && <DocReview i={i} />}</li>
-          ))}
-        </ul>
+        {(() => {
+          const eyes = items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok");
+          const received = items.filter((i) => i.status === "uploaded" && !eyes.includes(i));
+          const open = items.filter((i) => i.status !== "uploaded");
+          const group = (title: string, list: typeof items, tone?: "warn") => list.length > 0 && (
+            <div className="mt-4">
+              <p className={cn("mb-1.5 text-[11px] font-medium uppercase tracking-[0.04em]", tone === "warn" ? "text-alert-warning-fg" : "text-muted-foreground")}>{title} · {list.length}</p>
+              <ul className="divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1">
+                {list.map((i) => (
+                  <li key={i.id} className="px-3 py-2.5">
+                    <div className="flex flex-wrap items-center gap-2.5 text-sm">
+                      <button type="button" disabled={i.status !== "uploaded"} onClick={() => setGallery(true)}
+                        className="flex min-w-0 flex-1 items-center gap-2.5 text-left disabled:cursor-default">
+                        <span className={cn("grid size-7 shrink-0 place-items-center rounded-lg", i.status === "uploaded" ? "bg-fill-neutral text-deep-ink" : "border border-dashed border-line-2 text-muted-foreground")}><FileText className="size-3.5" /></span>
+                        <span className={cn("min-w-0 truncate", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
+                      </button>
+                      {i.status === "uploaded" ? <AiTag i={i} /> : <Tag tone={i.status === "not_applicable" ? "neutral" : "warning"}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</Tag>}
+                    </div>
+                    {i.ai_note && i.status === "uploaded" && i.review_status !== "accepted" && <p className={cn("mt-1 pl-[38px] text-xs", i.ai_check === "warning" || i.ai_check === "kept" ? "text-alert-warning-fg" : "text-muted-foreground")}>{i.ai_note}</p>}
+                    {eyes.includes(i) && <div className="mt-2 pl-[38px]"><DocReview i={i} inline /></div>}
+                    {i.review_status === "needs_fix" && <div className="pl-[38px]"><DocReview i={i} /></div>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+          return <>{group("Needs your eyes", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}</>;
+        })()}
         <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
       </section>
       <CloseoutBlock a={a} />
@@ -114,5 +131,23 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
         {!finishing && !(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">{a.filed_at ? "Return filed. Nothing left to do." : a.status === "completed" ? "Appointment finished." : "This appointment is closed."}</p>}
       </footer>
     </div>
+  );
+}
+
+const STAGES = ["Booked", "Documents", "Appointment", "Sign and pay", "Filed"];
+/** Where this appointment is in the season, the same five steps the client sees on their page. */
+function Stages({ a }: { a: Appt }) {
+  const closed = a.status === "cancelled" || a.status === "no_show";
+  const at = a.filed_at ? 5 : a.status === "completed" ? (a.signature_status === "signed" && a.paid_at ? 4 : 3) : a.ready_score >= 100 ? 2 : 1;
+  if (closed) return null;
+  return (
+    <ol aria-label="Progress" className="mt-4 grid grid-cols-5 gap-1.5">
+      {STAGES.map((label, i) => (
+        <li key={label} aria-current={i === at ? "step" : undefined}>
+          <span className={cn("block h-1 rounded-full transition-colors duration-300", i < at ? "bg-ink" : i === at ? "bg-ink/40" : "bg-line-1")} />
+          <span className={cn("mt-1.5 block truncate text-[11px]", i <= at ? "text-deep-ink" : "text-muted-foreground", i === at ? "font-medium" : "max-sm:invisible")}>{label}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

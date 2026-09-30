@@ -9,6 +9,10 @@ import { Switch } from "@/components/ui/switch";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { Integrations } from "@/components/owner/integrations";
 import { TimeOff } from "@/components/owner/time-off";
+import { BellRing, Clock, Plug, Tag as TagIcon } from "lucide-react";
+
+const SECTIONS = [["integrations", "Integrations", Plug], ["hours", "Office hours", Clock], ["services", "Services and prices", TagIcon], ["reminders", "Reminders", BellRing]] as const;
+type Section = (typeof SECTIONS)[number][0];
 
 export const Route = createFileRoute("/_authenticated/owner/settings")({ head: () => ({ meta: [{ title: "Settings — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: SettingsPage });
 
@@ -35,6 +39,7 @@ function SettingsPage() {
   const [tm, setTm] = useState<Timings>({ docs_reminder_days: 7, readiness_check_hours: 48, final_reminder_hours: 24, abandoned_nudge_hours: 1 });
   const [svcs, setSvcs] = useState<Svc[]>([]);
   const [saving, setSaving] = useState<string | null>(null);
+  const [tab, setTab] = useState<Section>("integrations");
 
   useEffect(() => {
     if (!q.data) return;
@@ -58,9 +63,19 @@ function SettingsPage() {
   return (
     <>
       <PageHead title="Settings" meta="Connections, office hours, services and reminders" />
-      <div className="space-y-3">
-        <Card title="Integrations" note="Where your bookings and messages go."><Integrations /></Card>
-        <Card title="Office hours" note="Bookings only offer times inside these hours.">
+      {/* magnific.com settings pattern: sub-navigation on the left, one section at a time on the right. */}
+      <div className="grid gap-6 md:grid-cols-[200px_minmax(0,1fr)] md:gap-8">
+        <nav aria-label="Settings sections" className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:flex-col md:overflow-visible md:px-0">
+          {SECTIONS.map(([k, label, Icon]) => (
+            <button key={k} type="button" onClick={() => setTab(k)} aria-current={tab === k ? "page" : undefined}
+              className={`flex h-8 shrink-0 items-center gap-2.5 rounded-lg px-2.5 text-[13px] transition-colors duration-150 ${tab === k ? "bg-tint-2 font-medium text-deep-ink" : "text-[#353535] hover:bg-tint-1"}`}>
+              <Icon className="size-4" strokeWidth={1.75} />{label}
+            </button>
+          ))}
+        </nav>
+        <div key={tab} className="enter min-w-0 max-w-2xl">
+        {tab === "integrations" && <Card title="Integrations" note="Where your bookings and messages go."><Integrations /></Card>}
+        {tab === "hours" && <Card title="Office hours" note="Bookings only offer times inside these hours.">
           <ul className="divide-y divide-border">
             {DAYS.map(([k, label]) => {
               const h = hours[k];
@@ -85,9 +100,9 @@ function SettingsPage() {
           </label>
           <Button className="mt-5" disabled={saving === "hours"} onClick={() => save("hours", async () => [await supabase.from("settings").update({ hours, buffer_min: buffer }).eq("id", 1)])}>Save hours</Button>
           <TimeOff />
-        </Card>
+        </Card>}
 
-        <Card title="Services and prices" note="What clients can book, how long it takes, and the starting fee.">
+        {tab === "services" && <Card title="Services and prices" note="What clients can book, how long it takes, and the starting fee.">
           <div className="space-y-3">
             {svcs.map((s, i) => {
               const set = (p: Partial<Svc>) => setSvcs(svcs.map((x, j) => (j === i ? { ...x, ...p } : x)));
@@ -102,9 +117,9 @@ function SettingsPage() {
             })}
           </div>
           <Button className="mt-5" disabled={saving === "svc"} onClick={() => save("svc", () => Promise.all(svcs.map((s) => supabase.from("services").update({ name: s.name, duration_min: s.duration_min, price_from: s.price_from, active: s.active }).eq("id", s.id))))}>Save services</Button>
-        </Card>
+        </Card>}
 
-        <Card title="Reminder timings" note="When the automatic messages go out.">
+        {tab === "reminders" && <Card title="Reminder timings" note="When the automatic messages go out.">
           <div className="grid gap-4 sm:grid-cols-2">
             <Num label="Document reminder" unit="days before" v={tm.docs_reminder_days} on={(n) => setTm({ ...tm, docs_reminder_days: n })} />
             <Num label="Readiness check" unit="hours before" v={tm.readiness_check_hours} on={(n) => setTm({ ...tm, readiness_check_hours: n })} />
@@ -112,7 +127,8 @@ function SettingsPage() {
             <Num label="Unfinished booking nudge" unit="hours after" v={tm.abandoned_nudge_hours} on={(n) => setTm({ ...tm, abandoned_nudge_hours: n })} />
           </div>
           <Button className="mt-5" disabled={saving === "tm"} onClick={() => save("tm", async () => [await supabase.from("settings").update({ reminder_timings: tm }).eq("id", 1)])}>Save timings</Button>
-        </Card>
+        </Card>}
+        </div>
       </div>
     </>
   );

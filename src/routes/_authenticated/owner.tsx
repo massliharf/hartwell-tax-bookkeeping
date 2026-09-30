@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { needsYou } from "@/components/owner/lib";
 import { DemoTools } from "@/components/owner/demo";
+import { NewAppointmentButton } from "@/components/owner/new-appointment";
 
 export const Route = createFileRoute("/_authenticated/owner")({
   head: () => ({
@@ -54,8 +55,10 @@ function OwnerLayout() {
   const toggle = () => setCollapsed((c) => { localStorage.setItem("owner-sidebar", c ? "0" : "1"); return !c; });
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setPaletteOpen((o) => !o); } };
+    const onOpen = () => setPaletteOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("owner:palette", onOpen);
+    return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("owner:palette", onOpen); };
   }, []);
 
   const signOut = async () => {
@@ -81,53 +84,57 @@ function OwnerLayout() {
   const current = PAGES.find((n) => ("exact" in n ? path === n.to : path.startsWith(n.to))) ?? PAGES[0];
   const mobileMain = NAV.slice(0, 4);
   const mobileMore = NAV.slice(4);
-  const item = "flex h-8 items-center gap-2.5 rounded-lg pr-2 text-xs text-sidebar-foreground transition-colors duration-150 hover:bg-fill-subtle";
+  const item = `flex h-8 items-center gap-2.5 rounded-lg text-[13px] text-[#353535] transition-colors duration-150 hover:bg-tint-1 ${collapsed ? "justify-center px-0" : "px-2"}`;
+  const wide = path === "/owner" || path.startsWith("/owner/calendar") || path.startsWith("/owner/clients") || path.startsWith("/owner/settings");
 
   return (
-    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper sm:flex sm:gap-2 sm:bg-canvas sm:p-2">
-      <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-4 rounded-2xl bg-sheet py-4  sm:flex ${collapsed ? "w-[72px] px-5" : "w-56 px-5"}`}>
-        <div className="flex h-8 items-center justify-between">
-          {!collapsed && <Link to="/" className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</Link>}
-          <button onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-fill-subtle">
-            <PanelLeft className="size-3.5" />
-          </button>
+    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper sm:flex sm:bg-canvas sm:py-2 sm:pr-2">
+      {/* DESIGN_SYSTEM v2 §5: the sidebar sits on the canvas (no card); the main panel is the white card. */}
+      <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-3 transition-[width,padding] duration-300 ease-expo sm:flex ${collapsed ? "w-[60px] px-2" : "w-[220px] px-3"}`}>
+        <div className={`flex h-9 items-center ${collapsed ? "justify-center" : "justify-between"}`}>
+          {!collapsed && <Link to="/" className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-lg bg-ink font-serif text-sm text-white">H</span><span className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</span></Link>}
+          <Button size="icon" variant="ghost" onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}><PanelLeft className="size-4" /></Button>
         </div>
-        <nav className="flex flex-col gap-1">
+        <NewAppointmentButton compact={collapsed} block listen />
+        <nav className="flex flex-col gap-0.5">
           {NAV.map((n) => (
-            <Link key={n.to} to={n.to} title={collapsed ? n.label : undefined} className={item} activeProps={{ className: "bg-fill-selected text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
-              <span className="relative grid size-8 shrink-0 place-items-center"><n.icon className="size-3.5" />
-                {collapsed && n.to === "/owner" && count > 0 && <span className="absolute right-0.5 top-0.5 grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
+            <Link key={n.to} to={n.to} title={collapsed ? n.label : undefined} className={item} activeProps={{ className: "bg-tint-2 font-medium text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
+              <span className="relative grid size-5 shrink-0 place-items-center"><n.icon className="size-4" strokeWidth={1.75} />
+                {collapsed && n.to === "/owner" && count > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-ink px-1 text-[9px] font-bold leading-4 text-white">{count}</span>}
               </span>
               {!collapsed && <span className="flex-1 truncate">{n.label}</span>}
-              {!collapsed && n.to === "/owner" && count > 0 && <span className="tabular grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
+              {!collapsed && n.to === "/owner" && count > 0 && <span className="tabular grid min-w-5 place-items-center rounded-full bg-ink px-1.5 text-[10px] font-semibold leading-5 text-white">{count}</span>}
             </Link>
           ))}
         </nav>
-        <div className="h-px bg-border" />
         <div className="flex-1" />
         {!collapsed && <DemoTools inline />}
-        <div className={`flex items-center gap-2 border-t border-border pt-3 ${collapsed ? "flex-col" : ""}`}>
+        <div className={`flex items-center gap-2 border-t border-line-1 pt-3 ${collapsed ? "flex-col" : ""}`}>
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink" title={collapsed ? `Claire Hartwell, ${email}` : undefined}>CH</span>
           {!collapsed && <span className="min-w-0 flex-1"><span className="block truncate text-xs font-medium text-deep-ink">Claire Hartwell</span><span className="block truncate text-[11px] text-muted-foreground">{email}</span></span>}
-          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="ghost" aria-label="Sign out" onClick={signOut}><LogOut className="size-3.5" /></Button></TooltipTrigger><TooltipContent side={collapsed ? "right" : "top"}>Sign out</TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="ghost" aria-label="Sign out" onClick={signOut}><LogOut className="size-4" /></Button></TooltipTrigger><TooltipContent side={collapsed ? "right" : "top"}>Sign out</TooltipContent></Tooltip>
         </div>
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-20 flex h-[60px] items-center justify-between bg-paper px-6 sm:static sm:bg-transparent sm:px-4">
-          <span className="text-sm font-medium text-deep-ink sm:hidden">{current.label}</span>
-          <nav aria-label="Breadcrumb" className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
-            <span>Practice</span><span>›</span><span className="text-deep-ink">{current.label}</span>
-          </nav>
-          <button onClick={() => setPaletteOpen(true)} className="hidden h-8 items-center gap-2 rounded-lg border border-border bg-sheet px-3 text-xs text-muted-foreground transition-colors duration-150 hover:bg-fill-subtle sm:flex">
-            <Search className="size-3.5" />Search clients or pages<kbd className="ml-4 text-[10px]">⌘K</kbd>
-          </button>
-          <Button size="icon" variant="ghost" aria-label="Search" onClick={() => setPaletteOpen(true)} className="sm:hidden"><Search className="size-4" /></Button>
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-between bg-paper px-5 sm:hidden">
+          <span className="text-sm font-medium text-deep-ink">{current.label}</span>
+          <Button size="icon" variant="ghost" aria-label="Search" onClick={() => setPaletteOpen(true)}><Search className="size-4" /></Button>
         </header>
-        <main className="min-h-[calc(100vh-76px)] rounded-t-2xl bg-sheet px-5 pb-28 pt-6 sm:rounded-2xl sm:px-8 sm:pb-12 sm:pt-8">
-          <div className={path.startsWith("/owner/calendar") ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
-            <div key={path} className="enter"><Outlet /></div>
-            <div className="mt-12 border-t border-border pt-4 sm:hidden"><DemoTools inline /></div>
+        <main className="min-h-[calc(100vh-56px)] rounded-t-2xl bg-sheet sm:min-h-[calc(100vh-16px)] sm:rounded-2xl">
+          <div className="hidden h-14 items-center justify-between px-6 sm:flex">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+              <span>Practice</span><span aria-hidden="true">/</span><span className="text-deep-ink">{current.label}</span>
+            </nav>
+            <button onClick={() => setPaletteOpen(true)} className="flex h-8 items-center gap-2 rounded-lg px-2.5 text-[13px] text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink">
+              <Search className="size-4" />Search<kbd className="ml-3 rounded border border-line-1 px-1 text-[10px] leading-4">⌘K</kbd>
+            </button>
+          </div>
+          <div className="px-5 pb-28 pt-4 sm:px-8 sm:pb-12 sm:pt-2">
+            <div className={wide ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
+              <div key={path} className="enter"><Outlet /></div>
+              <div className="mt-12 border-t border-border pt-4 sm:hidden"><DemoTools inline /></div>
+            </div>
           </div>
         </main>
       </div>

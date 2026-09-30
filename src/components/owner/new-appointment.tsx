@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -17,11 +17,22 @@ import { cn } from "@/lib/utils";
 
 type Client = { id: string; name: string; email: string; phone: string | null };
 
-export function NewAppointmentButton() {
+/** Opens the New appointment dialog from anywhere (Today tiles, palette). */
+export const openNewAppointment = () => window.dispatchEvent(new Event("owner:new-appointment"));
+
+export function NewAppointmentButton({ compact = false, block = false, listen = false }: { compact?: boolean; block?: boolean; listen?: boolean }) {
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!listen) return;
+    const on = () => setOpen(true);
+    window.addEventListener("owner:new-appointment", on);
+    return () => window.removeEventListener("owner:new-appointment", on);
+  }, [listen]);
   return (
     <>
-      <Button size="sm" variant="accent" onClick={() => setOpen(true)}><Plus />New appointment</Button>
+      {compact
+        ? <Button size="icon" aria-label="New appointment" title="New appointment" onClick={() => setOpen(true)} className="size-9 rounded-lg sm:size-9"><Plus /></Button>
+        : <Button size={block ? "md" : "sm"} onClick={() => setOpen(true)} className={block ? "w-full justify-start gap-2.5 px-3 text-[13px]" : undefined}><Plus />New appointment</Button>}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="block max-h-[92dvh] max-w-[560px] overflow-y-auto p-0">
           {open && <NewAppointmentForm onDone={() => setOpen(false)} />}

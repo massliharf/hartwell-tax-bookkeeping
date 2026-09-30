@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
+import { et, etToIso } from "@/components/owner/lib";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { MessageLog } from "@/components/owner/messages";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,12 +25,12 @@ function Insights() {
     queryFn: async () => {
       const t = new Date(now).getTime();
       const from = new Date(t - WEEKS * 7 * DAY).toISOString();
-      const monthStart = new Date(new Date(now).toLocaleString("en-US", { timeZone: "America/New_York" }).replace(/(\d+)\/\d+\/(\d+).*/, "$2-$1-01"));
+      const monthStart = etToIso(`${et(now).ymd.slice(0, 8)}01`, 0);
       const [m, a, o, paid, owed] = await Promise.all([
         supabase.from("messages").select("type, minutes_saved, sent_at, appointment_id").gte("sent_at", from).lte("sent_at", now),
         supabase.from("appointments").select("id, start_at, created_at, status, ready_score, signature_status, signed_at, needs_attention, attention_reason").gte("start_at", from),
         supabase.from("waitlist_offers").select("status, created_at").in("status", ["claimed", "claimed_seen"]).gte("created_at", from),
-        supabase.from("appointments").select("fee_cents, paid_at").not("paid_at", "is", null).gte("paid_at", isNaN(monthStart.getTime()) ? from : monthStart.toISOString()).lte("paid_at", now),
+        supabase.from("appointments").select("fee_cents, paid_at").not("paid_at", "is", null).gte("paid_at", monthStart).lte("paid_at", now),
         supabase.from("appointments").select("fee_cents").eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null),
       ]);
       if (m.error ?? a.error ?? o.error ?? paid.error ?? owed.error) throw m.error ?? a.error ?? o.error ?? paid.error ?? owed.error;

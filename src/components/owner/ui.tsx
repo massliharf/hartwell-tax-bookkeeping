@@ -125,10 +125,10 @@ export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; s
 }
 
 export function ApptList({ appts, showDate = false, showClient = true }: { appts: Appt[]; showDate?: boolean; showClient?: boolean }) {
-  return <div className="overflow-hidden rounded-2xl border border-border">{appts.map((a) => <ApptRow key={a.id} a={a} showDate={showDate} showClient={showClient} />)}</div>;
+  return <div className="overflow-hidden rounded-2xl border border-border">{appts.map((a, i) => <div key={a.id} className="enter-item" style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}><ApptRow a={a} showDate={showDate} showClient={showClient} /></div>)}</div>;
 }
 
-export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boolean }) {
+export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () => void; busy: boolean; idx?: number }) {
   const openAppt = useApptPanel();
   let icon: ReactNode, title: string, reason: string, action: string, appointmentId: string | undefined;
   if (it.kind === "review") { icon = <FileSearch />; title = `${it.count} document${it.count === 1 ? " needs" : "s need"} your eyes`; reason = `Everything else was checked automatically. Starting with ${it.appt.clients?.name}, ${fmtDay(it.appt.start_at)}.`; action = "Open"; appointmentId = it.appt.id; }
@@ -138,7 +138,7 @@ export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; 
   else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
   else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
   return (
-    <li className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-3 py-2.5 last:border-0 sm:flex-nowrap">
+    <li style={{ animationDelay: `${idx * 40}ms` }} className="enter-item flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-3 py-2.5 last:border-0 sm:flex-nowrap">
       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span>
       <button type="button" disabled={!appointmentId} onClick={() => appointmentId && openAppt({ appointmentId })} className="min-w-0 flex-1 basis-[calc(100%-44px)] text-left disabled:cursor-default sm:basis-auto">
         <span className="block line-clamp-2 text-sm font-medium text-deep-ink sm:truncate">{title}</span>
@@ -154,7 +154,7 @@ export function NeedsList({ items }: { items: NeedItem[] }) {
   const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const shown = all ? items : items.slice(0, 3);
   return <div>
-    <ul className="overflow-hidden rounded-2xl border border-border">{shown.map(it => <NeedRow key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>
+    <ul className="overflow-hidden rounded-2xl border border-border">{shown.map((it, i) => <NeedRow idx={i} key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>
     {items.length > 3 && <Button size="sm" variant="ghost" className="mt-2" onClick={() => setAll(v => !v)}>{all ? "Show less" : `Show all ${items.length}`}</Button>}
   </div>;
 }

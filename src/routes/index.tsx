@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -35,10 +36,11 @@ export const Route = createFileRoute("/")({
 
 const panel = "rounded-2xl bg-sheet";
 
-function SectionHead({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
+function SectionHead({ title, sub, action, eyebrow }: { title: string; sub?: string; action?: React.ReactNode; eyebrow?: string }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 [&_h2]:text-balance">
       <div className="max-w-2xl">
+        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
         <h2 className="t-section text-deep-ink">{title}</h2>
         {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground sm:text-base sm:leading-6">{sub}</p>}
       </div>
@@ -49,8 +51,8 @@ function SectionHead({ title, sub, action }: { title: string; sub?: string; acti
 
 function Home() {
   return (
-    <div className="min-h-screen overflow-x-clip bg-canvas">
-      <SiteHeader />
+    <div className="min-h-screen overflow-x-clip bg-paper-warm">
+      <SiteHeader warm />
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
         <WhatClaireDoes />
@@ -64,6 +66,31 @@ function Home() {
         <Faq />
       </main>
       <SiteFooter />
+      <StickyCta />
+    </div>
+  );
+}
+
+/** magnific.com/desktop pattern: a frosted pill that follows you once the hero is out of view, and steps aside near the final CTA. */
+function StickyCta() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const deadline = document.getElementById("deadline")?.getBoundingClientRect();
+      const nearEnd = !!deadline && deadline.top < window.innerHeight && deadline.bottom > 0;
+      setShow(window.scrollY > 640 && !nearEnd);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div aria-hidden={!show} className={`fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 transition-[opacity,transform] duration-300 ease-expo ${show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`} style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+      <div className="flex items-center gap-3 rounded-2xl border border-line-1 bg-white/80 py-2 pl-4 pr-2 shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_7px_rgba(18,18,18,0.02),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] backdrop-blur-lg">
+        <span className="hidden text-[13px] text-deep-ink sm:inline">Book in two minutes. No payment until you file.</span>
+        <Button asChild tabIndex={show ? 0 : -1}><Link to="/book">Book an appointment</Link></Button>
+        <Button asChild variant="ghost" tabIndex={show ? 0 : -1} className="hidden sm:inline-flex"><Link to="/book/returning">My appointment</Link></Button>
+      </div>
     </div>
   );
 }
@@ -78,7 +105,7 @@ function Hero() {
             <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-primary-foreground">Oct 15</span>
             Extensions are due. <span className="font-medium text-ink group-hover:underline">Book your slot</span>
           </Link>
-          <h1 className="mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
+          <h1 className="enter-title mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
             Taxes, without the chase.
           </h1>
           <p className="mt-5 max-w-md text-base leading-7 text-body sm:text-lg">
@@ -93,16 +120,16 @@ function Hero() {
             <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span><br />Confirmed instantly. No payment until you file.</p>
           </div>
         </div>
-        <div className="rounded-2xl bg-ink-50 px-4 py-2 sm:px-8"><HeroVisual /></div>
+        <div className="enter-spot min-w-0 rounded-2xl bg-ink-50 px-4 py-2 sm:px-8" style={{ animationDelay: "150ms" }}><HeroVisual /></div>
       </div>
       <div className="border-t border-border bg-surface-2 px-5 py-4 sm:px-10">
         <p className="mb-3 text-xs font-medium text-muted-foreground">Start with what you need</p>
         <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-5 sm:overflow-visible">
-          {SERVICES.map((s) => {
+          {SERVICES.map((s, si) => {
             const st = serviceStyle(s.id);
             const Icon = st.icon;
             return (
-              <li key={s.id} className="shrink-0">
+              <li key={s.id} className="enter-tile shrink-0" style={{ animationDelay: `${300 + si * 80}ms` }}>
                 <Link to="/book" search={{ service: s.id }} className="flex h-full w-40 items-center gap-3 rounded-xl bg-sheet p-3 transition-colors duration-150 hover:bg-fill-subtle sm:w-auto">
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${st.rgb},0.1)` }}>
                     <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${st.rgb})` }} />
@@ -140,7 +167,7 @@ function WhatClaireDoes() {
   ];
   return (
     <section id="what" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="An Enrolled Agent for your whole tax year." sub="Enrolled Agents are licensed by the IRS to prepare returns and to represent you if the IRS has questions. Claire prepares every return herself." />
+      <SectionHead eyebrow="What we do" title="An Enrolled Agent for your whole tax year." sub="Enrolled Agents are licensed by the IRS to prepare returns and to represent you if the IRS has questions. Claire prepares every return herself." />
       <div className="mt-10 grid gap-3 sm:grid-cols-2">
         {who.map((w) => (
           <article key={w.title} className="flex gap-4 rounded-2xl border border-border p-5">
@@ -208,27 +235,67 @@ function StepPreviewReady() {
   );
 }
 
-function HowItWorks() {
-  const steps = [
-    { title: "Book a time", text: "Pick a service and a slot that suits you. You're confirmed on the spot.", preview: <StepPreviewTime /> },
-    { title: "Upload what's on your list", text: "You get a short checklist made for your return. Add documents whenever you have them.", preview: <StepPreviewDocs /> },
-    { title: "Arrive ready, file once", text: "Claire reviews everything beforehand, so your appointment is the only one you need.", preview: <StepPreviewReady /> },
+function StepPreviewReminders() {
+  const msgs = [
+    { when: "7 days before", text: "2 documents to go. Upload them from your phone." },
+    { when: "2 days before", text: "All set. Claire has everything for Thursday." },
+    { when: "1 day before", text: "See you tomorrow at 10:30 am." },
   ];
   return (
-    <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Three steps. One appointment." sub="No back-and-forth emails, no second visit for a missing form." />
-      <ol className="mt-10 grid gap-4 md:grid-cols-3">
-        {steps.map((s, i) => (
-          <li key={s.title} className="flex flex-col rounded-2xl bg-surface-2 p-2">
-            <div className="flex min-h-[152px] items-center rounded-xl bg-ink-50 p-4">{s.preview}</div>
-            <div className="px-3 pb-4 pt-5">
-              <p className="tabular text-xs font-medium text-muted-foreground">Step {i + 1}</p>
-              <h3 className="mt-1 text-lg font-medium leading-7 text-deep-ink">{s.title}</h3>
-              <p className="mt-1 text-sm leading-[22px] text-body">{s.text}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+    <ul className="w-full space-y-2">
+      {msgs.map((m) => (
+        <li key={m.when} className="rounded-xl border border-line-1 bg-sheet px-3 py-2.5">
+          <p className="text-[11px] font-medium text-muted-foreground">{m.when}</p>
+          <p className="mt-0.5 text-[13px] text-deep-ink">{m.text}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** magnific.com/desktop "sticky index" section: the list on the left follows the text on the right. */
+function HowItWorks() {
+  const steps = [
+    { title: "Book a time.", text: "Pick a service and a slot that suits you. You're confirmed on the spot, with no emails back and forth.", preview: <StepPreviewTime /> },
+    { title: "Upload what's on your list.", text: "Your answers build a short checklist made for your return. Add documents from your phone whenever you have them.", preview: <StepPreviewDocs /> },
+    { title: "Reminders do the chasing.", text: "Friendly nudges go out until everything is in, so nothing is missing on the day.", preview: <StepPreviewReminders /> },
+    { title: "Arrive ready, file once.", text: "Claire reviews everything beforehand. Your appointment is the only one you need.", preview: <StepPreviewReady /> },
+  ];
+  const [active, setActive] = useState(0);
+  const refs = useRef<(HTMLLIElement | null)[]>([]);
+  useEffect(() => {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset["i"]));
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    refs.current.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, []);
+  return (
+    <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-20`}>
+      <SectionHead eyebrow="How it works" title="Four steps. One appointment." sub="No back-and-forth emails, no second visit for a missing form." />
+      <div className="mt-12 grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
+        <nav aria-label="Steps" className="hidden lg:block">
+          <ol className="sticky top-28 space-y-1">
+            {steps.map((s, i) => (
+              <li key={s.title}>
+                <a href={`#step-${i + 1}`} className={`relative flex h-9 items-center pl-4 text-sm transition-colors duration-150 before:absolute before:left-0 before:top-2 before:h-5 before:w-[2px] before:rounded-full before:transition-colors before:duration-200 ${active === i ? "font-medium text-deep-ink before:bg-ink" : "text-muted-foreground before:bg-transparent hover:text-deep-ink"}`}>
+                  {s.title.replace(/\.$/, "")}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+        <ol className="space-y-16 sm:space-y-24">
+          {steps.map((s, i) => (
+            <li key={s.title} id={`step-${i + 1}`} data-i={i} ref={(el) => { refs.current[i] = el; }} className="scroll-mt-28">
+              <p className="lead-text max-w-[560px] text-balance"><b>{s.title}</b> {s.text}</p>
+              <div className="mt-6 flex min-h-[220px] max-w-[640px] items-center justify-center rounded-[22px] bg-ink-50 p-6 sm:p-10">
+                <div className="w-full max-w-[340px]">{s.preview}</div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
@@ -238,7 +305,7 @@ function BeforeAfter() {
   const after = ["One link, confirmed on the spot", "A checklist made for your return", "Reminders until everything is in", "One appointment, filed the same week"];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="The same return. Half the hassle." sub="What booking a tax appointment usually looks like, and what it looks like here." />
+      <SectionHead eyebrow="Before and after" title="The same return. Half the hassle." sub="What booking a tax appointment usually looks like, and what it looks like here." />
       <div className="mt-10 grid gap-3 md:grid-cols-2">
         <div className="rounded-2xl bg-surface-2 p-6">
           <p className="text-sm font-medium text-muted-foreground">The usual way</p>
@@ -264,7 +331,7 @@ function BeforeAfter() {
 function Services() {
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
+      <SectionHead eyebrow="Prices" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
       <ul className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border">
         {SERVICES.map((s) => {
           const st = serviceStyle(s.id);
@@ -358,7 +425,7 @@ function Privacy() {
   ];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
+      <SectionHead eyebrow="Privacy" title="Handled the way you'd handle them yourself." sub="Tax papers are personal. Here is, in plain words, how we look after yours." />
       <div className="mt-10 grid gap-3 sm:grid-cols-2">
         {points.map((p) => (
           <div key={p.title} className="flex gap-4 rounded-2xl bg-surface-2 p-5">
@@ -373,7 +440,7 @@ function Privacy() {
 
 function DeadlineCta() {
   return (
-    <section className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
+    <section id="deadline" className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="font-serif text-[28px] font-medium leading-[36px] tracking-[-0.02em] sm:text-[36px] sm:leading-[44px]">October 15 is close. Your slot doesn't have to be.</h2>

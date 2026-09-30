@@ -4,24 +4,27 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// DESIGN_SYSTEM v2 §6: every fill has rest / hover / pressed steps; disabled = 50% opacity; 150ms ease-in-out.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-xs font-medium cursor-pointer transition-[color,background-color,border-color,transform] duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:opacity-60 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-[13px] font-medium cursor-pointer transition-[color,background-color,border-color,box-shadow,opacity] duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        accent: "bg-ink text-white hover:bg-ink/90",
-        highlight: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-secondary text-destructive hover:bg-secondary/80",
-        outline: "bg-fill-subtle text-deep-ink hover:bg-fill-selected",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "bg-transparent text-deep-ink hover:bg-fill-subtle",
+        default: "bg-ink text-white hover:bg-ink-hover active:bg-ink-pressed",
+        accent: "bg-ink text-white hover:bg-ink-hover active:bg-ink-pressed",
+        dark: "bg-dark-0 text-white hover:bg-dark-1 active:bg-dark-2",
+        highlight: "bg-dark-0 text-white hover:bg-dark-1 active:bg-dark-2",
+        destructive: "bg-alert-negative text-alert-negative-fg hover:bg-[#FCE1DB] active:bg-[#F9C7BE]",
+        outline: "border border-line-2 bg-transparent text-deep-ink hover:border-line-3 hover:bg-line-1 active:bg-tint-2",
+        secondary: "bg-tint-1 text-deep-ink hover:bg-tint-2 active:bg-[rgba(115,115,115,0.22)]",
+        ghost: "bg-transparent text-deep-ink hover:bg-tint-1 active:bg-tint-2",
         link: "text-ink text-sm font-semibold underline-offset-4 hover:underline active:opacity-70",
       },
       size: {
         default: "h-8 px-4",
-        sm: "h-8 px-3",
-        lg: "h-11 px-5 text-sm font-medium",
+        sm: "h-8 px-3 text-xs",
+        md: "h-10 px-4 text-sm",
+        lg: "h-12 px-6 text-[15px]",
         icon: "size-10 rounded-[10px] sm:size-8 sm:rounded-lg",
       },
     },

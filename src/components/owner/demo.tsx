@@ -72,7 +72,7 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
   return (
     <>
       <div className={inline ? "flex gap-2" : "fixed bottom-20 right-5 z-40 flex gap-2"}>
-        <Button size="icon" variant={phone ? "default" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className={inline ? "size-8 rounded-lg" : "h-11 w-11 rounded-full"}>
+        <Button size="icon" variant={phone ? "dark" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className={inline ? "size-8 rounded-lg" : "h-11 w-11 rounded-full"}>
           <Smartphone className="h-4 w-4" />
         </Button>
         <Button variant={inline ? "secondary" : "default"} onClick={() => setOpen(true)} className={inline ? "h-8 flex-1 gap-2 rounded-lg px-3 text-xs" : "h-11 gap-2 rounded-full px-4 text-sm"}>

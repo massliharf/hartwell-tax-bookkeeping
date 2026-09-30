@@ -181,9 +181,9 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
           <div key={x.key} className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm text-deep-ink">{x.label}</span>
             {x.type === "count" ? (
-              <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" variant={ans[x.key] === n ? "default" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
+              <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" variant={ans[x.key] === n ? "dark" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
             ) : (
-              <div className="flex gap-1">{([true, false] as const).map((v) => <Button key={String(v)} size="sm" variant={ans[x.key] === v ? "default" : "secondary"} aria-pressed={ans[x.key] === v} onClick={() => setAns({ ...ans, [x.key]: v })}>{v ? "Yes" : "No"}</Button>)}</div>
+              <div className="flex gap-1">{([true, false] as const).map((v) => <Button key={String(v)} size="sm" variant={ans[x.key] === v ? "dark" : "secondary"} aria-pressed={ans[x.key] === v} onClick={() => setAns({ ...ans, [x.key]: v })}>{v ? "Yes" : "No"}</Button>)}</div>
             )}
           </div>
         ))}

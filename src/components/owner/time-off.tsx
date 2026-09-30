@@ -69,7 +69,7 @@ export function TimeOff() {
           </span>}
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
-          {LABELS.map((l) => <Button key={l} type="button" size="sm" variant={label === l ? "default" : "secondary"} aria-pressed={label === l} onClick={() => setLabel(label === l ? "" : l)}>{l}</Button>)}
+          {LABELS.map((l) => <Button key={l} type="button" size="sm" variant={label === l ? "dark" : "secondary"} aria-pressed={label === l} onClick={() => setLabel(label === l ? "" : l)}>{l}</Button>)}
           <Input aria-label="Label (optional)" placeholder="Label (optional)" value={label} maxLength={60} onChange={(e) => setLabel(e.target.value)} className="h-8 w-44 bg-sheet" />
         </div>
         {!valid && !allDay && <p className="text-xs text-destructive">The end time must be after the start time.</p>}

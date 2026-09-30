@@ -35,9 +35,9 @@ function Wordmark() {
 
 const LINKS = [{ href: "/#what", label: "What we do" }, { href: "/#how", label: "How it works" }, { href: "/#services", label: "Prices" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
 
-export function SiteHeader() {
+export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   return (
-    <header className="sticky top-0 z-40 bg-canvas/85 backdrop-blur-md">
+    <header className={`sticky top-0 z-40 backdrop-blur-lg ${warm ? "bg-paper-warm/85" : "bg-canvas/85"}`}>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
         <Wordmark />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
@@ -62,32 +62,41 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 bg-surface-2 text-body lg:mt-24">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr]">
+    <footer className="mt-16 bg-night text-white/80 lg:mt-24">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
-          <p className="text-base font-semibold text-deep-ink">Hartwell Tax & Bookkeeping</p>
-           <p className="mt-2 max-w-sm text-sm text-muted-foreground">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
+          <p className="flex items-center gap-2.5 text-base font-semibold text-white"><span aria-hidden="true" className="grid size-8 place-items-center rounded-lg bg-ink font-serif text-base text-white">H</span>Hartwell Tax</p>
+          <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
         <div className="text-sm">
-           <p className="mb-2 text-xs font-medium text-muted-foreground">Visit</p>
+          <p className="mb-3 font-serif text-base font-semibold text-[#8FA3FF]">Book</p>
+          <ul className="space-y-2">
+            <li><Link to="/book" className="hover:text-white">Book an appointment</Link></li>
+            <li><Link to="/book/returning" className="hover:text-white">My appointment</Link></li>
+            <li><a href="/#services" className="hover:text-white">Prices</a></li>
+            <li><a href="/#faq" className="hover:text-white">FAQ</a></li>
+          </ul>
+        </div>
+        <div className="text-sm">
+          <p className="mb-3 font-serif text-base font-semibold text-[#8FA3FF]">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
-          <a href="tel:+19735550142" className="tabular mt-2 flex min-h-10 items-center hover:text-deep-ink">(973) 555-0142</a>
+          <a href="tel:+19735550142" className="tabular mt-1 flex min-h-10 items-center hover:text-white">(973) 555-0142</a>
         </div>
         <div className="text-sm">
-           <p className="mb-2 text-xs font-medium text-muted-foreground">Hours</p>
+          <p className="mb-3 font-serif text-base font-semibold text-[#8FA3FF]">Hours</p>
           {HOURS.map((h) => (
             <p key={h.days} className="tabular flex justify-between gap-4 whitespace-nowrap">
               <span>{h.days}</span>
-              <span className="text-muted-foreground">{h.time}</span>
+              <span className="text-white/50">{h.time}</span>
             </p>
           ))}
         </div>
       </div>
-      <div className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-muted-foreground">
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-white/50">
           <span>© {new Date().getFullYear()} Hartwell Tax & Bookkeeping</span>
-          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-deep-ink">Owner login</Link>
+          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner login</Link>
         </div>
       </div>
     </footer>

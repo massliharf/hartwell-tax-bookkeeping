@@ -16,7 +16,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/40 duration-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
+      "fixed inset-0 z-50 bg-overlay-light backdrop-blur-[2px] data-[state=open]:animate-[overlay-in_150ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:duration-150",
       className,
     )}
     {...props}
@@ -34,7 +34,7 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid max-h-[90dvh] w-[calc(100%-16px)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-2xl border border-[rgba(16,16,16,0.05)] bg-sheet p-6 shadow-lift duration-200 ease-[cubic-bezier(0,0,0.2,1)] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
+        "fixed left-1/2 top-1/2 z-50 grid max-h-[90dvh] w-[calc(100%-16px)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-2xl border border-line-0 bg-sheet p-6 shadow-[0_0_2px_rgba(18,18,18,0.08),0_25px_10px_rgba(18,18,18,0.02),0_14px_9px_rgba(18,18,18,0.02),0_6px_6px_rgba(18,18,18,0.04),0_2px_4px_rgba(18,18,18,0.04)] data-[state=open]:animate-[modal-in_220ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:duration-150",
         className,
       )}
       {...props}

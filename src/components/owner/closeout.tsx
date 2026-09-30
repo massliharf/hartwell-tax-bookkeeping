@@ -95,6 +95,7 @@ export function AiTag({ i }: { i: Item }) {
   if (i.status !== "uploaded") return null;
   if (i.review_status === "needs_fix") return <Tag tone="warning">Fix requested</Tag>;
   if (i.review_status === "accepted") return <Tag tone="success">{i.ai_check === "ok" ? "Auto-checked" : "Accepted"}</Tag>;
+  if (i.ai_check === "ok") return <Tag tone="success">Auto-checked</Tag>;
   if (i.ai_check === "warning") return <Tag>Client is replacing it</Tag>;
   if (i.ai_check === "unreadable") return <Tag tone="warning">Couldn't be read</Tag>;
   return <Tag tone="warning">Needs your eyes</Tag>;
@@ -134,7 +135,7 @@ export function DocReview({ i, inline = false, onDone }: { i: Item; inline?: boo
       {fixing && (
         <div className="mt-2 space-y-2 rounded-xl bg-surface-2 p-3">
           <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Reason">
-            {REASONS.map((r) => <Button key={r} type="button" size="sm" variant={reason === r ? "default" : "secondary"} role="radio" aria-checked={reason === r} onClick={() => setReason(r)}>{r}</Button>)}
+            {REASONS.map((r) => <Button key={r} type="button" size="sm" variant={reason === r ? "dark" : "secondary"} role="radio" aria-checked={reason === r} onClick={() => setReason(r)}>{r}</Button>)}
           </div>
           <Input aria-label="Note to the client (optional)" placeholder="Note to the client (optional)" value={note} maxLength={400} onChange={(e) => setNote(e.target.value)} className="h-9" />
           <div className="flex gap-2">

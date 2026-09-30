@@ -51,6 +51,19 @@
   --color-fill-neutral: var(--fill-neutral);
   --color-fill-subtle: var(--fill-subtle);
   --color-fill-selected: var(--fill-selected);
+  --color-ink-hover: var(--ink-hover);
+  --color-ink-pressed: var(--ink-pressed);
+  --color-dark-0: var(--dark-0); --color-dark-1: var(--dark-1); --color-dark-2: var(--dark-2);
+  --color-tint-0: var(--tint-0); --color-tint-1: var(--tint-1); --color-tint-2: var(--tint-2);
+  --color-line-0: var(--line-0); --color-line-1: var(--line-1); --color-line-2: var(--line-2); --color-line-3: var(--line-3);
+  --color-form-border: var(--form-border); --color-form-focus: var(--form-focus);
+  --color-alert-success: var(--alert-success); --color-alert-success-fg: var(--alert-success-fg);
+  --color-alert-info: var(--alert-info); --color-alert-info-fg: var(--alert-info-fg);
+  --color-alert-warning: var(--alert-warning); --color-alert-warning-fg: var(--alert-warning-fg);
+  --color-alert-negative: var(--alert-negative); --color-alert-negative-fg: var(--alert-negative-fg);
+  --color-paper-warm: var(--paper-warm);
+  --color-night: var(--night);
+  --color-overlay-light: var(--overlay-light);
   --color-body: #363636;
   --color-paper: var(--paper);
   --color-sheet: var(--sheet);
@@ -86,6 +99,20 @@
 :root {
   --radius: 8px;
   --canvas: #F5F5F5;
+  /* DESIGN_SYSTEM v2: 3-step fills (rest / hover / pressed) */
+  --ink-hover: #2441C9;
+  --ink-pressed: #1B33A6;
+  --dark-0: #1A1A1A; --dark-1: #424242; --dark-2: #616161;
+  --tint-0: rgba(115,115,115,0.05); --tint-1: rgba(115,115,115,0.10); --tint-2: rgba(115,115,115,0.15);
+  --line-0: rgba(16,16,16,0.05); --line-1: rgba(16,16,16,0.10); --line-2: rgba(16,16,16,0.20); --line-3: rgba(16,16,16,0.30);
+  --form-border: rgba(16,16,16,0.15); --form-focus: #93A6F5;
+  --alert-success: #E7F5F0; --alert-success-fg: #107A56;
+  --alert-info: #EDF0FD; --alert-info-fg: #2F54EB;
+  --alert-warning: #FDF8EA; --alert-warning-fg: #9A6B00;
+  --alert-negative: #FEF0ED; --alert-negative-fg: #C23A20;
+  --paper-warm: #F4F3EF;
+  --night: #0F0F0F;
+  --overlay-light: rgba(229,231,235,0.7);
   --surface-2: #FCFCFC;
   --fill-neutral: #EDEDED;
   --fill-subtle: rgba(115,115,115,0.05);
@@ -190,12 +217,33 @@
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 
 /* Type scale (DESIGN_SYSTEM.md section 1). One class per role keeps every page consistent. */
-@utility t-hero { font-family: var(--font-serif); font-weight: 500; font-size: 40px; line-height: 44px; letter-spacing: -0.03em; @media (width >= 40rem) { font-size: 60px; line-height: 64px; } }
+@utility t-hero { font-family: var(--font-serif); font-weight: 600; font-size: 40px; line-height: 44px; letter-spacing: -0.03em; @media (width >= 40rem) { font-size: 60px; line-height: 64px; } }
 @utility t-page { font-family: var(--font-serif); font-weight: 500; font-size: 24px; line-height: 32px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 28px; line-height: 36px; } }
-@utility t-section { font-family: var(--font-serif); font-weight: 500; font-size: 26px; line-height: 34px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 32px; line-height: 40px; } }
+@utility t-section { font-family: var(--font-serif); font-weight: 600; font-size: 26px; line-height: 34px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 32px; line-height: 40px; } }
 @utility t-card { font-family: var(--font-serif); font-weight: 500; font-size: 20px; line-height: 30px; letter-spacing: -0.2px; }
-@utility t-owner { font-family: var(--font-sans); font-weight: 400; font-size: 18px; line-height: 26px; letter-spacing: 0; }
+@utility t-owner { font-family: var(--font-serif); font-weight: 500; font-size: 22px; line-height: 30px; letter-spacing: -0.01em; @media (width >= 40rem) { font-size: 24px; line-height: 32px; } }
 
 /* Page-level entrance (DESIGN_SYSTEM.md: fade in, 200ms, decelerate). Disabled for reduced motion by the global rule. */
 @utility enter { animation: enter-fade 200ms cubic-bezier(0, 0, 0.2, 1) both; }
 @keyframes enter-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ---------- DESIGN_SYSTEM v2 motion (measured on magnific.com/app) ---------- */
+@keyframes title-enter { from { opacity: 0; transform: translateY(50px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes spot-enter { from { opacity: 0; filter: blur(5px); transform: scale(0.96); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes tile-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes item-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes menu-in { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.96) translateY(2px); } to { opacity: 1; transform: none; } }
+@keyframes skeleton-fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@utility enter-title { animation: title-enter 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@utility enter-spot { animation: spot-enter 0.8s cubic-bezier(0.4, 0, 0.2, 1) both; }
+@utility enter-tile { animation: tile-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@utility enter-item { animation: item-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@utility ease-expo { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+@utility ease-pop { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+@utility skeleton { background: var(--color-fill-neutral, #ECECEC); animation: skeleton-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+/* Marketing: bold lead sentence + grey continuation (magnific.com/desktop) */
+@utility lead-text { font-size: 20px; line-height: 30px; color: #616161; @media (width >= 40rem) { font-size: 22px; line-height: 33px; } & > b, & > strong { color: #1A1A1A; font-weight: 600; } }
+@utility eyebrow { font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink); }

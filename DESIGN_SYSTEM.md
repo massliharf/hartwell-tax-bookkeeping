@@ -1,439 +1,164 @@
-# DESIGN_SYSTEM.md — "Studio Shell"
-
-Faithful extraction of a modern pro-tool web app shell, measured from live computed styles.
-Only brand-specific items are swapped (see section 0). Everything else is exact.
-
----
-
-## 0. Brand swap (the ONLY deviations)
-
-| Original element | Use instead |
-|---|---|
-| Logo | Hartwell Tax wordmark (Geist 600) |
-| Brand accent pink #FF57AE | Hartwell blue #2F54EB, in the same usage slots: Create button, upgrade/primary text link, count badges, accent badges at 15% alpha, active display-tab underline |
-| Display font "Klarheit" (commercial license) | "Figtree" 500 (Google Fonts), same sizes and tracking |
-| Category icon hues | Keep the method (icon color + the same color at 10% alpha as tile background) with our service colors |
-
----
-
-## 1. Fonts
-
-- **UI font:** Geist (400 / 500 / 600 / 700). Default body 16/24, color #0D0D0D.
-- **Display font** (swap: Figtree 500): only for the greeting h1, big page tabs and content-card titles.
-
-| Use | Font | Size / line-height | Weight | Tracking | Color |
-|---|---|---|---|---|---|
-| Home greeting h1 | Display | 28/42 (mobile 24/36) | 500 | 0 | #1A1A1A |
-| Big page tabs | Display | 28/38.5 | 400 | -0.28px | #1A1A1A, inactive opacity 0.2 |
-| Content card title | Display | 20/30 | 500 | -0.2px | #1A1A1A |
-| Content card text | Display | 16/24 | 400 | 0 | #363636 |
-| Section heading (h2) | Geist | 20/30 | 500 | 0 | #1A1A1A |
-| Page title in panels | Geist | 18/26 | 400 | 0 | #1A1A1A |
-| Command/search text, palette items | Geist | 15/24 | 400 | 0 | #424242 (placeholder #616161) |
-| Category tile label | Geist | 15/24 | 500 | 0 | #1A1A1A |
-| Body small, modal item title | Geist | 14/22.75 | 400 | 0 | #363636 |
-| Buttons, nav, sub-nav, tabs | Geist | 12/18 | 500 | 0 | #1A1A1A |
-| Descriptions, meta, nav labels | Geist | 12/18 | 400 | 0 | #616161 / #363636 |
-| Segmented control items | Geist | 12/18 | 600 | 0 | active #1A1A1A, inactive #616161 |
-| Micro labels, badges | Geist | 10/16 | 500 | 0.2px | per badge |
-| Form section labels | Geist | 10/24 | 600 | 0 | #616161, uppercase |
-| Palette section header | Geist | 14/22.75 | 400 | 0 | #616161, uppercase |
-| Mobile tab bar labels | Geist | 10/15 | 400 | 0 | #737373 |
-| Count badge number | Geist | 8/8 | 700 | 0 | #FFFFFF |
-
----
-
-## 2. Colors
-
-### Neutrals
-
-| Token | Value | Use |
-|---|---|---|
-| canvas | #F5F5F5 | App background behind all panels |
-| panel | #FFFFFF | Sidebar, sub-panel, main panels, cards, menus, modals |
-| surface | #FAFAFA | Home content panel background, mobile page background |
-| surface-2 | #FCFCFC | Grouped rows, sticky toolbars, mobile tab bar |
-| fill-neutral | #EDEDED | Neutral buttons, segmented track, image cards background |
-| fill-indicator | #DBDBDB | Segmented active indicator |
-| fill-disabled | #E3E3E3 | Disabled large button (text #616161) |
-| fill-subtle | rgba(115,115,115,0.05) | Secondary buttons, tags, hover |
-| fill-selected | rgba(115,115,115,0.15) | Active nav item, toggled buttons |
-| dark | #1A1A1A | Primary dark buttons, dark chips |
-| dark-card | #2B2B2B | Dark media cards |
-| skeleton | #F0F0F0 | Loading blocks |
-
-### Text
-
-| Token | Value |
-|---|---|
-| text-primary | #1A1A1A |
-| text-nav | #363636 |
-| text-item | #424242 |
-| text-secondary | #616161 |
-| text-tertiary | #737373 |
-
-### Borders
-
-| Token | Value | Use |
-|---|---|---|
-| border-faint | rgba(16,16,16,0.05) | Modals |
-| border | rgba(16,16,16,0.1) | Cards, menus, inputs, command bar, tags, dividers |
-| border-input | rgba(16,16,16,0.15) | Inputs inside modals |
-| border-strong | rgba(16,16,16,0.2) | Strong outlines |
-
-### Overlays
-
-| Use | Value |
-|---|---|
-| Command palette | rgba(26,26,26,0.8) + backdrop blur 4px |
-| Modals | rgba(0,0,0,0.4) |
-
-### Accent and states
-
-| Token | Value | Use |
-|---|---|---|
-| accent (swapped) | #2F54EB | Create button, text links, count badges, active display-tab underline |
-| accent-tint | accent at 15% alpha | Accent badges, "New" pills |
-| focus | #4F69F2 | Toggle switches, focused input border |
-
-### Category tiles
-
-Icon color at 100%, tile background = the same color at 10% alpha.
-Examples: rgb(133,102,220) on rgba(133,102,220,0.1); rgb(79,105,242) on rgba(79,105,242,0.1).
-
----
-
-## 3. Radius
-
-| Value | Where |
-|---|---|
-| 16px | All panels (sidebar, sub-panel, main), cards, dropdown menus, modals, command bar, tile links, mobile tab bar (top corners only) |
-| 12px | Context header card in forms |
-| 10px | Mobile icon buttons |
-| 8px | Buttons, nav items, icon tiles, menu items, inputs, text box, image cards, segmented track |
-| 6px | Segmented active indicator |
-| 4px | Metadata tags, accent badges |
-| 3px | Project color squares |
-| 9999px | Pill tabs, chips, avatar, filter chips, "New" pill |
-
----
-
-## 4. Elevation
-
-- **Panels and cards: no shadow.** Depth comes from the canvas (#F5F5F5) against white panels.
-- **Dropdowns, popovers, coach marks:** 1px border rgba(16,16,16,0.1) plus this layered shadow:
-
-```css
-box-shadow:
-  0 0 2px rgba(18,18,18,.08),
-  0 2px 4px rgba(18,18,18,.08),
-  0 6px 6px rgba(18,18,18,.04),
-  0 14px 9px rgba(18,18,18,.02),
-  0 25px 10px rgba(18,18,18,.02);
-```
-
-- **Modals:** 1px border rgba(16,16,16,0.05), overlay behind.
-
----
-
-## 5. Motion
-
-| What | Value |
-|---|---|
-| Hover color / background / border | 150ms cubic-bezier(0.4,0,0.2,1) |
-| General state change | all 200ms cubic-bezier(0.4,0,0.2,1) |
-| Press / scale | transform 150ms cubic-bezier(0.4,0,0.2,1) |
-| Carousels, sliding panels | transform 500ms cubic-bezier(0,0,0.2,1) |
-| Fade in | opacity 200ms cubic-bezier(0,0,0.2,1) |
-| Sidebar collapse / expand | padding + gap 200ms cubic-bezier(0.4,0,0.2,1) |
-| Segmented control, pill tabs | Active indicator slides between items |
-| Menus | Open from their trigger (the Create menu slides out next to the sidebar) |
-| Command bar placeholder | Rotating typewriter text between hints |
-| Loading | Skeleton blocks in #F0F0F0 matching the final layout (cards, chips, toolbar) |
-| prefers-reduced-motion | Respected: remove non-essential motion |
-
----
-
-## 6. App shell (desktop, 640px and up)
-
-### Root
-
-Canvas #F5F5F5 with 8px padding on all sides.
-
-### Sidebar (left panel)
-
-- White, radius 16, full height.
-- **Expanded:** 224px wide, padding 16px 20px, vertical gap 16.
-- **Collapsed:** 72px icon rail. The collapse toggle sits right of the logo; the state is remembered per user.
-- **Collapsed tooltips:** on hover, placed to the right; light grey surface, 14px text, small shadow, arrow.
-- **Order, top to bottom:**
-  1. Logo row with collapse toggle
-  2. Create button
-  3. Primary nav
-  4. 1px divider rgba(16,16,16,0.1)
-  5. Tools nav
-  6. Flexible space
-  7. Optional promo card
-  8. Footer row of icon buttons (connections, learn, notifications with count badge, settings, more)
-- **Create button:** 32×32 accent square (radius 8, white plus icon) + label "Create" 12/500.
-- **Nav item:** 184×32, radius 8, 32×32 icon box with a 14px icon, gap 10, label 12/400 #363636. Pitch 36px (4px gap). Active: fill-selected. Hover: fill-subtle.
-
-### Content column
-
-- 8px gap between sidebar and content.
-- **Header (60px, transparent, padding 0 16):**
-  - Left: breadcrumb, 12/400 #616161 with "›" separators; the current page in #1A1A1A.
-  - Right: accent text link 14/600, neutral 32h button with icon, 32×32 icon buttons, 32px avatar with colored ring.
-- Panels start directly below the header (y = 68).
-
-### Two-level pages
-
-- Secondary panel: 256px, white, radius 16, padding 20px 10px, gap 2.
-- 4px gap, then the main panel: white, radius 16, padding 16px 24px.
-- **Secondary nav item:** 32h, padding 4px 16px, radius 8, 14px icon + label 12/500, active fill-selected.
-- **Section label inside:** 12px uppercase #616161, padding 6px 16px, with optional trailing icon buttons (search, +).
-
-### Main panel header row (32h)
-
-- Title on the left (18/400).
-- Actions on the right, in this order: dark primary "+ Add/Create", icon buttons, segmented control or neutral toggle buttons (Layout, Filters), search icon.
-- Active filters appear below as pill chips with an avatar and ×.
-
----
-
-## 7. Components
-
-### Buttons
-
-Base: height 32, radius 8, padding 0 16, 12/500, 14px icon with 8px gap.
-
-| Variant | Style |
-|---|---|
-| Primary dark | bg #1A1A1A, white text |
-| Neutral | bg #EDEDED, text #1A1A1A |
-| Secondary subtle | bg rgba(115,115,115,0.05) |
-| Toggled / active | bg rgba(115,115,115,0.15) |
-| Ghost | Transparent; "See all ›" style with trailing chevron |
-| Icon button | 32×32, radius 8 |
-| Accent text link | 14/600 accent color, no background |
-| Large action (forms, tools) | Full width, 40h, radius 8, 14/400, trailing icon; disabled bg #E3E3E3 with text #616161 |
-| Mobile icon buttons | 40×40, radius 10, same fills |
-
-### Command bar
-
-- Max width 768, height 50, white, radius 16, 1px border rgba(16,16,16,0.1), inner padding 6px 16px, gap 8.
-- Leading 16px search icon, placeholder 15/400 #616161, trailing "⌘ K" hint 12px.
-- Clicking it or pressing ⌘K opens the **command palette** in the same position:
-  - 768 wide, radius 16, 1px border, overlay rgba(26,26,26,0.8) + blur 4px.
-  - Search row on top with trailing icon buttons.
-  - Grouped list below, each group with an uppercase 14px header in #616161.
-  - Items 40h, radius 8: 28px tinted icon tile + 15/400 label + right-aligned shortcut hints. The highlighted item gets fill-selected.
-  - Footer hint bar: "↑↓ Navigate", "↵ Select", "Esc Close".
-
-### Category tiles
-
-- Link 104×124, radius 16, padding 20px 0, gap 12, centered.
-- Icon tile 48×48, radius 8, tinted background, 20px icon.
-- Label 15/500.
-- Selected or current tile: grey tile (#E3E3E3).
-
-### Info bar
-
-- White card, radius 16, height 54, padding 12px 18px, gap 16.
-- Title on the left (14/400).
-- Inline links on the right, separated by 1px vertical dividers; each has icon + label + ↗, optional "New" pill.
-- Close × at the end.
-- Mobile: wraps and centers.
-
-### Cards
-
-- **Content card on surface:** white, radius 16, padding 16px 28px, no shadow.
-- **Image / use-case card:** bg #EDEDED, radius 8, padding 16; text on the left, media on the right (media radius 8, play button overlay).
-- **Media card (dark):** full-bleed image, radius 16. Top-left label chip (12px white on dark translucent), title in display 20/500 white, white pill button.
-- **Carousel:** horizontal row, pagination dots (the active dot is a longer dark pill) plus prev/next 32px round arrow buttons.
-- **Grouped row block:** bg #FCFCFC, bottom radius 16, padding 0 12px 12px. Header line with 12px text, metadata tags, checkbox and timestamp (12/400 #424242).
-
-### Lists and badges
-
-- **Project row:** 28h. 12px colored square (radius 3) + 14px label + trailing lock/share icon or badge.
-- **Accent badge:** accent at 15% background, accent text 10/500, tracking 0.2px, uppercase, radius 4.
-- **"New" pill:** accent tint background, accent text 10/500, radius 9999.
-- **Metadata tag:** 24h, radius 4, 1px border rgba(16,16,16,0.1), bg rgba(115,115,115,0.05), 12/400.
-- **Count badge:** accent circle 14px, white 8/700.
-
-### Tabs
-
-- **Pill tabs:** 32h, radius 9999, padding 0 16, 12/500. Inactive text #616161. Active text #1A1A1A on a grey pill that slides.
-- **Display tabs (page-level):** display font 28/400. Inactive opacity 0.2; active opacity 1 with a 2px accent underline. A description line sits below (14–16px #616161).
-- **Segmented control:** track #EDEDED, radius 8, padding 4, gap 4, height 32. Items 24h, padding 6px 16px, 12/600. Active indicator #DBDBDB, radius 6, sliding.
-
-### Menus and modals
-
-- **Dropdown menu:**
-  - 224 wide, white, radius 16, padding 8px 0, 1px border + layered shadow.
-  - Items 32h, radius 8, padding 6px 8px 6px 4px, gap 10; 14px tinted icon + 12/400 label.
-  - Groups separated by a 1px divider; secondary actions (+ New …) at the bottom.
-- **Large picker modal:**
-  - 1024 wide, white, radius 16, padding 24, 1px border rgba(16,16,16,0.05), overlay rgba(0,0,0,0.4).
-  - Header row: pill tabs on the left, search input on the right (240×32, radius 8, 1px border rgba(16,16,16,0.15)).
-  - Body: uppercase group label, then a 3-column grid of items. Each item: button radius 8, padding 6; 40×40 tinted icon tile (radius 8); title 14/400 #363636; description 12/400 #616161. Optional pin icon on hover.
-- **Coach mark popover:** about 250 wide, white, radius 16, border + layered shadow, image area, 12px text, dark button bottom-right, close ×.
-
-### Forms (control panel)
-
-- **Panel column:** about 288px content width inside a white panel.
-- **Top:** pill tabs row with a horizontal scroll arrow.
-- **Context header card:**
-  - bg #F5F5F5 (or category tint), radius 12, padding 8px 8px 8px 12px.
-  - Back link "‹ Parent" 12px; title 14/500 with help icon.
-  - Square secondary button on the right (icon + 10px label).
-- **Section label:** 10/600 uppercase #616161, then the control.
-- **Text box:**
-  - Radius 8, 1px border rgba(16,16,16,0.1), padding 12px 12px 0, text 14/400.
-  - Focus: border #4F69F2.
-  - Footer row inside the box: blue toggle switch + 12px label, icon actions on the right.
-- **Number stepper:** "– 4 +" in a neutral 32h control.
-- **Select chips:** icon + value, 32h.
-- **Primary action:** full-width 40h button at the end of the form.
-- **Results area:**
-  - White panel, radius 16, padding 0 16 24.
-  - Sticky toolbar on #FCFCFC with top radius 16, padding 12.
-  - Responsive card grid (4 columns on desktop).
-
-### Empty state
-
-Centered in the panel:
-- 24px line icon, #616161
-- Title 20/500, #424242
-- Description 14/400 #616161, centered, max width about 600px
-- Optional single button
-
----
-
-## 8. Page templates
-
-**A. Dashboard home**
-- Content panel on #FAFAFA, inner padding 48px 24px, max width 1280 centered, 48px gap between sections.
-- Order:
-  1. Greeting h1 (display font)
-  2. Command bar
-  3. Category tiles row
-  4. Info bar
-  5. Two-column row: list card (302px) + large card with empty state
-  6. Centered "My work ›" link
-  7. Pill tabs + carousel with "Explore all ›"
-
-**B. Two-level library**
-- Sidebar + 256px secondary panel + main panel.
-- Header row with title and actions, filter chips, then content (list, grid or empty state).
-
-**C. Discover / browse**
-- Display tabs + description.
-- Sections, each with an h2 (20/500) + "See all ›" + arrows, then a horizontal card row.
-
-**D. Tool workspace**
-- Left control panel (form pattern) + right results panel.
-
-**E. Marketing-style catalog (inside the shell)**
-- Header with a wide search.
-- Hero banner: image collages left and right, centered title.
-- 4-column category cards (thumbnail + label).
-- Curated sections, each with an "Explore …" neutral button.
-
----
-
-## 9. Responsive
-
-### 640px and up (tested 700–1920)
-
-- Full shell: sidebar 224 expanded by default, collapsible to a 72 rail.
-- Panels on an 8px canvas.
-
-### Below 640px (tested 390–600)
-
-- Sidebar removed.
-- **Top bar (60h):** logo left, breadcrumb centered on inner pages, avatar right.
-- **Page:** bg #FAFAFA, content padding 40px 24px. Inner pages use one white panel with top radius 16.
-- **Page header:** 32×32 grey back button (‹) + title 20–22px + icon-only actions (dark +, neutral filter, search).
-- **Secondary navigation** becomes back navigation.
-- **Content:** h1 24px, category tiles wrap into rows, info bar wraps and centers.
-- **Bottom tab bar (fixed):** 63h, #FCFCFC, top radius 16, padding 12px 20px, 5 items (20px icon + 10px label #737373).
-
----
-
-## 10. Rules for applying this system to our product
-
-1. Do not add, remove or reorder features, sections, steps or fields. Keep every existing flow exactly as it is.
-2. For each existing screen, pick the closest template from section 8 and the matching components from section 7. If a needed component doesn't exist here, build it from the same tokens (sizes, radius, fills, type).
-3. Owner app → Template B shell: sidebar + panels, tabs, segmented controls, tables as grouped rows, command palette on ⌘K.
-4. Booking flow → Template D logic: left panel holds the current step's form; right panel is the live checklist (the "results area").
-5. Public pages keep their current sections and copy; only the visual layer changes to these tokens and components.
-6. Change only the UI layer. Never touch the database schema, server functions, routes, automations or email logic.
-
----
-
-## 11. Implementation tokens
-
-```css
-:root {
-  --canvas: #F5F5F5;
-  --panel: #FFFFFF;
-  --surface: #FAFAFA;
-  --surface-2: #FCFCFC;
-  --fill-neutral: #EDEDED;
-  --fill-indicator: #DBDBDB;
-  --fill-disabled: #E3E3E3;
-  --fill-subtle: rgba(115,115,115,0.05);
-  --fill-selected: rgba(115,115,115,0.15);
-  --dark: #1A1A1A;
-  --dark-card: #2B2B2B;
-  --skeleton: #F0F0F0;
-
-  --text-primary: #1A1A1A;
-  --text-nav: #363636;
-  --text-item: #424242;
-  --text-secondary: #616161;
-  --text-tertiary: #737373;
-
-  --border-faint: rgba(16,16,16,0.05);
-  --border: rgba(16,16,16,0.1);
-  --border-input: rgba(16,16,16,0.15);
-  --border-strong: rgba(16,16,16,0.2);
-
-  --accent: #2F54EB;
-  --accent-tint: rgba(30,91,71,0.15);
-  --focus: #4F69F2;
-
-  --radius-panel: 16px;
-  --radius-context: 12px;
-  --radius-control: 8px;
-  --radius-indicator: 6px;
-  --radius-tag: 4px;
-
-  --shadow-pop: 0 0 2px rgba(18,18,18,.08), 0 2px 4px rgba(18,18,18,.08),
-                0 6px 6px rgba(18,18,18,.04), 0 14px 9px rgba(18,18,18,.02),
-                0 25px 10px rgba(18,18,18,.02);
-
-  --ease-standard: cubic-bezier(0.4,0,0.2,1);
-  --ease-out: cubic-bezier(0,0,0.2,1);
-
-  --font-ui: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Figtree", "Geist", ui-sans-serif, system-ui, sans-serif;
-}
-
-body {
-  background: var(--canvas);
-  color: #0D0D0D;
-  font-family: var(--font-ui);
-  font-size: 16px;
-  line-height: 24px;
-}
-```
-
-Font loading (index.html):
-
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Figtree:wght@400;500&display=swap" rel="stylesheet">
-```
+# DESIGN_SYSTEM v2 — "Studio Shell", re-extracted from magnific.com
+
+Source: live extraction on 30 Sep 2026 from the full stylesheet (app-initial.css, 757 KB: 239 theme tokens, 40 keyframes,
+all easing/shadow/type/radius utilities) plus DOM measurement of 16 pages at 1568px:
+App: /app, /app/explore, /app/projects/work, /app/library/characters, /app/spaces, /app/ai-image-generator,
+/app/ai-video-generator, /app/voiceover-generator, /app/tools/image, /app/tools/designer, /user/organization/api-keys, /academy, /pricing
+Marketing: /desktop, /api (+ mega menu, footer)
+Overlays opened live: popover (Layout/Filters), modal (Upgrade), mega menu.
+
+What changed vs v1 (v1 was built from 7 pages and guessed several things):
+- Magnific's primary color is BLUE #4f69f2 (hover #344ce7, pressed #2236d2). Dark #1a1a1a is "secondary". Pink #ff58ae is "emphasis"
+  (Create button, Upgrade link, notification counts), not the main accent.
+- Fonts: UI = Geist; headings/display = Klarheit (500 in app, 600–700 on marketing). Our substitute for Klarheit: Figtree 500/600.
+- Motion is a real system (staggered entrances, expo-out easing, blur-in hero), not just 150ms hovers.
+- Modal overlay is LIGHT (rgba(229,231,235,.7)), not dark.
+- Every interactive fill has 3 steps: rest / hover / pressed (…-0 / …-1 / …-2).
+
+------------------------------------------------------------------------------------------------------------------------
+## 1. Color tokens (use these names; values are Magnific's, brand swap in §1.9)
+
+### 1.1 Surfaces
+surface-0 #ffffff (panels, cards) · surface-1 #f5f5f5 (app canvas) · surface-2 #ececec (selected nav, skeleton) · surface-3 #e3e3e3 · surface-4 #dbdbdb
+panel-2 #fafafa (settings panel) · panel-4 #ffffff (main panel) · panel-6 #fcfcfc (popovers) · surface-modal #ffffff
+
+### 1.2 Text
+fg-0 #1a1a1a (primary) · fg-1 #353535 · fg-2 #424242 (body on marketing) · fg-3 #616161 (secondary) · fg-4 #737373 (placeholder, meta)
+
+### 1.3 Borders
+alpha-0 #1010100d (card/modal hairline, 5%) · alpha-1 #1010101a (dividers, 10%) · alpha-2 #10101033 (outline buttons, 20%)
+solid-10 #1a1a1a (selected/checked) · accent-alpha #4f69f24d (focus/selected accent)
+
+### 1.4 Button fills (0 rest / 1 hover / 2 pressed)
+primary   #4f69f2 / #344ce7 / #2236d2, text #fafafa
+secondary #1a1a1a / #424242 / #616161, text #ffffff
+default   #7373730d / #7373731a / #73737326, text #1a1a1a   (neutral tinted: chips, filters, toolbar)
+ghost     transparent / #7373731a / #73737326, text #1a1a1a (nav items, icon buttons)
+outline   transparent / #1010101a / #7373731a, border #10101033 → #1010104d → #10101080
+emphasis  #ff58ae / #ff389f / #ff1a90 (Create, counters), soft #ff58ae26
+premium   #feb602 / #f4980a / #ea7e11 (gold)
+destructive bg #f9c7be, text #f66950, strong text #8c1b07
+blurred   #ffffff40 / 59 / 66 + backdrop-blur (chips over images)
+
+### 1.5 Forms
+field bg #ffffff · border #10101026 · focus/active #90abfa · error #f66950 · success #17cb8d · warning #e7ad16 · placeholder #737373
+
+### 1.6 Alerts / status (soft bg + icon color)
+success #e7f5f0 / #14a372 · information #edf0fd / #4f69f2 · warning #fdf8ea / #e7ad16 · negative #fef0ed / #f66950 · neutral #fafafa / #424242
+
+### 1.7 Category (app) colors — tile bg = color at 10%, icon = color
+image #4f69f2 · video #3cd39f · audio #00cdc6 · 3d #b39581 · designer #cc7e80 · spaces #8566dc · stock #101010
+
+### 1.8 Marketing palette (landing pages only)
+surface #f4f3ef (warm paper) · primary/ink #2c0000 (oxblood) · #3f0808 · footer bg #0f0f0f-ish (grey-950) · accents pink #ff58ae
+Dark marketing pages (API): near-black #0d0d0d background, white text, pink eyebrow labels, hairline dark cards.
+
+### 1.9 Brand swap for Hartwell Tax (the only deviations)
+primary #4f69f2 → Hartwell blue #2F54EB (hover #2441C9, pressed #1B33A6) — same role, same 3-step behavior
+emphasis pink → keep for tiny "New" dots only; Create/primary actions use primary blue
+success stays green #17804F (status only); everything else unchanged.
+
+------------------------------------------------------------------------------------------------------------------------
+## 2. Typography
+UI font: Geist (400/500/600). Display: Klarheit → substitute Figtree (500 app, 600 marketing).
+Scale (rem = 16px): 2xs .62rem · xs .75rem · sm .875rem/1.625 · base 15px · lg 1.125rem/1.5 · xl 1.25rem/1.5
+2xl 1.75rem · 3xl 1.75rem/1.375 −0.01em · 4xl 2rem/1.375 · 5xl 2.25rem/1.2 · 6xl 2.75rem/1.2 · 8xl 4rem/1.2
+Measured usage:
+- App page title (Home greeting): display 28/42 500, fg-0, centered on Home
+- Section headings in app: 20px (xl) 500, fg-0 ("Use Cases", "Featured Courses")
+- Card titles: 14px 500 (line-clamp 2); meta 12px 500/400 fg-3
+- Nav items / buttons: 13–14px; small buttons 12px 500
+- Tags/pills: 10–11px 500–600, often UPPERCASE with 0.2px tracking
+- Modal headline: display 36/49.5 400, −0.36px
+- Marketing hero: display 44–64px 600–700, tight leading (1.1–1.2); section titles 36/43 600 −0.36px
+- Marketing reading text: 20–24px, fg-3 grey with a bold fg-0 lead-in sentence ("Folders that sync themselves. Mirror any…")
+- Eyebrow label: 11px uppercase pink, above centered section titles
+
+------------------------------------------------------------------------------------------------------------------------
+## 3. Shape & elevation
+Radius: 4 (rounded) · 6 (md) · 8 (lg: buttons, inputs, nav items, icon buttons) · 12 (2lg: cards, tiles, pricing cards) · 16 (xl/2xl:
+panels, popovers, modals, big cards) · 22–24 (marketing feature cards) · full (pills, avatars, counters)
+Shadows (layered, faint): xs 0 2px 5px #3749571a · sm/md/lg/xl = 0 0 2px #12121214 + long soft drops at 2–5% (see tokens)
+Rules: panels on canvas have NO shadow (hairline border only); popovers/menus use shadow-lg; modals: border + no/soft shadow; floating
+chips over media use blur instead of shadow.
+
+------------------------------------------------------------------------------------------------------------------------
+## 4. Motion (the system)
+Easing: EXPO-OUT cubic-bezier(.16,1,.3,1) = signature for enters, modals, overlays, tiles
+        quint-out (.22,1,.36,1) enters · drawer (.32,.72,0,1) · pop (.34,1.56,.64,1) small overshoot · standard (.4,0,.2,1) state changes
+Durations: 150ms hover/color (default `transition duration-150 ease-in-out` on every button/link) · 200ms state/width/padding
+           300ms layout width (panels collapsing) · 450ms tile enter · 800ms spotlight · 1s hero title
+Recipes (measured on /app):
+- Page title enter: translateY(50px) scale(.96) opacity 0 → 1, 1s expo-out
+- Hero search/spotlight enter: blur(5px) scale(.96) opacity 0 → 1, 0.8s
+- Tile/list enter: translateY(12px) opacity 0 → 1, 0.45s expo-out, STAGGER 80ms per item (0, .08, .16, … .48s)
+- Grid/list item enter (projects, home lists): translateY(4px) opacity 0 → 1, staggered
+- Dropdown/menu: translateY(−2px) + fade (slideDownAndFade); popover/tooltip: scale(.96) translateY(2px) + fade
+- Tooltip: 6px → 4px offset + fade in the first 25% of the animation
+- Modal: overlay fade .15s expo-out; content fade + scale(.96→1)
+- Accordion: height 0 ↔ content height + opacity
+- Loading: skeleton-fade (opacity 1 → .6 → 1) on #ececec blocks; shimmer (bg-position −200% → 200%) on text bars
+- Hover micro: icon tiles scale(1.1) inside cards (group-hover), hidden row actions fade in (opacity 0 → 1, 150ms)
+- Numbers/progress: width transitions 300ms ease-out; progress bars animate width to 100%
+- Marketing: scroll-linked sticky index (active item gets a 2px left bar in the accent color), hover colors 150ms; content itself does not animate on scroll
+- Always honor prefers-reduced-motion (disable transforms, keep opacity)
+
+------------------------------------------------------------------------------------------------------------------------
+## 5. Layout
+App: canvas surface-1; sidebar sits on canvas (no card), collapsible (icon rail 48px ↔ 200px, width transition 300ms);
+main = white panel (panel-4) radius 16 (rounded-xl) with 16–20px padding, full height; optional secondary column 240px
+(tool list, settings sub-nav) inside the panel on panel-2/white; top bar 56–60px with breadcrumb left, actions right.
+Content max width on Home ~ 590px (centered hero + search), grids 3–8 columns for media.
+Marketing: sticky top nav 60–80px, bg white/95 + backdrop-blur; mega menu = dark panel (#111) radius 16 with columns;
+content width 1040–1200px; sections separated by 96–160px; footer dark with 4 link columns and pink column headings.
+
+------------------------------------------------------------------------------------------------------------------------
+## 6. Components (measured recipes)
+Buttons (all: inline-flex, gap 8px, radius 8, font 500, transition 150ms ease-in-out, disabled opacity .5, focus-visible outline 2px offset 2):
+- sm h32 px16 12px · md h40 px16 14px · lg h48 px24 15px · icon 32×32 (ghost) · tiny round 20–24 (row actions)
+- Variants: primary (blue), secondary (dark), outline, default (tinted), ghost, emphasis (pink, only "Create"), premium (gold)
+- Text link "Upgrade": 14px 600 emphasis color, hover opacity .8
+- Arrow buttons on marketing: outline, h32–40, trailing → icon
+Nav item (sidebar): h32, radius 8, gap 10px, 13–14px, ghost; selected = ghost-2 fill (#73737326) — i.e. neutral grey, never colored
+Segmented control: track surface-2/default-0, items h30 12px 600, selected = white pill with hairline + text fg-0, 200ms
+Tabs (Explore): display font 28–32px, selected fg-0 with underline, others fg-4
+Chip filters (Academy): h28–32 pills; selected = secondary dark pill with white text; others default tint
+Tags/badges: h16–18 px6 rounded-full 10–11px 500–600; "New" = soft blue (#e8edfe / #1e3a8a text) or soft pink; counter = pink
+  circle h16 8px bold; over-media chips = blurred white pill with backdrop-blur
+Cards: white on canvas, border alpha-0/alpha-1, radius 12–16, padding 16–24; clickable cards change bg to surface-1/2 on hover
+  (200ms) and scale their icon tile 1.1; shortcut tiles 124px tall, centered 48px icon tile (radius 8, category color 10%) + 13px label
+Pricing card: radius 12, border alpha-1 (current plan: emphasis border), 18px padding, display-font plan name 28px, dark CTA h32
+Popover/menu: panel-6 bg, 1px alpha-0 border, radius 16, shadow-lg, width 260, section labels 11px fg-4, items h32 radius 8
+Modal: light overlay rgba(229,231,235,.7); card white radius 16, hairline border, up to 1024px; split layout option (illustration left
+  on warm tinted bg, content right); close icon 32px top-right; CTA row: primary/secondary h48 + ghost h40
+Empty state: centered; 20–24px outline icon in fg-3; title 16–18px 500; one 13px sentence fg-3; small secondary/outline button
+Skeletons: surface-2 blocks radius 12, text bars h10–12 radius full, skeleton-fade 2s
+Forms: field h32–40, radius 8, white bg, border #10101026, focus border #90abfa (+ 3–4px soft ring), error #f66950 with 12px message
+Toggle/checkbox: checked = secondary dark (#1a1a1a) fill
+Tooltip: dark #1a1a1a bg, white 12px, radius 6–8, 4px offset, tooltipFadeIn
+Toasts: bottom-center stack, white card radius 12 shadow-lg, countdown sheen line
+Info bar (Home): white row radius 12, left text 13px, right inline links with ↗ and small logos, close X
+Media grid tile: radius 8–12, hover reveals top-right actions (opacity), meta row below 11–12px with tiny avatar
+
+------------------------------------------------------------------------------------------------------------------------
+## 7. Page templates
+App Home: greeting (display 28) → spotlight search (h40 pill-ish radius 12, ⌘K hint) → 8 shortcut tiles row (staggered enter)
+  → info bar → two-column (Projects list card + big empty-state/feature card) → tabbed media rail ("What's new", "Academy"…)
+List/Library: breadcrumb + title, filter chips row, grid of cards, "View all ↗" links on section headers
+Tool page: left 240px control column (segmented tool switcher, labeled sections 11px caps, primary CTA full width at bottom) +
+  right feed (toolbar with default buttons: Layout, Filters) — empty state centered
+Settings: sub-nav column with section labels, content card(s) centered max ~720px
+Pricing: centered display title + subtitle, billing segmented + "Save 25%" note, 3 plan cards, comparison table
+Marketing product page: hero (full-bleed media or dark), centered display headline + subline + 2 buttons (white pill + text link),
+  big framed product shot (radius 16–22, deep shadow, gradient bg), sticky-index feature section, sticky bottom CTA bar
+  (frosted white pill with dark button), dark footer
+
+------------------------------------------------------------------------------------------------------------------------
+## 8. Mapping to Hartwell Tax (so nothing is guessed)
+Owner app = App Home/List/Tool/Settings templates. Today = App Home (greeting enter, stat tiles as shortcut tiles with stagger,
+  Needs-you as info-bar-style rows). Calendar/Clients = List template. Appointment modal = Modal. Document review = media viewer.
+Booking flow = Tool page pattern (left control column → right preview) on desktop; single column on mobile.
+Client portal = Settings-like centered content card with a progress segmented header.
+Public site = Marketing product page (hero, framed product shot of the checklist, sticky-index feature section, sticky bottom CTA bar,
+  dark footer), using marketing warm paper #f4f3ef for section backgrounds instead of pure grey.
+Status colors: alerts palette (success/info/warning/negative) — never the brand blue for status.

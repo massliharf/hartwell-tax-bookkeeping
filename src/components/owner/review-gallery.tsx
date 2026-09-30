@@ -166,7 +166,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="left-0 top-0 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 p-0 sm:rounded-none">
+      <DialogContent className="data-[state=open]:animate-[overlay-in_200ms_cubic-bezier(0.16,1,0.3,1)] left-0 top-0 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 p-0 sm:rounded-none">
         <header className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 pr-16 sm:px-6 sm:pr-16">
           <div className="min-w-0 flex-1">
             <DialogTitle className="truncate text-sm font-medium text-deep-ink">Review documents, {title}</DialogTitle>

@@ -40,7 +40,7 @@ function SectionHead({ title, sub, action, eyebrow }: { title: string; sub?: str
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 [&_h2]:text-balance">
       <div className="max-w-2xl">
-        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+        {eyebrow && <p className="mb-3 text-sm font-medium text-muted-foreground">{eyebrow}</p>}
         <h2 className="t-section text-deep-ink">{title}</h2>
         {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground sm:text-base sm:leading-6">{sub}</p>}
       </div>

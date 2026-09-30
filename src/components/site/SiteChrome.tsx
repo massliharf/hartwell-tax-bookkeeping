@@ -72,7 +72,7 @@ export function SiteFooter() {
            <p className="mb-2 text-xs font-medium text-muted-foreground">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
-          <a href="tel:+19735550142" className="tabular mt-3 block hover:text-deep-ink">(973) 555-0142</a>
+          <a href="tel:+19735550142" className="tabular mt-2 flex min-h-10 items-center hover:text-deep-ink">(973) 555-0142</a>
         </div>
         <div className="text-sm">
            <p className="mb-2 text-xs font-medium text-muted-foreground">Hours</p>
@@ -87,7 +87,7 @@ export function SiteFooter() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-muted-foreground">
           <span>© {new Date().getFullYear()} Hartwell Tax & Bookkeeping</span>
-          <Link to="/owner" className="hover:text-deep-ink">Owner login</Link>
+          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-deep-ink">Owner login</Link>
         </div>
       </div>
     </footer>

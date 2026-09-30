@@ -85,8 +85,8 @@ function OwnerLayout() {
   const current = PAGES.find((n) => ("exact" in n ? path === n.to : path.startsWith(n.to))) ?? PAGES[0];
   const mobileMain = NAV.slice(0, 4);
   const mobileMore = NAV.slice(4);
-  const item = `flex h-8 items-center gap-2.5 rounded-lg text-[13px] text-[#353535] transition-colors duration-150 hover:bg-tint-1 ${collapsed ? "justify-center px-0" : "px-2"}`;
-  const wide = path === "/owner" || path.startsWith("/owner/calendar") || path.startsWith("/owner/clients") || path.startsWith("/owner/settings");
+  const item = `flex h-8 items-center gap-2.5 rounded-lg text-[13px] text-body transition-colors duration-150 hover:bg-tint-1 ${collapsed ? "justify-center px-0" : "px-2"}`;
+  const wide = path === "/owner" || path.startsWith("/owner/calendar") || path.startsWith("/owner/clients") || path.startsWith("/owner/settings") || path.startsWith("/owner/insights");
 
   return (
     <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper sm:flex sm:bg-canvas sm:py-2 sm:pr-2">
@@ -126,11 +126,11 @@ function OwnerLayout() {
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between bg-paper px-5 sm:hidden">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line-0 bg-sheet px-5 sm:hidden">
           <span className="text-sm font-medium text-deep-ink">{current.label}</span>
           <Button size="icon" variant="ghost" aria-label="Search" onClick={() => setPaletteOpen(true)}><Search className="size-4" /></Button>
         </header>
-        <main className="min-h-[calc(100vh-56px)] rounded-t-2xl bg-sheet sm:min-h-[calc(100vh-16px)] sm:rounded-2xl">
+        <main className="min-h-[calc(100vh-56px)] bg-sheet sm:min-h-[calc(100vh-16px)] sm:rounded-2xl">
           <div className="hidden h-14 items-center justify-between px-6 sm:flex">
             <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
               <span>Practice</span><span aria-hidden="true">/</span><span className="text-deep-ink">{current.label}</span>

@@ -84,7 +84,7 @@ function Insights() {
   return (
     <>
       <Hero hours={hours30} minutes={minutes30} />
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <article className="rounded-2xl border border-border p-5"><p className="text-xs font-medium text-muted-foreground">Collected this month</p><p className="tabular mt-1 text-2xl font-medium leading-8 text-deep-ink">{usd(collected)}</p></article>
         <article className="rounded-2xl border border-border p-5"><p className="text-xs font-medium text-muted-foreground">Waiting for payment</p><p className="tabular mt-1 text-2xl font-medium leading-8 text-deep-ink">{usd(owed)}</p><p className="text-xs text-muted-foreground">{owedN} return{owedN === 1 ? "" : "s"}</p></article>
       </div>

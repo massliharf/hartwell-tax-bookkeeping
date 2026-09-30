@@ -148,11 +148,11 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
         <header className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 pr-16 sm:px-6 sm:pr-16">
           <div className="min-w-0 flex-1">
             <DialogTitle className="truncate text-sm font-medium text-deep-ink">Review documents, {title}</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">{files.length} file{files.length === 1 ? "" : "s"}. Private, loaded through links that expire after a minute.</DialogDescription>
+            <DialogDescription className="hidden text-xs text-muted-foreground sm:block">{files.length} file{files.length === 1 ? "" : "s"}. Private, loaded through links that expire after a minute.</DialogDescription>
           </div>
           {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={onAcceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
-          <Button size="sm" variant="secondary" onClick={downloadAll}><Download />Download all</Button>
-          <Button size="sm" variant="secondary" disabled={!view} onClick={print}><Printer />Print</Button>
+          <Button size="sm" variant="secondary" aria-label="Download all" onClick={downloadAll}><Download /><span className="hidden sm:inline">Download all</span></Button>
+          <Button size="sm" variant="secondary" aria-label="Print" disabled={!view} onClick={print}><Printer /><span className="hidden sm:inline">Print</span></Button>
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col md:grid md:grid-cols-[200px_minmax(0,1fr)_320px]">
@@ -160,11 +160,11 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
             {files.map((f, i) => (
               <li key={f.id} className="shrink-0">
                 <button type="button" onClick={() => setIndex(i)} aria-current={i === index}
-                  className={cn("flex w-28 flex-col gap-1.5 rounded-xl border p-2 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:w-full", i === index ? "border-deep-ink bg-surface-2" : "border-border")}>
-                  <span className="grid h-20 place-items-center overflow-hidden rounded-lg bg-fill-subtle md:h-28">
+                  className={cn("flex w-24 flex-col gap-1 rounded-xl border p-2 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:w-full", i === index ? "border-deep-ink bg-surface-2" : "border-border")}>
+                  <span className="grid h-14 place-items-center overflow-hidden rounded-lg bg-fill-subtle md:h-28">
                     {thumb(f) ? <img src={thumb(f)} alt="" className="h-full w-full object-cover object-top" /> : loaded[`${f.id}:${f.file_path}`] ? <span className="text-[11px] text-muted-foreground">No preview</span> : <Skeleton className="h-full w-full" />}
                   </span>
-                  <span className="line-clamp-2 text-xs text-deep-ink">{f.document_name}</span>
+                  <span className="truncate text-xs text-deep-ink md:line-clamp-2 md:whitespace-normal">{f.document_name}</span>
                   <AiTag i={f} />
                 </button>
               </li>

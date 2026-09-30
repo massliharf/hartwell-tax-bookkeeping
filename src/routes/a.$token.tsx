@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Camera, Check, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine } from "lucide-react";
+import { AlertTriangle, Camera, Check, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { ReadyRing } from "@/components/brand/ReadyRing";
 import { BookingShell } from "@/components/booking/BookingShell";
 import {
   cancelAppointment, confirmAttendance, confirmUpload, createUploadUrl, getAppointmentByToken,
-  markNotApplicable, rescheduleAppointment, signForm8879, undoNotApplicable,
+  keepFlaggedFile, markNotApplicable, rescheduleAppointment, signForm8879, testPay, undoNotApplicable,
 } from "@/lib/portal.functions";
 import { getAvailabilityWindow } from "@/lib/booking.functions";
 import { fmtDateLong, fmtDayChip, fmtTime } from "@/lib/intake";
@@ -39,13 +39,35 @@ export const Route = createFileRoute("/a/$token")({
 const ADDRESS = "412 Bloomfield Avenue, Montclair, NJ 07042";
 const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("412 Bloomfield Avenue, Montclair, NJ 07042")}`;
 const MAX = 15 * 1024 * 1024;
-const TYPES = ["application/pdf", "image/jpeg", "image/png"];
+const EXTS = ["pdf", "jpg", "jpeg", "png", "heic", "heif"];
+const money = (c: number) => `$${(c / 100).toLocaleString("en-US", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
+
+/** Friendly checks before a file leaves the phone. Returns an error message or null. */
+async function checkFile(f: File): Promise<string | null> {
+  const ext = (f.name.split(".").pop() ?? "").toLowerCase();
+  if (!EXTS.includes(ext) && !["application/pdf", "image/jpeg", "image/png", "image/heic", "image/heif"].includes(f.type)) return "Please use a PDF, JPG, PNG or HEIC file.";
+  if (f.size === 0) return "That file looks empty. Please try another one.";
+  if (f.size > MAX) return "That file is over 15MB. A phone photo usually works.";
+  if (ext === "pdf" || f.type === "application/pdf") {
+    const head = await f.slice(0, Math.min(f.size, 2 * 1024 * 1024)).text();
+    const tail = await f.slice(Math.max(0, f.size - 64 * 1024)).text();
+    if (/\/Encrypt\b/.test(head) || /\/Encrypt\b/.test(tail)) return "This PDF is password-protected. Please save a copy without a password, or take a photo instead.";
+  } else if (["jpg", "jpeg", "png"].includes(ext) || f.type === "image/jpeg" || f.type === "image/png") {
+    try {
+      const bmp = await createImageBitmap(f);
+      const short = Math.min(bmp.width, bmp.height); bmp.close();
+      if (short < 1000) return "This photo is a bit small to read. Please take it closer, or use your phone's full camera resolution.";
+    } catch { return "We couldn't open this image. Please try another photo."; }
+  }
+  return null;
+}
 
 type Appt = {
   service_id: string; start_at: string; end_at: string; meeting_type: "in_person" | "video"; status: string;
   ready_score: number; signature_status: string; services: { name: string } | null; clients: { name: string } | null;
+  fee_cents: number | null; client_note: string | null; paid_at: string | null; filed_at: string | null;
 };
-type Item = { id: string; document_name: string; description: string | null; required: boolean; status: string; na_reason: string | null };
+type Item = { id: string; document_name: string; description: string | null; required: boolean; status: string; na_reason: string | null; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
 
 function PortalPage() {
   const { token } = Route.useParams();
@@ -78,7 +100,8 @@ function PortalPage() {
   const cancelled = a.status === "cancelled";
   const open = ["booked", "confirmed"].includes(a.status) && !isPast;
   const first = a.clients?.name?.split(" ")[0] ?? "there";
-  const todo = items.filter((i) => i.required && i.status === "missing").length;
+  const todo = items.filter((i) => i.required && (i.status === "missing" || i.review_status === "needs_fix")).length;
+  const closeout = a.status === "completed" && a.fee_cents != null;
 
   return (
     <BookingShell>
@@ -87,13 +110,13 @@ function PortalPage() {
           <p className="text-xs font-medium text-muted-foreground">Your private page</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
-            {cancelled ? "This appointment was cancelled." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
+            {cancelled ? "This appointment was cancelled." : a.filed_at ? "Your return has been e-filed." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
           </p>
         </div>
 
-        {a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
+        {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
 
-        <AppointmentCard appt={a} cancelled={cancelled} />
+        <AppointmentCard appt={a} cancelled={cancelled} videoLink={q.data.videoLink ?? null} />
         {open && <Actions token={token} appt={a} onChange={refresh} />}
         {cancelled && (
           <div className="rounded-2xl bg-surface-2 p-6">
@@ -106,7 +129,7 @@ function PortalPage() {
           <section>
             <div className="mb-4 flex items-end justify-between gap-4">
               <h2 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Your checklist</h2>
-              <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} done</span>
+              <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length} of {items.length} done</span>
             </div>
             <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
               <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only Claire can see your files. We never ask for your Social Security number.
@@ -114,7 +137,7 @@ function PortalPage() {
             <ul className="space-y-4">
               {items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}
             </ul>
-            <p className="mt-4 text-xs text-muted-foreground">PDF, JPG or PNG, up to 15MB each. Phone photos are perfect.</p>
+            <p className="mt-4 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
           </section>
         )}
       </div>
@@ -123,7 +146,7 @@ function PortalPage() {
 }
 
 /* ---------- Appointment card ---------- */
-function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }) {
+function AppointmentCard({ appt, cancelled, videoLink }: { appt: Appt; cancelled: boolean; videoLink: string | null }) {
   const video = appt.meeting_type === "video";
   return (
     <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
@@ -143,8 +166,8 @@ function AppointmentCard({ appt, cancelled }: { appt: Appt; cancelled: boolean }
         <div className="mt-5 border-t border-border pt-4 text-sm">
           {video ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> Video call. Your join link arrives by email the day before.</span>
-              <Button size="sm" variant="outline" disabled><Video /> Join call</Button>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> {videoLink ? "Video call. Join from here at your appointment time." : "Video call. Claire will send the link by email."}</span>
+              {videoLink && <Button size="sm" variant="outline" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -280,6 +303,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
   const confirm = useServerFn(confirmUpload);
   const markNa = useServerFn(markNotApplicable);
   const undoNa = useServerFn(undoNotApplicable);
+  const keep = useServerFn(keepFlaggedFile);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [drag, setDrag] = useState(false);
@@ -290,16 +314,17 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
 
   const upload = async (f?: File | null) => {
     if (!f) return;
-    if (!TYPES.includes(f.type)) return setErr("Please use a PDF, JPG or PNG.");
-    if (f.size > MAX) return setErr("That file is over 15MB. A phone photo usually works.");
-    setBusy(true); setErr(null);
+    setErr(null);
+    const problem = await checkFile(f);
+    if (problem) return setErr(problem);
+    setBusy(true);
     try {
       const { path, token: t } = await getUrl({ data: { token, itemId: item.id, fileName: f.name || "photo.jpg", size: f.size } });
-      const up = await supabase.storage.from("client-documents").uploadToSignedUrl(path, t, f, { contentType: f.type });
+      const up = await supabase.storage.from("client-documents").uploadToSignedUrl(path, t, f, { contentType: f.type || "application/octet-stream" });
       if (up.error) throw up.error;
       await confirm({ data: { token, itemId: item.id, path } });
       await onChange();
-    } catch { setErr("The upload didn't go through. Please try again."); }
+    } catch (e) { setErr(e instanceof Error && /15MB|empty|PDF, JPG/.test(e.message) ? e.message : "The upload didn't go through. Please try again."); }
     setBusy(false);
   };
 
@@ -311,15 +336,40 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
 
   return (
     <li>
-        {item.status === "uploaded" ? (
+        {item.status === "uploaded" && item.review_status === "needs_fix" ? (
+          <div key="fix" className="rounded-2xl border border-warning/40 bg-sheet p-5">
+            <div className="flex items-start gap-4">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-warning/10 text-warning"><AlertTriangle className="size-5" /></span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2"><p className="font-medium text-deep-ink">{item.document_name}</p><Tag tone="warning">Needs a fix</Tag></div>
+                <p className="mt-1 text-sm text-deep-ink/75">{item.fix_reason}{item.fix_note ? `. Claire says: ${item.fix_note}` : "."}</p>
+              </div>
+            </div>
+            <Button size="sm" className="mt-4" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
+          </div>
+        ) : item.status === "uploaded" && item.ai_check === "warning" ? (
+          <div key="warn" className="rounded-2xl border border-warning/40 bg-sheet p-5">
+            <div className="flex items-start gap-4">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-warning/10 text-warning"><AlertTriangle className="size-5" /></span>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-deep-ink">{item.document_name}</p>
+                <p className="mt-1 text-sm text-deep-ink/75">{item.ai_note || "This might not be the right document."}</p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button size="sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
+              <Button size="sm" variant="secondary" disabled={busy} onClick={async () => { setBusy(true); try { await keep({ data: { token, itemId: item.id } }); await onChange(); } catch { setErr("Couldn't save that. Please try again."); } setBusy(false); }}>Keep this file</Button>
+            </div>
+          </div>
+        ) : item.status === "uploaded" ? (
           <div key="up" className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5">
             <span
               className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink">{item.document_name}</p>
-              <p className="text-sm text-success">Received</p>
+              <p className="text-sm text-success">{busy ? "Checking…" : "Received"}</p>
             </div>
-            <Button size="sm" variant="ghost" onClick={() => fileRef.current?.click()}>Replace</Button>
+            <Button size="sm" variant="ghost" disabled={busy} onClick={() => fileRef.current?.click()}>Replace</Button>
           </div>
         ) : item.status === "not_applicable" ? (
           <div key="na" className="flex items-center gap-4 rounded-2xl bg-surface-2/70 p-5">
@@ -365,9 +415,59 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           </div>
         )}
       {err && <p className="mt-2 text-sm text-destructive" role="alert">{err}</p>}
-      <input ref={fileRef} type="file" className="sr-only" accept="application/pdf,image/jpeg,image/png" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+      <input ref={fileRef} type="file" className="sr-only" accept="application/pdf,image/jpeg,image/png,image/heic,image/heif,.heic,.heif" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
       <input ref={camRef} type="file" className="sr-only" accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
     </li>
+  );
+}
+
+/* ---------- Review, sign and pay ---------- */
+function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; onDone: () => void }) {
+  const pay = useServerFn(testPay);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(false);
+  const signed = appt.signature_status === "signed";
+  const paid = !!appt.paid_at;
+  if (appt.filed_at) return (
+    <section className="rounded-2xl border border-success/30 bg-sheet p-6">
+      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">Your return has been e-filed.</h2></div>
+      <p className="mt-3 text-sm text-deep-ink/75">You'll hear from the IRS directly about any refund. Thank you.</p>
+    </section>
+  );
+  if (signed && paid) return (
+    <section className="rounded-2xl border border-success/30 bg-sheet p-6">
+      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">All done. Claire will file your return today.</h2></div>
+      <p className="mt-3 text-sm text-deep-ink/75">Signed and paid ({money(appt.fee_cents!)}). You'll get an email once it's filed.</p>
+    </section>
+  );
+  return (
+    <section className="space-y-4">
+      <div className="rounded-2xl border border-border bg-sheet p-6">
+        <p className="text-[11px] font-medium text-warning">One last step</p>
+        <h2 className="mt-1 t-section text-deep-ink">Review, sign and pay</h2>
+        <div className="mt-4 flex items-baseline justify-between gap-4 rounded-lg bg-canvas p-4">
+          <span className="text-sm text-muted-foreground">Fee for {appt.services?.name}</span>
+          <span className="tabular text-xl font-medium text-deep-ink">{money(appt.fee_cents!)}</span>
+        </div>
+        {appt.client_note && <p className="mt-4 text-sm text-deep-ink/80"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
+        <p className="mt-4 text-sm text-muted-foreground">Your return is filed as soon as it's signed and paid.</p>
+        <ol className="mt-4 flex gap-2 text-xs">
+          <li><Tag tone={signed ? "success" : "neutral"}>1. Sign {signed && <Check className="size-3" />}</Tag></li>
+          <li><Tag tone={paid ? "success" : "neutral"}>2. Pay {paid && <Check className="size-3" />}</Tag></li>
+        </ol>
+      </div>
+      {!signed && <SignSection token={token} appt={appt} onDone={onDone} />}
+      {signed && !paid && (
+        <div className="rounded-2xl border border-border bg-sheet p-6">
+          <h3 className="t-card text-deep-ink">Pay {money(appt.fee_cents!)}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Online card payments aren't switched on yet. This test button marks your fee as paid, so you can see the whole flow.</p>
+          {err && <p className="mt-2 text-sm text-destructive" role="alert">That didn't go through. Please try again.</p>}
+          <Button size="lg" className="mt-4" disabled={busy} onClick={async () => { setBusy(true); setErr(false); try { const r = await pay({ data: { token } }); if (!r.ok) setErr(true); await onDone(); } catch { setErr(true); } setBusy(false); }}>
+            {busy ? <Loader2 /> : <CreditCard />} Test payment: pay {money(appt.fee_cents!)}
+          </Button>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -398,7 +498,7 @@ function SignSection({ token, appt, onDone }: { token: string; appt: Appt; onDon
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-sheet font-serif text-2xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-sheet text-xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />

@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, MailX, PenLine, Sparkles } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { Tag } from "@/components/ui/tag";
@@ -11,8 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getDocumentUrl } from "@/lib/portal.functions";
-import { markComplete, markNoShow, dismissAttention, nudgeSignature } from "@/lib/owner.functions";
-import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, type Appt, type Item, type NeedItem } from "./lib";
+import { markNoShow, dismissAttention, nudgeSignature, remindPayment } from "@/lib/owner.functions";
+import { FinishDialog } from "./closeout";
+import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, money, type Appt, type Item, type NeedItem } from "./lib";
 import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
 
@@ -55,9 +56,8 @@ function useStatusMutation(fn: (args: { data: { id: string } }) => Promise<unkno
 }
 
 export function useApptActions() {
-  const complete = useStatusMutation(useServerFn(markComplete), "completed", "Marked complete. Signature request is on its way.");
   const noShow = useStatusMutation(useServerFn(markNoShow), "no_show", "Marked as no-show.");
-  return { complete, noShow };
+  return { noShow };
 }
 const STATUS_LABEL: Record<string, string> = { booked: "Booked", confirmed: "Confirmed", completed: "Completed", no_show: "No-show", cancelled: "Cancelled", rescheduled: "Moved" };
 export function StatusPill({ status }: { status: string }) {
@@ -65,33 +65,29 @@ export function StatusPill({ status }: { status: string }) {
   return <Tag tone={tone}>{STATUS_LABEL[status] ?? status}</Tag>;
 }
 
-/** The two appointment actions, always shown the same way, each confirmed first. */
+/** Open appointment actions: Finish appointment (fee + note) and No-show (confirmed first). */
 export function ApptActionButtons({ a, onDone }: { a: Appt; onDone?: () => void }) {
-  const [confirm, setConfirm] = useState<"complete" | "noShow" | null>(null);
-  const { complete, noShow } = useApptActions();
+  const [confirm, setConfirm] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const { noShow } = useApptActions();
   const open = a.status === "booked" || a.status === "confirmed";
-  const pending = complete.isPending || noShow.isPending;
   const name = a.clients?.name ?? "this client";
   if (!open) return null;
-  const act = () => {
-    if (confirm === "complete") complete.mutate(a.id, { onSuccess: () => onDone?.() });
-    else if (confirm === "noShow") noShow.mutate(a.id, { onSuccess: () => onDone?.() });
-    setConfirm(null);
-  };
   return <>
     <div className="grid grid-cols-2 gap-2">
-      <Button disabled={pending} onClick={() => setConfirm("complete")}>Mark complete</Button>
-      <Button variant="secondary" disabled={pending} onClick={() => setConfirm("noShow")}>No-show</Button>
+      <Button disabled={noShow.isPending} onClick={() => setFinishing(true)}>Finish appointment</Button>
+      <Button variant="secondary" disabled={noShow.isPending} onClick={() => setConfirm(true)}>{noShow.isPending ? "Saving…" : "No-show"}</Button>
     </div>
-    <AlertDialog open={!!confirm} onOpenChange={(v) => { if (!v) setConfirm(null); }}>
+    <FinishDialog a={a} open={finishing} onOpenChange={setFinishing} onDone={onDone} />
+    <AlertDialog open={confirm} onOpenChange={setConfirm}>
       <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-base font-medium">{confirm === "complete" ? `Mark ${name} complete?` : `Mark ${name} as a no-show?`}</AlertDialogTitle>
-          <AlertDialogDescription>{confirm === "complete" ? "A signature request for Form 8879 is sent automatically." : "The appointment is closed and the client gets a link to book again."}</AlertDialogDescription>
+          <AlertDialogTitle className="text-base font-medium">Mark {name} as a no-show?</AlertDialogTitle>
+          <AlertDialogDescription>The appointment is closed and the client gets a link to book again.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={act}>{confirm === "complete" ? "Mark complete" : "Mark no-show"}</AlertDialogAction>
+          <AlertDialogAction onClick={() => noShow.mutate(a.id, { onSuccess: () => onDone?.() })}>Mark no-show</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -130,7 +126,9 @@ export function ApptList({ appts, showDate = false, showClient = true }: { appts
 export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; busy: boolean }) {
   const openAppt = useApptPanel();
   let icon: ReactNode, title: string, reason: string, action: string, appointmentId: string | undefined;
-  if (it.kind === "low") { icon = <AlertTriangle />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. ${missingOf(it.appt).length} documents missing, a later time was offered.`; action = "Keep appointment"; appointmentId = it.appt.id; }
+  if (it.kind === "review") { icon = <FileSearch />; title = `${it.count} document${it.count === 1 ? "" : "s"} to review`; reason = `Starting with ${it.appt.clients?.name}, ${fmtDay(it.appt.start_at)}.`; action = "Review"; appointmentId = it.appt.id; }
+  else if (it.kind === "unpaid") { icon = <CreditCard />; title = `${it.appt.clients?.name} hasn't paid yet`; reason = `${it.appt.fee_cents ? money(it.appt.fee_cents) : "Fee"} due since ${fmtDay(it.appt.finished_at ?? it.appt.end_at)}. Three reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
+  else if (it.kind === "low") { icon = <AlertTriangle />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. ${missingOf(it.appt).length} documents missing, a later time was offered.`; action = "Keep appointment"; appointmentId = it.appt.id; }
   else if (it.kind === "signature") { icon = <PenLine />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
   else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
   else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
@@ -146,9 +144,9 @@ export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; 
   );
 }
 export function NeedsList({ items }: { items: NeedItem[] }) {
-  const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature);
+  const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature), payNudge = useServerFn(remindPayment); const openAppt = useApptPanel();
   const [all, setAll] = useState(false);
-  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } toast.success(it.kind === "signature" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
+  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const shown = all ? items : items.slice(0, 3);
   return <div>
     <ul className="overflow-hidden rounded-2xl border border-border">{shown.map(it => <NeedRow key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>

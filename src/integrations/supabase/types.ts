@@ -18,13 +18,19 @@ export type Database = {
         Row: {
           attention_reason: string | null
           client_id: string
+          client_note: string | null
           created_at: string
           end_at: string
+          fee_cents: number | null
+          filed_at: string | null
+          finished_at: string | null
           id: string
           intake_answers: Json
           manage_token: string
           meeting_type: Database["public"]["Enums"]["meeting_type"]
           needs_attention: boolean
+          paid_at: string | null
+          paid_method: string | null
           ready_score: number
           service_id: string
           signature_status: Database["public"]["Enums"]["signature_status"]
@@ -32,17 +38,24 @@ export type Database = {
           signed_name: string | null
           start_at: string
           status: Database["public"]["Enums"]["appointment_status"]
+          stripe_session_id: string | null
         }
         Insert: {
           attention_reason?: string | null
           client_id: string
+          client_note?: string | null
           created_at?: string
           end_at: string
+          fee_cents?: number | null
+          filed_at?: string | null
+          finished_at?: string | null
           id?: string
           intake_answers?: Json
           manage_token?: string
           meeting_type?: Database["public"]["Enums"]["meeting_type"]
           needs_attention?: boolean
+          paid_at?: string | null
+          paid_method?: string | null
           ready_score?: number
           service_id: string
           signature_status?: Database["public"]["Enums"]["signature_status"]
@@ -50,17 +63,24 @@ export type Database = {
           signed_name?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["appointment_status"]
+          stripe_session_id?: string | null
         }
         Update: {
           attention_reason?: string | null
           client_id?: string
+          client_note?: string | null
           created_at?: string
           end_at?: string
+          fee_cents?: number | null
+          filed_at?: string | null
+          finished_at?: string | null
           id?: string
           intake_answers?: Json
           manage_token?: string
           meeting_type?: Database["public"]["Enums"]["meeting_type"]
           needs_attention?: boolean
+          paid_at?: string | null
+          paid_method?: string | null
           ready_score?: number
           service_id?: string
           signature_status?: Database["public"]["Enums"]["signature_status"]
@@ -68,6 +88,7 @@ export type Database = {
           signed_name?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["appointment_status"]
+          stripe_session_id?: string | null
         }
         Relationships: [
           {
@@ -103,37 +124,52 @@ export type Database = {
       }
       checklist_items: {
         Row: {
+          ai_check: string | null
+          ai_note: string | null
           appointment_id: string
           description: string | null
           document_name: string
           file_path: string | null
+          fix_note: string | null
+          fix_reason: string | null
           id: string
           na_reason: string | null
           required: boolean
+          review_status: string
           sort_order: number
           status: Database["public"]["Enums"]["checklist_status"]
           uploaded_at: string | null
         }
         Insert: {
+          ai_check?: string | null
+          ai_note?: string | null
           appointment_id: string
           description?: string | null
           document_name: string
           file_path?: string | null
+          fix_note?: string | null
+          fix_reason?: string | null
           id?: string
           na_reason?: string | null
           required?: boolean
+          review_status?: string
           sort_order?: number
           status?: Database["public"]["Enums"]["checklist_status"]
           uploaded_at?: string | null
         }
         Update: {
+          ai_check?: string | null
+          ai_note?: string | null
           appointment_id?: string
           description?: string | null
           document_name?: string
           file_path?: string | null
+          fix_note?: string | null
+          fix_reason?: string | null
           id?: string
           na_reason?: string | null
           required?: boolean
+          review_status?: string
           sort_order?: number
           status?: Database["public"]["Enums"]["checklist_status"]
           uploaded_at?: string | null
@@ -377,6 +413,7 @@ export type Database = {
           id: number
           reminder_timings: Json
           timezone: string
+          video_link: string | null
         }
         Insert: {
           buffer_min?: number
@@ -385,6 +422,7 @@ export type Database = {
           id?: number
           reminder_timings: Json
           timezone?: string
+          video_link?: string | null
         }
         Update: {
           buffer_min?: number
@@ -393,6 +431,7 @@ export type Database = {
           id?: number
           reminder_timings?: Json
           timezone?: string
+          video_link?: string | null
         }
         Relationships: []
       }
@@ -566,6 +605,10 @@ export type Database = {
         | "signature_reminder"
         | "missing_docs_after"
         | "new_season"
+        | "payment_reminder"
+        | "doc_fix_request"
+        | "review_sign_pay"
+        | "return_filed"
       signature_status: "not_needed" | "pending" | "signed"
       waitlist_status: "waiting" | "offered" | "booked" | "expired"
     }
@@ -718,6 +761,10 @@ export const Constants = {
         "signature_reminder",
         "missing_docs_after",
         "new_season",
+        "payment_reminder",
+        "doc_fix_request",
+        "review_sign_pay",
+        "return_filed",
       ],
       signature_status: ["not_needed", "pending", "signed"],
       waitlist_status: ["waiting", "offered", "booked", "expired"],

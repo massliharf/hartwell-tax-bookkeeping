@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useOwnerCtx } from "@/components/owner/ctx";
+import { et, etToIso } from "@/components/owner/lib";
 import { ErrorNote, LoadingRows, PageHead } from "@/components/owner/ui";
 import { MessageLog } from "@/components/owner/messages";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,18 +25,23 @@ function Insights() {
     queryFn: async () => {
       const t = new Date(now).getTime();
       const from = new Date(t - WEEKS * 7 * DAY).toISOString();
-      const [m, a, o] = await Promise.all([
+      const monthStart = etToIso(`${et(now).ymd.slice(0, 8)}01`, 0);
+      const [m, a, o, paid, owed] = await Promise.all([
         supabase.from("messages").select("type, minutes_saved, sent_at, appointment_id").gte("sent_at", from).lte("sent_at", now),
         supabase.from("appointments").select("id, start_at, created_at, status, ready_score, signature_status, signed_at, needs_attention, attention_reason").gte("start_at", from),
         supabase.from("waitlist_offers").select("status, created_at").in("status", ["claimed", "claimed_seen"]).gte("created_at", from),
+        supabase.from("appointments").select("fee_cents, paid_at").not("paid_at", "is", null).gte("paid_at", monthStart).lte("paid_at", now),
+        supabase.from("appointments").select("fee_cents").eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null),
       ]);
-      if (m.error ?? a.error ?? o.error) throw m.error ?? a.error ?? o.error;
-      return { t, msgs: m.data ?? [], appts: a.data ?? [], offers: o.data ?? [] };
+      if (m.error ?? a.error ?? o.error ?? paid.error ?? owed.error) throw m.error ?? a.error ?? o.error ?? paid.error ?? owed.error;
+      const sum = (r: { fee_cents: number | null }[]) => r.reduce((x, y) => x + (y.fee_cents ?? 0), 0);
+      return { t, msgs: m.data ?? [], appts: a.data ?? [], offers: o.data ?? [], collected: sum(paid.data ?? []), owed: sum(owed.data ?? []), owedN: owed.data?.length ?? 0 };
     },
   });
   if (q.isLoading) return <div role="status" aria-label="Loading insights"><Skeleton className="h-4 w-36" /><Skeleton className="mt-4 h-12 w-80 max-w-full" /><Skeleton className="mt-4 h-5 w-64 max-w-full" /><div className="mt-8 grid gap-4 md:grid-cols-2">{Array.from({ length: 6 }, (_, i) => <div key={i} className="rounded-2xl border border-border bg-sheet p-5"><Skeleton className="h-5 w-44 max-w-full" /><Skeleton className="mt-3 h-9 w-24" /><Skeleton className="mt-5 h-32 w-full rounded-lg" /></div>)}</div><Skeleton className="mt-8 h-48 w-full rounded-2xl" /></div>;
   if (q.isError || !q.data) return <ErrorNote onRetry={() => q.refetch()} />;
-  const { t, msgs, appts, offers } = q.data;
+  const { t, msgs, appts, offers, collected, owed, owedN } = q.data;
+  const usd = (c: number) => `$${Math.round(c / 100).toLocaleString("en-US")}`;
 
   // Week buckets, oldest first
   const wk = (iso: string) => Math.floor((t - new Date(iso).getTime()) / (7 * DAY));
@@ -78,6 +84,10 @@ function Insights() {
   return (
     <>
       <Hero hours={hours30} minutes={minutes30} />
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <article className="rounded-2xl border border-border p-5"><p className="text-xs font-medium text-muted-foreground">Collected this month</p><p className="tabular mt-1 text-2xl font-medium leading-8 text-deep-ink">{usd(collected)}</p></article>
+        <article className="rounded-2xl border border-border p-5"><p className="text-xs font-medium text-muted-foreground">Waiting for payment</p><p className="tabular mt-1 text-2xl font-medium leading-8 text-deep-ink">{usd(owed)}</p><p className="text-xs text-muted-foreground">{owedN} return{owedN === 1 ? "" : "s"}</p></article>
+      </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Metric title="Arrived fully ready" value={`${ready30}%`} note={`before: ~${BEFORE.ready}%`} good={ready30 >= BEFORE.ready}>

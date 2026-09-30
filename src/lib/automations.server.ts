@@ -102,10 +102,11 @@ export async function runAutomations(origin: string) {
   const t = now.getTime();
   const iso = (ms: number) => new Date(ms).toISOString();
   const counts: Record<string, number> = {};
-  const { data: st } = await s.from("settings").select("reminder_timings").eq("id", 1).maybeSingle();
+  const { data: st } = await s.from("settings").select("reminder_timings, video_link").eq("id", 1).maybeSingle();
   const rt = { docs_reminder_days: 7, readiness_check_hours: 48, final_reminder_hours: 24, abandoned_nudge_hours: 1, ...((st?.reminder_timings ?? {}) as Record<string, number>) };
   const docsD = Number(rt.docs_reminder_days) || 7, readyH = Number(rt.readiness_check_hours) || 48;
   const finalH = Number(rt.final_reminder_hours) || 24, nudgeH = Number(rt.abandoned_nudge_hours) || 1;
+  const videoLink = st?.video_link ?? null;
   const hit = (k: string, sent: boolean) => { if (sent) counts[k] = (counts[k] ?? 0) + 1; };
 
   // Upcoming appointments within 7 days
@@ -175,13 +176,14 @@ export async function runAutomations(origin: string) {
     // 24 hours before: final reminder
     if (until <= finalH * H) {
       const { all } = await missingDocs(a.id);
+      const join = a.meeting_type === "video" && videoLink ? [{ button: { label: "Join the video call", href: videoLink } } as Block] : [];
       hit("final_reminder_24h", await sendMessage({
         dedupeKey: key("final24"), type: "final_reminder_24h", minutesSaved: 4, clientId: c.id, appointmentId: a.id, to: c.email,
         subject: `See you tomorrow, ${fmtTime(a.start_at)}`,
         heading: "See you tomorrow.",
         blocks: [
           { p: `${a.services?.name ?? "Your appointment"}, ${when}.` },
-          where(a),
+          ...(join.length ? join : [where(a)]),
           { p: "What to bring: a photo ID, plus anything from your list you haven't uploaded yet." },
           ...(all.length ? [{ list: all } as Block] : []),
           { button: { label: "I'll be there", href: `${portal}?confirm=1` } },
@@ -218,6 +220,18 @@ export async function runAutomations(origin: string) {
         heading: "Almost done.",
         blocks: [{ p: `Hi ${first(c.name)}, thanks for coming in. To finish your return, Claire still needs:` }, { list: missing }, { button: { label: "Upload them here", href: portal } }],
       }));
+    }
+  }
+
+  // Payment reminders: 1, 3 and 5 days after finishing, while unpaid.
+  const { data: unpaid } = await s.from("appointments").select("id, finished_at")
+    .eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null).not("finished_at", "is", null)
+    .lte("finished_at", iso(t - D)).gte("finished_at", iso(t - 14 * D));
+  if (unpaid?.length) {
+    const { sendPaymentReminder } = await import("./closeout.server");
+    for (const a of unpaid) {
+      const since = t - new Date(a.finished_at!).getTime();
+      for (const d of [1, 3, 5]) if (since >= d * D) hit("payment_reminder", await sendPaymentReminder(a.id, origin, `pay${d}d:${a.id}`));
     }
   }
 

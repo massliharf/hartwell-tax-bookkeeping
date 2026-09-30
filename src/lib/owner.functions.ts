@@ -125,3 +125,75 @@ export const nudgeSignature = createServerFn({ method: "POST" })
     });
     return { ok: sent };
   });
+
+/** Finish appointment: final fee + note, then "Review, sign and pay" email. */
+export const finishAppointment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid(), feeCents: z.number().int().min(0).max(10_000_000), note: z.string().trim().max(600).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await assertOwner(context);
+    const { getNow } = await import("./clock.server");
+    const { error } = await db.from("appointments").update({
+      status: "completed", signature_status: "pending", fee_cents: data.feeCents, client_note: data.note || null,
+      finished_at: (await getNow()).toISOString(), needs_attention: false, attention_reason: null,
+    }).eq("id", data.id).in("status", ["booked", "confirmed"]);
+    if (error) return { ok: false };
+    const { sendReviewSignPay } = await import("./closeout.server");
+    const { requestOrigin } = await import("./origin.server");
+    await sendReviewSignPay(data.id, requestOrigin()).catch(console.error);
+    return { ok: true };
+  });
+
+export const reviewDocument = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ itemId: z.string().uuid(), decision: z.enum(["accepted", "needs_fix"]), reason: z.string().max(60).optional(), note: z.string().trim().max(400).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await assertOwner(context);
+    const { data: item } = await db.from("checklist_items").select("id, document_name, appointment_id, status").eq("id", data.itemId).maybeSingle();
+    if (!item || item.status !== "uploaded") return { ok: false };
+    if (data.decision === "accepted") {
+      await db.from("checklist_items").update({ review_status: "accepted", fix_reason: null, fix_note: null }).eq("id", item.id);
+      return { ok: true };
+    }
+    const reason = data.reason || "Other";
+    await db.from("checklist_items").update({ review_status: "needs_fix", fix_reason: reason, fix_note: data.note || null }).eq("id", item.id);
+    const { sendFixRequest } = await import("./closeout.server");
+    const { requestOrigin } = await import("./origin.server");
+    await sendFixRequest(item.appointment_id, item.id, item.document_name, reason.toLowerCase(), data.note || null, requestOrigin()).catch(console.error);
+    return { ok: true };
+  });
+
+export const markPaidInOffice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await assertOwner(context);
+    const { getNow } = await import("./clock.server");
+    await db.from("appointments").update({ paid_at: (await getNow()).toISOString(), paid_method: "in_office" }).eq("id", data.id).eq("status", "completed").is("paid_at", null);
+    return { ok: true };
+  });
+
+export const markFiled = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await assertOwner(context);
+    const { data: a } = await db.from("appointments").select("id, signature_status, paid_at, filed_at").eq("id", data.id).maybeSingle();
+    if (!a || a.signature_status !== "signed" || !a.paid_at || a.filed_at) return { ok: false };
+    const { getNow } = await import("./clock.server");
+    await db.from("appointments").update({ filed_at: (await getNow()).toISOString() }).eq("id", a.id);
+    const { sendFiled } = await import("./closeout.server");
+    await sendFiled(a.id).catch(console.error);
+    return { ok: true };
+  });
+
+export const remindPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertOwner(context);
+    const { sendPaymentReminder } = await import("./closeout.server");
+    const { requestOrigin } = await import("./origin.server");
+    const ok = await sendPaymentReminder(data.id, requestOrigin(), `pay-manual:${data.id}:${Date.now()}`);
+    return { ok };
+  });

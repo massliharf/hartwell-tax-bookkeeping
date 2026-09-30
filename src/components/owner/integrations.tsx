@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarDays, Copy, CreditCard, Mail, MessageSquare } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { CalendarDays, Copy, CreditCard, Mail, MessageSquare, Video } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,6 +44,7 @@ export function Integrations() {
         </div>
         <p className="mt-2">Keep this link private. Anyone with it can see appointment times and client names.</p>
       </Row>
+      <VideoLinkRow />
       <Row icon={<Mail />} title="Email" status={q.data.email.connected ? <Tag tone="success">Connected</Tag> : <Tag tone="warning">Not connected</Tag>}>
         {q.data.email.connected
           ? <p>Confirmations, reminders and signature requests go out from <span className="text-deep-ink">{q.data.email.from}</span>.</p>
@@ -51,8 +56,33 @@ export function Integrations() {
           : <p>Texts are written and logged in Report, but not sent. Connect Twilio to send them to clients' phones.</p>}
       </Row>
       <Row icon={<CreditCard />} title="Payments" status={q.data.payments.connected ? <Tag tone="success">Connected</Tag> : <Tag>Not connected</Tag>}>
-        <p>Clients pay after the appointment, when they sign Form 8879. Connect Stripe to take card payments online.</p>
+        <p>Clients pay after the appointment, when they sign Form 8879. {q.data.payments.connected ? "Card payments are taken online." : "Until Stripe is turned on, clients see a clearly labeled test payment button."}</p>
       </Row>
     </ul>
+  );
+}
+
+function VideoLinkRow() {
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ["owner", "video-link"], queryFn: async () => { const { data, error } = await supabase.from("settings").select("video_link").eq("id", 1).maybeSingle(); if (error) throw error; return data?.video_link ?? ""; } });
+  const [val, setVal] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { if (q.data !== undefined) setVal(q.data); }, [q.data]);
+  const valid = val.trim() === "" || /^https:\/\/\S+$/.test(val.trim());
+  const save = async () => {
+    setBusy(true);
+    const { error } = await supabase.from("settings").update({ video_link: val.trim() || null }).eq("id", 1);
+    setBusy(false);
+    if (error) toast.error("Couldn't save that."); else { toast.success("Video link saved."); void qc.invalidateQueries({ queryKey: ["owner", "video-link"] }); }
+  };
+  return (
+    <Row icon={<Video />} title="Video meeting link" status={q.data ? <Tag tone="success">Set</Tag> : <Tag>Not set</Tag>}>
+      <p>Your personal Zoom or Google Meet link. Video clients see a "Join call" button, and it's in the reminder the day before. If it's empty, clients are told you'll send the link by email.</p>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <Input aria-label="Video meeting link" placeholder="https://meet.google.com/abc-defg-hij" value={val} onChange={(e) => setVal(e.target.value)} className="h-10 sm:max-w-sm" />
+        <Button size="sm" className="h-10" disabled={!valid || busy || val === (q.data ?? "")} onClick={save}>{busy ? "Saving…" : "Save"}</Button>
+      </div>
+      {!valid && <p className="mt-1 text-destructive">Use a full link starting with https://</p>}
+    </Row>
   );
 }

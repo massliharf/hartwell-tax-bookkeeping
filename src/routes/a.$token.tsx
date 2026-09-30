@@ -204,7 +204,8 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
   const [date, setDate] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [alts, setAlts] = useState<string[] | null>(null);
-  const days = q.data?.days ?? [];
+  // Same 30-minute starts as the booking page, so days and times always agree.
+  const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const sel = date ?? days.find((d) => d.slots.length)?.date;
   const day = days.find((d) => d.date === sel);
 
@@ -234,10 +235,10 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
                 const off = d.closed || d.slots.length === 0;
                 return (
                   <button key={d.date} disabled={off} onClick={() => setDate(d.date)}
-                    className={`flex w-[68px] shrink-0 flex-col items-center rounded-lg px-2 py-2 ${active ? "bg-fill-selected text-deep-ink" : off ? "text-muted-foreground/50" : "bg-fill-neutral hover:bg-fill-selected"}`}>
-                    <span className="text-[10px] tracking-wider opacity-70">{c.dow}</span>
+                    aria-pressed={active} className={`flex w-[68px] shrink-0 flex-col items-center rounded-lg px-2 py-2 transition-colors duration-150 ${active ? "bg-primary text-primary-foreground" : off ? "text-muted-foreground/50" : "bg-fill-neutral text-deep-ink hover:bg-fill-selected"}`}>
+                    <span className="text-[10px] opacity-70">{c.dow} {c.month}</span>
                     <span className="tabular text-lg font-medium leading-tight">{c.day}</span>
-                    <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : c.month}</span>
+                    <span className="text-[10px] opacity-70">{d.closed ? "Closed" : d.slots.length === 0 ? "Full" : `${d.slots.length} open`}</span>
                   </button>
                 );
               })}

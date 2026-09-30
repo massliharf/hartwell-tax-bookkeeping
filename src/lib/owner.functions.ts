@@ -197,3 +197,33 @@ export const remindPayment = createServerFn({ method: "POST" })
     const ok = await sendPaymentReminder(data.id, requestOrigin(), `pay-manual:${data.id}:${Date.now()}`);
     return { ok };
   });
+
+/** Phone-in: Claire books for a client. Same database booking as the public page (lock, re-check, checklist), then the same confirmation email. */
+export const ownerBookAppointment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    serviceId: z.string().uuid(),
+    start: z.string().datetime({ offset: true }),
+    name: z.string().trim().min(1).max(120),
+    email: z.string().trim().email().max(200),
+    phone: z.string().trim().max(40).optional(),
+    meetingType: z.enum(["in_person", "video"]),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await assertOwner(context);
+    const { getNow } = await import("./clock.server");
+    const now = await getNow();
+    const { data: res, error } = await db.rpc("book_appointment", {
+      _service_id: data.serviceId, _start: new Date(data.start).toISOString(), _now: now.toISOString(),
+      _name: data.name, _email: data.email, _phone: data.phone ?? "", _meeting_type: data.meetingType,
+      _intake: { intake_pending: true } as never,
+    });
+    if (error) { console.error(error); return { ok: false as const, error: "Something went wrong. Try again." }; }
+    const r = res as { ok: boolean; appointment_id?: string };
+    if (!r.ok) return { ok: false as const, error: "That time was just taken. Pick another." };
+    await db.from("leads").update({ converted: true }).eq("email", data.email.toLowerCase()).eq("converted", false);
+    const { sendBookingConfirmation } = await import("./automations.server");
+    const { requestOrigin } = await import("./origin.server");
+    await sendBookingConfirmation(r.appointment_id!, requestOrigin()).catch(console.error);
+    return { ok: true as const, appointmentId: r.appointment_id!, error: null };
+  });

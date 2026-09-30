@@ -66,7 +66,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
           const pdf = ext === "pdf" || blob.type === "application/pdf";
           const pages = pdf ? await pdfPages(blob) : [];
           if (live) setLoaded((m) => ({ ...m, [k]: { url: URL.createObjectURL(blob), blob, pdf, ext, pages } }));
-        } catch { if (live) setLoaded((m) => ({ ...m, [k]: { error: true } })); }
+        } catch (e) { console.error("gallery load failed", f.document_name, e); if (live) setLoaded((m) => ({ ...m, [k]: { error: true } })); }
       })();
     }
     return () => { live = false; };
@@ -130,7 +130,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="left-0 top-0 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 p-0 sm:rounded-none">
-        <header className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 pr-14 sm:px-6">
+        <header className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 pr-16 sm:px-6 sm:pr-16">
           <div className="min-w-0 flex-1">
             <DialogTitle className="truncate text-sm font-medium text-deep-ink">Review documents, {title}</DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">{files.length} file{files.length === 1 ? "" : "s"}. Private, loaded through links that expire after a minute.</DialogDescription>
@@ -191,7 +191,7 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
             {cur && <>
               <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-deep-ink">{cur.document_name}</p><AiTag i={cur} /></div>
               {cur.ai_note && <p className={cn("mt-2 text-xs", cur.ai_check === "warning" || cur.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{cur.ai_note}{cur.ai_check === "kept" && " The client chose to keep it."}</p>}
-              <div className="mt-3 -mx-4 md:-mx-4"><DocReview key={cur.id} i={cur} onDone={next} /></div>
+              <div className="mt-3"><DocReview key={cur.id} i={cur} inline onDone={next} /></div>
               {cur.review_status === "accepted" && <p className="mt-2 text-xs text-muted-foreground">Accepted. Use the arrows to keep going.</p>}
             </>}
           </aside>

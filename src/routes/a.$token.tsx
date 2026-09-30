@@ -17,10 +17,10 @@ import { ReadyRing } from "@/components/brand/ReadyRing";
 import { BookingShell } from "@/components/booking/BookingShell";
 import {
   cancelAppointment, confirmAttendance, confirmUpload, createUploadUrl, getAppointmentByToken,
-  keepFlaggedFile, markNotApplicable, rescheduleAppointment, signForm8879, testPay, undoNotApplicable,
+  keepFlaggedFile, markNotApplicable, rescheduleAppointment, saveIntake, signForm8879, testPay, undoNotApplicable,
 } from "@/lib/portal.functions";
 import { getAvailabilityWindow } from "@/lib/booking.functions";
-import { fmtDateLong, fmtDayChip, fmtTime } from "@/lib/intake";
+import { fmtDateLong, fmtDayChip, fmtTime, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
 import { docGuide } from "@/lib/doc-guide";
 
 export const Route = createFileRoute("/a/$token")({
@@ -66,7 +66,7 @@ async function checkFile(f: File): Promise<string | null> {
 
 type Appt = {
   service_id: string; start_at: string; end_at: string; meeting_type: "in_person" | "video"; status: string;
-  ready_score: number; signature_status: string; services: { name: string } | null; clients: { name: string } | null;
+  ready_score: number; signature_status: string; services: { name: string; slug?: string } | null; intake_answers?: Record<string, unknown> | null; clients: { name: string } | null;
   fee_cents: number | null; client_note: string | null; paid_at: string | null; filed_at: string | null;
 };
 type Item = { id: string; document_name: string; description: string | null; required: boolean; status: string; na_reason: string | null; ai_check: string | null; ai_note: string | null; review_status: string; fix_reason: string | null; fix_note: string | null };
@@ -126,6 +126,7 @@ function PortalPage() {
         {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
 
         <AppointmentCard appt={a} cancelled={cancelled} postAppointment={postAppointment} videoLink={q.data.videoLink ?? null} />
+        {open && !!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
         {open && <Actions token={token} appt={a} onChange={refresh} />}
         {cancelled && (
           <div className="rounded-2xl bg-surface-2 p-6">
@@ -154,6 +155,42 @@ function PortalPage() {
         ))}
       </div>
     </BookingShell>
+  );
+}
+
+/* ---------- Intake (phone-in bookings) ---------- */
+function IntakeCard({ token, slug, onDone }: { token: string; slug: string | null; onDone: () => void }) {
+  const save = useServerFn(saveIntake);
+  const qs = questionsFor(slug);
+  const [ans, setAns] = useState<Answers>({});
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const done = qs.every((x) => ans[x.key] !== undefined);
+  const submit = async () => {
+    setBusy(true); setErr(null);
+    try { const r = await save({ data: { token, intake: toIntakePayload(slug ?? "individual", ans) } }); if (!r.ok) throw new Error(); onDone(); }
+    catch { setErr("We couldn't save your answers. Please try again."); }
+    finally { setBusy(false); }
+  };
+  return (
+    <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
+      <h2 className="text-[15px] font-medium text-deep-ink">A few quick questions</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Claire booked this for you by phone. Your answers tell us exactly which documents to bring.</p>
+      <div className="mt-5 space-y-4">
+        {qs.map((x) => (
+          <div key={x.key} className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-sm text-deep-ink">{x.label}</span>
+            {x.type === "count" ? (
+              <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" variant={ans[x.key] === n ? "default" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
+            ) : (
+              <div className="flex gap-1">{([true, false] as const).map((v) => <Button key={String(v)} size="sm" variant={ans[x.key] === v ? "default" : "secondary"} aria-pressed={ans[x.key] === v} onClick={() => setAns({ ...ans, [x.key]: v })}>{v ? "Yes" : "No"}</Button>)}</div>
+            )}
+          </div>
+        ))}
+      </div>
+      {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
+      <Button className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
+    </section>
   );
 }
 

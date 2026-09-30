@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Camera, Check, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine } from "lucide-react";
+import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -102,6 +102,10 @@ function PortalPage() {
   const first = a.clients?.name?.split(" ")[0] ?? "there";
   const todo = items.filter((i) => i.required && (i.status === "missing" || i.review_status === "needs_fix")).length;
   const closeout = a.status === "completed" && a.fee_cents != null;
+  const postAppointment = a.status === "completed";
+  const fixItems = items.filter((i) => i.review_status === "needs_fix");
+  const sentItems = items.filter((i) => i.status === "uploaded" && i.review_status !== "needs_fix");
+  const progress = a.filed_at ? 5 : postAppointment ? 4 : isPast ? 3 : items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix") ? 2 : 1;
 
   return (
     <BookingShell>
@@ -110,13 +114,16 @@ function PortalPage() {
           <p className="text-xs font-medium text-muted-foreground">Your private page</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
-            {cancelled ? "This appointment was cancelled." : a.filed_at ? "Your return has been e-filed." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
+            {cancelled ? "This appointment was cancelled." : a.filed_at ? "Your return has been e-filed." : postAppointment ? a.signature_status === "signed" && a.paid_at ? "All done. Claire will file your return today." : "Your return is ready. Sign and pay to have it filed." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
           </p>
         </div>
+        <ol aria-label="Appointment progress" className="-mb-3 flex gap-1 overflow-x-auto border-b border-border pb-4 sm:gap-2">
+          {["Booked", "Documents", "Appointment", "Sign and pay", "Filed"].map((label, index) => <li key={label} aria-current={index + 1 === progress ? "step" : undefined} className={`flex min-w-max flex-1 items-center gap-1.5 rounded-lg px-2 py-2 text-xs sm:px-3 ${index + 1 === progress ? "bg-primary text-primary-foreground" : index + 1 < progress ? "text-success" : "text-muted-foreground"}`}><span className={`grid size-5 shrink-0 place-items-center rounded-full border ${index + 1 === progress ? "border-primary-foreground" : "border-current"}`}>{index + 1 < progress ? <Check className="size-3" /> : index + 1}</span>{label}</li>)}
+        </ol>
 
         {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
 
-        <AppointmentCard appt={a} cancelled={cancelled} videoLink={q.data.videoLink ?? null} />
+        <AppointmentCard appt={a} cancelled={cancelled} postAppointment={postAppointment} videoLink={q.data.videoLink ?? null} />
         {open && <Actions token={token} appt={a} onChange={refresh} />}
         {cancelled && (
           <div className="rounded-2xl bg-surface-2 p-6">
@@ -125,7 +132,10 @@ function PortalPage() {
           </div>
         )}
 
-        {!cancelled && items.length > 0 && (
+        {!cancelled && items.length > 0 && (postAppointment ? <section className="space-y-4">
+          {fixItems.length > 0 && <div><h2 className="mb-4 t-section text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+          <details className="rounded-2xl border border-border bg-sheet p-5"><summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-deep-ink [&::-webkit-details-marker]:hidden">Documents you sent ({sentItems.length}) <ChevronDown className="size-4" /></summary><p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground"><Lock className="size-4 shrink-0" /> Only Claire can see your files. We never ask for your Social Security number.</p><ul className="mt-4 space-y-3">{sentItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></details>
+        </section> : (
           <section>
             <div className="mb-4 flex items-end justify-between gap-4">
               <h2 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Your checklist</h2>
@@ -139,14 +149,14 @@ function PortalPage() {
             </ul>
             <p className="mt-4 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
           </section>
-        )}
+        ))}
       </div>
     </BookingShell>
   );
 }
 
 /* ---------- Appointment card ---------- */
-function AppointmentCard({ appt, cancelled, videoLink }: { appt: Appt; cancelled: boolean; videoLink: string | null }) {
+function AppointmentCard({ appt, cancelled, postAppointment, videoLink }: { appt: Appt; cancelled: boolean; postAppointment: boolean; videoLink: string | null }) {
   const video = appt.meeting_type === "video";
   return (
     <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
@@ -160,14 +170,14 @@ function AppointmentCard({ appt, cancelled, videoLink }: { appt: Appt; cancelled
           <p className={`mt-1 t-card text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
-        {!cancelled && <ReadyRing value={appt.ready_score} size={84} />}
+        {!cancelled && !postAppointment && <ReadyRing value={appt.ready_score} size={84} />}
       </div>
       {!cancelled && (
         <div className="mt-5 border-t border-border pt-4 text-sm">
           {video ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> {videoLink ? "Video call. Join from here at your appointment time." : "Video call. Claire will send the link by email."}</span>
-              {videoLink && <Button size="sm" variant="outline" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
+              {videoLink && !postAppointment && <Button size="sm" variant="outline" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">

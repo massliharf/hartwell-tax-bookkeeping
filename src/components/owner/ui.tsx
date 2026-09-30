@@ -12,7 +12,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getDocumentUrl } from "@/lib/portal.functions";
 import { markNoShow, dismissAttention, nudgeSignature, remindPayment } from "@/lib/owner.functions";
-import { FinishDialog } from "./closeout";
 import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, money, type Appt, type Item, type NeedItem } from "./lib";
 import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
@@ -66,19 +65,17 @@ export function StatusPill({ status }: { status: string }) {
 }
 
 /** Open appointment actions: Finish appointment (fee + note) and No-show (confirmed first). */
-export function ApptActionButtons({ a, onDone }: { a: Appt; onDone?: () => void }) {
+export function ApptActionButtons({ a, onDone, onFinish }: { a: Appt; onDone?: () => void; onFinish: () => void }) {
   const [confirm, setConfirm] = useState(false);
-  const [finishing, setFinishing] = useState(false);
   const { noShow } = useApptActions();
   const open = a.status === "booked" || a.status === "confirmed";
   const name = a.clients?.name ?? "this client";
   if (!open) return null;
   return <>
     <div className="grid grid-cols-2 gap-2">
-      <Button disabled={noShow.isPending} onClick={() => setFinishing(true)}>Finish appointment</Button>
+      <Button disabled={noShow.isPending} onClick={onFinish}>Finish appointment</Button>
       <Button variant="secondary" disabled={noShow.isPending} onClick={() => setConfirm(true)}>{noShow.isPending ? "Saving…" : "No-show"}</Button>
     </div>
-    <FinishDialog a={a} open={finishing} onOpenChange={setFinishing} onDone={onDone} />
     <AlertDialog open={confirm} onOpenChange={setConfirm}>
       <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
         <AlertDialogHeader>
@@ -99,10 +96,18 @@ export function Readiness({ value }: { value: number }) {
   return <span className="flex w-[58px] shrink-0 items-center gap-1.5"><ReadyRing value={value} size={20} stroke={3} /><span className="tabular text-[11px] text-muted-foreground">{value}%</span></span>;
 }
 
+export function AppointmentStage({ a }: { a: Appt }) {
+  if (a.status !== "completed") return <Readiness value={a.ready_score} />;
+  if (a.filed_at) return <Tag tone="success">Filed</Tag>;
+  if (a.signature_status !== "signed") return <Tag tone="warning">Waiting for signature</Tag>;
+  if (!a.paid_at) return <Tag tone="warning">Unpaid</Tag>;
+  return <Tag tone="success">Ready to file</Tag>;
+}
+
 /** THE appointment row. Used on Today, Calendar (mobile), client pages and search. Click opens the appointment panel. */
 export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; showDate?: boolean; showClient?: boolean }) {
   const openAppt = useApptPanel();
-  const done = a.status === "completed" || a.status === "no_show" || a.status === "cancelled";
+  const done = !!a.filed_at || a.status === "no_show" || a.status === "cancelled";
   return (
     <button type="button" onClick={() => openAppt({ appointmentId: a.id })}
       className={cn("flex min-h-14 w-full items-center gap-3 border-b border-border px-3 py-2 text-left transition-colors duration-150 last:border-0 hover:bg-surface-2", done && "opacity-60")}>
@@ -112,8 +117,8 @@ export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; s
         <span className="block truncate text-sm font-medium text-deep-ink">{showClient ? a.clients?.name ?? "Client" : a.services?.name}</span>
         <span className="block truncate text-xs text-muted-foreground">{showClient ? a.services?.name : a.meeting_type === "video" ? "Video" : "In person"}</span>
       </span>
-      <Readiness value={a.ready_score} />
-      <span className="hidden w-[84px] justify-end sm:flex"><StatusPill status={a.status} /></span>
+      <span className="shrink-0"><AppointmentStage a={a} /></span>
+      {a.status !== "completed" && <span className="hidden w-[84px] justify-end sm:flex"><StatusPill status={a.status} /></span>}
       <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
     </button>
   );
@@ -136,7 +141,7 @@ export function NeedRow({ it, onAct, busy }: { it: NeedItem; onAct: () => void; 
     <li className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-3 py-2.5 last:border-0 sm:flex-nowrap">
       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span>
       <button type="button" disabled={!appointmentId} onClick={() => appointmentId && openAppt({ appointmentId })} className="min-w-0 flex-1 basis-[calc(100%-44px)] text-left disabled:cursor-default sm:basis-auto">
-        <span className="block truncate text-sm font-medium text-deep-ink">{title}</span>
+        <span className="block line-clamp-2 text-sm font-medium text-deep-ink sm:truncate">{title}</span>
         <span className="block truncate text-xs text-muted-foreground" title={reason}>{reason}</span>
       </button>
       <Button size="sm" variant="secondary" disabled={busy} onClick={onAct} className="ml-11 shrink-0 sm:ml-0">{busy ? "Saving…" : action}</Button>

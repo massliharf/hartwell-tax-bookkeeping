@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
@@ -51,6 +52,13 @@ function CalendarPage() {
   const [mobileDay, setMobileDay] = useState(today);
   const days = Array.from({ length: 6 }, (_, i) => addDays(week, i));
   const q = useQuery(apptsRange(etToIso(week, 0), etToIso(addDays(week, 7), 0)));
+  const off = useQuery({ queryKey: ["owner", "time-off", week], queryFn: async () => { const { data, error } = await supabase.from("time_off").select("id, starts_at, ends_at, all_day, label").lt("starts_at", etToIso(addDays(week, 7), 0)).gt("ends_at", etToIso(week, 0)); if (error) throw error; return data ?? []; } });
+  /** Time-off pieces clipped to one day's visible hours. */
+  const offOn = (d: string) => (off.data ?? []).flatMap((o) => {
+    const s = Math.max(new Date(o.starts_at).getTime(), new Date(etToIso(d, START)).getTime());
+    const e = Math.min(new Date(o.ends_at).getTime(), new Date(etToIso(d, END)).getTime());
+    return e > s ? [{ o, top: et(new Date(s).toISOString()).minutes, bottom: et(new Date(e).toISOString()).minutes || END }] : [];
+  });
   const [pending, setPending] = useState<{ id: string; name: string; ymd: string; mins: number } | null>(null);
   const [drag, setDrag] = useState<string | null>(null);
   const qc = useQueryClient();
@@ -129,6 +137,12 @@ function CalendarPage() {
                   <span className="absolute -left-1 -top-1 size-2 rounded-full bg-destructive" />
                 </span>
               )}
+              {offOn(d).map(({ o, top, bottom }) => (
+                <div key={o.id} className="pointer-events-none absolute inset-x-0 z-[5] overflow-hidden border-y border-border px-2 py-1 text-[11px] text-muted-foreground"
+                  style={{ top: (top - START) * PX, height: Math.max(18, (bottom - top) * PX), backgroundColor: "hsl(var(--fill-subtle, 0 0% 96%))", backgroundImage: "repeating-linear-gradient(135deg, rgba(16,16,16,0.07) 0 6px, transparent 6px 12px)" }}>
+                  <span className="rounded bg-sheet/90 px-1">{o.label || "Time off"}</span>
+                </div>
+              ))}
               {layoutDay(byDay(d)).map(({ a, lane, lanes }) => {
                 const { minutes } = et(a.start_at);
                 const dur = (new Date(a.end_at).getTime() - new Date(a.start_at).getTime()) / 60000;
@@ -176,6 +190,7 @@ function CalendarPage() {
             );
           })}
         </div>
+        {offOn(mobileDay).map(({ o, top, bottom }) => <p key={o.id} className="mb-3 rounded-xl border border-border px-3 py-2 text-xs text-muted-foreground" style={{ backgroundImage: "repeating-linear-gradient(135deg, rgba(16,16,16,0.07) 0 6px, transparent 6px 12px)" }}>{o.label || "Time off"}, {o.all_day ? "all day" : `${fmtMins(top)} to ${fmtMins(bottom)}`}</p>)}
         {q.isLoading ? <Skeleton className="h-40 rounded-2xl" /> : byDay(mobileDay).length ? (
           <ApptList appts={byDay(mobileDay)} />
         ) : <p className="rounded-2xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">Nothing booked on {ymdLabel(mobileDay)}.</p>}

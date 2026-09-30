@@ -28,7 +28,7 @@ export function PageHead({ title, meta, actions, children }: { eyebrow?: string;
   );
 }
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
-  return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 text-base font-medium text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
+  return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 t-sub">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;
 }
 export function LoadingRows({ n = 3 }: { n?: number }) {
   return <div role="status" aria-label="Loading" className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface-2">{Array.from({ length: n }, (_, i) => <div key={i} className="flex h-16 items-center gap-3 px-3"><Skeleton className="size-10 shrink-0 rounded-full" /><Skeleton className="h-4 w-16 shrink-0" /><div className="min-w-0 flex-1"><Skeleton className="h-4 w-32 max-w-full" /><Skeleton className="mt-1 h-3 w-40 max-w-full" /></div><Skeleton className="hidden h-6 w-16 sm:block" /><Skeleton className="size-8 shrink-0" /></div>)}</div>;
@@ -77,14 +77,14 @@ export function ApptActionButtons({ a, onDone, onFinish }: { a: Appt; onDone?: (
       <Button variant="secondary" disabled={noShow.isPending} onClick={() => setConfirm(true)}>{noShow.isPending ? "Saving…" : "No-show"}</Button>
     </div>
     <AlertDialog open={confirm} onOpenChange={setConfirm}>
-      <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
+      <AlertDialogContent className="max-w-sm">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-base font-medium">Mark {name} as a no-show?</AlertDialogTitle>
+          <AlertDialogTitle>Mark {name} as a no-show?</AlertDialogTitle>
           <AlertDialogDescription>The appointment is closed and the client gets a link to book again.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => noShow.mutate(a.id, { onSuccess: () => onDone?.() })}>Mark no-show</AlertDialogAction>
+          <AlertDialogAction className="bg-alert-negative text-alert-negative-fg hover:bg-[#FCE1DB] active:bg-[#F9C7BE]" onClick={() => noShow.mutate(a.id, { onSuccess: () => onDone?.() })}>Mark no-show</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
-import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { CalendarCheck, Check, Clock, Link as LinkIcon, Loader2 } from "lucide-react";
+import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { claimOffer, getOffer } from "@/lib/automations.functions";
@@ -25,24 +25,14 @@ export const Route = createFileRoute("/claim/$token")({
 });
 
 function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main className="mx-auto max-w-xl px-5 py-10 sm:py-16">
-        <div className="sheet-stack p-8 text-center">{children}</div>
-      </main>
-      <SiteFooter />
-    </div>
-  );
+  return <BookingShell>{children}</BookingShell>;
 }
 
 function Missed() {
   return (
-    <>
-      <h1 className="t-page text-deep-ink">Just missed it.</h1>
-      <p className="mt-4 text-deep-ink/70">Someone claimed this time a moment before you. You're still on the waitlist, and we'll write the moment another spot opens.</p>
-      <Button asChild variant="outline" className="mt-8"><Link to="/">Back to home</Link></Button>
-    </>
+    <ResultPanel icon={<Clock />} title="Just missed it." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See other times</Link></Button>}>
+      Someone claimed this time a moment before you. You're still on the waitlist, and we'll email you the moment another spot opens.
+    </ResultPanel>
   );
 }
 
@@ -54,32 +44,29 @@ function ClaimPage() {
   const [state, setState] = useState<"idle" | "busy" | "missed" | { token: string }>("idle");
 
   if (q.isLoading) return <Shell><div role="status" aria-label="Loading" className="space-y-4"><Skeleton className="mx-auto h-5 w-36" /><Skeleton className="mx-auto h-9 w-64 max-w-full" /><Skeleton className="mx-auto h-6 w-44" /><Skeleton className="mx-auto mt-8 h-10 w-full" /></div></Shell>;
-  if (q.isError || !q.data) return <Shell><h1 className="t-page text-deep-ink">This link isn't working.</h1><p className="mt-4 text-deep-ink/70">It may have expired. You're still on the waitlist.</p></Shell>;
+  if (q.isError || !q.data) return <Shell><ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See open times</Link></Button>}>It may have expired. You're still on the waitlist, and we'll email you when another spot opens.</ResultPanel></Shell>;
   if (state === "missed" || (state === "idle" && q.data.status !== "open")) return <Shell><Missed /></Shell>;
   if (typeof state === "object") {
     return (
       <Shell>
-        <h1 className="t-page text-deep-ink">It's yours.</h1>
-        <p className="mt-4 text-deep-ink/70">{fmtDateLong(q.data.slotStart)} at {fmtTime(q.data.slotStart)}. A confirmation is on its way with your document checklist.</p>
-        <Button variant="accent" asChild className="mt-8"><Link to="/a/$token" params={{ token: state.token }}>Open your checklist</Link></Button>
+        <ResultPanel icon={<Check />} tone="success" title="It's yours." actions={<Button asChild size="lg"><Link to="/a/$token" params={{ token: state.token }}>Open your appointment</Link></Button>}>
+          <strong>{fmtDateLong(q.data.slotStart)} at {fmtTime(q.data.slotStart)}</strong>. A confirmation is on its way with your document checklist.
+        </ResultPanel>
       </Shell>
     );
   }
   return (
     <Shell>
-      <p className="text-sm text-muted-foreground">A spot opened up</p>
-      <h1 className="mt-3 t-page text-deep-ink">{fmtDateLong(q.data.slotStart)}</h1>
-      <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(q.data.slotStart)}, {q.data.service}, {q.data.minutes} min</p>
-      <p className="mt-4 text-deep-ink/70">First to claim it gets it. No payment now.</p>
-      <Button variant="accent" size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {
-        setState("busy");
-        try {
-          const r = await claim({ data: { token } });
-          setState(r.ok ? { token: r.manageToken } : "missed");
-        } catch { setState("missed"); }
-      }}>
-        {state === "busy" ? <Loader2 className="size-4 " /> : "Claim this time"}
-      </Button>
+      <ResultPanel icon={<CalendarCheck />} eyebrow="A spot opened up" title={`${fmtDateLong(q.data.slotStart)}, ${fmtTime(q.data.slotStart)}`}
+        actions={<Button size="lg" className="w-full sm:w-auto" disabled={state === "busy"} onClick={async () => {
+          setState("busy");
+          try {
+            const r = await claim({ data: { token } });
+            setState(r.ok ? { token: r.manageToken } : "missed");
+          } catch { setState("missed"); }
+        }}>{state === "busy" && <Loader2 className="animate-spin" />}Claim this time</Button>}>
+        {q.data.service}, {q.data.minutes} minutes. The first person to claim it gets it. No payment now.
+      </ResultPanel>
     </Shell>
   );
 }

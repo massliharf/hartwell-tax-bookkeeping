@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Copy, Mail, MessageSquare, Phone } from "lucide-react";
-import { toast } from "sonner";
+import { Mail, MessageSquare, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { APPT_SELECT, MSG_LABEL, fmtStamp, type Appt } from "./lib";
-import { ApptList, ErrorNote, LoadingRows, PageHead } from "./ui";
+import { APPT_SELECT, MSG_LABEL, fmtDay, fmtStamp, fmtTime, money, type Appt } from "./lib";
+import { Tag } from "@/components/ui/tag";
+import { ApptList, ErrorNote, LoadingRows } from "./ui";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return <section><h2 className="mb-2 text-sm font-medium text-deep-ink">{title}</h2>{children}</section>;
+  return <section><h2 className="mb-3 t-sub">{title}</h2>{children}</section>;
 }
 
 /** A person: contact details, their appointments (same rows as everywhere), and messages sent to them. */
@@ -30,24 +30,50 @@ export function ClientProfile({ id }: { id: string }) {
   const { client, msgs } = q.data;
   const nowIso = new Date().toISOString();
   const appts = [...q.data.appts.filter((a) => a.start_at >= nowIso).reverse(), ...q.data.appts.filter((a) => a.start_at < nowIso)];
-  const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); toast.success("Copied."); } catch { toast.error("Couldn't copy."); } };
 
   return (
     <div className="space-y-8">
-      <PageHead title={client.name} meta={client.is_returning ? "Returning client" : "Client"} />
-      <Section title="Contact">
-        <div className="divide-y divide-border rounded-2xl border border-border text-sm">
-          <div className="flex h-12 items-center gap-3 px-4"><Mail className="size-4 shrink-0 text-muted-foreground" /><a className="min-w-0 flex-1 truncate text-deep-ink hover:underline" href={`mailto:${client.email}`}>{client.email}</a><Button size="icon" variant="ghost" aria-label="Copy email" onClick={() => copy(client.email)}><Copy className="size-3.5" /></Button></div>
-          {client.phone && <div className="flex h-12 items-center gap-3 px-4"><Phone className="size-4 shrink-0 text-muted-foreground" /><a className="tabular flex-1 text-deep-ink hover:underline" href={`tel:${client.phone}`}>{client.phone}</a><Button size="icon" variant="ghost" aria-label="Copy phone" onClick={() => copy(client.phone ?? "")}><Copy className="size-3.5" /></Button></div>}
-          {client.notes && <p className="px-4 py-3 text-deep-ink">{client.notes}</p>}
-        </div>
-      </Section>
+      {(() => {
+        const next = q.data.appts.filter((a) => a.start_at >= nowIso && (a.status === "booked" || a.status === "confirmed")).sort((x, y) => x.start_at.localeCompare(y.start_at))[0];
+        const owed = q.data.appts.filter((a) => a.status === "completed" && a.fee_cents != null && !a.paid_at).reduce((n, a) => n + (a.fee_cents ?? 0), 0);
+        const filed = q.data.appts.filter((a) => a.filed_at).length;
+        const stats: [string, string, "neutral" | "warning" | "success"][] = [
+          ["Next appointment", next ? `${fmtDay(next.start_at)}, ${fmtTime(next.start_at)}` : "None booked", "neutral"],
+          ["Documents", next ? (next.ready_score >= 100 ? "All in" : `${next.ready_score}% in`) : "Nothing due", next && next.ready_score < 100 ? "warning" : "neutral"],
+          ["Balance", owed ? money(owed) + " unpaid" : "Nothing owed", owed ? "warning" : "neutral"],
+          ["Returns filed", String(filed), filed ? "success" : "neutral"],
+        ];
+        return (
+          <header>
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-ink-50 font-serif text-lg font-medium text-ink">{client.name.charAt(0)}</span>
+              <div className="min-w-0 flex-1">
+                <h1 className="t-owner text-deep-ink">{client.name}</h1>
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground"><span className="break-all">{client.email}</span>{client.phone && <span className="tabular">{client.phone}</span>}{client.is_returning ? <Tag>Returning</Tag> : <Tag tone="accent">New this season</Tag>}</p>
+              </div>
+              <div className="flex w-full gap-2 sm:w-auto">
+                <Button asChild size="sm" variant="secondary"><a href={`mailto:${client.email}`}><Mail />Email</a></Button>
+                {client.phone && <Button asChild size="sm" variant="secondary"><a href={`tel:${client.phone}`}><Phone />Call</a></Button>}
+              </div>
+            </div>
+            <dl className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {stats.map(([k, v, tone]) => (
+                <div key={k} className="rounded-xl border border-line-1 px-3.5 py-3">
+                  <dt className="text-xs text-muted-foreground">{k}</dt>
+                  <dd className={`mt-1 text-sm font-medium ${tone === "warning" ? "text-alert-warning-fg" : tone === "success" ? "text-alert-success-fg" : "text-deep-ink"}`}>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </header>
+        );
+      })()}
+      {client.notes && <Section title="Notes"><p className="rounded-xl border border-line-1 px-4 py-3 text-sm text-deep-ink">{client.notes}</p></Section>}
       <Section title={`Appointments (${appts.length})`}>
         {appts.length ? <ApptList appts={appts} showDate showClient={false} /> : <p className="text-sm text-muted-foreground">No appointments yet.</p>}
       </Section>
       <Section title={`Messages (${msgs.length})`}>
         {msgs.length ? (
-          <ol className="divide-y divide-border rounded-2xl border border-border">
+          <ol className="divide-y divide-line-1 overflow-hidden rounded-2xl border border-line-1">
             {msgs.map((m) => (
               <li key={m.id} className="flex min-h-14 items-center gap-3 px-4 py-2">
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink">{m.channel === "sms" ? <MessageSquare className="size-4" /> : <Mail className="size-4" />}</span>

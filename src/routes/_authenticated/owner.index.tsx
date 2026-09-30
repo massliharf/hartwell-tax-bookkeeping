@@ -30,9 +30,9 @@ function Today() {
 
   const shortcuts: Shortcut[] = [
     { label: "New appointment", icon: Plus, rgb: "47,84,235", onClick: openNewAppointment },
-    { label: "Calendar", icon: CalendarDays, rgb: "133,102,220", onClick: () => navigate({ to: "/owner/calendar" }) },
-    { label: "Clients", icon: Users, rgb: "33,124,150", onClick: () => navigate({ to: "/owner/clients" }) },
-    { label: "Documents to check", icon: FileSearch, rgb: "196,120,44", count: reviewCount, disabled: !reviewCount, onClick: () => { const r = review[0]; if (r) openAppt({ appointmentId: r.id }); } },
+    { label: "Calendar", icon: CalendarDays, rgb: "124,92,219", onClick: () => navigate({ to: "/owner/calendar" }) },
+    { label: "Clients", icon: Users, rgb: "13,148,136", onClick: () => navigate({ to: "/owner/clients" }) },
+    { label: "Documents to check", icon: FileSearch, rgb: "217,119,6", count: reviewCount, disabled: !reviewCount, onClick: () => { const r = review[0]; if (r) openAppt({ appointmentId: r.id }); } },
     { label: "Unpaid", icon: CreditCard, rgb: "194,58,32", count: unpaid.length, disabled: !unpaid.length, onClick: () => scrollTo("today-needs") },
     { label: "Ready to file", icon: Send, rgb: "23,128,79", count: toFile.data?.length ?? 0, disabled: !toFile.data?.length, onClick: () => scrollTo("today-to-file") },
   ];
@@ -70,7 +70,7 @@ function Today() {
       <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-6">
         <div className="min-w-0 space-y-8">
           <section id="today-needs" className="scroll-mt-20">
-            <div className="mb-3 flex items-center gap-2"><h2 className="text-[15px] font-medium text-deep-ink">Needs you</h2>{!!needs.data?.length && <Tag>{needs.data.length}</Tag>}</div>
+            <div className="mb-3 flex items-center gap-2"><h2 className="t-sub">Needs you</h2>{!!needs.data?.length && <Tag>{needs.data.length}</Tag>}</div>
             {needs.isLoading && <LoadingRows n={3} />}
             {needs.isError && <ErrorNote onRetry={() => needs.refetch()} />}
             {needs.data && !needs.data.length && <Empty title="Nothing needs you.">Every appointment is on track. Exceptions show up here.</Empty>}
@@ -78,21 +78,21 @@ function Today() {
           </section>
           {!!toFile.data?.length && (
             <section id="today-to-file" className="scroll-mt-20">
-              <div className="mb-3 flex items-center gap-2"><h2 className="text-[15px] font-medium text-deep-ink">Ready to file</h2><Tag tone="success">{toFile.data.length}</Tag></div>
+              <div className="mb-3 flex items-center gap-2"><h2 className="t-sub">Ready to file</h2><Tag tone="success">{toFile.data.length}</Tag></div>
               <ApptList appts={toFile.data} showDate />
             </section>
           )}
         </div>
         <div className="min-w-0 space-y-8">
           <section id="today-appointments" className="scroll-mt-20">
-            <div className="mb-3 flex items-center gap-2"><h2 className="text-[15px] font-medium text-deep-ink">Today's schedule</h2>{!!q.data?.length && <Tag>{q.data.filter((a) => a.status !== "no_show").length}</Tag>}</div>
+            <div className="mb-3 flex items-center gap-2"><h2 className="t-sub">Today's schedule</h2>{!!q.data?.length && <Tag>{q.data.filter((a) => a.status !== "no_show").length}</Tag>}</div>
             {q.isLoading && <LoadingRows />}
             {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
             {q.data && !q.data.length && <Empty title="A quiet day.">Nothing on the calendar. New bookings show up here on their own.</Empty>}
             {q.data && !!q.data.length && <ApptList appts={q.data} />}
           </section>
           <section>
-            <h2 className="mb-3 text-[15px] font-medium text-deep-ink">Next up</h2>
+            <h2 className="mb-3 t-sub">Next up</h2>
             {upcoming.isLoading && <LoadingRows n={3} />}
             {upcoming.isError && <ErrorNote onRetry={() => upcoming.refetch()} />}
             {upcoming.data && !upcoming.data.length && <p className="text-sm text-muted-foreground">No appointments in the next two weeks.</p>}

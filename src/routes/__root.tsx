@@ -13,27 +13,17 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
+import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
+import { Compass, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
-    <main className="grid min-h-screen place-items-center bg-paper px-5">
-      <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
-        <p className="text-xs font-medium text-muted-foreground">Page not found</p>
-        <h1 className="mt-2 t-page text-deep-ink">This page isn't here.</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          The link may be old or mistyped. You can head back home, or book an appointment in about two minutes.
-        </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <Button asChild><Link to="/">
-            Back to home
-          </Link></Button>
-          <Button asChild variant="secondary"><Link to="/book">
-            Book an appointment
-          </Link></Button>
-        </div>
-      </div>
-    </main>
+    <BookingShell>
+      <ResultPanel icon={<Compass />} title="This page isn't here." actions={<><Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button></>}>
+        The link may be old or mistyped. Booking takes about two minutes.
+      </ResultPanel>
+    </BookingShell>
   );
 }
 
@@ -45,23 +35,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <main className="grid min-h-screen place-items-center bg-paper px-5">
-      <div className="sheet-stack mx-auto max-w-md px-8 py-12 text-center">
-        <p className="text-xs font-medium text-muted-foreground">Something went wrong</p>
-        <h1 className="mt-2 t-page text-deep-ink">This page didn't load.</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          It's on our side, not yours. Try again, or call the office at (973) 555-0142.
-        </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <Button onClick={() => { router.invalidate(); reset(); }}>
-            Try again
-          </Button>
-          <Button asChild variant="secondary"><a href="/">
-            Back to home
-          </a></Button>
-        </div>
-      </div>
-    </main>
+    <BookingShell>
+      <ResultPanel icon={<RotateCcw />} tone="warning" title="This page didn't load." actions={<><Button size="lg" onClick={() => { router.invalidate(); reset(); }}>Try again</Button><Button asChild size="lg" variant="secondary"><a href="/">Back to home</a></Button></>}>
+        It's on our side, not yours. Try again, or call the office at (973) 555-0142.
+      </ResultPanel>
+    </BookingShell>
   );
 }
 
@@ -91,7 +69,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "alternate icon", href: "/favicon.ico" },
-      { rel: "apple-touch-icon", href: "/favicon.svg" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,

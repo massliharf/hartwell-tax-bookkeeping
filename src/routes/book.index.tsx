@@ -125,7 +125,7 @@ function BookPage() {
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button variant="accent" size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
+            <Button size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
           </div>
         </div>
         <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">
@@ -134,7 +134,7 @@ function BookPage() {
         </div></aside>
       </div>
       <div className="fixed inset-x-0 bottom-[64px] z-30 border-t border-border bg-sheet px-5 py-2 lg:hidden">
-        <Dialog><DialogTrigger asChild><Button variant="secondary" className="w-full justify-between">Your checklist ({service ? preview.length : 0}) <ChevronRight className="size-4" /></Button></DialogTrigger>
+        <Dialog><DialogTrigger asChild><Button variant="secondary" size="md" className="w-full justify-between">Your checklist ({service ? preview.length : 0}) <ChevronRight className="size-4" /></Button></DialogTrigger>
           <DialogContent className="max-w-md"><DialogTitle className="sr-only">Your checklist</DialogTitle><ChecklistPreview docs={preview} hasService={!!service} /></DialogContent>
         </Dialog>
       </div>
@@ -230,19 +230,8 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
                 </button>
               </div>
             ) : (
-              <div className="flex h-10 shrink-0 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label={q.label}>
-                {[true, false].map((v) => (
-                  <button
-                    key={String(v)}
-                    role="radio"
-                    aria-checked={answers[q.key] === v}
-                    onClick={() => set(q.key, v)}
-                     className={`h-8 min-w-16 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-deep-ink"}`}
-                  >
-                    {v ? "Yes" : "No"}
-                  </button>
-                ))}
-              </div>
+              <Segmented className="shrink-0" label={q.label} value={answers[q.key] === true ? "yes" : answers[q.key] === false ? "no" : ("" as "yes" | "no")}
+                onChange={(v) => set(q.key, v === "yes")} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
             )}
           </div>
         ))}
@@ -285,7 +274,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
               <button type="button" onClick={() => update({ date: fd.date, slot: first })}
                 className={`mb-4 flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors duration-150 sm:w-auto sm:min-w-[320px] ${picked ? "border-deep-ink bg-surface-2" : "border-border bg-sheet hover:bg-surface-2"}`}>
                 <span><span className="block text-xs text-muted-foreground">Next available</span><span className="block text-sm font-medium text-deep-ink">{fmtDateLong(first)}, {fmtTime(first)}</span></span>
-                <span className="text-xs font-medium text-ink">{picked ? "Selected" : "Pick this"}</span>
+                <span className="shrink-0 whitespace-nowrap text-xs font-medium text-ink">{picked ? "Selected" : "Pick this"}</span>
               </button>
             );
           })()}
@@ -323,7 +312,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
                    const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
                    return new Date(s).getUTCMinutes() % 30 === 0 && (period === "Morning" ? hour < 12 : period === "Afternoon" ? hour >= 12 && hour < 17 : hour >= 17);
                  });
-                 return slots.length ? <div key={period}><h2 className="mb-2 text-sm font-medium text-deep-ink">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{slots.map((s) => (
+                 return slots.length ? <div key={period}><h2 className="mb-3 t-sub">{period}</h2><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{slots.map((s) => (
                    <Button key={s} variant="secondary" onClick={() => update({ date: day.date, slot: s })} aria-pressed={draft.slot === s && draft.date === day.date}
                      className={`tabular h-11 rounded-lg text-sm font-medium transition-colors duration-150 ${draft.slot === s && draft.date === day.date ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary text-deep-ink hover:bg-fill-selected"}`}>
                      {fmtTime(s)}
@@ -360,15 +349,15 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
         try { const r = await join({ data: { serviceId: service.id, name, email, date } }); setState(r.ok ? "done" : "error"); } catch { setState("error"); }
       }}
     >
-      <p className="t-card text-deep-ink">Full — join the waitlist</p>
+      <p className="t-card text-deep-ink">This day is full. Join the waitlist.</p>
       <p className="mt-1 text-sm text-deep-ink/70">{c.dow} {c.month} {c.day} is fully booked. We'll email you if a spot opens.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Input required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-10" />
-        <Input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10" />
+        <Input required aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-10" />
+        <Input required type="email" aria-label="Email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10" />
       </div>
       {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
-      <Button type="submit" variant="highlight" className="mt-4" disabled={state === "saving"}>
-        {state === "saving" && <Loader2 className="" />} Join the waitlist
+      <Button type="submit" size="md" className="mt-4" disabled={state === "saving"}>
+        {state === "saving" && <Loader2 className="animate-spin" />} Join the waitlist
       </Button>
     </form>
   );
@@ -378,7 +367,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
 function BookingSummary({ service, draft, onPickAgain }: { service: Service; draft: BookingDraft; onPickAgain: () => void }) {
   return <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sheet p-4">
     <div className="min-w-0"><p className="font-medium text-deep-ink">{service.name}</p><p className="text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}`}, {draft.meetingType === "video" ? "Video call" : "In person"}</p></div>
-    <Button variant="secondary" onClick={onPickAgain}>Change</Button>
+    <Button size="sm" variant="secondary" onClick={onPickAgain}>Change</Button>
   </div>;
 }
 

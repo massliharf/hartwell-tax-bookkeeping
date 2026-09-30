@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/brand/Logo";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
@@ -22,15 +23,7 @@ export function AnnouncementBar() {
 }
 
 function Wordmark() {
-  return (
-    <Link to="/" className="flex min-w-0 items-center gap-2.5">
-      <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-lg bg-ink font-serif text-base text-primary-foreground">H</span>
-      <span className="flex min-w-0 flex-col leading-tight">
-        <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
-        <span className="truncate text-[11px] text-muted-foreground">& Bookkeeping, Montclair NJ</span>
-      </span>
-    </Link>
-  );
+  return <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="min-w-0"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>;
 }
 
 const LINKS = [{ href: "/#what", label: "What we do" }, { href: "/#how", label: "How it works" }, { href: "/#services", label: "Prices" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
@@ -45,14 +38,14 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
         </nav>
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild variant="ghost"><Link to="/book/returning">My appointment</Link></Button>
-          <Button variant="accent" asChild><Link to="/book">Book an appointment</Link></Button>
+          <Button asChild><Link to="/book">Book an appointment</Link></Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="md:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-border p-2 shadow-lift">
             {LINKS.map((l) => <DropdownMenuItem key={l.href} asChild className="h-11 rounded-lg px-3 text-sm"><a href={l.href}>{l.label}</a></DropdownMenuItem>)}
             <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">My appointment</Link></DropdownMenuItem>
-            <div className="p-1 pt-2"><Button variant="accent" asChild size="lg" className="w-full"><Link to="/book">Book an appointment</Link></Button></div>
+            <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Book an appointment</Link></Button></div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -65,7 +58,7 @@ export function SiteFooter() {
     <footer className="mt-16 bg-night text-white/80 lg:mt-24">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
-          <p className="flex items-center gap-2.5 text-base font-semibold text-white"><span aria-hidden="true" className="grid size-8 place-items-center rounded-lg bg-ink font-serif text-base text-white">H</span>Hartwell Tax</p>
+          <Logo tone="light" />
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
         <div className="text-sm">

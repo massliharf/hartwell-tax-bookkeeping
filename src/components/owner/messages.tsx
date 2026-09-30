@@ -29,7 +29,7 @@ export function MessageLog() {
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-deep-ink">Sent automatically</h2>
+        <h2 className="t-sub">Sent automatically</h2>
         <Segmented size="sm" label="Filter messages" value={type ?? "all"} onChange={(v) => setType(v === "all" ? null : v)}
           options={[{ value: "all", label: "All" }, ...types.map((t) => ({ value: t, label: MSG_LABEL[t] ?? t }))]} className="max-w-full" />
       </div>

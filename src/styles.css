@@ -247,3 +247,8 @@
 /* Marketing: bold lead sentence + grey continuation (magnific.com/desktop) */
 @utility lead-text { font-size: 20px; line-height: 30px; color: #616161; @media (width >= 40rem) { font-size: 22px; line-height: 33px; } & > b, & > strong { color: #1A1A1A; font-weight: 600; } }
 @utility eyebrow { font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink); }
+
+/* Sub-heading for every section inside a page, card or window (owner app and client pages). */
+@utility t-sub { font-family: var(--font-sans); font-weight: 500; font-size: 15px; line-height: 22px; letter-spacing: 0; color: var(--color-deep-ink, #1A1A1A); }
+/* Small group label above a list (e.g. "Received · 2"). */
+@utility t-label { font-family: var(--font-sans); font-weight: 500; font-size: 11px; line-height: 16px; letter-spacing: 0.04em; text-transform: uppercase; color: #737373; }

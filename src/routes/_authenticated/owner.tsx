@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AppointmentPanel } from "@/components/owner/appointment-panel";
 import { ApptPanelContext, type ApptPanelTarget } from "@/components/owner/drawer-context";
 import { useLocation } from "@tanstack/react-router";
-import { BarChart3, CalendarDays, Inbox, LogOut, Settings, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
+import { BarChart3, CalendarDays, FlaskConical, Inbox, LogOut, Settings, Smartphone, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { needsYou } from "@/components/owner/lib";
 import { DemoTools } from "@/components/owner/demo";
+import { Logo } from "@/components/brand/Logo";
 import { NewAppointmentButton } from "@/components/owner/new-appointment";
 
 export const Route = createFileRoute("/_authenticated/owner")({
@@ -73,7 +74,7 @@ function OwnerLayout() {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-6 text-center">
         <div className="max-w-sm">
-          <h1 className="font-sans text-lg font-normal text-deep-ink">This area is for Claire only.</h1>
+          <h1 className="t-page text-deep-ink">This area is for Claire only.</h1>
           <p className="mt-2 text-sm text-muted-foreground">You're signed in with an account that doesn't have access.</p>
           <Button className="mt-6" variant="outline" onClick={signOut}>Sign out</Button>
         </div>
@@ -92,7 +93,7 @@ function OwnerLayout() {
       {/* DESIGN_SYSTEM v2 §5: the sidebar sits on the canvas (no card); the main panel is the white card. */}
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-3 transition-[width,padding] duration-300 ease-expo sm:flex ${collapsed ? "w-[60px] px-2" : "w-[220px] px-3"}`}>
         <div className={`flex h-9 items-center ${collapsed ? "justify-center" : "justify-between"}`}>
-          {!collapsed && <Link to="/" className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-lg bg-ink font-serif text-sm text-white">H</span><span className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</span></Link>}
+          {collapsed ? null : <Link to="/owner" aria-label="Hartwell practice home" className="min-w-0"><Logo size={28} sub="Practice" /></Link>}
           <Button size="icon" variant="ghost" onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}><PanelLeft className="size-4" /></Button>
         </div>
         <div className="flex flex-col gap-0.5">
@@ -139,7 +140,6 @@ function OwnerLayout() {
           <div className="px-5 pb-28 pt-4 sm:px-8 sm:pb-12 sm:pt-2">
             <div className={wide ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
               <div key={path} className="enter"><Outlet /></div>
-              <div className="mt-12 border-t border-border pt-4 sm:hidden"><DemoTools inline /></div>
             </div>
           </div>
         </main>
@@ -162,6 +162,9 @@ function OwnerLayout() {
                 <Link to={n.to}><n.icon className="size-3.5" />{n.label}</Link>
               </DropdownMenuItem>
             ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event("owner:demo"))} className="h-8 gap-2.5 rounded-lg text-xs"><FlaskConical className="size-3.5" />Demo tools</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event("owner:phone"))} className="h-8 gap-2.5 rounded-lg text-xs"><Smartphone className="size-3.5" />Phone preview</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={signOut} className="h-8 gap-2.5 rounded-lg text-xs"><LogOut className="size-3.5" />Sign out</DropdownMenuItem>
           </DropdownMenuContent>

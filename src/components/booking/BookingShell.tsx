@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Check, X } from "lucide-react";
+import { X } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
+import { Stepper } from "@/components/ui/stepper";
 import type { ReactNode } from "react";
 
 export const STEPS = ["Service", "Questions", "Time", "Details"] as const;
@@ -9,10 +11,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
     <div className="min-h-screen bg-paper sm:bg-canvas sm:p-2">
       <header>
         <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-6 sm:px-4">
-          <Link to="/" className="flex min-w-0 items-baseline gap-2">
-            <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
-            <span className="truncate text-xs text-muted-foreground">& Bookkeeping</span>
-          </Link>
+          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="min-w-0"><Logo /></Link>
           <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
             <X className="size-4" />
           </Link>
@@ -27,23 +26,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
 }
 
 function Progress({ step }: { step: number }) {
-  return (
-    <div className="px-6 pt-6 sm:px-8">
-      <ol className="flex gap-1 overflow-x-auto [scrollbar-width:none] sm:overflow-visible" aria-label="Booking progress">
-        {STEPS.map((label, i) => {
-          const done = i < step;
-          const active = i === step;
-          return (
-            <li key={label} aria-current={active ? "step" : undefined}
-               className={`flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-medium min-[390px]:px-3 sm:px-4 sm:text-xs ${active ? "bg-fill-selected text-deep-ink" : done ? "text-deep-ink" : "text-muted-foreground"}`}>
-              {done ? <Check className="size-3.5 text-ink" strokeWidth={3} /> : <span className="tabular">{i + 1}</span>}
-              {label}
-            </li>
-          );
-        })}
-      </ol>
-    </div>
-  );
+  return <div className="px-6 pt-6 sm:px-8"><Stepper steps={STEPS} current={step} label="Booking progress" className="max-w-xl" /></div>;
 }
 
 export function StepTitle({ eyebrow, title, sub, hideEyebrow = false }: { eyebrow: string; title: string; sub?: string; hideEyebrow?: boolean }) {
@@ -52,6 +35,22 @@ export function StepTitle({ eyebrow, title, sub, hideEyebrow = false }: { eyebro
        {!hideEyebrow && <p className="text-xs font-medium leading-6 text-muted-foreground">{eyebrow}</p>}
        <h1 className={`${hideEyebrow ? "" : "mt-1 "}t-page text-deep-ink`}>{title}</h1>
       {sub && <p className="mt-2 text-sm text-muted-foreground">{sub}</p>}
+    </div>
+  );
+}
+
+/** The one centered "outcome" layout used by every client page (booked, sent, expired link, taken, not found). */
+export function ResultPanel({ icon, tone = "neutral", eyebrow, title, children, actions }: {
+  icon?: ReactNode; tone?: "neutral" | "success" | "warning"; eyebrow?: string; title: string; children?: ReactNode; actions?: ReactNode;
+}) {
+  const ring = tone === "success" ? "bg-alert-success text-alert-success-fg" : tone === "warning" ? "bg-alert-warning text-alert-warning-fg" : "bg-tint-1 text-deep-ink";
+  return (
+    <div className="enter mx-auto max-w-md py-6 text-center sm:py-10">
+      {icon && <span className={`mx-auto grid size-12 place-items-center rounded-full [&_svg]:size-5 ${ring}`}>{icon}</span>}
+      {eyebrow && <p className={`${icon ? "mt-5" : ""} text-[13px] text-muted-foreground`}>{eyebrow}</p>}
+      <h1 className={`${icon && !eyebrow ? "mt-5" : eyebrow ? "mt-1" : ""} t-page text-balance text-deep-ink`}>{title}</h1>
+      {children && <div className="mt-3 text-[15px] leading-6 text-muted-foreground [&_strong]:font-medium [&_strong]:text-deep-ink">{children}</div>}
+      {actions && <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">{actions}</div>}
     </div>
   );
 }

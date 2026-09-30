@@ -112,7 +112,7 @@ function Hero() {
             Book in two minutes. We'll tell you exactly what to bring, and check it before you arrive.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button variant="accent" asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
+            <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I already have a booking</Link></Button>
           </div>
           <div className="mt-6 flex items-center gap-3">
@@ -172,12 +172,12 @@ function WhatClaireDoes() {
         {who.map((w) => (
           <article key={w.title} className="flex gap-4 rounded-2xl border border-border p-5">
             <ServiceIcon service={w.svc} size={40} />
-            <div><h3 className="text-[15px] font-medium text-deep-ink">{w.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{w.text}</p></div>
+            <div><h3 className="t-sub">{w.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{w.text}</p></div>
           </article>
         ))}
       </div>
       <div className="mt-3 rounded-2xl bg-ink-50 p-5 sm:p-6">
-        <h3 className="text-[15px] font-medium text-deep-ink">Every return includes</h3>
+        <h3 className="t-sub">Every return includes</h3>
         <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {included.map((x) => (
             <li key={x} className="flex items-start gap-3 text-sm leading-[22px] text-body"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-success/10 text-success"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
@@ -430,7 +430,7 @@ function Privacy() {
         {points.map((p) => (
           <div key={p.title} className="flex gap-4 rounded-2xl bg-surface-2 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><p.icon className="size-5" strokeWidth={1.75} /></span>
-            <div><h3 className="text-[15px] font-medium text-deep-ink">{p.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{p.text}</p></div>
+            <div><h3 className="t-sub">{p.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{p.text}</p></div>
           </div>
         ))}
       </div>
@@ -443,7 +443,7 @@ function DeadlineCta() {
     <section id="deadline" className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
-          <h2 className="font-serif text-[28px] font-medium leading-[36px] tracking-[-0.02em] sm:text-[36px] sm:leading-[44px]">October 15 is close. Your slot doesn't have to be.</h2>
+          <h2 className="t-section text-white">October 15 is close. Your slot doesn't have to be.</h2>
           <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">Extended returns are due on October 15. Book now, upload your documents this week, and file once.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">

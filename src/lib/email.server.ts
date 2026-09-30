@@ -22,27 +22,30 @@ export type Block =
   | { buttons: { label: string; href: string }[] }
   | { note: string };
 
-/** Brand email: paper background, ink green, serif heading. Table layout for mail clients. */
+/** Brand email (DESIGN_SYSTEM v2): canvas grey, white card, Hartwell blue buttons, logo tile. Table layout for mail clients. */
 export function renderEmail(heading: string, blocks: Block[]) {
   const body = blocks.map((b) => {
-    if ("p" in b) return `<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#16201B">${esc(b.p)}</p>`;
-    if ("note" in b) return `<p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#5b6660">${esc(b.note)}</p>`;
-    if ("list" in b) return `<table role="presentation" width="100%" style="margin:0 0 20px;border-collapse:collapse">${b.list.map((i) =>
-      `<tr><td style="padding:10px 0;border-bottom:1px solid #e6dfcf;font-size:15px;color:#16201B"><span style="color:#E0A43A;font-weight:700">&#9675;</span>&nbsp;&nbsp;${esc(i)}</td></tr>`).join("")}</table>`;
+    if ("p" in b) return `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#353535">${esc(b.p)}</p>`;
+    if ("note" in b) return `<p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#737373">${esc(b.note)}</p>`;
+    if ("list" in b) return `<table role="presentation" width="100%" style="margin:0 0 20px;border-collapse:collapse;border:1px solid #EAEAEA;border-radius:12px">${b.list.map((i, n) =>
+      `<tr><td style="padding:12px 14px;${n ? "border-top:1px solid #EAEAEA;" : ""}font-size:14px;color:#1A1A1A"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E7AD16;margin-right:10px;vertical-align:middle"></span>${esc(i)}</td></tr>`).join("")}</table>`;
     const btns = "button" in b ? [b.button] : b.buttons;
-    return btns.map((x, i) => `<a href="${esc(x.href)}" style="display:block;text-align:center;margin:0 0 10px;padding:14px 20px;border-radius:999px;font-size:15px;font-weight:600;text-decoration:none;${i === 0 && "button" in b ? "background:#123B2F;color:#F5F1E8" : "background:#ffffff;color:#123B2F;border:1px solid #123B2F"}">${esc(x.label)}</a>`).join("") + `<div style="height:8px"></div>`;
+    return btns.map((x, i) => `<a href="${esc(x.href)}" style="display:block;text-align:center;margin:0 0 10px;padding:13px 20px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;${i === 0 ? "background:#2F54EB;color:#FFFFFF" : "background:#F0F0F0;color:#1A1A1A"}">${esc(x.label)}</a>`).join("");
   }).join("");
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#F5F1E8;font-family:Inter,Helvetica,Arial,sans-serif">
-<table role="presentation" width="100%" style="background:#F5F1E8"><tr><td align="center" style="padding:32px 16px">
+<body style="margin:0;padding:0;background:#F5F5F5;font-family:Geist,Inter,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" style="background:#F5F5F5"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
-<tr><td style="padding:0 4px 16px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#123B2F">Hartwell Tax &amp; Bookkeeping</td></tr>
-<tr><td style="background:#FFFDF8;border:1px solid #e6dfcf;border-radius:16px;padding:32px 28px;box-shadow:0 6px 0 -3px #efe9dc,0 10px 24px rgba(18,59,47,.06)">
-<h1 style="margin:0 0 20px;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:32px;line-height:1.15;color:#123B2F">${esc(heading)}</h1>
+<tr><td style="padding:0 4px 16px"><table role="presentation"><tr>
+<td style="width:28px;height:28px;background:#2F54EB;border-radius:8px;text-align:center;vertical-align:middle;color:#FFFFFF;font-weight:700;font-size:15px;line-height:28px">H</td>
+<td style="padding-left:10px;font-size:15px;font-weight:600;color:#1A1A1A">Hartwell <span style="font-weight:400;color:#737373">Tax &amp; Bookkeeping</span></td>
+</tr></table></td></tr>
+<tr><td style="background:#FFFFFF;border:1px solid rgba(16,16,16,0.06);border-radius:16px;padding:32px 28px">
+<h1 style="margin:0 0 18px;font-family:Figtree,Geist,Helvetica,Arial,sans-serif;font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-0.01em;color:#1A1A1A">${esc(heading)}</h1>
 ${body}
-<p style="margin:24px 0 0;font-size:15px;color:#16201B">Warmly,<br><span style="font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:#123B2F">Claire Hartwell, EA</span></p>
+<p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:#353535">Warmly,<br><strong style="color:#1A1A1A">Claire Hartwell, EA</strong></p>
 </td></tr>
-<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#5b6660">${OFFICE} &middot; We never ask for your Social Security number by email.</td></tr>
+<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#737373">${OFFICE} &middot; (973) 555-0142<br>We never ask for your Social Security number by email.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 

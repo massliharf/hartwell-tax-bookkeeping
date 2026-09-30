@@ -89,7 +89,7 @@ export function FollowUps({ a, now }: { a: Appt; now: string }) {
 
   return (
     <section className="border-t border-border px-6 py-5">
-      <h3 className="text-[13px] font-medium text-deep-ink">Follow-ups</h3>
+      <h3 className="t-sub">Follow-ups</h3>
       <p className="mt-0.5 text-xs text-muted-foreground">These go out on their own. Send any of them now if you'd rather not wait.</p>
       <ol className="mt-3 space-y-1">
         {steps.map((s) => (
@@ -155,13 +155,13 @@ export function MoreActions({ a, onClosed }: { a: Appt; onClosed: () => void }) 
       <AlertDialog open={confirm} onOpenChange={setConfirm}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-medium">Cancel {a.clients?.name}'s appointment?</AlertDialogTitle>
+            <AlertDialogTitle>Cancel {a.clients?.name}'s appointment?</AlertDialogTitle>
             <AlertDialogDescription>They get an email with a link to pick a new time, and the waitlist is offered the slot.</AlertDialogDescription>
           </AlertDialogHeader>
           <Input aria-label="Note to the client (optional)" placeholder="Note to the client (optional)" value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} />
           <AlertDialogFooter>
             <AlertDialogCancel>Keep it</AlertDialogCancel>
-            <AlertDialogAction className="bg-alert-negative text-alert-negative-fg hover:bg-[#FCE1DB]" onClick={() => send.mutate(() => cancel({ data: { id: a.id, note: note.trim() || undefined } }), { onSuccess: (r) => { if (r.ok) onClosed(); } })}>Cancel appointment</AlertDialogAction>
+            <AlertDialogAction className="bg-alert-negative text-alert-negative-fg hover:bg-[#FCE1DB] active:bg-[#F9C7BE]" onClick={() => send.mutate(() => cancel({ data: { id: a.id, note: note.trim() || undefined } }), { onSuccess: (r) => { if (r.ok) onClosed(); } })}>Cancel appointment</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

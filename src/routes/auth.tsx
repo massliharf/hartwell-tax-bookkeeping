@@ -7,6 +7,7 @@ import { useState, type FormEvent } from "react";
 import { Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/brand/Logo";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createOwnerAccount, ownerSetupStatus } from "@/lib/owner.functions";
@@ -57,11 +58,11 @@ function AuthPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-sm">
-        <Link to="/" className="flex items-baseline gap-2"><span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span><span className="text-xs text-muted-foreground">&amp; Bookkeeping</span></Link>
+        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home"><Logo /></Link>
         <form onSubmit={submit} className="mt-8 space-y-5 rounded-2xl border border-border bg-sheet p-7">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-deep-ink"><Lock className="h-4 w-4" /></span>
           <div>
-            <h1 className="t-card text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
+            <h1 className="t-owner text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {setup ? "This is a one-time step. After this, only you can sign in." : "Sign in to see your day."}
             </p>

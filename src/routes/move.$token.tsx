@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { CalendarClock, Check, Clock, Loader2 } from "lucide-react";
 import { z } from "zod";
-import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
 import { Button } from "@/components/ui/button";
 import { rescheduleAppointment } from "@/lib/portal.functions";
 import { fmtDateLong, fmtTime } from "@/lib/intake";
@@ -31,40 +31,31 @@ function MovePage() {
   const move = useServerFn(rescheduleAppointment);
   const [state, setState] = useState<"idle" | "busy" | "done" | "taken">("idle");
 
+  const back = <Button asChild size="lg" variant="secondary"><Link to="/a/$token" params={{ token }}>Open your appointment</Link></Button>;
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main className="mx-auto max-w-xl px-5 py-10 sm:py-16">
-        <div className="sheet-stack p-8 text-center">
-          {!to ? (
-            <h1 className="t-page text-deep-ink">Pick a time from your portal.</h1>
-          ) : state === "done" ? (
-            <>
-              <h1 className="t-page text-deep-ink">You're moved.</h1>
-              <p className="mt-4 text-deep-ink/70">New time: {fmtDateLong(to)} at {fmtTime(to)}. More time to gather your documents.</p>
-            </>
-          ) : state === "taken" ? (
-            <>
-              <h1 className="t-page text-deep-ink">That time was just taken.</h1>
-              <p className="mt-4 text-deep-ink/70">Your original appointment is still booked. You can pick another time in your portal.</p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-muted-foreground">Move to</p>
-              <h1 className="mt-3 t-page text-deep-ink">{fmtDateLong(to)}</h1>
-              <p className="mt-2 text-lg tabular text-deep-ink">{fmtTime(to)}</p>
-              <Button variant="accent" size="lg" className="mt-8 w-full" disabled={state === "busy"} onClick={async () => {
-                setState("busy");
-                try { setState((await move({ data: { token, start: to } })).ok ? "done" : "taken"); } catch { setState("taken"); }
-              }}>
-                {state === "busy" ? <Loader2 className="size-4 " /> : "Yes, move my appointment"}
-              </Button>
-            </>
-          )}
-          <Link to="/a/$token" params={{ token }} className="mt-6 inline-block text-sm font-medium text-ink underline underline-offset-4">Open your portal</Link>
-        </div>
-      </main>
-      <SiteFooter />
-    </div>
+    <BookingShell>
+      {!to ? (
+        <ResultPanel icon={<CalendarClock />} title="Pick a new time from your appointment page." actions={back} />
+      ) : state === "done" ? (
+        <ResultPanel icon={<Check />} tone="success" title="You're moved." actions={back}>
+          New time: <strong>{fmtDateLong(to)} at {fmtTime(to)}</strong>. More time to gather your documents.
+        </ResultPanel>
+      ) : state === "taken" ? (
+        <ResultPanel icon={<Clock />} tone="warning" title="That time was just taken." actions={back}>
+          Your original appointment is still booked. You can pick another time from your appointment page.
+        </ResultPanel>
+      ) : (
+        <ResultPanel icon={<CalendarClock />} eyebrow="Move your appointment to" title={`${fmtDateLong(to)}, ${fmtTime(to)}`}
+          actions={<>
+            <Button size="lg" disabled={state === "busy"} onClick={async () => {
+              setState("busy");
+              try { setState((await move({ data: { token, start: to } })).ok ? "done" : "taken"); } catch { setState("taken"); }
+            }}>{state === "busy" && <Loader2 className="animate-spin" />}Yes, move it</Button>
+            {back}
+          </>}>
+          Your documents and answers stay with the appointment.
+        </ResultPanel>
+      )}
+    </BookingShell>
   );
 }

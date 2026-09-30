@@ -50,7 +50,7 @@ export async function sendBookingConfirmation(apptId: string, origin: string) {
       { p: `${a.services?.name ?? "Your appointment"} on ${when} (Eastern).` },
       where(a),
       ...(docs.all.length ? [{ p: "Here is your personal checklist. Upload whenever it suits you, there's no rush today." } as Block, { list: docs.all }] : []),
-      { button: { label: "Open your checklist", href: portal } },
+      { button: { label: "Open your appointment", href: portal } },
       { note: "A calendar invite is attached. Your documents go to private storage that only Claire can see." },
     ],
     ics: buildIcs({ id: a.id, start: a.start_at, end: a.end_at, title: `Hartwell Tax: ${a.services?.name ?? "Appointment"}`,

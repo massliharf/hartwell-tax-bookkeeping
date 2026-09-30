@@ -212,7 +212,7 @@ function CalendarPage() {
       </div>
 
       <AlertDialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>
-        <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-sans text-base font-medium">Move {pending?.name}?</AlertDialogTitle>
             <AlertDialogDescription>{pending ? `New time: ${ymdLabel(pending.ymd)} at ${fmtMins(pending.mins)}. The client is emailed the new time automatically.` : ""}</AlertDialogDescription>

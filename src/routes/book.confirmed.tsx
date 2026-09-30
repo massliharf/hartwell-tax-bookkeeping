@@ -53,7 +53,7 @@ function ConfirmedPage() {
         <div className="mx-auto max-w-md text-center">
           <h1 className="t-page text-deep-ink">We couldn't find that booking</h1>
           <p className="mt-3 text-deep-ink/70">Check the link in your confirmation email, or book again.</p>
-          <Button variant="accent" asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
+          <Button asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
         </div>
       </BookingShell>
     );
@@ -79,16 +79,12 @@ function ConfirmedPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
-          <div
-            className="mx-auto grid size-16 place-items-center rounded-full bg-ink text-primary-foreground"
-          >
-            <Check className="size-8" strokeWidth={2.5} />
-          </div>
+          <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="size-5" strokeWidth={2.5} /></span>
           <h1
-            className="mt-6 t-page text-deep-ink">
+            className="mt-5 t-page text-deep-ink">
             You're booked{first && `, ${first}`}.
           </h1>
-          <p className="mt-3 text-deep-ink/70">
+          <p className="mt-3 text-[15px] text-muted-foreground">
             A confirmation is on its way to your inbox.
           </p>
         </div>
@@ -122,10 +118,10 @@ function ConfirmedPage() {
           <div className="mt-6">
             <DocumentStack docs={items.map((i) => ({ id: i.id, title: i.document_name, note: i.description ?? (i.required ? "Needed" : "If you have it"), received: i.status === "uploaded" }))} />
           </div>
-          <Button asChild size="lg" variant="highlight" className="mt-6 w-full">
+          <Button asChild size="lg" className="mt-6 w-full">
             <Link to="/a/$token" params={{ token: token! }}><Upload /> Upload your documents now</Link>
           </Button>
-          <p className="mt-3 text-center text-sm text-muted-foreground">or do it later — we'll remind you</p>
+          <p className="mt-3 text-center text-sm text-muted-foreground">Or do it later. We'll remind you.</p>
           <p className="mt-5 flex items-start gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
             <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We'll never ask for your Social Security number online.
           </p>

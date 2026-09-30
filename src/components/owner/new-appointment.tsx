@@ -97,7 +97,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
 
       <div className="space-y-6 px-6 py-5">
         <section>
-          <h3 className="mb-2 text-sm font-medium text-deep-ink">Client</h3>
+          <h3 className="mb-2 t-sub">Client</h3>
           {picked ? (
             <div className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5">
               <span className="grid size-8 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{picked.name.charAt(0)}</span>
@@ -123,7 +123,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
         </section>
 
         <section>
-          <h3 className="mb-2 text-sm font-medium text-deep-ink">Service</h3>
+          <h3 className="mb-2 t-sub">Service</h3>
           {services.isLoading ? <Skeleton className="h-24 rounded-xl" /> : (
             <div className="grid gap-2 sm:grid-cols-2">{(services.data ?? []).map((s) => (
               <Button key={s.id} variant="secondary" aria-pressed={serviceId === s.id} onClick={() => { setServiceId(s.id); setDate(null); setSlot(null); }}
@@ -137,7 +137,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
 
         {serviceId && (
           <section>
-            <h3 className="mb-2 text-sm font-medium text-deep-ink">Time <span className="text-xs font-normal text-muted-foreground">All times Eastern</span></h3>
+            <h3 className="mb-2 t-sub">Time <span className="text-xs font-normal text-muted-foreground">All times Eastern</span></h3>
             {avail.isLoading ? <div className="flex gap-1">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[68px] rounded-lg" />)}</div>
               : avail.isError || avail.data?.error ? <p className="text-sm text-muted-foreground">Couldn't load times. <button className="font-medium text-ink underline" onClick={() => avail.refetch()}>Try again</button></p>
               : <>

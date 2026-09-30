@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ChevronRight, FileText, MapPin, Video } from "lucide-react";
 import { Tag } from "@/components/ui/tag";
+import { Stepper } from "@/components/ui/stepper";
 import { FollowUps, MoreActions, RequestDocument } from "./follow-ups";
 import { useOwnerCtx } from "./ctx";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,7 +104,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           const open = items.filter((i) => i.status !== "uploaded");
           const group = (title: string, list: typeof items, tone?: "warn") => list.length > 0 && (
             <div className="mt-4">
-              <p className={cn("mb-1.5 text-[11px] font-medium uppercase tracking-[0.04em]", tone === "warn" ? "text-alert-warning-fg" : "text-muted-foreground")}>{title} · {list.length}</p>
+              <p className={cn("mb-1.5 t-label", tone === "warn" && "text-alert-warning-fg")}>{title} · {list.length}</p>
               <ul className="divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1">
                 {list.map((i) => (
                   <li key={i.id} className="px-3 py-2.5">
@@ -142,16 +143,8 @@ const STAGES = ["Booked", "Documents", "Appointment", "Sign and pay", "Filed"];
 /** Where this appointment is in the season, the same five steps the client sees on their page. */
 function Stages({ a }: { a: Appt }) {
   const closed = a.status === "cancelled" || a.status === "no_show";
-  const at = a.filed_at ? 5 : a.status === "completed" ? (a.signature_status === "signed" && a.paid_at ? 4 : 3) : a.ready_score >= 100 ? 2 : 1;
+  // Same rule as the client's page: 0 booked, 1 documents, 2 appointment, 3 sign and pay, 4 filed.
+  const at = a.filed_at ? 4 : a.status === "completed" ? 3 : a.ready_score >= 100 || Date.parse(a.start_at) < Date.now() ? 2 : 1;
   if (closed) return null;
-  return (
-    <ol aria-label="Progress" className="mt-4 grid grid-cols-5 gap-1.5">
-      {STAGES.map((label, i) => (
-        <li key={label} aria-current={i === at ? "step" : undefined}>
-          <span className={cn("block h-1 rounded-full transition-colors duration-300", i < at ? "bg-ink" : i === at ? "bg-ink/40" : "bg-line-1")} />
-          <span className={cn("mt-1.5 block truncate text-[11px]", i <= at ? "text-deep-ink" : "text-muted-foreground", i === at ? "font-medium" : "max-sm:invisible")}>{label}</span>
-        </li>
-      ))}
-    </ol>
-  );
+  return <Stepper steps={STAGES} current={at} className="mt-4" />;
 }

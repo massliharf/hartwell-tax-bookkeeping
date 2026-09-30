@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine } from "lucide-react";
+import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
+import { Stepper } from "@/components/ui/stepper";
+import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,7 +16,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { BookingShell } from "@/components/booking/BookingShell";
+import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
 import {
   cancelAppointment, confirmAttendance, confirmUpload, createUploadUrl, getAppointmentByToken,
   keepFlaggedFile, markNotApplicable, rescheduleAppointment, saveIntake, signForm8879, testPay, undoNotApplicable,
@@ -80,14 +82,9 @@ function PortalPage() {
   if (q.isError || (q.data && !q.data.appointment)) {
     return (
       <BookingShell>
-        <div className="mx-auto max-w-md text-center">
-          <h1 className="t-page text-deep-ink">This link isn't working</h1>
-          <p className="mt-3 text-muted-foreground">It may be old or mistyped. We can email you a fresh one.</p>
-          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
-            <Button variant="accent" asChild size="lg"><Link to="/book/returning">Email me a new link</Link></Button>
-            <Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button>
-          </div>
-        </div>
+        <ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<><Button asChild size="lg"><Link to="/book/returning">Email me a new link</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button></>}>
+          It may be old or mistyped. We can email you a fresh one.
+        </ResultPanel>
       </BookingShell>
     );
   }
@@ -113,15 +110,13 @@ function PortalPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
-          <p className="text-xs font-medium text-muted-foreground">Your private page</p>
+          <p className="text-[13px] text-muted-foreground">Your appointment</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
           <p className="mt-2 text-deep-ink/70">
             {cancelled ? "This appointment was cancelled." : a.filed_at ? "Your return has been e-filed." : postAppointment ? a.signature_status === "signed" && a.paid_at ? "All done. Claire will file your return today." : "Your return is ready. Sign and pay to have it filed." : isPast ? "Thanks for coming in." : todo > 0 ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "You're all set. Claire has everything she needs."}
           </p>
         </div>
-        <ol aria-label="Appointment progress" className="-mb-3 grid grid-cols-3 gap-1 border-b border-border pb-4 sm:grid-cols-5 sm:gap-2">
-          {["Booked", "Documents", "Appointment", "Sign and pay", "Filed"].map((label, index) => <li key={label} aria-current={index + 1 === progress ? "step" : undefined} className={`flex min-w-0 items-center gap-1 rounded-lg px-1 py-2 text-[11px] sm:gap-1.5 sm:px-3 sm:text-xs ${index + 1 === progress ? "bg-primary text-primary-foreground" : index + 1 < progress ? "text-success" : "text-muted-foreground"}`}><span className={`grid size-5 shrink-0 place-items-center rounded-full border ${index + 1 === progress ? "border-primary-foreground" : "border-current"}`}>{index + 1 < progress || index === 3 && !!a.paid_at && a.signature_status === "signed" ? <Check className="size-3" /> : index + 1}</span>{label}</li>)}
-        </ol>
+        {!cancelled && <Stepper steps={["Booked", "Documents", "Appointment", "Sign and pay", "Filed"]} current={a.filed_at ? 4 : postAppointment ? 3 : isPast || progress >= 2 ? 2 : 1} label="Appointment progress" />}
 
         {closeout ? <CloseoutSection token={token} appt={a} onDone={refresh} /> : a.signature_status === "pending" && <SignSection token={token} appt={a} onDone={refresh} />}
 
@@ -131,17 +126,17 @@ function PortalPage() {
         {cancelled && (
           <div className="rounded-2xl bg-surface-2 p-6">
             <p className="text-deep-ink/80">Whenever you're ready, you can pick a new time. It takes two minutes.</p>
-            <Button variant="accent" asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
+            <Button asChild className="mt-4"><Link to="/book">Book a new time</Link></Button>
           </div>
         )}
 
         {!cancelled && items.length > 0 && (postAppointment ? <section className="space-y-4">
-          {fixItems.length > 0 && <div><h2 className="mb-4 t-section text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+          {fixItems.length > 0 && !a.paid_at && !a.filed_at && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
           <details className="rounded-2xl border border-border bg-sheet p-5"><summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-deep-ink [&::-webkit-details-marker]:hidden">Documents you sent ({sentItems.length}) <ChevronDown className="size-4" /></summary><p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground"><Lock className="size-4 shrink-0" /> Only Claire can see your files. We never ask for your Social Security number.</p><ul className="mt-4 space-y-3">{sentItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></details>
         </section> : (
           <section>
             <div className="mb-4 flex items-end justify-between gap-4">
-              <h2 className="text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Your checklist</h2>
+              <h2 className="t-card text-deep-ink">Your checklist</h2>
               <span className="tabular text-sm text-muted-foreground">{items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length} of {items.length} done</span>
             </div>
             <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
@@ -174,7 +169,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
   };
   return (
     <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
-      <h2 className="text-[15px] font-medium text-deep-ink">A few quick questions</h2>
+      <h2 className="t-sub">A few quick questions</h2>
       <p className="mt-1 text-sm text-muted-foreground">Claire booked this for you by phone. Your answers tell us exactly which documents to bring.</p>
       <div className="mt-5 space-y-4">
         {qs.map((x) => (
@@ -183,13 +178,13 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
             {x.type === "count" ? (
               <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" variant={ans[x.key] === n ? "dark" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
             ) : (
-              <div className="flex gap-1">{([true, false] as const).map((v) => <Button key={String(v)} size="sm" variant={ans[x.key] === v ? "dark" : "secondary"} aria-pressed={ans[x.key] === v} onClick={() => setAns({ ...ans, [x.key]: v })}>{v ? "Yes" : "No"}</Button>)}</div>
+              <Segmented label={x.label} value={ans[x.key] === true ? "yes" : ans[x.key] === false ? "no" : ("" as "yes" | "no")} onChange={(v) => setAns({ ...ans, [x.key]: v === "yes" })} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
             )}
           </div>
         ))}
       </div>
       {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
-      <Button variant="accent" className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
+      <Button className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
     </section>
   );
 }
@@ -215,7 +210,7 @@ function AppointmentCard({ appt, cancelled, postAppointment, videoLink }: { appt
         <div className="mt-5 border-t border-border pt-4 text-sm">
           {video ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> {videoLink ? "Video call. Join from here at your appointment time." : "Video call. Claire will send the link by email."}</span>
+              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> {postAppointment ? "Video call" : videoLink ? "Video call. Join from here at your appointment time." : "Video call. Claire will send the link by email."}</span>
               {videoLink && !postAppointment && <Button size="sm" variant="outline" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
             </div>
           ) : (
@@ -240,25 +235,25 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 [&>*:first-child]:col-span-2 sm:[&>*:first-child]:col-span-1">
         {appt.status === "confirmed" ? (
-          <span className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-success/10 px-3 text-sm font-medium text-success"><Check className="size-4" /> Confirmed</span>
+          <span className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-alert-success px-3 text-sm font-medium text-alert-success-fg"><Check className="size-4" /> You're confirmed</span>
         ) : (
-          <Button variant="accent" size="lg" onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
-            {busy === "confirm" ? <Loader2 className="" /> : <Check />} I'll be there
+          <Button size="lg" onClick={() => run("confirm", () => confirm({ data: { token } }))} disabled={!!busy}>
+            {busy === "confirm" ? <Loader2 className="animate-spin" /> : <Check />} I'll be there
           </Button>
         )}
         <Button size="lg" variant="secondary" onClick={() => setPicking((p) => !p)}><CalendarClock /> Reschedule</Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild><Button size="lg" variant="secondary" className="text-destructive">Cancel</Button></AlertDialogTrigger>
-          <AlertDialogContent className="rounded-2xl bg-sheet">
+          <AlertDialogTrigger asChild><Button size="lg" variant="secondary" className="text-alert-negative-fg">Cancel</Button></AlertDialogTrigger>
+          <AlertDialogContent className="max-w-sm">
             <AlertDialogHeader>
-              <AlertDialogTitle className="t-card">Cancel this appointment?</AlertDialogTitle>
+              <AlertDialogTitle>Cancel this appointment?</AlertDialogTitle>
               <AlertDialogDescription>That's completely fine. Your slot will be offered to someone on the waitlist. If another time would work better, you can reschedule instead.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-full">Keep my appointment</AlertDialogCancel>
-              <AlertDialogAction className="rounded-full" onClick={() => run("cancel", () => cancel({ data: { token } }))}>Yes, cancel</AlertDialogAction>
+              <AlertDialogCancel>Keep my appointment</AlertDialogCancel>
+              <AlertDialogAction className="bg-alert-negative text-alert-negative-fg hover:bg-[#FCE1DB] active:bg-[#F9C7BE]" onClick={() => run("cancel", () => cancel({ data: { token } }))}>Yes, cancel</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -319,7 +314,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {day.slots.map((s) => (
                   <Button key={s} variant="secondary" disabled={!!busy} onClick={() => pick(s)} className="tabular h-11 text-sm">
-                    {busy === s ? <Loader2 className="size-4 " /> : fmtTime(s)}
+                    {busy === s ? <Loader2 className="animate-spin" /> : fmtTime(s)}
                   </Button>
                 ))}
               </div>
@@ -394,7 +389,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
                 <p className="mt-1 text-sm text-deep-ink/75">{item.fix_reason}{item.fix_note ? `. Claire says: ${item.fix_note}` : "."}</p>
               </div>
             </div>
-            <Button variant="accent" size="sm" className="mt-4" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
+            <Button size="sm" className="mt-4" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Replace file</Button>
           </div>
         ) : item.status === "uploaded" && item.ai_check === "warning" ? (
           <div key="warn" className="rounded-2xl border border-warning/40 bg-sheet p-5">
@@ -406,7 +401,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button variant="accent" size="sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 /> : <Upload />} Replace file</Button>
+              <Button size="sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Replace file</Button>
               <Button size="sm" variant="secondary" disabled={busy} onClick={async () => { setBusy(true); try { await keep({ data: { token, itemId: item.id } }); await onChange(); } catch { setErr("Couldn't save that. Please try again."); } setBusy(false); }}>Keep this file</Button>
             </div>
           </div>
@@ -449,13 +444,13 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
               <div className="mt-4 space-y-2">
                 <Input autoFocus placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
                 <div className="flex gap-2">
-                  <Button variant="accent" size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Save</Button>
+                  <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Save</Button>
                   <Button size="sm" variant="ghost" onClick={() => setNaOpen(false)}>Never mind</Button>
                 </div>
               </div>
             ) : (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Button variant="accent" size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="" /> : <Upload />} Upload</Button>
+                <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
                 <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
               </div>
@@ -491,8 +486,8 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
   );
   return (
     <section className="rounded-2xl border border-border bg-sheet p-6">
-        <p className="text-[11px] font-medium text-warning">One last step</p>
-        <h2 className="mt-1 t-section text-deep-ink">Review, sign and pay</h2>
+        <Tag tone="warning">One last step</Tag>
+        <h2 className="mt-2 t-card text-deep-ink">Review, sign and pay</h2>
         <div className="mt-4 flex items-baseline justify-between gap-4 rounded-lg bg-canvas p-4">
           <span className="text-sm text-muted-foreground">Fee for {appt.services?.name}</span>
           <span className="tabular text-xl font-medium text-deep-ink">{money(appt.fee_cents!)}</span>
@@ -509,8 +504,8 @@ function CloseoutSection({ token, appt, onDone }: { token: string; appt: Appt; o
           <h3 className="t-card text-deep-ink">Pay {money(appt.fee_cents!)}</h3>
           <p className="mt-1 text-sm text-muted-foreground">Online card payments aren't switched on yet. This test button marks your fee as paid, so you can see the whole flow.</p>
           {err && <p className="mt-2 text-sm text-destructive" role="alert">That didn't go through. Please try again.</p>}
-          <Button variant="accent" size="lg" className="mt-4" disabled={busy} onClick={async () => { setBusy(true); setErr(false); try { const r = await pay({ data: { token } }); if (!r.ok) setErr(true); await onDone(); } catch { setErr(true); } setBusy(false); }}>
-            {busy ? <Loader2 /> : <CreditCard />} Test payment: pay {money(appt.fee_cents!)}
+          <Button size="lg" className="mt-4" disabled={busy} onClick={async () => { setBusy(true); setErr(false); try { const r = await pay({ data: { token } }); if (!r.ok) setErr(true); await onDone(); } catch { setErr(true); } setBusy(false); }}>
+            {busy ? <Loader2 className="animate-spin" /> : <CreditCard />} Test payment: pay {money(appt.fee_cents!)}
           </Button>
         </div>
       )}
@@ -529,8 +524,8 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
 
   return (
     <section className={embedded ? "mt-5 border-t border-border pt-5" : "sheet-stack p-6"}>
-      {!embedded && <p className="text-[11px] font-medium text-warning">One last step</p>}
-      <h2 className="text-xl leading-[30px] text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
+      {!embedded && <Tag tone="warning">One last step</Tag>}
+      <h2 className="mt-2 t-card text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
       <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>
@@ -552,7 +547,7 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
-        <Button variant="accent" type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="" /> : <PenLine />} Sign</Button>
+        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>
       </form>
     </section>
   );

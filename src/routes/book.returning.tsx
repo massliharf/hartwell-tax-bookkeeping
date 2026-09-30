@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
+import { BookingShell, ResultPanel, StepTitle } from "@/components/booking/BookingShell";
 import { sendReturningLinks } from "@/lib/booking.functions";
 
 export const Route = createFileRoute("/book/returning")({
@@ -35,16 +35,11 @@ function ReturningPage() {
     <BookingShell>
       <div className="mx-auto max-w-md">
         {state === "sent" ? (
-          <div className="text-center">
-            <span className="mx-auto grid size-12 place-items-center rounded-full bg-success/10 text-success"><Mail className="size-5" /></span>
-            <h1 className="mt-4 t-page text-deep-ink">Check your inbox</h1>
-            <p className="mt-2 text-sm text-muted-foreground">If <span className="text-deep-ink">{email}</span> has booked with Claire, a private link is on its way. It opens your appointment, and lets you book again with last year's answers.</p>
-            <div className="mt-6 grid gap-2">
-              <Button size="lg" variant="secondary" onClick={() => setState("idle")}><RotateCcw />Use a different email</Button>
-              <Button asChild size="lg" variant="ghost"><Link to="/book">Start a new booking instead</Link></Button>
-            </div>
-            <p className="mt-6 text-xs text-muted-foreground">Nothing after a few minutes? Check spam, or call (973) 555-0142.</p>
-          </div>
+          <ResultPanel icon={<Mail />} tone="success" title="Check your inbox."
+            actions={<><Button size="lg" variant="secondary" onClick={() => setState("idle")}><RotateCcw />Use a different email</Button><Button asChild size="lg" variant="ghost"><Link to="/book">Start a new booking</Link></Button></>}>
+            If <strong>{email}</strong> has booked with Claire, a private link is on its way. It opens your appointment, and lets you book again with last year's answers.
+            <p className="mt-4 text-xs">Nothing after a few minutes? Check spam, or call (973) 555-0142.</p>
+          </ResultPanel>
         ) : (
           <>
             <StepTitle hideEyebrow eyebrow="" title="Welcome back" sub="Enter the email you booked with. We'll send you a private link." />
@@ -58,7 +53,7 @@ function ReturningPage() {
                 <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-11 bg-sheet" />
               </div>
               {state === "error" && <p className="text-sm text-destructive">Something went wrong. Please try again.</p>}
-              <Button variant="accent" type="submit" size="lg" className="w-full" disabled={state === "busy"}>
+              <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
                 {state === "busy" && <Loader2 className="animate-spin" />} Email me my link
               </Button>
               <p className="text-center text-xs text-muted-foreground">For your privacy, we never show booking details on this page.</p>

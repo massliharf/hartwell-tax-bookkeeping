@@ -30,7 +30,7 @@ export function FinishForm({ a, onBack, onDone }: { a: Appt; onBack: () => void;
   const valid = fee.trim() !== "" && Number.isFinite(cents) && cents >= 0;
   return (
     <div className="space-y-4">
-        <div><h3 className="text-base font-medium text-deep-ink">Finish appointment</h3><p className="mt-1 text-sm text-muted-foreground">{a.clients?.name} gets an email to review, sign Form 8879 and pay.</p></div>
+        <div><h3 className="t-sub">Finish appointment</h3><p className="mt-1 text-sm text-muted-foreground">{a.clients?.name} gets an email to review, sign Form 8879 and pay.</p></div>
         <div className="space-y-4">
           <div>
             <label htmlFor="fee" className="text-sm font-medium text-deep-ink">Final fee</label>
@@ -74,9 +74,9 @@ export function CloseoutBlock({ a }: { a: Appt }) {
         </div>
       )}
       <AlertDialog open={!!confirm} onOpenChange={(v) => { if (!v) setConfirm(null); }}>
-        <AlertDialogContent className="max-w-sm rounded-2xl border-border bg-sheet">
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-medium">{confirm === "paid" ? `Mark ${money(a.fee_cents)} as paid?` : `Mark ${a.clients?.name}'s return filed?`}</AlertDialogTitle>
+            <AlertDialogTitle>{confirm === "paid" ? `Mark ${money(a.fee_cents)} as paid?` : `Mark ${a.clients?.name}'s return filed?`}</AlertDialogTitle>
             <AlertDialogDescription>{confirm === "paid" ? "Use this for cash, check or the card terminal. Payment reminders stop." : "The client gets an email that their return has been e-filed."}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

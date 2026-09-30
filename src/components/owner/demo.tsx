@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink, FlaskConical, Mail, Smartphone, X } from "lucide-react";
@@ -12,7 +12,7 @@ type Msg = { id: string; channel: string; type: string; subject: string | null; 
 const STORY: { title: string; actions: { k: string; label: string; hint: string; link?: boolean }[] }[] = [
   { title: "A client books", actions: [
     { k: "book", label: "Open the booking page", hint: "Book as a client in a new tab. It appears in Today right away.", link: true },
-    { k: "portal", label: "Open a client's private page", hint: "The page every confirmation email links to.", link: true },
+    { k: "portal", label: "Open a client's appointment page", hint: "The page every confirmation email links to.", link: true },
   ] },
   { title: "Documents come in", actions: [
     { k: "up", label: "Client uploads a document", hint: "Checked and accepted automatically. Nothing lands on your desk." },
@@ -38,6 +38,13 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
   const [phone, setPhone] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const qc = useQueryClient();
+  // The phone's "More" menu opens these from anywhere (the sidebar instance is always mounted).
+  useEffect(() => {
+    if (!rows) return;
+    const o = () => setOpen(true), p = () => setPhone((v) => !v);
+    window.addEventListener("owner:demo", o); window.addEventListener("owner:phone", p);
+    return () => { window.removeEventListener("owner:demo", o); window.removeEventListener("owner:phone", p); };
+  }, [rows]);
   const fns = {
     run: useServerFn(demoRun), jump: useServerFn(demoJump), upload: useServerFn(demoUpload),
     cancel: useServerFn(demoCancelTomorrow), claim: useServerFn(demoClaim), abandon: useServerFn(demoAbandon), reset: useServerFn(demoReset),
@@ -61,7 +68,7 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
   const openTab = (url: string) => window.open(url, "_blank", "noopener");
   const run = (k: string) => {
     if (k === "book") return openTab("/book");
-    if (k === "portal") return act(k, async () => { const r = await fns.portal(); if (r.token) openTab(`/a/${r.token}`); return { message: r.token ? "Opened the client's private page in a new tab." : "No upcoming appointment to open." }; });
+    if (k === "portal") return act(k, async () => { const r = await fns.portal(); if (r.token) openTab(`/a/${r.token}`); return { message: r.token ? "Opened the client's appointment page in a new tab." : "No upcoming appointment to open." }; });
     const map: Record<string, () => Promise<{ message: string }>> = {
       run: () => fns.run(), j1: () => fns.jump({ data: { days: 1 } }), j2: () => fns.jump({ data: { days: 2 } }), j7: () => fns.jump({ data: { days: 7 } }),
       up: () => fns.upload(), wrong: () => fns.wrong(), cx: () => fns.cancel(), cl: () => fns.claim(), ab: () => fns.abandon(), pays: () => fns.pays(), rs: () => fns.reset(),
@@ -126,7 +133,9 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
 
 function PhonePanel({ onClose }: { onClose: () => void }) {
   const feed = useServerFn(phoneFeed);
-  const { data = [] } = useQuery({ queryKey: ["owner", "phone"], queryFn: () => feed() as Promise<Msg[]>, refetchInterval: 3000 });
+  const q = useQuery({ queryKey: ["owner", "phone"], queryFn: () => feed() as Promise<Msg[]>, refetchInterval: 3000 });
+  // Never let an unexpected response take the page down; the preview just stays empty.
+  const data: Msg[] = Array.isArray(q.data) ? q.data : [];
   const [pick, setPick] = useState<string>("latest");
   const people = useMemo(() => {
     const m = new Map<string, string>();

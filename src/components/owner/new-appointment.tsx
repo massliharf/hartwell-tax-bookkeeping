@@ -20,7 +20,7 @@ type Client = { id: string; name: string; email: string; phone: string | null };
 /** Opens the New appointment dialog from anywhere (Today tiles, palette). */
 export const openNewAppointment = () => window.dispatchEvent(new Event("owner:new-appointment"));
 
-export function NewAppointmentButton({ compact = false, block = false, listen = false }: { compact?: boolean; block?: boolean; listen?: boolean }) {
+export function NewAppointmentButton({ compact = false, block = false, listen = false, row = false }: { compact?: boolean; block?: boolean; listen?: boolean; row?: boolean }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!listen) return;
@@ -30,7 +30,12 @@ export function NewAppointmentButton({ compact = false, block = false, listen = 
   }, [listen]);
   return (
     <>
-      {compact
+      {row
+        ? <button type="button" onClick={() => setOpen(true)} title={compact ? "New appointment" : undefined}
+            className={`flex h-9 w-full items-center gap-2.5 rounded-lg text-[13px] font-medium text-deep-ink transition-colors duration-150 hover:bg-tint-1 ${compact ? "justify-center px-0" : "px-1.5"}`}>
+            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-ink text-white"><Plus className="size-3.5" strokeWidth={2.5} /></span>{!compact && "New appointment"}
+          </button>
+        : compact
         ? <Button size="icon" aria-label="New appointment" title="New appointment" onClick={() => setOpen(true)} className="size-9 rounded-lg sm:size-9"><Plus /></Button>
         : <Button size={block ? "md" : "sm"} onClick={() => setOpen(true)} className={block ? "w-full justify-start gap-2.5 px-3 text-[13px]" : undefined}><Plus />New appointment</Button>}
       <Dialog open={open} onOpenChange={setOpen}>

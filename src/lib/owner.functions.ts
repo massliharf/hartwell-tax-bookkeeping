@@ -227,3 +227,118 @@ export const ownerBookAppointment = createServerFn({ method: "POST" })
     await sendBookingConfirmation(r.appointment_id!, requestOrigin()).catch(console.error);
     return { ok: true as const, appointmentId: r.appointment_id!, error: null };
   });
+
+/* ---------- Manual follow-ups: every automatic message can also be sent by Claire on demand ---------- */
+type FollowAppt = {
+  id: string; manage_token: string; start_at: string; status: string; meeting_type: string; service_id: string; sort_max?: number;
+  clients: { id: string; name: string; email: string } | null; services: { name: string; slug: string } | null;
+  checklist_items: { document_name: string; status: string; required: boolean; sort_order: number }[];
+};
+async function followAppt(context: unknown, id: string) {
+  const db = await assertOwner(context);
+  const { data } = await db.from("appointments")
+    .select("id, manage_token, start_at, status, meeting_type, service_id, clients(id, name, email), services(name, slug), checklist_items(document_name, status, required, sort_order)")
+    .eq("id", id).maybeSingle();
+  const a = data as unknown as FollowAppt | null;
+  const { requestOrigin } = await import("./origin.server");
+  const { sendMessage } = await import("./email.server");
+  const { getNow } = await import("./clock.server");
+  return { db, a, c: a?.clients ?? null, origin: requestOrigin(), sendMessage, now: await getNow() };
+}
+const tz = { timeZone: "America/New_York" } as const;
+const when = (iso: string) => `${new Date(iso).toLocaleDateString("en-US", { ...tz, weekday: "long", month: "long", day: "numeric" })} at ${new Date(iso).toLocaleTimeString("en-US", { ...tz, hour: "numeric", minute: "2-digit" })}`;
+const firstName = (n: string) => n.split(" ")[0] ?? n;
+/** One manual send per hour per kind, so a double click never sends twice. */
+const hourKey = (kind: string, id: string, now: Date) => `${kind}-manual:${id}:${now.toISOString().slice(0, 13)}`;
+
+export const sendDocsReminder = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c || !["booked", "confirmed"].includes(a.status)) return { ok: false, message: "This appointment isn't open." };
+    const missing = a.checklist_items.filter((i) => i.required && i.status === "missing").map((i) => i.document_name);
+    if (!missing.length) return { ok: false, message: "Nothing is missing." };
+    const ok = await sendMessage({
+      dedupeKey: hourKey("docs", a.id, now), type: "docs_reminder_7d", minutesSaved: 6, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: `${missing.length} document${missing.length === 1 ? "" : "s"} left for ${new Date(a.start_at).toLocaleDateString("en-US", { ...tz, weekday: "long" })}`,
+      heading: "A few documents to go.",
+      blocks: [{ p: `Hi ${firstName(c.name)}, a quick note from Claire before your appointment on ${when(a.start_at)}. Still needed:` }, { list: missing }, { button: { label: "Upload from your phone", href: `${origin}/a/${a.manage_token}` } }],
+    });
+    return { ok, message: ok ? `Document reminder sent to ${firstName(c.name)}.` : "Already sent in the last hour." };
+  });
+
+export const sendApptReminder = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { db, a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c || !["booked", "confirmed"].includes(a.status)) return { ok: false, message: "This appointment isn't open." };
+    const { data: st } = await db.from("settings").select("video_link").eq("id", 1).maybeSingle();
+    const place = a.meeting_type === "video" ? (st?.video_link ? `Video call: ${st.video_link}` : "Video call. Claire will send the link.") : "In person at 412 Bloomfield Avenue, Montclair, NJ 07042.";
+    const ok = await sendMessage({
+      dedupeKey: hourKey("remind", a.id, now), type: "final_reminder_24h", minutesSaved: 4, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: `Reminder: ${a.services?.name ?? "your appointment"}, ${when(a.start_at)}`, heading: "See you soon.",
+      blocks: [{ p: `Hi ${firstName(c.name)}, this is a reminder of your appointment with Claire on ${when(a.start_at)}.` }, { p: place }, { button: { label: "Confirm, move or cancel", href: `${origin}/a/${a.manage_token}` } }],
+      sms: `Hartwell Tax: reminder, ${when(a.start_at)}. Manage: ${origin}/a/${a.manage_token}`,
+    });
+    return { ok, message: ok ? `Reminder sent to ${firstName(c.name)}.` : "Already sent in the last hour." };
+  });
+
+export const requestExtraDocument = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid(), name: z.string().trim().min(2).max(80), note: z.string().trim().max(300).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { db, a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c || ["cancelled", "no_show"].includes(a.status) ) return { ok: false, message: "This appointment is closed." };
+    if (a.checklist_items.some((i) => i.document_name.toLowerCase() === data.name.toLowerCase())) return { ok: false, message: "That document is already on the list." };
+    const sort = Math.max(0, ...a.checklist_items.map((i) => i.sort_order)) + 1;
+    const { error } = await db.from("checklist_items").insert({ appointment_id: a.id, document_name: data.name, description: data.note || null, required: true, status: "missing", sort_order: sort });
+    if (error) return { ok: false, message: "Couldn't add it. Try again." };
+    await db.rpc("compute_ready_score", { _id: a.id });
+    await sendMessage({
+      dedupeKey: `extra:${a.id}:${data.name.toLowerCase()}:${now.toISOString().slice(0, 13)}`, type: "doc_fix_request", minutesSaved: 6, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: `Claire needs one more document: ${data.name}`, heading: "One more document, please.",
+      blocks: [{ p: `Hi ${firstName(c.name)}, after looking through your documents Claire needs one more: ${data.name}.` }, ...(data.note ? [{ p: `Claire's note: ${data.note}` }] : []), { button: { label: "Upload it", href: `${origin}/a/${a.manage_token}` } }],
+    });
+    return { ok: true, message: `Added "${data.name}" and emailed ${firstName(c.name)}.` };
+  });
+
+export const resendPortalLink = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c) return { ok: false, message: "Not found." };
+    const ok = await sendMessage({
+      dedupeKey: hourKey("link", a.id, now), type: "booking_confirmation", minutesSaved: 3, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: "Your Hartwell Tax appointment link", heading: "Here's your private link.",
+      blocks: [{ p: `Hi ${firstName(c.name)}, here is the link to your appointment (${a.services?.name ?? "appointment"}, ${when(a.start_at)}). Upload documents, confirm, move or cancel from there.` }, { button: { label: "Open my appointment", href: `${origin}/a/${a.manage_token}` } }],
+    });
+    return { ok, message: ok ? `Link sent to ${firstName(c.name)}.` : "Already sent in the last hour." };
+  });
+
+export const ownerCancelAppointment = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid(), note: z.string().trim().max(300).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { db, a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c || !["booked", "confirmed"].includes(a.status)) return { ok: false, message: "This appointment isn't open." };
+    await db.from("appointments").update({ status: "cancelled", needs_attention: false, attention_reason: null }).eq("id", a.id);
+    await sendMessage({
+      dedupeKey: `owner-cancel:${a.id}`, type: "reschedule_offer", minutesSaved: 5, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: "Your appointment was cancelled", heading: "We need to find you a new time.",
+      blocks: [{ p: `Hi ${firstName(c.name)}, Claire had to cancel your appointment on ${when(a.start_at)}.` }, ...(data.note ? [{ p: `Claire's note: ${data.note}` }] : []), { p: "Your documents and answers are saved. Pick any open time and you're booked again." }, { button: { label: "Pick a new time", href: `${origin}/book?service=${a.services?.slug ?? ""}` } }],
+    });
+    const { offerFreedSlot } = await import("./automations.server");
+    if (new Date(a.start_at) > now) await offerFreedSlot(a.service_id, a.start_at, origin).catch(console.error);
+    return { ok: true, message: `Cancelled. ${firstName(c.name)} was emailed a link to rebook, and the waitlist was offered the slot.` };
+  });
+
+export const sendRebookLink = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c) return { ok: false, message: "Not found." };
+    const ok = await sendMessage({
+      dedupeKey: hourKey("rebook", a.id, now), type: "reschedule_offer", minutesSaved: 5, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: "Let's find you a new time", heading: "We missed you.",
+      blocks: [{ p: `Hi ${firstName(c.name)}, we missed you on ${when(a.start_at)}. Your documents are saved, so booking again takes a minute.` }, { button: { label: "Pick a new time", href: `${origin}/book?service=${a.services?.slug ?? ""}` } }],
+    });
+    return { ok, message: ok ? `Rebooking link sent to ${firstName(c.name)}.` : "Already sent in the last hour." };
+  });

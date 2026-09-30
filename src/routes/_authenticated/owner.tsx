@@ -95,20 +95,28 @@ function OwnerLayout() {
           {!collapsed && <Link to="/" className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-lg bg-ink font-serif text-sm text-white">H</span><span className="truncate text-sm font-semibold text-deep-ink">Hartwell Tax</span></Link>}
           <Button size="icon" variant="ghost" onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}><PanelLeft className="size-4" /></Button>
         </div>
-        <NewAppointmentButton compact={collapsed} block listen />
-        <nav className="flex flex-col gap-0.5">
-          {NAV.map((n) => (
-            <Link key={n.to} to={n.to} title={collapsed ? n.label : undefined} className={item} activeProps={{ className: "bg-tint-2 font-medium text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
-              <span className="relative grid size-5 shrink-0 place-items-center"><n.icon className="size-4" strokeWidth={1.75} />
-                {collapsed && n.to === "/owner" && count > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-ink px-1 text-[9px] font-bold leading-4 text-white">{count}</span>}
-              </span>
-              {!collapsed && <span className="flex-1 truncate">{n.label}</span>}
-              {!collapsed && n.to === "/owner" && count > 0 && <span className="tabular grid min-w-5 place-items-center rounded-full bg-ink px-1.5 text-[10px] font-semibold leading-5 text-white">{count}</span>}
-            </Link>
+        <div className="flex flex-col gap-0.5">
+          <NewAppointmentButton compact={collapsed} row listen />
+          <button type="button" onClick={() => setPaletteOpen(true)} title={collapsed ? "Search" : undefined} className={item}>
+            <Search className="size-4 shrink-0" strokeWidth={1.75} />{!collapsed && <><span className="flex-1 text-left">Search</span><kbd className="rounded border border-line-1 px-1 text-[10px] leading-4 text-muted-foreground">⌘K</kbd></>}
+          </button>
+        </div>
+        <nav className="flex flex-col gap-0.5" aria-label="Main">
+          {NAV.map((n, i) => (
+            <div key={n.to} className="contents">
+              {i === 3 && <div className="mx-2 my-2 h-px bg-line-1" />}
+              <Link to={n.to} title={collapsed ? n.label : undefined} className={item} activeProps={{ className: "bg-tint-2 font-medium text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
+                <span className="relative grid size-5 shrink-0 place-items-center"><n.icon className="size-4" strokeWidth={1.75} />
+                  {collapsed && n.to === "/owner" && count > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-ink px-1 text-[9px] font-bold leading-4 text-white">{count}</span>}
+                </span>
+                {!collapsed && <span className="flex-1 truncate">{n.label}</span>}
+                {!collapsed && n.to === "/owner" && count > 0 && <span className="tabular grid min-w-5 place-items-center rounded-full bg-ink px-1.5 text-[10px] font-semibold leading-5 text-white">{count}</span>}
+              </Link>
+            </div>
           ))}
         </nav>
         <div className="flex-1" />
-        {!collapsed && <DemoTools inline />}
+        <DemoTools rows collapsed={collapsed} />
         <div className={`flex items-center gap-2 border-t border-line-1 pt-3 ${collapsed ? "flex-col" : ""}`}>
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink" title={collapsed ? `Claire Hartwell, ${email}` : undefined}>CH</span>
           {!collapsed && <span className="min-w-0 flex-1"><span className="block truncate text-xs font-medium text-deep-ink">Claire Hartwell</span><span className="block truncate text-[11px] text-muted-foreground">{email}</span></span>}
@@ -126,9 +134,7 @@ function OwnerLayout() {
             <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
               <span>Practice</span><span aria-hidden="true">/</span><span className="text-deep-ink">{current.label}</span>
             </nav>
-            <button onClick={() => setPaletteOpen(true)} className="flex h-8 items-center gap-2 rounded-lg px-2.5 text-[13px] text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink">
-              <Search className="size-4" />Search<kbd className="ml-3 rounded border border-line-1 px-1 text-[10px] leading-4">⌘K</kbd>
-            </button>
+
           </div>
           <div className="px-5 pb-28 pt-4 sm:px-8 sm:pb-12 sm:pt-2">
             <div className={wide ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>

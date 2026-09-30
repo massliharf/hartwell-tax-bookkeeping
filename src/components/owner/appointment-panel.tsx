@@ -6,6 +6,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ChevronRight, FileText, MapPin, Video } from "lucide-react";
 import { Tag } from "@/components/ui/tag";
+import { FollowUps, MoreActions, RequestDocument } from "./follow-ups";
+import { useOwnerCtx } from "./ctx";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -33,6 +35,7 @@ export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget 
 function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }) {
   const [gallery, setGallery] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const [accepting, setAccepting] = useState(false);
   const review = useServerFn(reviewDocument);
   const qc = useQueryClient();
@@ -120,14 +123,15 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
               </ul>
             </div>
           );
-          return <>{group("Needs your eyes", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}</>;
+          return <>{group("Needs your eyes", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}<RequestDocument a={a} /></>;
         })()}
         <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
       </section>
       <CloseoutBlock a={a} />
+      <FollowUps a={a} now={now} />
 
       <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
-        {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} /> : <ApptActionButtons a={a} onDone={onClose} onFinish={() => setFinishing(true)} />}
+        {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} /> : <div className="flex items-center gap-2"><div className="min-w-0 flex-1"><ApptActionButtons a={a} onDone={onClose} onFinish={() => setFinishing(true)} /></div><MoreActions a={a} onClosed={onClose} /></div>}
         {!finishing && !(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">{a.filed_at ? "Return filed. Nothing left to do." : a.status === "completed" ? "Appointment finished." : "This appointment is closed."}</p>}
       </footer>
     </div>

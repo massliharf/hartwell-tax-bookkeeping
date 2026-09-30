@@ -33,7 +33,7 @@ const STORY: { title: string; actions: { k: string; label: string; hint: string;
   ] },
 ];
 
-export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
+export function DemoTools({ inline = false, rows = false, collapsed = false }: { inline?: boolean; rows?: boolean; collapsed?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -71,6 +71,16 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
 
   return (
     <>
+      {rows ? (
+        <div className="flex flex-col gap-0.5">
+          {([[FlaskConical, "Demo tools", () => setOpen(true), false], [Smartphone, "Phone preview", () => setPhone((p) => !p), phone]] as const).map(([Icon, label, onClick, on]) => (
+            <button key={label} type="button" onClick={onClick} aria-pressed={label === "Phone preview" ? on : undefined} title={collapsed ? label : undefined}
+              className={`flex h-8 items-center gap-2.5 rounded-lg text-[13px] transition-colors duration-150 hover:bg-tint-1 ${collapsed ? "justify-center px-0" : "px-2"} ${on ? "bg-tint-2 font-medium text-deep-ink" : "text-[#616161]"}`}>
+              <Icon className="size-4 shrink-0" strokeWidth={1.75} />{!collapsed && label}
+            </button>
+          ))}
+        </div>
+      ) : (
       <div className={inline ? "flex gap-2" : "fixed bottom-20 right-5 z-40 flex gap-2"}>
         <Button size="icon" variant={phone ? "dark" : "secondary"} onClick={() => setPhone((p) => !p)} aria-pressed={phone} aria-label="Phone preview" className={inline ? "size-8 rounded-lg" : "h-11 w-11 rounded-full"}>
           <Smartphone className="h-4 w-4" />
@@ -79,6 +89,7 @@ export function DemoTools({ inline = false }: { inline?: boolean } = {}) {
           <FlaskConical className="h-4 w-4" /> {inline ? "Demo tools" : "Demo"}
         </Button>
       </div>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">

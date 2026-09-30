@@ -43,7 +43,7 @@ function SectionHead({ title, sub, action }: { title: string; sub?: string; acti
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 [&_h2]:text-balance">
       <div className="max-w-2xl">
-        <h2 className="font-serif text-[26px] font-medium leading-[34px] tracking-[-0.02em] text-deep-ink sm:text-[32px] sm:leading-[40px]">{title}</h2>
+        <h2 className="t-section text-deep-ink">{title}</h2>
         {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground sm:text-base sm:leading-6">{sub}</p>}
       </div>
       {action}
@@ -59,6 +59,7 @@ function Home() {
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
         <HowItWorks />
+        <BeforeAfter />
         <Services />
         <About />
         <Testimonials />
@@ -81,7 +82,7 @@ function Hero() {
             <img src={claire} alt="" width={28} height={28} className="size-7 rounded-full object-cover" />
             <span className="text-xs font-medium text-deep-ink">Claire Hartwell, EA, Montclair NJ</span>
           </div>
-          <h1 className="mt-5 max-w-[12ch] text-balance font-serif text-[40px] font-medium leading-[44px] tracking-[-0.03em] text-deep-ink sm:text-[60px] sm:leading-[64px]">
+          <h1 className="mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
             Taxes, without the chase.
           </h1>
           <p className="mt-5 max-w-md text-base leading-7 text-[#363636] sm:text-lg">
@@ -195,6 +196,34 @@ function HowItWorks() {
   );
 }
 
+function BeforeAfter() {
+  const before = ["Six emails to find a time", "A list of documents you have to guess", "Arrive, find out a form is missing", "Book a second visit to finish"];
+  const after = ["One link, confirmed on the spot", "A checklist made for your return", "Reminders until everything is in", "One appointment, filed the same week"];
+  return (
+    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="The same return. Half the hassle." sub="What booking a tax appointment usually looks like, and what it looks like here." />
+      <div className="mt-10 grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl bg-surface-2 p-6">
+          <p className="text-sm font-medium text-muted-foreground">The usual way</p>
+          <ul className="mt-4 space-y-3">
+            {before.map((x) => (
+              <li key={x} className="flex items-start gap-3 text-[15px] leading-6 text-muted-foreground"><span className="mt-2.5 h-px w-3 shrink-0 bg-muted-foreground/50" />{x}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-2xl bg-[#1A1A1A] p-6 text-white">
+          <p className="text-sm font-medium text-white/70">With Hartwell Tax</p>
+          <ul className="mt-4 space-y-3">
+            {after.map((x) => (
+              <li key={x} className="flex items-start gap-3 text-[15px] leading-6"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-white text-[#1A1A1A]"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Services() {
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
@@ -238,7 +267,7 @@ function About() {
           <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
-          <h2 className="font-serif text-[26px] font-medium leading-[34px] tracking-[-0.02em] text-deep-ink sm:text-[32px] sm:leading-[40px]">A neighbor who happens to love the tax code.</h2>
+          <h2 className="t-section text-deep-ink">A neighbor who happens to love the tax code.</h2>
           <div className="mt-5 space-y-3 text-base leading-7 text-[#363636]">
             <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
             <p>My practice is small on purpose. When you book with me, you work with me, from the first document to the final signature.</p>

@@ -51,7 +51,7 @@ function ConfirmedPage() {
     return (
       <BookingShell>
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-2xl leading-9 sm:text-[28px] sm:leading-[42px] text-deep-ink">We couldn't find that booking</h1>
+          <h1 className="t-page text-deep-ink">We couldn't find that booking</h1>
           <p className="mt-3 text-deep-ink/70">Check the link in your confirmation email, or book again.</p>
           <Button asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
         </div>
@@ -85,7 +85,7 @@ function ConfirmedPage() {
             <Check className="size-8" strokeWidth={2.5} />
           </div>
           <h1
-            className="mt-6 text-[28px] leading-[42px] text-deep-ink">
+            className="mt-6 t-page text-deep-ink">
             You're booked{first && `, ${first}`}.
           </h1>
           <p className="mt-3 text-deep-ink/70">
@@ -96,7 +96,7 @@ function ConfirmedPage() {
         <div
           className="sheet-stack mt-10 p-6">
           <p className="text-[11px] font-medium text-muted-foreground">{service}</p>
-          <p className="mt-1 font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{fmtDateLong(a.start_at)}</p>
+          <p className="mt-1 t-card text-deep-ink">{fmtDateLong(a.start_at)}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
             <span className="tabular">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</span>
             <span className="inline-flex items-center gap-1.5">
@@ -115,7 +115,7 @@ function ConfirmedPage() {
           <div className="flex items-center gap-5">
             <ReadyRing value={a.ready_score} size={84} />
             <div className="min-w-0">
-              <p className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">Your checklist</p>
+              <p className="t-card text-deep-ink">Your checklist</p>
               <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Claire will check everything before you arrive.</p>
             </div>
           </div>

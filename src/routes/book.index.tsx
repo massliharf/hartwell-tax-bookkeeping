@@ -145,7 +145,7 @@ function ChecklistPreview({ docs, hasService }: { docs: ReturnType<typeof previe
     <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
       <div className="bg-surface-2 p-3 px-4">
          <p className="text-xs font-medium leading-6 text-muted-foreground">Your checklist so far</p>
-         <p className="font-serif text-xl text-deep-ink">
+         <p className="t-card text-deep-ink">
            <span className="tabular">{hasService ? docs.length : 0}</span> document{hasService && docs.length === 1 ? "" : "s"}
         </p>
       </div>
@@ -181,7 +181,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
                 className={`group h-auto min-h-36 w-full flex-col items-stretch whitespace-normal rounded-2xl p-4 text-left transition-colors duration-150 ${active ? "bg-primary text-primary-foreground hover:bg-primary" : "bg-secondary hover:bg-fill-indicator"}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <h2 className={`font-serif text-xl leading-[30px] tracking-[-0.2px] ${active ? "text-primary-foreground" : "text-deep-ink"}`}>{s.name}</h2>
+                <h2 className={`t-card ${active ? "text-primary-foreground" : "text-deep-ink"}`}>{s.name}</h2>
                 <span className={`mt-1 size-4 shrink-0 rounded-full border ${active ? "border-[5px] border-primary-foreground" : "border-border bg-sheet"}`} />
               </div>
               <p className={`mt-1 text-sm ${active ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{s.description}</p>
@@ -337,7 +337,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
   const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
   const c = fmtDayChip(date);
   if (state === "done") {
-    return <div className="rounded-2xl bg-surface-2 p-6"><p className="font-serif text-2xl text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
+    return <div className="rounded-2xl bg-surface-2 p-6"><p className="t-card text-deep-ink">You're on the list.</p><p className="mt-1 text-sm text-deep-ink/70">If a {c.dow} slot opens, we'll email you first.</p></div>;
   }
   return (
     <form
@@ -348,7 +348,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
         try { const r = await join({ data: { serviceId: service.id, name, email, date } }); setState(r.ok ? "done" : "error"); } catch { setState("error"); }
       }}
     >
-      <p className="font-serif text-2xl text-deep-ink">Full — join the waitlist</p>
+      <p className="t-card text-deep-ink">Full — join the waitlist</p>
       <p className="mt-1 text-sm text-deep-ink/70">{c.dow} {c.month} {c.day} is fully booked. We'll email you if a spot opens.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <Input required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-10" />

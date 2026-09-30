@@ -32,7 +32,7 @@ export function ClientContent({ id, appointmentId }: { id: string; appointmentId
   return <div className="space-y-6 pb-8">
     <header className="border-b border-border pb-4">
       <p className="text-xs text-muted-foreground">{client.is_returning ? "Returning client" : "Client"}</p>
-      <h2 className="mt-1 font-sans text-lg font-normal leading-[26px] text-deep-ink">{client.name}</h2>
+      <h2 className="mt-1 t-owner text-deep-ink">{client.name}</h2>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex min-w-0 items-center gap-2"><Mail className="size-4 shrink-0 text-muted-foreground" /><a className="min-w-0 truncate text-ink hover:underline" href={`mailto:${client.email}`}>{client.email}</a><Button size="icon" variant="ghost" aria-label="Copy email" title="Copy email" onClick={() => copy(client.email)}><Copy className="size-3.5" /></Button></div>
         {client.phone && <div className="flex items-center gap-2"><Phone className="size-4 text-muted-foreground" /><a className="text-ink hover:underline" href={`tel:${client.phone}`}>{client.phone}</a><Button size="icon" variant="ghost" aria-label="Copy phone" title="Copy phone" onClick={() => copy(client.phone ?? "")}><Copy className="size-3.5" /></Button></div>}

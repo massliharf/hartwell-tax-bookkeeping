@@ -15,7 +15,7 @@ function Today() {
   const hi = minutes < 12 * 60 ? "Good morning" : minutes < 17 * 60 ? "Good afternoon" : "Good evening";
   const appts = (q.data ?? []).filter(a => a.status !== "no_show");
   return <>
-    <header className="mb-6"><h1 className="font-sans text-lg font-normal leading-[26px] text-deep-ink">{hi}, Claire.</h1><p className="mt-1 text-xs text-muted-foreground">{fmtLong(now)}</p></header>
+    <header className="mb-6"><h1 className="t-owner text-deep-ink">{hi}, Claire.</h1><p className="mt-1 text-xs text-muted-foreground">{fmtLong(now)}</p></header>
     <div className="mb-8 grid grid-cols-3 gap-2">{[
       { label: "Appointments today", value: q.data ? appts.length : null },
       { label: "Ready", value: q.data ? appts.filter(a => a.ready_score >= 100).length : null },

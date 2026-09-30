@@ -58,11 +58,11 @@ function AuthPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-sm">
-        <Link to="/" className="font-serif text-2xl text-ink">Hartwell Tax &amp; Bookkeeping</Link>
+        <Link to="/" className="flex items-baseline gap-2"><span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span><span className="text-xs text-muted-foreground">&amp; Bookkeeping</span></Link>
         <form onSubmit={submit} className="sheet-stack mt-8 space-y-5 p-7">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-ink"><Lock className="h-4 w-4" /></span>
           <div>
-            <h1 className="font-serif text-xl leading-[30px] tracking-[-0.2px] text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
+            <h1 className="t-card text-deep-ink">{setup ? "Set up your account" : "Welcome back, Claire"}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {setup ? "This is a one-time step. After this, only you can sign in." : "Sign in to see your day."}
             </p>

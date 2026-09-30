@@ -16,7 +16,7 @@ import { useClientDrawer } from "./drawer-context";
 import { cn } from "@/lib/utils";
 
 export function PageHead({ eyebrow, title, children }: { eyebrow?: string; title: ReactNode; children?: ReactNode }) {
-  return <header className="mb-6"><h1 className="font-sans text-lg font-normal leading-[26px] text-deep-ink">{title}</h1>{eyebrow && <p className="mt-1 text-xs text-muted-foreground">{eyebrow}</p>}{children && <div className="mt-2 text-sm text-muted-foreground">{children}</div>}</header>;
+  return <header className="mb-6"><h1 className="t-owner text-deep-ink">{title}</h1>{eyebrow && <p className="mt-1 text-xs text-muted-foreground">{eyebrow}</p>}{children && <div className="mt-2 text-sm text-muted-foreground">{children}</div>}</header>;
 }
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
   return <div className="mx-auto max-w-md py-12 text-center"><Check className="mx-auto size-6 text-ink" /><h2 className="mt-4 font-sans text-xl font-medium leading-[30px] text-deep-ink">{title}</h2>{children && <p className="mt-2 text-sm text-muted-foreground">{children}</p>}</div>;

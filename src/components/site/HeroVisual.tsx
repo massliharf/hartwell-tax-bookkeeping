@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { DocumentStack, type StackDoc } from "@/components/brand/DocumentStack";
 import { ReadyRing } from "@/components/brand/ReadyRing";
+import { BellRing, CalendarCheck } from "lucide-react";
 
 const ALL: StackDoc[] = [
   { id: "w2", title: "W-2", note: "Wages from your employer", received: true },
@@ -23,7 +24,12 @@ export function HeroVisual() {
   const docs = [...ALL].reverse().map((doc, i) => ({ ...doc, received: i < shown }));
 
   return (
-    <div className="relative mx-auto h-[340px] w-full max-w-sm rounded-2xl border border-border bg-sheet p-5 shadow-[0_0_2px_rgba(18,18,18,.08),0_2px_4px_rgba(18,18,18,.08),0_6px_6px_rgba(18,18,18,.04),0_14px_9px_rgba(18,18,18,.02),0_25px_10px_rgba(18,18,18,.02)] sm:p-6">
+    <div className="relative mx-auto w-full max-w-sm pb-12 pt-12">
+      <div className="absolute -left-2 top-1 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-left-10">
+        <span className="grid size-7 place-items-center rounded-lg bg-[rgba(30,91,71,0.1)] text-ink"><CalendarCheck className="size-3.5" /></span>
+        <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">You're booked</span><span className="text-muted-foreground">Thursday, 10:30 am</span></span>
+      </div>
+    <div className="relative h-[340px] w-full rounded-2xl border border-border bg-sheet p-5 shadow-lift sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>
@@ -35,9 +41,14 @@ export function HeroVisual() {
       <div className="mt-5">
         <DocumentStack docs={docs} />
       </div>
-      <p className={`mt-3 text-center text-xs font-medium ${shown === 3 ? "text-success" : "invisible"}`}>
+      <p className={`mt-3 text-center text-xs font-medium transition-opacity duration-150 ${shown === 3 ? "text-success opacity-100" : "opacity-0"}`}>
         All set. Claire has checked everything.
       </p>
+    </div>
+      <div className="absolute -right-2 bottom-1 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-right-8">
+        <span className="grid size-7 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><BellRing className="size-3.5" /></span>
+        <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">Reminder sent</span><span className="text-muted-foreground">1 document left</span></span>
+      </div>
     </div>
   );
 }

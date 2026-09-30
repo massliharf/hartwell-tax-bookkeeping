@@ -90,7 +90,7 @@
   --paper-deep: #EDEDED;
   --ink-green: #1E5B47;
   --deep-ink: #1A1A1A;
-  --marigold: #737373;
+  --marigold: #E0A13A;
   --sage: #EDEDED;
   --success: #1E5B47;
   --warning: #B26B17;
@@ -147,7 +147,9 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv11", "ss01";
   }
-  h1, h2, h3, .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
+  /* Headings use the UI font by default (Studio Shell). The display font is opt-in via .font-serif or the t-* type styles. */
+  h1, h2, h3 { font-family: var(--font-sans); font-weight: 500; }
+  .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
   ::selection { background: rgba(30,91,71,0.15); }
   /* One consistent, high-contrast focus ring everywhere keyboard users land. */
   :focus-visible {
@@ -168,7 +170,7 @@
 @utility sheet-stack {
   position: relative;
   background: #FFFFFF;
-  border: 1px solid rgba(16,16,16,0.05);
+  border: 1px solid rgba(16,16,16,0.08);
   border-radius: 16px;
 }
 
@@ -180,14 +182,9 @@
 /* Keep motion limited to hover feedback, booking steps, and the readiness ring. */
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 
-/* Card surface used by client pages (portal, confirmation, auth). Studio Shell: white, 16px radius, 1px hairline, no heavy shadow. */
-@layer components {
-  .sheet-stack {
-    background: var(--sheet);
-    border: 1px solid rgba(16, 16, 16, 0.1);
-    border-radius: 16px;
-  }
-  .ledger {
-    background-image: none;
-  }
-}
+/* Type scale (DESIGN_SYSTEM.md section 1). One class per role keeps every page consistent. */
+@utility t-hero { font-family: var(--font-serif); font-weight: 500; font-size: 40px; line-height: 44px; letter-spacing: -0.03em; @media (width >= 40rem) { font-size: 60px; line-height: 64px; } }
+@utility t-page { font-family: var(--font-serif); font-weight: 500; font-size: 24px; line-height: 32px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 28px; line-height: 36px; } }
+@utility t-section { font-family: var(--font-serif); font-weight: 500; font-size: 26px; line-height: 34px; letter-spacing: -0.02em; @media (width >= 40rem) { font-size: 32px; line-height: 40px; } }
+@utility t-card { font-family: var(--font-serif); font-weight: 500; font-size: 20px; line-height: 30px; letter-spacing: -0.2px; }
+@utility t-owner { font-family: var(--font-sans); font-weight: 400; font-size: 18px; line-height: 26px; letter-spacing: 0; }

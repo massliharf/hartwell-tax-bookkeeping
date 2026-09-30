@@ -69,7 +69,7 @@ export const readyToFile = () =>
     },
   });
 
-export const missingOf = (a: Appt) => a.checklist_items.filter((i) => i.required && i.status === "missing").sort((x, y) => x.sort_order - y.sort_order);
+export const missingOf = (a: Appt) => a.checklist_items.filter((i) => i.required && (i.status === "missing" || i.review_status === "needs_fix")).sort((x, y) => x.sort_order - y.sort_order);
 
 export const apptsRange = (fromIso: string, toIso: string) =>
   queryOptions({
@@ -121,7 +121,7 @@ export const needsYou = (nowIso: string) =>
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").is("filed_at", null).lt("end_at", ago3).order("end_at"),
         supabase.from("messages").select("id, subject, recipient, error, sent_at, type").eq("delivery", "failed").order("sent_at", { ascending: false }),
         supabase.from("waitlist_offers").select("id, slot_start, services(name), waitlist(clients(name))").eq("status", "claimed").order("slot_start"),
-        supabase.from("checklist_items").select("appointment_id, appointments!inner(start_at, status)").eq("status", "uploaded").eq("review_status", "pending").neq("appointments.status", "cancelled"),
+        supabase.from("checklist_items").select("appointment_id, appointments!inner(start_at, status)").eq("status", "uploaded").eq("review_status", "pending").in("appointments.status", ["booked", "confirmed", "completed"]).is("appointments.filed_at", null),
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null).lt("finished_at", ago5).order("finished_at"),
       ]);
       const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error;

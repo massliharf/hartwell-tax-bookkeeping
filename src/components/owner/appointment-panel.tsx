@@ -69,7 +69,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
           {items.map((i) => (
             <li key={i.id} className="flex h-11 items-center gap-2.5 px-4 text-sm">
               {i.status === "uploaded"
-                ? <span className="grid size-4 place-items-center rounded-full bg-success text-white"><Check className="size-2.5" strokeWidth={3} /></span>
+                ? <span className="grid size-4 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span>
                 : <span className={cn("size-4 rounded-full border", i.status === "not_applicable" ? "border-border bg-fill-subtle" : "border-warning/60")} />}
               <span className={cn("min-w-0 flex-1 truncate", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
               {i.status === "uploaded"

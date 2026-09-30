@@ -24,7 +24,7 @@ export function AnnouncementBar() {
 function Wordmark() {
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5">
-      <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-lg bg-deep-ink font-serif text-base text-white">H</span>
+      <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-lg bg-deep-ink font-serif text-base text-primary-foreground">H</span>
       <span className="flex min-w-0 flex-col leading-tight">
         <span className="text-sm font-semibold text-deep-ink">Hartwell Tax</span>
         <span className="truncate text-[11px] text-muted-foreground">& Bookkeeping, Montclair NJ</span>

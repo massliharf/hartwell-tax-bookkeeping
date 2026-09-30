@@ -13,3 +13,4 @@
 - [ ] Add shared client drawer, confirmable appointment actions, and first-file document viewing.
 - [ ] Update owner navigation, search, and remaining owner visual styling.
 - [ ] Verify the full owner journey on mobile and desktop.
+- [ ] Full product QA: list issues, fix by severity, re-test affected flows, reset demo data.

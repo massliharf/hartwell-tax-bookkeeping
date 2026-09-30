@@ -75,7 +75,7 @@ function Hero() {
       <div className="grid items-center gap-10 px-5 pb-10 pt-10 sm:px-10 md:grid-cols-[1.15fr_1fr] md:gap-12 md:pb-14 md:pt-16">
         <div>
           <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-[rgba(16,16,16,0.1)] bg-sheet pl-1 pr-3 text-xs text-[#363636] transition-colors duration-150 hover:bg-surface-2">
-            <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-white">Oct 15</span>
+            <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-primary-foreground">Oct 15</span>
             Extensions are due. <span className="font-medium text-ink group-hover:underline">Book your slot</span>
           </Link>
           <h1 className="mt-5 max-w-[12ch] text-balance t-hero text-deep-ink">
@@ -168,14 +168,14 @@ function StepPreviewTime() {
     <div className="space-y-3">
       <div className="flex gap-2">
         {days.map((x, i) => (
-          <span key={x.n} className={`flex h-12 w-12 flex-col items-center justify-center rounded-lg text-[11px] ${i === 1 ? "bg-deep-ink text-white" : "bg-sheet text-deep-ink"}`}>
-            <span className={i === 1 ? "text-white/70" : "text-muted-foreground"}>{x.d}</span><span className="tabular text-sm font-medium">{x.n}</span>
+          <span key={x.n} className={`flex h-12 w-12 flex-col items-center justify-center rounded-lg text-[11px] ${i === 1 ? "bg-deep-ink text-primary-foreground" : "bg-sheet text-deep-ink"}`}>
+            <span className={i === 1 ? "text-primary-foreground/70" : "text-muted-foreground"}>{x.d}</span><span className="tabular text-sm font-medium">{x.n}</span>
           </span>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">
         {times.map((t, i) => (
-          <span key={t} className={`tabular grid h-8 place-items-center rounded-lg text-xs ${i === 1 ? "bg-deep-ink text-white" : "bg-sheet text-deep-ink"}`}>{t}</span>
+          <span key={t} className={`tabular grid h-8 place-items-center rounded-lg text-xs ${i === 1 ? "bg-deep-ink text-primary-foreground" : "bg-sheet text-deep-ink"}`}>{t}</span>
         ))}
       </div>
     </div>
@@ -189,7 +189,7 @@ function StepPreviewDocs() {
       {docs.map((d) => (
         <li key={d.t} className="flex h-10 items-center gap-2.5 rounded-lg bg-sheet px-3 text-xs text-deep-ink">
           <FileText className="size-3.5 text-muted-foreground" /><span className="flex-1">{d.t}</span>
-          {d.ok ? <span className="grid size-4 place-items-center rounded-full bg-ink text-white"><Check className="size-2.5" strokeWidth={3} /></span> : <span className="size-4 rounded-full border border-border" />}
+          {d.ok ? <span className="grid size-4 place-items-center rounded-full bg-ink text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span> : <span className="size-4 rounded-full border border-border" />}
         </li>
       ))}
     </ul>
@@ -248,8 +248,8 @@ function BeforeAfter() {
             ))}
           </ul>
         </div>
-        <div className="rounded-2xl bg-[#1A1A1A] p-6 text-white">
-          <p className="text-sm font-medium text-white/70">With Hartwell Tax</p>
+        <div className="rounded-2xl bg-primary p-6 text-primary-foreground">
+          <p className="text-sm font-medium text-primary-foreground/70">With Hartwell Tax</p>
           <ul className="mt-4 space-y-3">
             {after.map((x) => (
               <li key={x} className="flex items-start gap-3 text-[15px] leading-6"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-white text-[#1A1A1A]"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
@@ -373,18 +373,18 @@ function Privacy() {
 
 function DeadlineCta() {
   return (
-    <section className="overflow-hidden rounded-2xl bg-[#1A1A1A] px-5 py-12 text-white sm:px-10 sm:py-16">
+    <section className="overflow-hidden rounded-2xl bg-primary px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="font-serif text-[28px] font-medium leading-[36px] tracking-[-0.02em] sm:text-[36px] sm:leading-[44px]">October 15 is close. Your slot doesn't have to be.</h2>
-          <p className="mt-3 max-w-lg text-sm leading-6 text-white/70 sm:text-base">Extended returns are due on October 15. Book now, upload your documents this week, and file once.</p>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">Extended returns are due on October 15. Book now, upload your documents this week, and file once.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
           <Button asChild size="lg" className="bg-white text-[#1A1A1A] hover:bg-white/90"><Link to="/book" search={{ service: "extension" }}>Book an extension review</Link></Button>
-          <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><a href="#services">See all services</a></Button>
+          <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><a href="#services">See all services</a></Button>
         </div>
       </div>
-      <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6 text-xs text-white/70">
+      <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-primary-foreground/10 pt-6 text-xs text-primary-foreground/70">
         <li className="flex items-center gap-1.5"><MapPin className="size-3.5" />412 Bloomfield Avenue, Montclair</li>
         <li className="flex items-center gap-1.5"><Video className="size-3.5" />Video appointments available</li>
         <li className="flex items-center gap-1.5"><Clock className="size-3.5" />Mon to Fri 9 to 6, Sat 10 to 2</li>

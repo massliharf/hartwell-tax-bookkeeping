@@ -230,14 +230,14 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
                 </button>
               </div>
             ) : (
-              <div className="flex h-8 shrink-0 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label={q.label}>
+              <div className="flex h-10 shrink-0 gap-1 rounded-lg bg-fill-neutral p-1" role="radiogroup" aria-label={q.label}>
                 {[true, false].map((v) => (
                   <button
                     key={String(v)}
                     role="radio"
                     aria-checked={answers[q.key] === v}
                     onClick={() => set(q.key, v)}
-                     className={`h-6 min-w-14 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-fill-selected text-deep-ink" : "text-muted-foreground hover:text-deep-ink"}`}
+                     className={`h-8 min-w-16 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ${answers[q.key] === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-deep-ink"}`}
                   >
                     {v ? "Yes" : "No"}
                   </button>

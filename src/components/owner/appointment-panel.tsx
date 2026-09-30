@@ -96,7 +96,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
                 : <span className={cn("size-4 rounded-full border", i.status === "not_applicable" ? "border-border bg-fill-subtle" : "border-warning/60")} />}
               <span className={cn("min-w-[100px] flex-1", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
               <AiTag i={i} />
-              {i.status === "uploaded" && i.review_status === "pending" && <span className="order-last w-full sm:order-none sm:w-auto"><DocReview i={i} inline /></span>}
+              {i.status === "uploaded" && i.review_status === "pending" && <div className="order-last w-full sm:order-none sm:w-auto"><DocReview i={i} inline /></div>}
               {i.status === "uploaded"
                 ? <Button size="sm" variant="ghost" onClick={() => setViewer({ open: true, startId: i.id })}>View</Button>
                 : <span className={cn("text-xs", i.status === "not_applicable" ? "text-muted-foreground" : "text-warning")}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</span>}

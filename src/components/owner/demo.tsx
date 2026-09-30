@@ -52,7 +52,7 @@ export function DemoTools() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className="overflow-y-auto bg-paper">
           <SheetHeader>
-            <SheetTitle className="font-serif text-2xl font-normal">Test controls</SheetTitle>
+            <SheetTitle className="font-sans text-2xl font-normal">Test controls</SheetTitle>
             <SheetDescription>Show the follow-through live. Only you can see this.</SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-6">
@@ -129,7 +129,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   ) : (
                     <div className="rounded-2xl bg-surface-2 p-3">
                       <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" /> Email</p>
-                      <p className="mt-1 font-serif text-[15px] leading-tight text-ink">{m.subject}</p>
+                      <p className="mt-1 font-sans text-[15px] leading-tight text-ink">{m.subject}</p>
                       <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-deep-ink/75">{m.body}</p>
                     </div>
                   )}

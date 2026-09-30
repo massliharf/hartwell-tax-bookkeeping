@@ -9,3 +9,7 @@
 - [x] Repair UI-only layout, loading, interaction, and navigation issues.
 - [x] Verify full public-to-owner journey and repeat viewport checks.
 - [x] Re-audit global motion, hero checklist, typography, announcement bar, button/link styles; list changed places.
+- [ ] Make Today the compact home base with shared Needs you rows and upcoming appointments.
+- [ ] Add shared client drawer, confirmable appointment actions, and first-file document viewing.
+- [ ] Update owner navigation, search, and remaining owner visual styling.
+- [ ] Verify the full owner journey on mobile and desktop.

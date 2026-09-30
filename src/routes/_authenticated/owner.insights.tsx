@@ -102,13 +102,13 @@ function Insights() {
       <section className="mt-12 grid overflow-hidden rounded-2xl border border-border md:grid-cols-2">
         <div className="bg-paper-deep/60 p-7 md:p-9">
           <p className="text-xs font-medium text-muted-foreground">Before</p>
-          <p className="mt-4 font-serif text-xl leading-[30px] text-deep-ink/60">
+          <p className="mt-4 font-sans text-xl leading-[30px] text-deep-ink/60">
             {BEFORE.msgsPerBooking} messages per booking.<br />1 in 3 clients unprepared.
           </p>
         </div>
         <div className="relative bg-ink p-7 text-primary-foreground md:p-9">
           <p className="text-xs font-medium text-marigold">Now</p>
-          <p className="mt-4 font-serif text-xl leading-[30px]">
+          <p className="mt-4 font-sans text-xl leading-[30px]">
             0 messages from you.<br />{inTen} in 10 ready.
           </p>
         </div>
@@ -120,10 +120,10 @@ function Insights() {
 
 function Hero({ hours, minutes }: { hours: number; minutes: number }) {
   return (
-    <header className="ledger relative overflow-hidden rounded-2xl bg-surface-2 px-7 py-12 md:px-12 md:py-16">
+    <header className=" relative overflow-hidden rounded-2xl bg-surface-2 px-7 py-12 md:px-12 md:py-16">
       <p className="text-xs font-medium text-muted-foreground">Insights, last 30 days</p>
       <h1
-        className="mt-3 font-serif text-[40px] leading-[48px] text-deep-ink md:text-[56px] md:leading-[64px]">
+        className="mt-3 font-sans text-[40px] leading-[48px] text-deep-ink md:text-[56px] md:leading-[64px]">
         <span className="tabular text-ink">{hours}</span> hour{hours === 1 ? "" : "s"} given back<br className="hidden sm:block" /> this month.
       </h1>
       <p className="tabular mt-4 max-w-md text-muted-foreground">{minutes.toLocaleString()} minutes of messages, reminders and follow-ups you didn't have to write.</p>
@@ -135,9 +135,9 @@ function Hero({ hours, minutes }: { hours: number; minutes: number }) {
 
 function Metric({ title, value, note, good, children }: { title: string; value: string; note: string; good?: boolean; children: ReactNode }) {
   return (
-    <article className="sheet-stack flex flex-col p-5">
+    <article className=" flex flex-col p-5">
       <p className="text-sm text-muted-foreground">{title}</p>
-      <p className="tabular mt-1 font-serif text-[28px] leading-[38px] text-deep-ink">{value}</p>
+      <p className="tabular mt-1 font-sans text-[28px] leading-[38px] text-deep-ink">{value}</p>
       <p className={`text-xs ${good === undefined ? "text-muted-foreground" : good ? "text-success" : "text-warning"}`}>{note}</p>
       <div className="mt-4 h-24">{children}</div>
     </article>

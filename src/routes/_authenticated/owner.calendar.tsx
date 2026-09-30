@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -11,6 +11,7 @@ import { useOwnerCtx } from "@/components/owner/ctx";
 import { addDays, apptsRange, et, etToIso, fmtLong, fmtTime, missingOf, readiness, readinessStyle, ymdLabel, type Appt } from "@/components/owner/lib";
 import { ErrorNote, MeetingTag, PageHead, StatusPill, useApptActions } from "@/components/owner/ui";
 import { ownerMoveAppointment } from "@/lib/owner.functions";
+import { useClientDrawer } from "@/components/owner/drawer-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/owner/calendar")({ head: () => ({ meta: [{ title: "Calendar — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: CalendarPage });
@@ -23,6 +24,7 @@ const mondayOf = (ymd: string) => {
 
 function CalendarPage() {
   const now = useOwnerCtx().data!.now;
+  const openClient = useClientDrawer();
   const [week, setWeek] = useState(() => mondayOf(et(now).ymd));
   const days = Array.from({ length: 6 }, (_, i) => addDays(week, i));
   const q = useQuery(apptsRange(etToIso(week, 0), etToIso(addDays(week, 7), 0)));
@@ -69,7 +71,7 @@ function CalendarPage() {
       <p className="mb-3 hidden text-xs text-muted-foreground md:block">Drag an appointment to move it. The client is emailed automatically.</p>
 
       {/* Desktop week grid */}
-      <div className="sheet-stack hidden overflow-hidden md:block">
+      <div className=" hidden overflow-hidden md:block">
         <div className="grid grid-cols-[52px_repeat(6,1fr)] border-b border-border bg-sheet">
           <div />
           {days.map((d) => (
@@ -84,14 +86,14 @@ function CalendarPage() {
           </div>
           {days.map((d) => (
             <div key={d} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(e, d)}
-              className={cn("relative border-l border-border ledger", drag && "bg-fill-neutral/30", d === today && "bg-marigold/5")}
+              className={cn("relative border-l border-border ", drag && "bg-fill-neutral/30", d === today && "bg-marigold/5")}
               style={{ backgroundSize: `100% ${60 * PX}px` }}>
               {byDay(d).map((a) => {
                 const { minutes } = et(a.start_at);
                 const h = (new Date(a.end_at).getTime() - new Date(a.start_at).getTime()) / 60000;
                 return (
                   <button key={a.id} draggable onDragStart={(e) => { e.dataTransfer.setData("text/plain", a.id); setDrag(a.id); }} onDragEnd={() => setDrag(null)}
-                    onClick={() => setOpenId(a.id)}
+                    onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })}
                     className={cn("absolute inset-x-1 overflow-hidden rounded-lg border px-2 py-1 text-left text-[11px] leading-tight transition-colors duration-150 hover:bg-fill-subtle",
                       readinessStyle[readiness(a.ready_score)], a.status === "completed" && "opacity-60", drag === a.id && "opacity-40")}
                     style={{ top: (minutes - START) * PX, height: Math.max(22, h * PX - 2) }}>
@@ -114,7 +116,7 @@ function CalendarPage() {
               <ul className="space-y-2">
                 {byDay(d).map((a) => (
                   <li key={a.id}>
-                    <button onClick={() => setOpenId(a.id)} className={cn("flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left", readinessStyle[readiness(a.ready_score)])}>
+                    <button onClick={() => a.clients && openClient({ clientId: a.clients.id, appointmentId: a.id })} className={cn("flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left", readinessStyle[readiness(a.ready_score)])}>
                       <span className="tabular w-16 text-xs font-medium">{fmtTime(a.start_at)}</span>
                       <span className="flex-1 truncate text-sm text-deep-ink">{a.clients?.name}</span>
                       <span className="tabular text-xs">{a.ready_score}%</span>
@@ -146,6 +148,7 @@ function Legend() {
 }
 
 function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
+  const openClient = useClientDrawer();
   const { complete, noShow } = useApptActions();
   const open = a && (a.status === "booked" || a.status === "confirmed");
   return (
@@ -154,7 +157,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
         {a && (
           <>
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl leading-[30px] tracking-[-0.2px]">{a.clients?.name}</DialogTitle>
+              <DialogTitle className="font-sans text-xl leading-[30px] tracking-[-0.2px]">{a.clients?.name}</DialogTitle>
               <DialogDescription>{a.services?.name}, {fmtLong(a.start_at)}, {fmtTime(a.start_at)}–{fmtTime(a.end_at)}</DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4">
@@ -175,7 +178,7 @@ function Detail({ a, onClose }: { a: Appt | null; onClose: () => void }) {
             <div className="flex flex-wrap gap-2">
               {open && <Button size="sm" onClick={() => complete.mutate(a.id, { onSuccess: onClose })}>Mark complete</Button>}
               {open && <Button size="sm" variant="outline" onClick={() => noShow.mutate(a.id, { onSuccess: onClose })}>No-show</Button>}
-              {a.clients && <Button size="sm" variant="ghost" asChild><Link to="/owner/clients/$id" params={{ id: a.clients.id }}>Client details</Link></Button>}
+              {a.clients && <Button size="sm" variant="ghost" onClick={() => { onClose(); openClient({ clientId: a.clients.id, appointmentId: a.id }); }}>Client details</Button>}
             </div>
           </>
         )}

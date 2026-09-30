@@ -41,7 +41,7 @@ function Today() {
   return (
     <div className="pb-6">
       <header className="enter-tile pt-2 text-left sm:pt-4">
-        <h1 className="font-display text-[26px] font-medium leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]">{hi}, Claire.</h1>
+        <h1 className="font-serif text-[26px] font-medium leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]">{hi}, Claire.</h1>
         <p className="mt-1 text-[13px] text-muted-foreground">{fmtLong(now)}</p>
       </header>
 

@@ -9,14 +9,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  */
 const BUCKET = "client-documents";
 const MAX_BYTES = 15 * 1024 * 1024;
-const ALLOWED_EXT = ["pdf", "jpg", "jpeg", "png"];
+const ALLOWED_EXT = ["pdf", "jpg", "jpeg", "png", "heic", "heif"];
 const tokenSchema = z.string().regex(/^[a-f0-9]{64}$/);
 
 async function appointmentByToken(token: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("appointments")
-    .select("id, service_id, start_at, end_at, meeting_type, status, ready_score, signature_status, signed_at, services(name, duration_min), clients(name)")
+    .select("id, service_id, start_at, end_at, meeting_type, status, ready_score, signature_status, signed_at, fee_cents, client_note, paid_at, filed_at, finished_at, services(name, duration_min), clients(name)")
     .eq("manage_token", token)
     .maybeSingle();
   return { supabaseAdmin, appt: data };
@@ -27,17 +27,18 @@ export const getAppointmentByToken = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ token: tokenSchema }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin, appt } = await appointmentByToken(data.token);
-    if (!appt) return { appointment: null, checklist: [], now: null };
+    if (!appt) return { appointment: null, checklist: [], now: null, videoLink: null };
     const { getNow } = await import("./clock.server");
-    const [{ data: items }, now] = await Promise.all([
+    const [{ data: items }, now, { data: st }] = await Promise.all([
       supabaseAdmin
         .from("checklist_items")
-        .select("id, document_name, description, required, status, uploaded_at, na_reason")
+        .select("id, document_name, description, required, status, uploaded_at, na_reason, ai_check, ai_note, review_status, fix_reason, fix_note")
         .eq("appointment_id", appt.id)
         .order("sort_order"),
       getNow(),
+      supabaseAdmin.from("settings").select("video_link").eq("id", 1).maybeSingle(),
     ]);
-    return { appointment: appt, checklist: items ?? [], now: now.toISOString() };
+    return { appointment: appt, checklist: items ?? [], now: now.toISOString(), videoLink: appt.meeting_type === "video" ? st?.video_link ?? null : null };
   });
 
 /** Returns a one-time signed upload URL scoped to this appointment's folder. */
@@ -52,7 +53,7 @@ export const createUploadUrl = createServerFn({ method: "POST" })
       .from("checklist_items").select("id").eq("id", data.itemId).eq("appointment_id", appt.id).maybeSingle();
     if (!item) throw new Error("Item not found");
     const ext = (data.fileName.split(".").pop() ?? "").replace(/[^a-z0-9]/gi, "").toLowerCase();
-    if (!ALLOWED_EXT.includes(ext)) throw new Error("Please upload a PDF, JPG or PNG.");
+    if (!ALLOWED_EXT.includes(ext)) throw new Error("Please upload a PDF, JPG, PNG or HEIC.");
     const path = `${appt.id}/${item.id}-${crypto.randomUUID()}.${ext}`;
     const { data: signed, error } = await supabaseAdmin.storage.from(BUCKET).createSignedUploadUrl(path);
     if (error || !signed) throw new Error("Could not prepare upload");
@@ -70,16 +71,18 @@ export const confirmUpload = createServerFn({ method: "POST" })
     const file = files?.find((f) => f.name === name);
     if (!file) throw new Error("File not found");
     const size = Number((file.metadata as { size?: number } | null)?.size ?? 0);
-    if (size > MAX_BYTES) {
+    if (size === 0 || size > MAX_BYTES) {
       await supabaseAdmin.storage.from(BUCKET).remove([data.path]);
-      throw new Error("That file is over 15MB.");
+      throw new Error(size === 0 ? "That file is empty." : "That file is over 15MB.");
     }
     const { getNow } = await import("./clock.server");
     await supabaseAdmin
       .from("checklist_items")
-      .update({ status: "uploaded", file_path: data.path, na_reason: null, uploaded_at: (await getNow()).toISOString() })
+      .update({ status: "uploaded", file_path: data.path, na_reason: null, uploaded_at: (await getNow()).toISOString(), review_status: "pending", ai_check: null, ai_note: null, fix_reason: null, fix_note: null })
       .eq("id", data.itemId)
       .eq("appointment_id", appt.id);
+    const { aiCheckDocument } = await import("./doccheck.server");
+    await aiCheckDocument(data.itemId);
     return { ok: true };
   });
 
@@ -184,4 +187,25 @@ export const getDocumentUrl = createServerFn({ method: "POST" })
     if (!item?.file_path) return { url: null };
     const { data: signed } = await context.supabase.storage.from(BUCKET).createSignedUrl(item.file_path, 60);
     return { url: signed?.signedUrl ?? null };
+  });
+
+/** Client keeps a file the AI flagged. */
+export const keepFlaggedFile = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ token: tokenSchema, itemId: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin, appt } = await appointmentByToken(data.token);
+    if (!appt) throw new Error("Link not found");
+    await supabaseAdmin.from("checklist_items").update({ ai_check: "kept" }).eq("id", data.itemId).eq("appointment_id", appt.id).eq("ai_check", "warning");
+    return { ok: true };
+  });
+
+/** Test payment (used until Stripe is enabled): marks the fee paid. */
+export const testPay = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ token: tokenSchema }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin, appt } = await appointmentByToken(data.token);
+    if (!appt || appt.status !== "completed" || appt.paid_at || !appt.fee_cents) return { ok: false };
+    const { getNow } = await import("./clock.server");
+    await supabaseAdmin.from("appointments").update({ paid_at: (await getNow()).toISOString(), paid_method: "test" }).eq("id", appt.id).is("paid_at", null);
+    return { ok: true };
   });

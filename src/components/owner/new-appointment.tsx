@@ -140,7 +140,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
                 </div>
                 {day && day.slots.length > 0 ? (
                   <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">{day.slots.map((s) => (
-                    <Button key={s} variant="secondary" aria-pressed={slot === s} onClick={() => setSlot(s)} className={cn("tabular h-10 text-sm", slot === s ? "bg-primary text-primary-foreground hover:bg-primary" : "hover:bg-fill-selected")}>{fmtTime(s)}</Button>))}</div>
+                    <Button key={s} variant={slot === s ? "default" : "secondary"} aria-pressed={slot === s} onClick={() => setSlot(s)} className="tabular h-10 text-sm">{fmtTime(s)}</Button>))}</div>
                 ) : <p className="mt-3 text-sm text-muted-foreground">No open times in the next two weeks.</p>}
               </>}
           </section>

@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { APPT_SELECT, fmtLong, fmtTime, missingOf, type Appt } from "./lib";
 import { ApptActionButtons, DocViewer, ErrorNote, StatusPill } from "./ui";
+import { AiTag, CloseoutBlock, DocReview } from "./closeout";
 import type { ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
 
@@ -67,23 +68,25 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
         </div>
         <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">
           {items.map((i) => (
-            <li key={i.id} className="flex h-11 items-center gap-2.5 px-4 text-sm">
+            <li key={i.id}><div className="flex h-11 items-center gap-2.5 px-4 text-sm">
               {i.status === "uploaded"
                 ? <span className="grid size-4 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-2.5" strokeWidth={3} /></span>
                 : <span className={cn("size-4 rounded-full border", i.status === "not_applicable" ? "border-border bg-fill-subtle" : "border-warning/60")} />}
               <span className={cn("min-w-0 flex-1 truncate", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
+              <AiTag i={i} />
               {i.status === "uploaded"
                 ? <Button size="sm" variant="ghost" onClick={() => setViewer({ open: true, startId: i.id })}>View</Button>
                 : <span className={cn("text-xs", i.status === "not_applicable" ? "text-muted-foreground" : "text-warning")}>{i.status === "not_applicable" ? "Doesn't apply" : "Missing"}</span>}
-            </li>
+            </div><DocReview i={i} /></li>
           ))}
         </ul>
         <DocViewer open={viewer.open} startId={viewer.startId} onOpenChange={(o) => setViewer((v) => ({ ...v, open: o }))} title={a.clients?.name ?? "Documents"} items={items} />
       </section>
+      <CloseoutBlock a={a} />
 
       <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
         <ApptActionButtons a={a} onDone={onClose} />
-        {!(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">This appointment is closed.</p>}
+        {!(a.status === "booked" || a.status === "confirmed") && <p className="text-center text-xs text-muted-foreground">{a.filed_at ? "Return filed. Nothing left to do." : a.status === "completed" ? "Appointment finished." : "This appointment is closed."}</p>}
       </footer>
     </div>
   );

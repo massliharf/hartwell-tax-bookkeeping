@@ -104,8 +104,8 @@ function Year() {
         <div>
           <p className="text-sm font-medium text-primary-foreground/70">Planning ahead</p>
           <h2 className="t-section mt-3 max-w-[13ch] text-balance">Open all year. Book early when it counts.</h2>
-          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">February to mid-April and before October 15, times fill a few weeks ahead. The rest of the year, there’s usually an opening the same week.</p>
-          <Button asChild variant="secondary" className="mt-7"><Link to="/book">See open times</Link></Button>
+          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">February to mid-April and before October 15, times fill a few weeks ahead. Outside those weeks, there’s usually an opening the same week.</p>
+          <Button asChild variant="secondary" className="mt-7 bg-sheet text-ink hover:bg-paper-deep active:bg-fill-neutral"><Link to="/book">See open times</Link></Button>
         </div>
         <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
           <p className="text-sm font-medium text-primary-foreground/70">When to plan your visit</p>
@@ -127,7 +127,7 @@ function Year() {
             {months.map((month, i) => (
               <div key={month} className="min-w-0 text-center">
                 <div className={`h-2 rounded-full ${peak.has(i) ? "bg-primary-foreground" : "bg-primary-foreground/20"}`} />
-                <span className={`mt-2 block text-[10px] sm:text-xs ${peak.has(i) ? "font-semibold text-primary-foreground" : "text-primary-foreground/60"}`}>{month.slice(0, 1)}</span>
+                <span className={`mt-2 block text-[10px] sm:text-xs ${peak.has(i) ? "font-semibold text-primary-foreground" : "text-primary-foreground/60"}`}><span className="sm:hidden">{month.slice(0, 1)}</span><span className="hidden sm:inline">{month}</span></span>
               </div>
             ))}
           </div>

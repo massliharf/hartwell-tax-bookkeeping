@@ -20,5 +20,5 @@
 - [x] Refine the homepage header, opening section and trust strip against the supplied screenshots; check mobile and desktop.
 - [ ] Confirm Claire's real business email before launch; the address now shown everywhere is a placeholder (claire@hartwelltax.com).
 - [ ] Verify a real booking confirmation and a demo email in a real inbox; requires a verified sending domain or a test addressed to the mail account owner.
-- [ ] Connect a separate Hartwell demo calendar, synchronize booking changes and video meeting links, and verify them without touching personal events; Google calendar-creation permission is pending.
-- [ ] Check that the existing Jitsi appointment room opens and clarify that it does not require a Google account.
+- [x] Verify “Add to calendar” opens Google Calendar with the correct appointment details; no automatic calendar sync is needed.
+- [x] Check that the existing Jitsi appointment room opens and clarify that it does not require a Google account.

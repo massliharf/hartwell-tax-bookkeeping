@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
-import { DIRECTIONS, MAP_EMBED, OFFICE, OFFICE_ADDRESS, downloadIcs, joinState } from "@/lib/meeting";
+import { DIRECTIONS, MAP_EMBED, OFFICE, OFFICE_ADDRESS, googleCalendarLink, joinState } from "@/lib/meeting";
 import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
 import { Checkout } from "@/components/booking/Checkout";
 import { IntakeQuestions } from "@/components/booking/IntakeQuestions";
@@ -285,7 +285,7 @@ function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: 
               {join === "open" ? <Button size="lg" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>
                 : <Button size="lg" variant="secondary" disabled><Video /> Join call</Button>}
               <Button size="sm" variant="ghost" onClick={copy}>{copied ? <><Check />Copied</> : <><Copy />Copy link</>}</Button>
-              <Button size="sm" variant="ghost" onClick={() => downloadIcs(icsTitle, appt.start_at, appt.end_at, videoLink, `Join: ${videoLink}`)}><CalendarPlus />Add to calendar</Button>
+              <Button size="sm" variant="ghost" asChild><a href={googleCalendarLink(icsTitle, appt.start_at, appt.end_at, videoLink, `Join the video call: ${videoLink}`)} target="_blank" rel="noopener noreferrer"><CalendarPlus />Add to calendar</a></Button>
             </div>
           )}
         </div>
@@ -297,7 +297,7 @@ function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: 
             <p className="mt-2 text-xs leading-5 text-muted-foreground">{OFFICE.parking}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button size="sm" asChild><a href={DIRECTIONS} target="_blank" rel="noreferrer"><MapPin /> Directions</a></Button>
-              <Button size="sm" variant="ghost" onClick={() => downloadIcs(icsTitle, appt.start_at, appt.end_at, OFFICE_ADDRESS, `Directions: ${DIRECTIONS}`)}><CalendarPlus />Add to calendar</Button>
+              <Button size="sm" variant="ghost" asChild><a href={googleCalendarLink(icsTitle, appt.start_at, appt.end_at, OFFICE_ADDRESS, `Directions: ${DIRECTIONS}`)} target="_blank" rel="noopener noreferrer"><CalendarPlus />Add to calendar</a></Button>
             </div>
           </div>
           <iframe title={`Map of ${OFFICE_ADDRESS}`} src={MAP_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="h-40 w-full border-0 border-t border-border sm:h-full sm:min-h-[180px] sm:border-l sm:border-t-0" />

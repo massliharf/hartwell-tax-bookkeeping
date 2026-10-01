@@ -28,6 +28,19 @@ export function joinState(startIso: string, endIso: string, nowIso: string): "ea
 
 export const gcalStamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
+/** Open Google's event form with New York appointment instants; the visitor chooses Save there. */
+export function googleCalendarLink(title: string, start: string, end: string, where: string, details: string) {
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${gcalStamp(start)}/${gcalStamp(end)}`,
+    ctz: "America/New_York",
+    location: where,
+    details,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 /** Save the appointment to the phone or computer calendar (.ics), same file the confirmation email attaches. */
 export function downloadIcs(title: string, start: string, end: string, where: string, details: string) {
   const ics = [

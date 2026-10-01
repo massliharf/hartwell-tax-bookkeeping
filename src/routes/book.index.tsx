@@ -176,8 +176,14 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
               <div className="mt-auto flex items-center justify-between pt-4 text-sm">
                 <span className="tabular text-muted-foreground">{s.duration_min} min</span>
                 <span className="text-deep-ink">
-                  {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                  <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
+                  {Number(s.price_from) === 0 ? (
+                    <span className="text-base font-semibold">Free</span>
+                  ) : (
+                    <>
+                      {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                      <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
+                    </>
+                  )}
                 </span>
               </div>
              </button>
@@ -366,7 +372,7 @@ function BookingSummary({ service, draft, onPickAgain }: { service: Service; dra
     ["When", draft.slot ? `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}` : "Pick a time"],
     ["Where", draft.meetingType === "video" ? "Video call" : "412 Bloomfield Ave, Montclair"],
     ["Length", `${service.duration_min} minutes`],
-    ["Fee", `${service.is_from_price ? "From " : ""}$${service.price_from}, paid when your return is filed`],
+    ["Fee", Number(service.price_from) === 0 ? "Free" : `${service.is_from_price ? "From " : ""}$${service.price_from}, paid when your return is filed`],
   ];
   return (
     <div className="overflow-hidden rounded-xl border border-line-2 bg-sheet">

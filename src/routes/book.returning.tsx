@@ -37,7 +37,7 @@ function ReturningPage() {
         {state === "sent" ? (
           <ResultPanel icon={<Mail />} tone="success" title="Check your inbox."
             actions={<><Button size="lg" variant="secondary" onClick={() => setState("idle")}><RotateCcw />Use a different email</Button><Button asChild size="lg" variant="ghost"><Link to="/book">Schedule a new appointment</Link></Button></>}>
-            If <strong>{email}</strong> has booked with Claire, a private link is on its way. It opens your appointment, and lets you book again with last year's answers.
+            If <strong>{email}</strong> has an appointment with us, a private link is on its way.
             <p className="mt-4 text-xs">Nothing after a few minutes? Check spam, or call (973) 555-0142.</p>
           </ResultPanel>
         ) : (

@@ -123,12 +123,12 @@ function PortalPage() {
     meeting: "Your call is now. Join from the button below.", wrap_up: "Thanks for talking with Claire.", filed: "Thanks for talking with Claire.",
   };
   const sub: Record<Stage, string> = {
-    documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer five quick questions so Claire knows what to ask you for." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
+    documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer five quick questions to get your document list." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
     ready: `Everything is in. See you ${day}.`,
-    meeting: a.meeting_type === "video" ? "Your appointment is now. Join the call below." : "Your appointment is now. Claire is expecting you.",
-    wrap_up: "Thanks for meeting with Claire. She's finishing your return.",
+    meeting: a.meeting_type === "video" ? "Your appointment is now. Join the call below." : "Your appointment is now. See you at 412 Bloomfield Avenue.",
+    wrap_up: "Thanks for coming in. We're finishing your return.",
     sign_pay: a.signature_status === "signed" ? "Signed. One payment and your return is filed." : "Your return is ready. Sign and pay to have it filed.",
-    to_file: "All done. Claire will file your return today.",
+    to_file: "All done. We'll file your return today.",
     filed: "Your return has been e-filed.",
     cancelled: "This appointment was cancelled.",
     no_show: "We missed you at your appointment.",
@@ -140,7 +140,7 @@ function PortalPage() {
         <span className="tabular text-sm text-muted-foreground">{doneCount} of {items.length} done</span>
       </div>
       <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
-        <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only Claire can see your files. We never ask for your Social Security number.
+        <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only your preparer can see your files. We never ask for your Social Security number.
       </p>
       <ul className="space-y-4">{items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
       <p className="mt-4 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
@@ -182,11 +182,11 @@ function PortalPage() {
         {/* 3. After the meeting, before Claire finishes. */}
         {intro && (stage === "wrap_up" || stage === "filed") && (
           <StatusCard icon={<CalendarClock />} title="Ready for the next step?" action={<Button asChild size="lg"><Link to="/book">Schedule your appointment</Link></Button>}>
-            Book the appointment Claire suggested. Your details carry over, so it takes about two minutes.
+            Book the appointment Claire suggested. Your details carry over.
           </StatusCard>
         )}
         {!intro && stage === "wrap_up" && <>
-          <StatusCard icon={<Hourglass />} title="Claire is finishing your return.">You'll get an email to review, sign and pay, usually the same day. Nothing to do until then.</StatusCard>
+          <StatusCard icon={<Hourglass />} title="We're finishing your return.">You'll get an email to review, sign and pay, usually the same day.</StatusCard>
           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
         </>}
 
@@ -238,7 +238,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
   };
   return (
     <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
-      <h2 className="t-card text-deep-ink">Tell Claire about your year.</h2>
+      <h2 className="t-card text-deep-ink">Tell us about your year.</h2>
       <p className="mt-1 text-sm text-muted-foreground">A few yes-or-no questions. Your answers become the exact list of documents to bring.</p>
       <div className="mt-5 space-y-4">
         {qs.map((x) => (
@@ -573,7 +573,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="t-card text-deep-ink">Review, sign and pay</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Two steps. Claire files your return as soon as both are done.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Two steps. We file as soon as both are done.</p>
         </div>
         <div className="text-right">
           <p className="text-xs text-muted-foreground">{appt.services?.name}</p>
@@ -582,7 +582,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
       </div>
       {appt.client_note && <p className="mt-4 rounded-lg bg-canvas px-4 py-3 text-sm text-deep-ink/85"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
       <ol className="mt-5 space-y-2">
-        <Task n={1} title="Sign your e-file authorization (Form 8879)" state={signed ? "done" : "now"} meta={signed ? "Signed. Thank you." : "Lets Claire file your return with the IRS for you."}>
+        <Task n={1} title="Sign your e-file authorization (Form 8879)" state={signed ? "done" : "now"} meta={signed ? "Signed. Thank you." : "Lets us e-file your return with the IRS."}>
           <SignSection token={token} appt={appt} onDone={onDone} embedded />
         </Task>
         <Task n={2} title={`Pay ${money(appt.fee_cents!)}`} state={paid ? "done" : signed ? "now" : "later"} meta={paid ? "Paid. A receipt is in your inbox." : signed ? "By card. You'll get a receipt by email." : "Available once you've signed."}>

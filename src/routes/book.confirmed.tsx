@@ -115,14 +115,14 @@ function ConfirmedPage() {
         {items.length === 0 && !pending ? (
           <div className="mt-6 rounded-xl border border-line-2 bg-sheet p-5 sm:p-6">
             <p className="t-card text-deep-ink">What happens next</p>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Claire starts the video call at your time; the link is on your appointment page and in the reminder the day before. Nothing to prepare. Have your questions ready.</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Claire starts the video call at your time. The link is on your appointment page and in tomorrow's reminder. Nothing to prepare.</p>
             <Button asChild size="lg" variant="secondary" className="mt-5"><Link to="/a/$token" params={{ token: token! }}>Open your appointment</Link></Button>
           </div>
         ) : pending ? (
         <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
           <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more minute, and you're ready</p>
           <div className="p-5 sm:p-6">
-            <p className="t-card text-deep-ink">Tell Claire about your year.</p>
+            <p className="t-card text-deep-ink">Tell us about your year.</p>
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Five yes-or-no questions, like whether you have a mortgage or freelance income. Your answers turn into the exact list of documents to bring, and you can send them from your phone.</p>
             <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
               <Link to="/a/$token" params={{ token: token! }}>Answer the questions</Link>
@@ -130,14 +130,14 @@ function ConfirmedPage() {
             <p className="mt-3 text-[13px] text-muted-foreground">Not now? The link is in your confirmation email, and we'll remind you.</p>
           </div>
           <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
-            <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We never ask for your Social Security number online.
+            <Lock className="mt-0.5 size-3.5 shrink-0" /> Private storage. Only your preparer can open your files.
           </p>
         </div>
         ) : (
           <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
             <div className="border-b border-line-1 bg-surface-2 px-5 py-4">
               <p className="t-card text-deep-ink">What to bring</p>
-              <p className="mt-1 text-sm text-muted-foreground">{items.length} document{items.length === 1 ? "" : "s"}, from your answers. Send them from your phone and Claire checks each one before you arrive.</p>
+              <p className="mt-1 text-sm text-muted-foreground">{items.length} document{items.length === 1 ? "" : "s"}, from your answers. Send them from your phone; we check each one as it arrives.</p>
             </div>
             <ul className="divide-y divide-line-1">
               {items.map((i) => (
@@ -152,7 +152,7 @@ function ConfirmedPage() {
               <p className="mt-3 text-[13px] text-muted-foreground">Not now? The link is in your confirmation email, and we'll remind you about anything missing.</p>
             </div>
             <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
-              <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We never ask for your Social Security number online.
+              <Lock className="mt-0.5 size-3.5 shrink-0" /> Private storage. Only your preparer can open your files.
             </p>
           </div>
         )}

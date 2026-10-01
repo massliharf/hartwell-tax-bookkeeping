@@ -45,7 +45,7 @@ export function HeroVisual() {
     </div>
       <motion.div initial={reduce ? false : { opacity: 0, y: 6 }} animate={step >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }} transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }} className="absolute -right-2 bottom-0 z-10 flex items-center gap-2 rounded-xl border border-border bg-sheet px-3 py-2 shadow-lift sm:-right-8">
         <span className="grid size-7 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><BellRing className="size-3.5" /></span>
-        <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">Claire checked everything</span><span className="text-muted-foreground">All documents in</span></span>
+        <span className="text-xs leading-4"><span className="block font-medium text-deep-ink">Checked before you arrive</span><span className="text-muted-foreground">All documents in</span></span>
       </motion.div>
     </div>
   );

@@ -59,7 +59,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
           <Logo tone="light" />
-          <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
+          <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">Tax preparation and bookkeeping in Montclair, NJ. Claire Hartwell, EA.</p>
         </div>
         <div className="text-sm">
           <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Schedule</p>

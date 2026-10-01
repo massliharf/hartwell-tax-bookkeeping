@@ -25,7 +25,7 @@ export const Route = createFileRoute("/book/")({
   head: () => ({
     meta: [
       { title: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
-      { name: "description", content: "Book with Claire Hartwell, EA in about two minutes. Confirmed instantly, with a personal document checklist." },
+      { name: "description", content: "Book a tax appointment in Montclair, NJ in about two minutes. Confirmed right away, with your own document list." },
       { property: "og:title", content: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a service and a time. Confirmed instantly." },
     ],
@@ -139,7 +139,7 @@ function BookPage() {
             <Button size="lg" className="flex-1 lg:flex-none" type={step === 2 ? "submit" : "button"} form={step === 2 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 2 ? () => go(step + 1) : undefined}>{cta}</Button>
           </div>
         </div>
-        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && preview.length > 0 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure which one fits? Pick the closest. Claire adjusts it when she sees your documents, and the price is agreed before any work starts.</p>}</div></aside>
+        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && preview.length > 0 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure? Pick the closest. We adjust it when we see your documents, and agree the price before we start.</p>}</div></aside>
       </div>
     </BookingShell>
   );
@@ -149,7 +149,7 @@ function BookPage() {
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Pick the closest fit. Every price is agreed before work starts, and nothing is charged when you book." />
+       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Pick the closest fit. Nothing to pay now." />
        {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
@@ -193,7 +193,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
                 <ServiceIcon service="intro" size={40} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[15px] font-semibold text-deep-ink">Not sure? Start with a free 15-minute call</span>
-                  <span className="mt-0.5 block text-sm text-muted-foreground">Tell Claire what's going on and she'll point you to the right appointment. No documents needed.</span>
+                  <span className="mt-0.5 block text-sm text-muted-foreground">15 minutes with Claire to find the right appointment. No documents needed.</span>
                 </span>
                 <span className="shrink-0 text-sm font-semibold text-deep-ink">Free</span>
               </button>
@@ -234,7 +234,7 @@ function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewC
           </li>
         ))}
       </ul>
-      <p className="border-t border-line-1 px-4 py-3 text-xs text-muted-foreground">Send them from your phone after you confirm. They never hold up your appointment.</p>
+      <p className="border-t border-line-1 px-4 py-3 text-xs text-muted-foreground">Send them from your phone after you book.</p>
     </div>
   );
 }
@@ -247,8 +247,8 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
   return (
     <>
        <div className="mb-4 mt-10 border-t border-line-1 pt-8">
-        <h2 className="t-card text-deep-ink">Tell Claire about your year</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Five quick answers. They become the exact list of documents to bring, shown as you go.</p>
+        <h2 className="t-card text-deep-ink">Tell us about your year</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Your answers become your document list.</p>
       </div>
       <div className="space-y-3">
          {qs.map((q) => (
@@ -289,7 +289,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes, with Claire. All times are Eastern; you can move or cancel later from your link.`} />
+        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. Eastern time. You can move it later.`} />
       {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">A 15-minute video call. Add your phone number on the next step if you would rather talk by phone.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
         options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />}
 
@@ -408,7 +408,7 @@ function BookingSummary({ service, draft, onPickAgain }: { service: Service; dra
         ))}
       </dl>
       <div className="border-t border-line-1 bg-surface-2 px-4 py-3 text-[12px] leading-5 text-muted-foreground">
-        Confirmed as soon as you book. Move or cancel any time from your link.
+        Confirmed right away. Move or cancel from your link.
         {onPickAgain && <button type="button" onClick={onPickAgain} className="ml-1 font-semibold text-ink underline underline-offset-2">Change time</button>}
       </div>
     </div>
@@ -453,7 +453,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
 
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 3 of 3" title="Your details" sub="Where to send your confirmation and reminders." />
+       <StepTitle hideEyebrow eyebrow="Step 3 of 3" title="Your details" sub="For your confirmation and reminders." />
        <div className="mb-6 lg:hidden"><BookingSummary service={service} draft={draft} onPickAgain={onPickAgain} /></div>
        <form id="booking-details" className="w-full space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot && draft.date === nyDay(draft.slot)) submit(draft.slot); }}>
         <div className="space-y-1.5">
@@ -492,7 +492,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
         )}
 
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed instantly, nothing to pay now. We never ask for your Social Security number online.
+          <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed right away. Nothing to pay now. We never ask for your Social Security number online.
         </p>
       </form>
       {questionsFor(service.slug).length > 0 && <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />}

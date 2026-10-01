@@ -56,45 +56,18 @@ function Home() {
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
         <HowItWorks />
-        <Season />
         <BeforeAfter />
-        <WhatClaireDoes />
         <Services />
         <About />
-        <Testimonials />
         <Privacy />
-        <DeadlineCta />
         <Faq />
+        <DeadlineCta />
       </main>
       <SiteFooter />
-      <StickyCta />
     </div>
   );
 }
 
-/** magnific.com/desktop pattern: a frosted pill that follows you once the hero is out of view, and steps aside near the final CTA. */
-function StickyCta() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const onScroll = () => {
-      const deadline = document.getElementById("deadline")?.getBoundingClientRect();
-      const nearEnd = !!deadline && deadline.top < window.innerHeight && deadline.bottom > 0;
-      setShow(window.scrollY > 640 && !nearEnd);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <div aria-hidden={!show} className={`fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 transition-[opacity,transform] duration-300 ease-expo ${show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`} style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-      <div className="flex items-center gap-3 rounded-2xl border border-line-1 bg-white/80 py-2 pl-4 pr-2 shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_7px_rgba(18,18,18,0.02),0_9px_5px_rgba(18,18,18,0.02),0_4px_4px_rgba(18,18,18,0.04)] backdrop-blur-lg">
-        <span className="hidden text-[13px] text-deep-ink sm:inline">Book in two minutes. No payment until you file.</span>
-        <Button asChild tabIndex={show ? 0 : -1}><Link to="/book">Book an appointment</Link></Button>
-        <Button asChild variant="ghost" tabIndex={show ? 0 : -1} className="hidden sm:inline-flex"><Link to="/book/returning">My appointment</Link></Button>
-      </div>
-    </div>
-  );
-}
 
 function Hero() {
   return (
@@ -111,7 +84,7 @@ function Hero() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
-            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I already have a booking</Link></Button>
+            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">Find my appointment</Link></Button>
           </div>
           <div className="mt-7 flex items-center gap-3">
             <img src={claire} alt="" width={40} height={40} className="size-10 rounded-full object-cover" />
@@ -119,67 +92,6 @@ function Hero() {
           </div>
         </div>
         <div className="enter-spot min-w-0" style={{ animationDelay: "200ms" }}><OpenTimes /></div>
-      </div>
-    </section>
-  );
-}
-
-/** Busy season, plans that change, the one missing form: what booking here does about each, in the client's words. */
-function Season() {
-  const rows = [
-    { k: "Busy weeks", t: "February to April, and the run-up to October 15, fill fast.", d: "You see every open time, evenings and Saturdays included. If a day is full, join the waitlist and the first cancellation is offered to you." },
-    { k: "Plans change", t: "Move or cancel from your link, any time.", d: "No call needed. Your old slot is offered to the next person on the waitlist, so nobody's afternoon is wasted, including yours." },
-    { k: "The missing form", t: "Find out before you come, not at the desk.", d: "Your checklist is built from your answers. Claire checks each upload, and you're reminded only about what's still missing." },
-  ];
-  return (
-    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-20`}>
-      <SectionHead eyebrow="Made for tax season" title="Built around the way tax season actually goes." sub="It's a one-person practice with two deadline rushes a year. These are the parts that used to go wrong, and what happens now." />
-      <ul className="mt-12 grid gap-4 md:grid-cols-3">
-        {rows.map((r, i) => (
-          <li key={r.k} className="enter-item lift flex flex-col rounded-[22px] border border-line-1 p-6" style={{ animationDelay: `${i * 80}ms` }}>
-            <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-ink">{r.k}</p>
-            <p className="mt-3 font-serif text-[22px] font-semibold leading-7 tracking-[-0.02em] text-deep-ink">{r.t}</p>
-            <p className="mt-3 text-[15px] leading-6 text-muted-foreground">{r.d}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function WhatClaireDoes() {
-  const who = [
-    { svc: "individual", title: "Families and employees", text: "W-2 income, mortgage interest, child and education credits, and the deductions most people miss." },
-    { svc: "self-employed", title: "Freelancers and 1099 workers", text: "Schedule C, home office, quarterly estimated payments, and a plan so April isn't a surprise." },
-    { svc: "rental", title: "Landlords", text: "Rental income and expenses, depreciation, and records that hold up if you sell." },
-    { svc: "bookkeeping", title: "Small businesses", text: "Clean monthly books, sales tax questions, and a return that matches them." },
-  ];
-  const included = [
-    "Federal and New Jersey returns, e-filed with confirmation",
-    "A look at last year's return for anything missed",
-    "Help if the IRS or the NJ Division of Taxation writes to you",
-    "Answers to tax questions all year, not just in April",
-    "Private document upload, no Social Security number online",
-    "One flat price, agreed before any work starts",
-  ];
-  return (
-    <section id="what" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead eyebrow="What we do" title="An Enrolled Agent for your whole tax year." sub="Enrolled Agents are licensed by the IRS to prepare returns and to represent you if the IRS has questions. Claire prepares every return herself." />
-      <div className="mt-10 grid gap-3 sm:grid-cols-2">
-        {who.map((w) => (
-          <article key={w.title} className="flex gap-4 rounded-2xl border border-border p-5">
-            <ServiceIcon service={w.svc} size={40} />
-            <div><h3 className="t-sub">{w.title}</h3><p className="mt-1 text-sm leading-[22px] text-body">{w.text}</p></div>
-          </article>
-        ))}
-      </div>
-      <div className="mt-3 rounded-2xl bg-ink-50 p-5 sm:p-6">
-        <h3 className="t-sub">Every return includes</h3>
-        <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
-          {included.map((x) => (
-            <li key={x} className="flex items-start gap-3 text-sm leading-[22px] text-body"><span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-success/10 text-success"><Check className="size-3" strokeWidth={3} /></span>{x}</li>
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -374,6 +286,7 @@ function About() {
             <p>There's no front desk. When you book, you work with me from the first document to the final signature. That's also why booking is online: in season I'm with clients, not on the phone, and this way you never wait for a call back.</p>
           </div>
           <p className="mt-5 text-base font-medium text-deep-ink">Claire Hartwell, EA</p>
+          <blockquote className="mt-8 border-l-2 border-ink pl-4 text-[15px] leading-6 text-body">“I uploaded everything the week before and my appointment took forty minutes. First year I didn't have to come back.”<footer className="mt-2 text-[13px] text-muted-foreground">Anita R., Montclair</footer></blockquote>
           <dl className="mt-8 grid grid-cols-3 gap-2">
             {stats.map((x) => (
               <div key={x.l} className="rounded-xl bg-surface-2 p-3 sm:p-4">
@@ -384,30 +297,6 @@ function About() {
             ))}
           </dl>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const t = [
-    { q: "I uploaded everything the week before and my appointment took forty minutes. First year I didn't have to come back.", n: "Anita R.", r: "Individual return, Montclair" },
-    { q: "Claire untangled three years of 1099s from my design work and explained every line. I finally understand my taxes.", n: "Marcus L.", r: "Freelancer, Glen Ridge" },
-    { q: "The checklist for my rental was spot on. She caught a depreciation item my old preparer missed for years.", n: "Deepa & Raj S.", r: "Rental property, Bloomfield" },
-  ];
-  return (
-    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="What clients say." />
-      <div tabIndex={0} aria-label="Client reviews, scroll sideways" className="mt-8 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-ring md:grid md:grid-cols-3 md:overflow-visible">
-        {t.map((x) => (
-          <figure key={x.n} className="flex w-[82vw] shrink-0 snap-start flex-col rounded-2xl bg-surface-2 p-6 md:w-auto">
-            <blockquote className="text-base leading-7 text-deep-ink">"{x.q}"</blockquote>
-            <figcaption className="mt-auto flex items-center gap-3 pt-6 text-sm">
-              <span className="grid size-9 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{x.n.charAt(0)}</span>
-              <span><span className="block font-medium text-deep-ink">{x.n}</span><span className="block text-xs text-muted-foreground">{x.r}</span></span>
-            </figcaption>
-          </figure>
-        ))}
       </div>
     </section>
   );

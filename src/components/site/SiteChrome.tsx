@@ -31,7 +31,7 @@ const LINKS = [{ href: "/#what", label: "What we do" }, { href: "/#how", label: 
 export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   return (
     <header className={`sticky top-0 z-40 backdrop-blur-lg ${warm ? "bg-paper-warm/85" : "bg-canvas/85"}`}>
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
+      <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
         <Wordmark />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-8 items-center rounded-lg px-3 text-[13px] font-medium text-body transition-colors duration-150 hover:bg-fill-subtle hover:text-deep-ink">{l.label}</a>)}
@@ -89,7 +89,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-white/50">
           <span>© {new Date().getFullYear()} Hartwell Tax & Bookkeeping</span>
-          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner login</Link>
+          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner view</Link>
         </div>
       </div>
     </footer>

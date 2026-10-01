@@ -166,18 +166,6 @@ function TimeStep({ service, services, draft, update }: { service: Service; serv
 
       {days.length > 0 && (
         <>
-          {firstOpen && (() => {
-            const fd = days.find((d) => d.date === firstOpen)!;
-            const first = fd.slots[0]!;
-            const picked = draft.slot === first;
-            return (
-              <button type="button" onClick={() => update({ date: fd.date, slot: first })}
-                className={`mb-4 flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors duration-150 sm:w-auto sm:min-w-[320px] ${picked ? "border-deep-ink bg-surface-2" : "border-border bg-sheet hover:bg-surface-2"}`}>
-                <span><span className="block text-xs text-muted-foreground">Next available</span><span className="block text-sm font-medium text-deep-ink">{fmtDateLong(first)}, {fmtTime(first)}</span></span>
-                <span className="shrink-0 whitespace-nowrap text-xs font-medium text-ink">{picked ? "Selected" : "Pick this"}</span>
-              </button>
-            );
-          })()}
            <div className="relative">
               <div className="pointer-events-none absolute right-0 top-0 z-10 h-[76px] w-10 bg-gradient-to-l from-sheet to-transparent" />
              <div ref={strip} className="flex gap-1 overflow-x-auto pb-2 pr-9 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">

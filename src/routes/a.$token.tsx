@@ -191,7 +191,6 @@ function PortalPage() {
         )}
 
         {after && items.length > 0 && sentDocs}
-        {!cancelled && <Timeline a={a} items={items} stage={stage} nowIso={nowIso} />}
       </div>
     </BookingShell>
   );
@@ -212,40 +211,6 @@ function StatusCard({ icon, title, children, action }: { icon: React.ReactNode; 
   );
 }
 
-/** What happened when, and what's next. The same milestones Claire sees. */
-function Timeline({ a, items, stage, nowIso }: { a: Appt; items: Item[]; stage: Stage; nowIso: string }) {
-  const lastUpload = items.map((i) => i.uploaded_at).filter(Boolean).sort().at(-1) ?? null;
-  const allIn = items.every((i) => i.status !== "missing" && i.review_status !== "needs_fix");
-  const metDone = stage === "wrap_up" || stage === "sign_pay" || stage === "to_file" || stage === "filed";
-  const rows: { label: string; at: string | null; done: boolean; note?: string | undefined }[] = [
-    { label: "Booked", at: a.created_at ?? null, done: true },
-    { label: allIn ? "All documents in" : "Documents", at: lastUpload, done: allIn || metDone, note: allIn ? undefined : `${items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length} of ${items.length} sent` },
-    { label: a.meeting_type === "video" ? "Video call with Claire" : "Meeting with Claire", at: a.start_at, done: metDone || stage === "no_show", note: stage === "no_show" ? "Missed" : undefined },
-    { label: "Return finished", at: a.finished_at ?? null, done: !!a.finished_at },
-    { label: "Form 8879 signed", at: a.signed_at ?? null, done: a.signature_status === "signed" },
-    { label: "Paid", at: a.paid_at, done: !!a.paid_at },
-    { label: "E-filed", at: a.filed_at, done: !!a.filed_at },
-  ];
-  const fmt = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
-  const nextIdx = rows.findIndex((r) => !r.done);
-  return (
-    <section>
-      <h2 className="mb-3 t-sub">Timeline</h2>
-      <ol className="relative space-y-0">
-        {rows.map((r, i) => (
-          <li key={r.label} className="relative flex gap-3 pb-4 last:pb-0">
-            {i < rows.length - 1 && <span aria-hidden="true" className={`absolute left-[9px] top-5 h-[calc(100%-12px)] w-px ${r.done ? "bg-ink" : "bg-line-1"}`} />}
-            <span className={`relative mt-0.5 grid size-[19px] shrink-0 place-items-center rounded-full border ${r.done ? "border-ink bg-ink text-white" : i === nextIdx ? "border-ink bg-sheet" : "border-line-2 bg-sheet"}`}>{r.done && <Check className="size-3" strokeWidth={3} />}</span>
-            <div className="min-w-0 text-sm">
-              <p className={r.done ? "text-deep-ink" : i === nextIdx ? "font-medium text-deep-ink" : "text-muted-foreground"}>{r.label}{i === nextIdx && <span className="ml-2 text-xs font-normal text-ink">Next</span>}</p>
-              <p className="tabular text-xs text-muted-foreground">{r.done && r.at ? fmt(r.at) : !r.done && r.label.includes("with Claire") ? fmt(r.at!) : r.note ?? ""}{r.done && r.note ? ` · ${r.note}` : ""}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
 
 /* ---------- Intake (phone-in bookings) ---------- */
 function IntakeCard({ token, slug, onDone }: { token: string; slug: string | null; onDone: () => void }) {

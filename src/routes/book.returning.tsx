@@ -42,7 +42,7 @@ function ReturningPage() {
           </ResultPanel>
         ) : (
           <>
-            <StepTitle hideEyebrow eyebrow="" title="Welcome back" sub="Enter the email you booked with. We'll send you a private link." />
+            <StepTitle hideEyebrow eyebrow="" title="Find your appointment" sub="Enter the email you booked with. We'll send you a private link." />
             <ul className="mb-6 space-y-3">
               <li className="flex items-start gap-3 text-sm text-body"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><CalendarClock className="size-4" /></span><span><span className="block font-medium text-deep-ink">Already booked?</span>See your appointment, upload documents, move or cancel it.</span></li>
               <li className="flex items-start gap-3 text-sm text-body"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><RotateCcw className="size-4" /></span><span><span className="block font-medium text-deep-ink">Booking again?</span>Your answers from last time come filled in.</span></li>

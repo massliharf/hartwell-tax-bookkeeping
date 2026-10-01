@@ -1,9 +1,11 @@
+import { stageOf, type Stage } from "@/lib/lifecycle";
+import { openNewAppointment } from "@/components/owner/new-appointment";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Check, ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, SlidersHorizontal, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +27,18 @@ const mondayOf = (ymd: string) => {
 };
 const hourLabel = (h: number) => `${((h + 11) % 12) + 1} ${h < 12 ? "AM" : "PM"}`;
 const ACCENT = { ready: "bg-success", partial: "bg-marigold", none: "bg-[#C8C8C8]" } as const;
+/** Same stage rules as everywhere else (src/lib/lifecycle.ts), as a calendar colour and a short label. */
+const STAGE_INFO: Record<Stage, { bar: string; label: string; text: string }> = {
+  documents: { bar: "bg-marigold", label: "", text: "text-muted-foreground" },
+  ready: { bar: "bg-success", label: "", text: "text-muted-foreground" },
+  meeting: { bar: "bg-deep-ink", label: "Now", text: "font-medium text-deep-ink" },
+  wrap_up: { bar: "bg-alert-warning-fg", label: "Finish up", text: "font-medium text-alert-warning-fg" },
+  sign_pay: { bar: "bg-alert-warning-fg", label: "Sign and pay", text: "text-alert-warning-fg" },
+  to_file: { bar: "bg-success", label: "Ready to file", text: "text-success" },
+  filed: { bar: "bg-[#C8C8C8]", label: "Done", text: "text-muted-foreground" },
+  no_show: { bar: "bg-destructive", label: "No-show", text: "text-destructive" },
+  cancelled: { bar: "bg-[#C8C8C8]", label: "Cancelled", text: "text-muted-foreground" },
+};
 
 /** Side-by-side lanes for appointments that overlap in time, so blocks never cover each other. */
 function layoutDay(list: Appt[]) {
@@ -72,6 +86,27 @@ function CalendarPage() {
     },
     onError: () => toast.error("Couldn't move it. Try again."),
   });
+  const hoursQ = useQuery({ queryKey: ["owner", "hours"], queryFn: async () => ((await supabase.from("settings").select("hours").eq("id", 1).maybeSingle()).data?.hours ?? {}) as Record<string, [string, string] | null> });
+  const DOW = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  /** Open time Claire could still fill: business hours minus appointments and time off, from now on, 30+ minutes. */
+  const gapsOn = (d: string) => {
+    const h = hoursQ.data?.[DOW[new Date(`${d}T12:00:00Z`).getUTCDay()]!];
+    if (!h) return [] as { from: number; to: number }[];
+    let from = Math.max(START, toMin(h[0])); const to = Math.min(END, toMin(h[1]));
+    if (d < today) return [];
+    if (d === today) from = Math.max(from, Math.ceil(nowMins / 30) * 30);
+    const busy = [
+      ...(q.data ?? []).filter((a) => et(a.start_at).ymd === d && (a.status === "booked" || a.status === "confirmed" || a.status === "completed"))
+        .map((a) => ({ s: et(a.start_at).minutes, e: et(a.start_at).minutes + (Date.parse(a.end_at) - Date.parse(a.start_at)) / 60000 })),
+      ...offOn(d).map((o) => ({ s: o.top, e: o.bottom })),
+    ].sort((x, y) => x.s - y.s);
+    const out: { from: number; to: number }[] = [];
+    let cur = from;
+    for (const b of busy) { if (b.s - cur >= 30) out.push({ from: cur, to: Math.min(b.s, to) }); cur = Math.max(cur, b.e); if (cur >= to) break; }
+    if (to - cur >= 30) out.push({ from: cur, to });
+    return out.filter((g) => g.to - g.from >= 30);
+  };
   const [show, setShow] = useState<"all" | "attention" | "confirmed">("all");
   const visible = (q.data ?? []).filter((a) => show === "all" || (show === "attention" ? (a.status === "booked" || a.status === "confirmed") && a.ready_score < 100 : a.status === "confirmed"));
   const byDay = (d: string) => visible.filter((a) => et(a.start_at).ymd === d);
@@ -129,9 +164,16 @@ function CalendarPage() {
             const [wd, , num] = ymdLabel(d).replace(",", "").split(" ");
             const isToday = d === today;
             return (
-              <div key={d} className="flex items-center justify-center gap-1.5 border-l border-border py-2.5 text-xs text-muted-foreground">
-                <span>{wd}</span>
-                <span className={cn("tabular grid size-6 place-items-center rounded-full text-xs font-medium", isToday ? "bg-deep-ink text-primary-foreground" : "text-deep-ink")}>{num}</span>
+              <div key={d} className="flex flex-col items-center justify-center gap-0.5 border-l border-border py-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span>{wd}</span>
+                  <span className={cn("tabular grid size-6 place-items-center rounded-full text-xs font-medium", isToday ? "bg-deep-ink text-primary-foreground" : "text-deep-ink")}>{num}</span>
+                </span>
+                {d >= today && hoursQ.data && (() => {
+                  const open = gapsOn(d).reduce((n, g) => n + Math.floor((g.to - g.from) / 45), 0);
+                  const closed = !hoursQ.data[DOW[new Date(`${d}T12:00:00Z`).getUTCDay()]!];
+                  return <span className={cn("text-[10px] font-medium", closed ? "text-muted-foreground" : open === 0 ? "text-alert-warning-fg" : "text-success")}>{closed ? "Closed" : open === 0 ? "Full" : `${open} open`}</span>;
+                })()}
               </div>
             );
           })}
@@ -158,12 +200,23 @@ function CalendarPage() {
                   <span className="absolute bottom-1 left-2 rounded bg-sheet/90 px-1">{o.label || "Time off"}</span>
                 </div>
               ))}
+              {show === "all" && gapsOn(d).map((g) => (
+                <button key={`gap-${g.from}`} type="button" onClick={() => openNewAppointment()}
+                  className="group absolute inset-x-1 z-[6] flex items-start justify-between rounded-lg border border-dashed border-line-2 px-2 py-1 text-left text-[11px] text-muted-foreground transition-colors duration-150 hover:border-ink hover:bg-ink-50 hover:text-ink"
+                  style={{ top: (g.from - START) * PX + 1, height: Math.max(22, (g.to - g.from) * PX - 3) }}
+                  aria-label={`Open ${fmtMins(g.from)} to ${fmtMins(g.to)}. Add an appointment`}>
+                  <span className="tabular">Open {fmtMins(g.from)}–{fmtMins(g.to)}</span>
+                  <Plus className="size-3.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+                </button>
+              ))}
               {layoutDay(byDay(d)).map(({ a, lane, lanes }) => {
                 const { minutes } = et(a.start_at);
                 const dur = (new Date(a.end_at).getTime() - new Date(a.start_at).getTime()) / 60000;
                 const h = Math.max(24, dur * PX - 3);
                 const tall = h >= 46;
-                const done = a.status === "completed" || a.status === "no_show";
+                const st = stageOf(a, now);
+                const done = st === "filed" || st === "no_show" || st === "cancelled";
+                const info = STAGE_INFO[st];
                 return (
                   <button key={a.id} draggable={!done} onDragStart={(e) => { e.dataTransfer.setData("text/plain", a.id); setDrag(a.id); }} onDragEnd={() => setDrag(null)}
                     onClick={() => openAppt({ appointmentId: a.id })}
@@ -171,10 +224,10 @@ function CalendarPage() {
                     className={cn("absolute z-10 flex overflow-hidden rounded-lg border border-border bg-sheet text-left shadow-[0_1px_2px_rgba(16,16,16,0.04)] transition-colors duration-150 hover:bg-surface-2",
                       done && "bg-surface-2 opacity-60", drag === a.id && "opacity-40")}
                     style={{ top: (minutes - START) * PX + 1, height: h, left: `calc(${(lane / lanes) * 100}% + 4px)`, width: `calc(${100 / lanes}% - 8px)` }}>
-                    <span className={cn("w-[3px] shrink-0", ACCENT[readiness(a.ready_score)])} />
+                    <span className={cn("w-[3px] shrink-0", st === "documents" || st === "ready" ? ACCENT[readiness(a.ready_score)] : info.bar)} />
                     <span className={cn("min-w-0 flex-1 px-2", tall ? "py-1.5" : "flex items-center")}>
                       <span className="block truncate text-xs font-medium leading-4 text-deep-ink">{tall ? a.clients?.name : `${fmtTime(a.start_at)} ${a.clients?.name ?? ""}`}</span>
-                      {tall && <span className="tabular block truncate text-[11px] leading-4 text-muted-foreground">{fmtTime(a.start_at)}, {a.ready_score}% ready</span>}
+                      {tall && <span className={cn("tabular block truncate text-[11px] leading-4", info.text)}>{fmtTime(a.start_at)}, {st === "documents" || st === "ready" ? `${a.ready_score}% ready` : info.label}</span>}
                     </span>
                   </button>
                 );
@@ -183,10 +236,11 @@ function CalendarPage() {
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-4 border-t border-border bg-surface-2 px-4 py-2.5 text-[11px] text-muted-foreground">
-          {(["ready", "partial", "none"] as const).map((k) => (
-            <span key={k} className="inline-flex items-center gap-1.5"><span className={cn("h-3 w-[3px] rounded-full", ACCENT[k])} />{k === "ready" ? "Ready" : k === "partial" ? "Partly ready" : "Not started"}</span>
+          {([["bg-success", "Ready"], ["bg-marigold", "Documents coming"], ["bg-deep-ink", "Now"], ["bg-alert-warning-fg", "Your turn or waiting on the client"], ["bg-[#C8C8C8]", "Done"]] as const).map(([c, l]) => (
+            <span key={l} className="inline-flex items-center gap-1.5"><span className={cn("h-3 w-[3px] rounded-full", c)} />{l}</span>
           ))}
-          <span className="ml-auto">Click an appointment to see its checklist</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-4 rounded-sm border border-dashed border-line-2" />Open time</span>
+          <span className="ml-auto">Drag to move. Click open time to add an appointment.</span>
         </div>
       </div>
 

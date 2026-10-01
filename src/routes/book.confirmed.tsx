@@ -36,7 +36,7 @@ function ConfirmedPage() {
     return (
       <BookingShell>
         <ResultPanel icon={<RotateCcw />} tone="warning" title="Your appointment didn't load." actions={<><Button size="lg" onClick={() => q.refetch()}>Try again</Button><Button asChild size="lg" variant="secondary"><Link to="/book/returning">Email me my link</Link></Button></>}>
-          Your appointment is still booked. This page just couldn't load it.
+          Your appointment is still scheduled. This page couldn't load it.
         </ResultPanel>
       </BookingShell>
     );
@@ -45,7 +45,7 @@ function ConfirmedPage() {
     return (
       <BookingShell>
         <ResultPanel icon={<LinkIcon />} tone="warning" title="We couldn't find that appointment." actions={<><Button asChild size="lg"><Link to="/book/returning">Email me my link</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/book">Schedule an appointment</Link></Button></>}>
-          Check the link in your confirmation email, or we can send you a fresh one.
+          Check the link in your confirmation email, or we can email you a new one.
         </ResultPanel>
       </BookingShell>
     );
@@ -113,7 +113,7 @@ function ConfirmedPage() {
         {items.length === 0 && !pending ? (
           <div className="mt-6 rounded-xl border border-line-2 bg-sheet p-5 sm:p-6">
             <p className="t-card text-deep-ink">What happens next</p>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">At your appointment time, open your appointment page and click Join. We'll also email you the link the day before. You don't need to prepare anything.</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">At your appointment time, click Join on your appointment page. We'll also email you the link the day before. You don't need to prepare anything.</p>
             <Button asChild size="lg" variant="secondary" className="mt-5"><Link to="/a/$token" params={{ token: token! }}>Open your appointment</Link></Button>
           </div>
         ) : pending ? (
@@ -121,7 +121,7 @@ function ConfirmedPage() {
           <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more step</p>
           <div className="p-5 sm:p-6">
             <p className="t-card text-deep-ink">Tell us about your year.</p>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Answer a few yes-or-no questions, like whether you have a mortgage or freelance income. We'll turn your answers into a checklist of exactly which documents to bring.</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Answer a few yes-or-no questions, like whether you have a mortgage or freelance income. We'll turn your answers into a document checklist of exactly which documents to bring.</p>
             <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
               <Link to="/a/$token" params={{ token: token! }}>Answer the questions</Link>
             </Button>

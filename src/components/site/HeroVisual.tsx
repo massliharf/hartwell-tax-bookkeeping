@@ -33,7 +33,7 @@ export function HeroVisual() {
     <div className="relative w-full rounded-2xl border border-border bg-sheet p-5 shadow-lift sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>
+          <p className="text-[11px] font-medium text-muted-foreground">Your document checklist</p>
           <p className="mt-1 text-[20px] font-semibold leading-tight text-deep-ink sm:text-2xl">Thursday, 10:30 am</p>
           <p className="text-xs text-muted-foreground">Individual return, 45 min</p>
         </div>

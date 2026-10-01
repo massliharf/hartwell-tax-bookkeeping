@@ -33,7 +33,7 @@ export const Route = createFileRoute("/a/$token")({
   head: () => ({
     meta: [
       { title: "Your appointment — Hartwell Tax & Bookkeeping" },
-      { name: "description", content: "Manage your appointment and send your documents privately." },
+      { name: "description", content: "Manage your appointment and upload your documents privately." },
       { property: "og:title", content: "Your appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Your private appointment page." },
       { property: "og:type", content: "website" },
@@ -137,7 +137,7 @@ function PortalPage() {
   const checklist = (
     <section>
        <div className="mb-3 flex items-end justify-between gap-4">
-        <h2 className="t-card text-deep-ink">Your checklist</h2>
+        <h2 className="t-card text-deep-ink">Your document checklist</h2>
         <span className="tabular text-sm text-muted-foreground">{doneCount} of {items.length} done</span>
       </div>
        <p className="mb-3 flex items-start gap-2 rounded-xl bg-fill-neutral/70 px-3 py-2.5 text-[13px] leading-5 text-deep-ink/85">
@@ -189,7 +189,7 @@ function PortalPage() {
         </>}
         {!intro && stage === "wrap_up" && <>
           <StatusCard icon={<Hourglass />} title="We're finishing your return.">We'll email you when it's ready to review, sign and pay, usually the same day.</StatusCard>
-           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents to send again</h2><ul className="space-y-2">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents to upload again</h2><ul className="space-y-2">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
         </>}
 
         {/* 4. Sign and pay, then done. */}
@@ -402,7 +402,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
         )}
         {alts && (
           <div className="mt-4 text-sm">
-            <p className="font-medium text-deep-ink">That time was just taken.</p>
+            <p className="font-medium text-deep-ink">That time was taken a moment ago.</p>
             {alts.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {alts.map((s) => (
@@ -553,7 +553,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
   const paid = !!appt.paid_at;
   if (appt.filed_at) return (
     <section className="rounded-2xl border border-success/30 bg-sheet p-6">
-      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">Your return has been e-filed.</h2></div>
+      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">Your return has been filed with the IRS.</h2></div>
       <p className="mt-3 text-sm text-deep-ink/75">Any refund comes directly from the IRS. Thank you for choosing Hartwell Tax.</p>
     </section>
   );
@@ -592,7 +592,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
       </div>
       {appt.client_note && <p className="mt-4 rounded-lg bg-canvas px-4 py-3 text-sm text-deep-ink/85"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
       <ol className="mt-5 space-y-2">
-        <Task n={1} title="Sign your e-file authorization (Form 8879)" state={signed ? "done" : "now"} meta={signed ? "Signed. Thank you." : "Lets us e-file your return with the IRS."}>
+        <Task n={1} title="Sign your filing authorization (Form 8879)" state={signed ? "done" : "now"} meta={signed ? "Signed. Thank you." : "Lets us file your return with the IRS for you."}>
           <SignSection token={token} appt={appt} onDone={onDone} embedded />
         </Task>
         <Task n={2} title={`Pay ${money(appt.fee_cents!)}`} state={paid ? "done" : signed ? "now" : "later"} meta={paid ? "Paid. A receipt is in your inbox." : signed ? "By card. You'll get a receipt by email." : "Available once you've signed."}>
@@ -616,7 +616,7 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
 
   return (
     <section className={embedded ? "" : "sheet-stack p-6"}>
-      {!embedded && <><Tag tone="warning">One last step</Tag><h2 className="mt-2 t-card text-deep-ink">Sign your e-file authorization (Form 8879)</h2></>}
+      {!embedded && <><Tag tone="warning">One last step</Tag><h2 className="mt-2 t-card text-deep-ink">Sign your filing authorization (Form 8879)</h2></>}
       <dl className="grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>
         <div><dt className="text-muted-foreground">Tax year</dt><dd className="tabular font-medium text-deep-ink">2025</dd></div>
@@ -633,7 +633,7 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
           <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder={appt.clients?.name ?? ""} className="mt-1.5 h-12 bg-sheet text-lg" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
-          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5 size-5" aria-label="I authorize Claire to e-file my return" />
+          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5 size-5" aria-label="I authorize Claire to file my return" />
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}

@@ -13,7 +13,7 @@ import claire from "@/assets/claire-portrait.jpg";
 
 
 const TITLE = "Hartwell Tax & Bookkeeping — Tax preparation in Montclair, NJ";
-const DESC = "Tax preparation in Montclair, NJ for families, freelancers, landlords and small businesses. See open times, schedule in two minutes, and file in one visit.";
+const DESC = "Tax preparation in Montclair, NJ for families, freelancers, landlords and small businesses. See available times, schedule in two minutes, and file in one visit.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -78,7 +78,7 @@ function Hero() {
             We prepare tax returns for families, freelancers, landlords and small businesses in Montclair, NJ. Choose a time online, upload your documents before you come in, and leave with your return done.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button asChild size="lg"><Link to="/book">See available times</Link></Button>
+            <Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
           </div>
         </div>
@@ -94,7 +94,7 @@ function Year() {
     <section className="rounded-[28px] bg-ink px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-16">
         <div>
-          <p className="text-sm font-medium text-primary-foreground/70">When to book</p>
+          <p className="text-sm font-medium text-primary-foreground/70">When to schedule</p>
           <h2 className="t-section mt-3 max-w-[13ch] text-balance">Open all year. Busiest in spring and October.</h2>
         </div>
         <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
@@ -125,11 +125,14 @@ function Year() {
     </section>
   );
 }
+/** The services palette (DESIGN_SYSTEM.md): oxblood, plum, sage, amber, slate. Used as soft tints for numbers and icons. */
+const TINTS = ["122,31,31", "125,91,166", "62,125,96", "196,128,20", "79,106,168"];
+
 function HowItWorks() {
   const steps = [
     { t: "Choose a time online", d: "Pick any available time. You're confirmed right away, no phone call needed." },
     { t: "Get your document checklist", d: "Answer a few yes-or-no questions and we'll list exactly which documents to bring." },
-    { t: "Upload your documents", d: "Send them from your phone before your appointment. We check each one and tell you if anything is missing." },
+    { t: "Upload your documents", d: "Upload them any time before your appointment. We check each one and tell you if anything is missing." },
     { t: "Go over your return with Claire", d: "In person or by video. Afterwards you sign and pay online, and we file your return with the IRS." },
   ];
   return (
@@ -141,7 +144,7 @@ function HowItWorks() {
       <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
           <li key={x.t} className="min-w-0">
-            <span className="flex size-9 items-center justify-center rounded-full bg-ink text-sm font-semibold tabular-nums text-primary-foreground">{i + 1}</span>
+            <span className="flex size-10 items-center justify-center rounded-xl text-sm font-semibold tabular-nums" style={{ background: `rgba(${TINTS[i % TINTS.length]},0.12)`, color: `rgb(${TINTS[i % TINTS.length]})` }}>{i + 1}</span>
             <h3 className="mt-5 text-lg font-semibold leading-snug text-deep-ink">{x.t}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{x.d}</p>
           </li>
@@ -261,7 +264,7 @@ function Reviews() {
               <div className="flex items-center justify-between gap-2"><Stars /><span className="text-[11px] text-muted-foreground">{r.src}</span></div>
               <p className="mt-3 flex-1 text-[15px] leading-6 text-deep-ink">“{r.text}”</p>
               <div className="mt-5 flex items-end justify-between gap-3">
-                <div><p className="text-sm font-medium text-deep-ink">{r.name}</p><p className="text-xs text-muted-foreground">{r.where}, {r.what}</p></div>
+                <div className="flex items-center gap-2.5"><span className="grid size-8 shrink-0 place-items-center rounded-full text-xs font-semibold" style={{ background: `rgba(${TINTS[reviews.indexOf(r) % TINTS.length]},0.14)`, color: `rgb(${TINTS[reviews.indexOf(r) % TINTS.length]})` }}>{r.name.charAt(0)}</span><div><p className="text-sm font-medium text-deep-ink">{r.name}</p><p className="text-xs text-muted-foreground">{r.where}, {r.what}</p></div></div>
                 <p className="shrink-0 text-[11px] text-muted-foreground">{r.when}</p>
               </div>
             </li>
@@ -289,7 +292,7 @@ function Privacy() {
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {points.map((x) => (
           <li key={x.title} className="flex gap-3">
-            <x.icon className="mt-0.5 size-5 shrink-0 text-deep-ink" strokeWidth={1.75} />
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg" style={{ background: `rgba(${TINTS[(points.indexOf(x) + 1) % TINTS.length]},0.12)`, color: `rgb(${TINTS[(points.indexOf(x) + 1) % TINTS.length]})` }}><x.icon className="size-[18px]" strokeWidth={1.75} /></span>
             <div><h3 className="text-[15px] font-medium text-deep-ink">{x.title}</h3><p className="mt-0.5 text-sm text-muted-foreground">{x.text}</p></div>
           </li>
         ))}
@@ -334,14 +337,14 @@ function Faq() {
     { q: "What is an Enrolled Agent?", a: "A tax professional licensed by the IRS to prepare returns and to represent you in audits, collections and appeals." },
     { q: "How much will it cost?", a: "See the prices above. Your exact price is agreed before any work starts, and you pay when the work is done." },
     { q: "Do you do New York returns?", a: "Yes. If you work in New York, your non-resident return is included." },
-    { q: "What should I bring?", a: "When you schedule, you answer a few questions and get a checklist of exactly what to bring. You can upload everything from your phone." },
+    { q: "What should I bring?", a: "When you schedule, you answer a few questions and get a checklist of exactly what to bring. You can upload everything from any device." },
     { q: "Video call or in person?", a: "Either. You choose when you schedule. Video calls work in your browser, no app needed." },
     { q: "Can I reschedule or cancel?", a: "Yes. Use the link in your confirmation email to move or cancel any time, no phone call needed." },
     { q: "What are the key deadlines?", a: "April 15 for most returns, October 15 for extended returns. Quarterly estimates are due in April, June, September and January." },
   ];
   return (
     <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
-      <div className="self-start"><SectionHead title="Questions." sub="Can't find your answer? Send us a question, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
+      <div className="self-start"><SectionHead title="Questions." sub="Can't find your answer? Ask us below, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
       <Accordion type="single" collapsible className="overflow-hidden rounded-2xl border border-line-1 bg-sheet px-4">
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-line-1 last:border-b-0">

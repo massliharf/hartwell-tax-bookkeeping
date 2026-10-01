@@ -221,7 +221,7 @@ export const ownerBookAppointment = createServerFn({ method: "POST" })
     });
     if (error) { console.error(error); return { ok: false as const, error: "Something went wrong. Try again." }; }
     const r = res as { ok: boolean; appointment_id?: string };
-    if (!r.ok) return { ok: false as const, error: "That time was just taken. Pick another." };
+    if (!r.ok) return { ok: false as const, error: "That time was taken a moment ago. Pick another." };
     await db.from("leads").update({ converted: true }).eq("email", data.email.toLowerCase()).eq("converted", false);
     const { sendBookingConfirmation } = await import("./automations.server");
     const { requestOrigin } = await import("./origin.server");

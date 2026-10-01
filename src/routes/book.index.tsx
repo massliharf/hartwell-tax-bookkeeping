@@ -420,7 +420,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
       setError(r.error);
       setAlternatives(r.alternatives);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError("We couldn't schedule that. Please try again, or call (973) 555-0142.");
     }
     setBusy(false);
   };
@@ -451,7 +451,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
             <p className="font-medium text-deep-ink">{error}</p>
             {alternatives.length > 0 ? (
               <>
-                <p className="mt-1 text-sm text-deep-ink/70">Here are the closest open times:</p>
+                <p className="mt-1 text-sm text-deep-ink/70">Here are the closest available times:</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                    {alternatives.map((a) => (
                      <Button key={a} variant="secondary" type="button" disabled={busy} onClick={() => { update({ date: nyDay(a), slot: a }); onPickAgain(); }}

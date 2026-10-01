@@ -16,7 +16,7 @@ export function AnnouncementBar() {
       >
         <span className="mr-2 font-medium text-deep-ink">Oct 15</span>
         <span>
-          Filing an extension? The deadline is October 15 — <span className="font-semibold text-ink underline-offset-4 hover:underline">book your slot</span>.
+          Filing an extension? The deadline is October 15 — <span className="font-semibold text-ink underline-offset-4 hover:underline">schedule your appointment</span>.
         </span>
       </Link>
     </div>

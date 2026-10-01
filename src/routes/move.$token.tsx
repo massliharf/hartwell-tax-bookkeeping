@@ -41,7 +41,7 @@ function MovePage() {
           New time: <strong>{fmtDateLong(to)} at {fmtTime(to)}</strong>. You now have more time to gather your documents.
         </ResultPanel>
       ) : state === "taken" ? (
-        <ResultPanel icon={<Clock />} tone="warning" title="That time was just taken." actions={back}>
+        <ResultPanel icon={<Clock />} tone="warning" title="That time was taken a moment ago." actions={back}>
           Your original appointment is unchanged. You can choose another time from your appointment page.
         </ResultPanel>
       ) : (

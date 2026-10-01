@@ -1,0 +1,13 @@
+{
+  "max_words": 24,
+  "banned": ["meet claire once", "no second visit", "come in once", "from your phone", "eastern time", "slot", "booking", "e-filed", "your preparer", "nothing extra", "on the spot", "phone tag", "next opening", "open times", "send your documents", "send them"],
+  "avoid": {
+    "book": "schedule (verb for the main action)",
+    "booked": "scheduled (except the 'You're booked' moment)",
+    "appointment page": "your appointment page (keep, but show the detail here instead when you can)",
+    "e-file": "file with the IRS",
+    "send": "upload (for documents)",
+    "checklist": "document checklist (first mention), checklist after",
+    "Free call": "free 15-minute call"
+  }
+}

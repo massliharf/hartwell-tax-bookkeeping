@@ -80,7 +80,7 @@ export const bookAppointment = createServerFn({ method: "POST" })
       const { requestOrigin } = await import("./origin.server");
       await sendBookingConfirmation(r.appointment_id!, requestOrigin()).catch(console.error);
     }
-    if (!r.ok) return { ok: false as const, alternatives: r.alternatives ?? [], error: "That time was just taken." };
+    if (!r.ok) return { ok: false as const, alternatives: r.alternatives ?? [], error: "That time was taken a moment ago." };
     return { ok: true as const, appointmentId: r.appointment_id!, manageToken: r.manage_token! };
   });
 

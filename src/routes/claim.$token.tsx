@@ -30,8 +30,8 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 function Missed() {
   return (
-    <ResultPanel icon={<Clock />} title="Just missed it." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See other times</Link></Button>}>
-      Someone took this time just before you. You're still on the waitlist, and we'll email you as soon as another time opens.
+    <ResultPanel icon={<Clock />} title="This time was taken." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See other times</Link></Button>}>
+      Someone took this time a moment before you. You're still on the waitlist, and we'll email you as soon as another time opens.
     </ResultPanel>
   );
 }
@@ -45,7 +45,7 @@ function ClaimPage() {
 
   if (q.isLoading) return <Shell><div role="status" aria-label="Loading" className="space-y-4"><Skeleton className="mx-auto h-5 w-36" /><Skeleton className="mx-auto h-9 w-64 max-w-full" /><Skeleton className="mx-auto h-6 w-44" /><Skeleton className="mx-auto mt-8 h-10 w-full" /></div></Shell>;
   if (q.isError) return <Shell><ResultPanel icon={<Clock />} tone="warning" title="This page didn't load." actions={<Button size="lg" onClick={() => q.refetch()}>Try again</Button>}>Your place on the waitlist is safe. Try again in a moment.</ResultPanel></Shell>;
-  if (!q.data) return <Shell><ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See open times</Link></Button>}>It may have expired. You're still on the waitlist, and we'll email you when another spot opens.</ResultPanel></Shell>;
+  if (!q.data) return <Shell><ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See available times</Link></Button>}>It may have expired. You're still on the waitlist, and we'll email you when another spot opens.</ResultPanel></Shell>;
   if (state === "missed" || (state === "idle" && q.data.status !== "open")) return <Shell><Missed /></Shell>;
   if (typeof state === "object") {
     return (

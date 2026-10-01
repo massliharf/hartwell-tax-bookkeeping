@@ -90,7 +90,7 @@ function ReturningPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} className="h-11 bg-sheet" />
               </div>
-              {state === "error" && <p className="text-sm text-destructive">Something went wrong. Please try again.</p>}
+              {state === "error" && <p className="text-sm text-destructive">We couldn't send the link. Please try again, or call (973) 555-0142.</p>}
               <Button type="submit" size="lg" className="w-full" disabled={state === "busy"}>
                 {state === "busy" && <Loader2 className="animate-spin" />} Email me my link
               </Button>

@@ -173,7 +173,7 @@
     border-color: var(--color-border);
   }
 
-  html { scroll-behavior: auto; }
+  html { scroll-behavior: auto; overflow-y: scroll; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

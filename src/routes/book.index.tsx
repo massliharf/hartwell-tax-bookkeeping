@@ -170,10 +170,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
                 aria-pressed={active}
                 className={`flex min-h-36 w-full flex-col rounded-xl border p-5 text-left ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <ServiceIcon service={s.slug} size={40} />
-                  <span className={`mt-1 size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] duration-150 ${active ? "border-[6px] border-ink" : "border-line-2 bg-sheet"}`} />
-                </div>
+                <ServiceIcon service={s.slug} size={40} />
                 <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
                 <p className="mt-0.5 text-sm text-muted-foreground">{SERVICES.find((x) => x.id === s.slug)?.blurb ?? s.description}</p>
                 <div className="mt-auto flex items-center justify-between pt-4 text-sm">
@@ -257,7 +254,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   const fetchWindow = useServerFn(getAvailabilityWindow);
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 21 } }), staleTime: 30_000 });
   // Clients see 30-minute starts only; every label, chip and "Next available" uses the same list.
-  const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
+  // Closed days are hidden entirely; only days Claire could take you appear.
+  const days = (q.data?.days ?? []).filter((d) => !d.closed).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
@@ -289,20 +287,20 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
               <Button variant="secondary" size="icon" aria-label="Next week" disabled={week >= weeks - 1} onClick={() => setWeek((w) => Math.min(weeks - 1, w + 1))}><ChevronRight /></Button>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-7 gap-1 sm:gap-1.5" role="listbox" aria-label="Choose a day">
+          <div className="mt-3 flex gap-1 sm:gap-1.5" role="listbox" aria-label="Choose a day">
             {shown.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
               const open = d.slots.length;
-              const full = !d.closed && open === 0;
+              const full = open === 0;
               return (
-                <button key={d.date} type="button" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                  aria-label={`${c.dow} ${c.month} ${c.day}, ${d.closed ? "closed" : full ? "full" : `${open} open`}`}
-                  className={`flex min-h-[72px] flex-col items-center justify-center gap-0.5 rounded-lg border px-0.5 py-2 transition-colors duration-150 ${
-                    active ? "border-deep-ink bg-deep-ink text-primary-foreground" : d.closed ? "border-transparent text-muted-foreground/50" : full ? "border-line-1 bg-surface-2 text-muted-foreground hover:border-line-2" : "border-line-1 bg-sheet text-deep-ink hover:border-line-3"}`}>
+                <button key={d.date} type="button" onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
+                  aria-label={`${c.dow} ${c.month} ${c.day}, ${full ? "full" : `${open} open`}`}
+                  className={`flex min-h-[72px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg border px-0.5 py-2 transition-colors duration-150 ${
+                    active ? "border-deep-ink bg-deep-ink text-primary-foreground" : full ? "border-line-1 bg-surface-2 text-muted-foreground hover:border-line-2" : "border-line-1 bg-sheet text-deep-ink hover:border-line-3"}`}>
                   <span className={`text-[11px] ${active ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{c.dow}</span>
                   <span className={`tabular text-lg font-medium leading-tight ${full && !active ? "line-through decoration-1" : ""}`}>{c.day}</span>
-                  <span className={`text-[10px] font-medium ${active ? "text-primary-foreground/80" : d.closed ? "" : full ? "" : "text-success"}`}>{d.closed ? "Closed" : full ? "Full" : `${open} open`}</span>
+                  <span className={`text-[10px] font-medium ${active ? "text-primary-foreground/80" : full ? "" : "text-success"}`}>{full ? "Full" : `${open} open`}</span>
                 </button>
               );
             })}

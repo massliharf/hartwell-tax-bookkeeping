@@ -26,7 +26,7 @@ import {
   keepFlaggedFile, markNotApplicable, rescheduleAppointment, saveIntake, signForm8879, testPay, undoNotApplicable,
 } from "@/lib/portal.functions";
 import { getAvailabilityWindow } from "@/lib/booking.functions";
-import { fmtDateLong, fmtDayChip, fmtTime, toIntakePayload, type Answers, intakeComplete } from "@/lib/intake";
+import { userTz, fmtDateLong, fmtDayChip, fmtTime, toIntakePayload, type Answers, intakeComplete } from "@/lib/intake";
 import { docGuide } from "@/lib/doc-guide";
 
 export const Route = createFileRoute("/a/$token")({
@@ -118,10 +118,10 @@ function PortalPage() {
   const todo = items.filter((i) => i.required && (i.status === "missing" || i.review_status === "needs_fix")).length;
   const fixItems = items.filter((i) => i.review_status === "needs_fix");
   const doneCount = items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length;
-  const day = new Date(a.start_at).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" });
+  const day = new Date(a.start_at).toLocaleDateString("en-US", { weekday: "long", timeZone: userTz() });
   const introSub: Partial<Record<Stage, string>> = {
     documents: `Your free call with Claire is ${day}. You don't need any documents.`, ready: `Your free call with Claire is ${day}. You don't need any documents.`,
-    meeting: "Your call is starting. Click Join below.", wrap_up: "Thanks for talking with Claire.", filed: "Thanks for talking with Claire.",
+    meeting: "Your call is starting. Click Join below.", wrap_up: "Your free call with Claire has ended.", filed: "Your free call with Claire is complete.",
   };
   const sub: Record<Stage, string> = {
     documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer a few quick questions so we know which documents to ask for." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to upload. Everything else is set.` : "Everything is set.",
@@ -181,17 +181,19 @@ function PortalPage() {
         </>}
 
         {/* 3. After the meeting, before Claire finishes. */}
-        {intro && (stage === "wrap_up" || stage === "filed") && (
-          <StatusCard icon={<CalendarClock />} title="Ready for the next step?" action={<Button asChild size="lg"><Link to="/book">Schedule your appointment</Link></Button>}>
-            Schedule the appointment Claire recommended. Your details are already filled in.
+        {intro && (stage === "wrap_up" || stage === "filed") && <>
+          <AppointmentCard appt={a} mode="past" videoLink={null} nowIso={nowIso} />
+          <StatusCard icon={<CalendarClock />} title="Need a full appointment?" action={<Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button>}>
+            If Claire suggested a tax return, a letter review or another service, you can schedule it here. Your details are already filled in. We've also emailed you this link.
           </StatusCard>
-        )}
+        </>}
         {!intro && stage === "wrap_up" && <>
           <StatusCard icon={<Hourglass />} title="We're finishing your return.">We'll email you when it's ready to review, sign and pay, usually the same day.</StatusCard>
            {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents to send again</h2><ul className="space-y-2">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
         </>}
 
         {/* 4. Sign and pay, then done. */}
+        {!intro && stage === "filed" && <AppointmentCard appt={a} mode="past" videoLink={null} nowIso={nowIso} />}
         {!intro && (stage === "sign_pay" || stage === "to_file" || stage === "filed") && <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} />}
 
         {/* Side exits. */}
@@ -248,7 +250,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
 }
 
 /* ---------- Appointment card ---------- */
-function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: "upcoming" | "now"; videoLink: string | null; nowIso: string }) {
+function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: "upcoming" | "now" | "past"; videoLink: string | null; nowIso: string }) {
   const video = appt.meeting_type === "video";
   const intro = isIntroAppt(appt);
   const join = joinState(appt.start_at, appt.end_at, nowIso);
@@ -262,16 +264,16 @@ function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-[11px] font-medium text-muted-foreground">{appt.services?.name}</p>
-            {mode === "now" ? <Tag tone="accent">Happening now</Tag> : appt.status === "confirmed" && <Tag tone="success">Confirmed</Tag>}
+            {mode === "past" ? <Tag tone="success">Completed</Tag> : mode === "now" ? <Tag tone="accent">Happening now</Tag> : appt.status === "confirmed" && <Tag tone="success">Confirmed</Tag>}
           </div>
           <p className="mt-1 t-card text-deep-ink">{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
-        {!intro && !appt.intake_answers?.["intake_pending"] && <ReadyRing value={appt.ready_score} size={76} />}
+        {mode !== "past" && !intro && !appt.intake_answers?.["intake_pending"] && <ReadyRing value={appt.ready_score} size={76} />}
       </div>
 
       {/* Where: a working link for video, the office for in person */}
-      {video ? (
+      {mode === "past" ? null : video ? (
         <div className="border-t border-border bg-surface-2 px-6 py-5">
           <p className="flex items-center gap-2 text-sm font-medium text-deep-ink"><Video className="size-4" />Video call{intro ? " with Claire" : ""}</p>
           <p className="mt-1 text-sm text-muted-foreground">{join === "open" ? "Your call is open." : "Join opens 10 minutes before."}</p>

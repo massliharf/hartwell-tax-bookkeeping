@@ -139,8 +139,10 @@ export function fromIntakePayload(p: Record<string, unknown>): Answers {
 }
 
 export const TZ = "America/New_York";
-export const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" });
-export const fmtDateLong = (iso: string) => new Date(iso).toLocaleDateString("en-US", { timeZone: TZ, weekday: "long", month: "long", day: "numeric" });
+/** Times are shown in the visitor's own time zone (the browser's); the office's zone is only a fallback on the server. */
+export const userTz = () => (typeof window !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : TZ);
+export const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-US", { timeZone: userTz(), hour: "numeric", minute: "2-digit" });
+export const fmtDateLong = (iso: string) => new Date(iso).toLocaleDateString("en-US", { timeZone: userTz(), weekday: "long", month: "long", day: "numeric" });
 export const fmtDayChip = (ymd: string) => {
   const d = new Date(`${ymd}T12:00:00Z`);
   return {

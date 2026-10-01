@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
-import { downloadIcs, gcalStamp } from "@/lib/meeting";
+import { DIRECTIONS, OFFICE, downloadIcs, gcalStamp } from "@/lib/meeting";
 import { getAppointmentByToken } from "@/lib/portal.functions";
 import { fmtDateLong, fmtTime } from "@/lib/intake";
 
@@ -62,7 +62,8 @@ function ConfirmedPage() {
   const items = (q.data.checklist ?? []) as { id: string; document_name: string; description: string | null; required: boolean; status: string }[];
   const service = a.services?.name ?? "Appointment";
   const first = a.clients?.name?.split(" ")[0] ?? "";
-  const where = a.meeting_type === "video" ? ((q.data as { videoLink?: string | null }).videoLink ?? "Video call") : ADDRESS;
+  const videoLink = (q.data as { videoLink?: string | null }).videoLink ?? null;
+  const where = a.meeting_type === "video" ? (videoLink ?? "Video call") : ADDRESS;
   const title = `${service} with Claire Hartwell, EA`;
   const manageUrl = typeof window !== "undefined" ? `${window.location.origin}/a/${token}` : "";
   const details = `Upload your documents: ${manageUrl}`;
@@ -86,14 +87,23 @@ function ConfirmedPage() {
           className="mt-10 rounded-xl border border-line-1 bg-sheet p-6">
           <p className="text-[11px] font-medium text-muted-foreground">{service}</p>
           <p className="mt-1 t-card text-deep-ink">{fmtDateLong(a.start_at)}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
-            <span className="tabular">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</span>
-            <span className="inline-flex items-center gap-1.5">
-              {a.meeting_type === "video" ? <Video className="size-4" /> : <Users className="size-4" />}
-              {a.meeting_type === "video" ? "Video call" : `In person, ${ADDRESS}`}
-            </span>
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">{a.meeting_type === "video" ? "You'll find the video call link on your appointment page." : "You'll find the address and directions on your appointment page."}</p>
+          <p className="tabular mt-1 text-deep-ink/80">{fmtTime(a.start_at)} – {fmtTime(a.end_at)}</p>
+          {/* Where it happens, in full: the join link, or the address with parking and directions. */}
+          {a.meeting_type === "video" ? (
+            <div className="mt-4 rounded-lg bg-surface-2 p-3">
+              <p className="flex items-center gap-2 text-sm font-medium text-deep-ink"><Video className="size-4" />Video call</p>
+              {videoLink && <p className="mt-1 break-all text-sm text-ink">{videoLink}</p>}
+              <p className="mt-1 text-xs text-muted-foreground">Works in your browser, no app needed. We'll also email the link the day before.</p>
+              {videoLink && <Button size="sm" variant="secondary" className="mt-3" onClick={() => { void navigator.clipboard?.writeText(videoLink); }}><LinkIcon />Copy link</Button>}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-lg bg-surface-2 p-3">
+              <p className="flex items-center gap-2 text-sm font-medium text-deep-ink"><Users className="size-4" />In person</p>
+              <p className="mt-1 text-sm text-deep-ink">{OFFICE.line1}, {OFFICE.line2}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{OFFICE.parking}</p>
+              <Button size="sm" variant="secondary" className="mt-3" asChild><a href={DIRECTIONS} target="_blank" rel="noreferrer">Directions</a></Button>
+            </div>
+          )}
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button variant="outline" size="sm" onClick={() => downloadIcs(title, a.start_at, a.end_at, where, details)}><Download /> Add to calendar (.ics)</Button>
             <Button variant="outline" size="sm" asChild><a href={gcal} target="_blank" rel="noreferrer"><CalendarPlus /> Google Calendar</a></Button>
@@ -125,7 +135,7 @@ function ConfirmedPage() {
           <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
              <div className="border-b border-line-1 bg-surface-2 px-5 py-3">
               <p className="t-card text-deep-ink">What to bring</p>
-              <p className="mt-1 text-sm text-muted-foreground">Upload them from your phone before your appointment.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Upload them any time before your appointment.</p>
             </div>
             <ul className="divide-y divide-line-1">
               {items.map((i) => (

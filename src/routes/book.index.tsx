@@ -19,7 +19,7 @@ import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
 import { getLeadDraft } from "@/lib/automations.functions";
-import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers, chipsFor, intakeComplete } from "@/lib/intake";
+import { userTz, fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers, chipsFor, intakeComplete } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
   validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(2).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
@@ -107,7 +107,7 @@ function BookPage() {
   const preview = previewChecklist(draft.serviceSlug, draft.answers);
   const canContinue = step === 0 ? !!service : step === 1 ? slotOk : detailsComplete && questionsComplete && slotOk && !bookingBusy;
   // Short enough to fit a phone's sticky footer; the selection itself is visible on the page.
-  const short = (iso?: string) => (iso ? `${new Date(iso).toLocaleDateString("en-US", { weekday: "short", timeZone: "America/New_York" })} ${fmtTime(iso)}` : "");
+  const short = (iso?: string) => (iso ? `${new Date(iso).toLocaleDateString("en-US", { weekday: "short", timeZone: userTz() })} ${fmtTime(iso)}` : "");
   const cta = step === 0 ? (service ? "Continue" : "Choose a service")
     : step === 1 ? (draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time")
     : bookingBusy ? "Confirming…" : !questionsComplete ? "Answer the questions" : `Confirm ${short(draft.slot)}`;
@@ -267,7 +267,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Choose a time" sub="All times are Eastern Time (New York)." />
+        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Choose a time" />
       {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">This is a 15-minute video call.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
         options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />}
 
@@ -311,7 +311,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
             {day && day.slots.length > 0 && (
                <div className="space-y-6">{(["Morning", "Afternoon", "Evening"] as const).map((period) => {
                  const slots = day.slots.filter((s) => {
-                   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).formatToParts(new Date(s));
+                   const parts = new Intl.DateTimeFormat("en-US", { timeZone: userTz(), hour: "numeric", hourCycle: "h23" }).formatToParts(new Date(s));
                    const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
                    return new Date(s).getUTCMinutes() % 30 === 0 && (period === "Morning" ? hour < 12 : period === "Afternoon" ? hour >= 12 && hour < 17 : hour >= 17);
                  });

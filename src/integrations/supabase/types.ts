@@ -342,6 +342,50 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_notes: {
+        Row: {
+          action_items: Json
+          appointment_id: string
+          duration_min: number | null
+          id: string
+          key_points: Json
+          recorded_at: string
+          status: string
+          summary: string | null
+          transcript: Json
+        }
+        Insert: {
+          action_items?: Json
+          appointment_id: string
+          duration_min?: number | null
+          id?: string
+          key_points?: Json
+          recorded_at?: string
+          status?: string
+          summary?: string | null
+          transcript?: Json
+        }
+        Update: {
+          action_items?: Json
+          appointment_id?: string
+          duration_min?: number | null
+          id?: string
+          key_points?: Json
+          recorded_at?: string
+          status?: string
+          summary?: string | null
+          transcript?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_notes_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           appointment_id: string | null

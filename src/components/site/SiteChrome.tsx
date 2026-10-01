@@ -26,18 +26,18 @@ function Wordmark() {
   return <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>;
 }
 
-const LINKS = [{ href: "/#services", label: "Services and prices" }, { href: "/#how", label: "How it works" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
+const LINKS = [{ href: "/#services", label: "Services and prices" }, { href: "/#about", label: "Meet Claire" }, { href: "/#how", label: "How it works" }, { href: "/#faq", label: "Questions" }];
 
 export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   return (
-    <header className={`sticky top-0 z-40 backdrop-blur-lg ${warm ? "bg-paper-warm/85" : "bg-canvas/85"}`}>
-      <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
+    <header className={`sticky top-0 z-40 border-b border-line-1 backdrop-blur-lg ${warm ? "bg-paper-warm/95" : "bg-canvas/95"}`}>
+      <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
         <Wordmark />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-          {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-8 items-center rounded-lg px-3 text-[13px] font-medium text-body transition-colors duration-150 hover:bg-fill-subtle hover:text-deep-ink">{l.label}</a>)}
+          {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-10 items-center rounded-lg px-2 text-[13px] font-medium text-body transition-colors duration-150 hover:bg-fill-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{l.label}</a>)}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
-          <Button asChild variant="ghost"><Link to="/book/returning">My appointment</Link></Button>
+          <Button asChild variant="link"><Link to="/book/returning">My appointment</Link></Button>
           <Button asChild><Link to="/book">Schedule an appointment</Link></Button>
         </div>
         <DropdownMenu>

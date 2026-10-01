@@ -34,7 +34,7 @@ export function HeroVisual() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium text-muted-foreground">Your checklist</p>
-          <p className="mt-1 font-serif text-[20px] leading-tight text-deep-ink sm:text-2xl">Thursday, 10:30 am</p>
+          <p className="mt-1 text-[20px] font-semibold leading-tight text-deep-ink sm:text-2xl">Thursday, 10:30 am</p>
           <p className="text-xs text-muted-foreground">Individual return, 45 min</p>
         </div>
         <div className="shrink-0"><ReadyRing value={(shown / 3) * 100} size={72} stroke={6} /></div>

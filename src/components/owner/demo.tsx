@@ -193,6 +193,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   </div>
                 </div>
                 {(() => { const e = parseEmailText(current.body ?? ""); return <EmailCard compact heading={e.heading} blocks={e.blocks} />; })()}
+                <SendCopy id={current.id} />
               </div>
             </>
           ) : (

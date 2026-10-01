@@ -11,7 +11,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
     <div className="min-h-screen bg-paper-warm">
       <header className="border-b border-line-1 bg-paper-warm">
         <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
-          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo /></Link>
+          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>
           <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
             <X className="size-4" />
           </Link>

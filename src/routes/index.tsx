@@ -66,12 +66,12 @@ function Home() {
 
 
 function Hero() {
-  const facts: [string, string][] = [["Claire Hartwell, EA", "Your tax professional from start to finish"], ["Here in Montclair", "Meet at the office or by video"], ["Federal, NJ and NY", "Your returns handled together"]];
+  const facts: [string, string][] = [["Claire Hartwell, EA", "An IRS Enrolled Agent you can talk to directly"], ["Here in Montclair", "Meet at the office or by video"], ["No payment to reserve", "Know the price before work begins"]];
   return (
     <section className="enter overflow-hidden">
       <div className="grid items-center gap-10 px-2 pb-10 pt-10 sm:px-4 md:min-h-[530px] md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-14 md:pt-16">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping · Montclair, NJ</p>
+          <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping in Montclair, NJ</p>
           <h1 className="enter-title mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
             We prepare returns for families, freelancers, landlords and small businesses. Choose a time, share your documents from your phone, and sit down with Claire once.

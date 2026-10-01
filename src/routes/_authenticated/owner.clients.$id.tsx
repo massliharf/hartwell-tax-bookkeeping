@@ -8,7 +8,7 @@ function ClientPage() {
   const { id } = Route.useParams();
   return (
     <>
-      <Link to="/owner/clients" className="mb-4 inline-flex h-8 items-center gap-1 rounded-lg pr-2 text-xs text-muted-foreground transition-colors duration-150 hover:text-deep-ink"><ChevronLeft className="size-4" />Clients</Link>
+      <Link to="/owner/clients" className="mb-4 inline-flex h-11 items-center sm:h-8 gap-1 rounded-lg pr-2 text-xs text-muted-foreground transition-colors duration-150 hover:text-deep-ink"><ChevronLeft className="size-4" />Clients</Link>
       <ClientProfile id={id} />
     </>
   );

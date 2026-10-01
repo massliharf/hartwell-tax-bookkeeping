@@ -158,7 +158,7 @@ function PortalPage() {
 
   return (
     <BookingShell>
-      <div className="mx-auto max-w-2xl space-y-10">
+      <div className="reveal-children mx-auto max-w-2xl space-y-10">
         <div>
           <p className="text-[13px] text-muted-foreground">Your appointment</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>

@@ -151,7 +151,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
   else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
   else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
   return (
-    <li style={{ animationDelay: `${idx * 40}ms` }} className="enter-item flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-3 py-2.5 last:border-0 sm:flex-nowrap">
+    <li style={{ animationDelay: `${150 + idx * 30}ms` }} className="enter-item flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-3 py-2.5 last:border-0 sm:flex-nowrap">
       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span>
       <button type="button" disabled={!appointmentId} onClick={() => appointmentId && openAppt({ appointmentId })} className="min-w-0 flex-1 basis-[calc(100%-44px)] text-left disabled:cursor-default sm:basis-auto">
         <span className="block line-clamp-2 text-sm font-medium text-deep-ink sm:truncate">{title}</span>

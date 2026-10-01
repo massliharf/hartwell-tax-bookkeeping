@@ -69,11 +69,11 @@ function Home() {
 function Hero() {
   const facts: [string, string][] = [["Claire Hartwell, EA", "An IRS Enrolled Agent you can talk to directly"], ["Here in Montclair", "Meet at the office or by video"], ["No payment to reserve", "Know the price before work begins"]];
   return (
-    <section className="enter overflow-hidden">
+    <section className="overflow-hidden">
       <div className="grid items-center gap-10 px-2 pb-10 pt-10 sm:px-4 md:min-h-[530px] md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-14 md:pt-16">
-        <div className="min-w-0">
+        <div className="reveal-children min-w-0">
           <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping in Montclair, NJ</p>
-          <h1 className="enter-title mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
+          <h1 className="mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
             We prepare returns for families, freelancers, landlords and small businesses. Choose a time, share your documents from your phone, and sit down with Claire once.
           </p>
@@ -83,12 +83,12 @@ function Hero() {
           </div>
           <p className="mt-5 text-sm text-muted-foreground">Your time is confirmed right away. Documents can follow.</p>
         </div>
-        <div className="min-w-0 rounded-[24px] bg-ink-50 px-4 py-4 sm:px-8 sm:py-6"><HeroVisual /></div>
+        <div className="reveal min-w-0 rounded-[24px] bg-ink-50 px-4 py-4 sm:px-8 sm:py-6" style={{ ["--d" as string]: "250ms" }}><HeroVisual /></div>
       </div>
       <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
         {facts.map(([k, v], i) => (
           <li key={k} className="flex min-w-0 items-center gap-3.5 bg-sheet px-5 py-5 sm:px-6">
-            {i === 0 ? <img src={claire} alt="" width={44} height={44} className="size-11 shrink-0 rounded-full object-cover" /> : <span aria-hidden="true" className="text-xl font-semibold text-ink/50">0{i + 1}</span>}
+            {i === 0 ? <img src={claire} alt="" width={44} height={44} className="size-11 shrink-0 rounded-full object-cover" /> : <span aria-hidden="true" className="text-xl font-semibold text-muted-foreground">0{i + 1}</span>}
             <div className="min-w-0"><p className="text-sm font-semibold text-deep-ink">{k}</p><p className="mt-0.5 text-[13px] leading-5 text-muted-foreground">{v}</p></div>
           </li>
         ))}

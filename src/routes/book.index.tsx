@@ -214,7 +214,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
           </>
         );
       })()}
-      <p className="mt-6 text-sm text-muted-foreground">Already have an appointment? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Find it here</Link></p>
+      <p className="mt-6 text-sm text-muted-foreground">Already have an appointment? <Link to="/book/returning" className="inline-flex min-h-10 items-center font-medium text-ink underline underline-offset-4">Find it here</Link></p>
     </>
   );
 }

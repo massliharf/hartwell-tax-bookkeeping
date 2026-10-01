@@ -20,7 +20,7 @@ function Today() {
   const toFile = useQuery(readyToFile());
   const hi = minutes < 12 * 60 ? "Good morning" : minutes < 17 * 60 ? "Good afternoon" : "Good evening";
   return (
-    <div className="pb-6">
+    <div className="reveal-children pb-6">
       <header className="flex items-start justify-between gap-3 pt-2 sm:pt-4">
         <div>
         <h1 className="font-serif text-[26px] font-medium leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]">{hi}, Claire.</h1>
@@ -94,7 +94,7 @@ function SavedBanner({ now }: { now: string }) {
     [hours, "given back to you"],
   ];
   return (
-    <Link to="/owner/insights" className="enter-tile group mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-ink-900 text-white transition-opacity duration-150 hover:opacity-95 sm:grid-cols-4" style={{ animationDelay: "650ms" }} aria-label="This week, handled automatically. Open the report.">
+    <Link to="/owner/insights" className="group mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-ink-900 text-white transition-opacity duration-150 hover:opacity-95 sm:grid-cols-4" aria-label="This week, handled automatically. Open the report.">
       {stats.map(([v, l]) => (
         <span key={l} className="flex flex-col gap-1 px-4 py-4 sm:px-5">
           <span className="tabular font-serif text-[28px] font-semibold leading-none tracking-[-0.03em]">{v}</span>

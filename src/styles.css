@@ -258,3 +258,14 @@
 @utility draw-check { & path, & polyline { stroke-dasharray: 26; stroke-dashoffset: 26; animation: draw-check 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; } }
 /* Cards that are clickable rise slightly on hover. */
 @utility lift { transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.15s ease, background-color 0.15s ease; &:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -18px rgba(44,20,10,0.35); } &:active { transform: translateY(0); } }
+
+/* Reveal order: pages build top to bottom. Children of .reveal-children enter one after another (50ms apart),
+   so nothing lower on the page appears before what's above it. Same curve as item-enter. */
+@keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@utility reveal { animation: reveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--d, 0ms); }
+@utility reveal-children {
+  & > * { animation: reveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  & > *:nth-child(2) { animation-delay: 50ms; } & > *:nth-child(3) { animation-delay: 100ms; } & > *:nth-child(4) { animation-delay: 150ms; }
+  & > *:nth-child(5) { animation-delay: 200ms; } & > *:nth-child(6) { animation-delay: 250ms; } & > *:nth-child(7) { animation-delay: 300ms; }
+  & > *:nth-child(n+8) { animation-delay: 350ms; }
+}

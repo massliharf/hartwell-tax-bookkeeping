@@ -56,8 +56,8 @@ function Home() {
         <Services />
         <Reviews />
         <About />
-        <Year />
         <Privacy />
+        <Year />
         <Faq />
         <DeadlineCta />
       </main>
@@ -81,21 +81,9 @@ function Hero() {
             <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
           </div>
-          <a href="#reviews" className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-deep-ink">
-            <Stars /><span><span className="font-semibold text-deep-ink">4.9</span> from 212 Google reviews</span>
-          </a>
         </div>
         <div className="min-w-0 rounded-[28px] bg-surface-2 px-4 py-4 sm:px-8 sm:py-6"><HeroVisual /></div>
       </div>
-      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-line-1 lg:grid-cols-4">
-        {PROOF.map((x) => (
-          <div key={x.l} className="bg-sheet px-5 py-5 sm:px-6">
-            <dt className="sr-only">{x.l}</dt>
-            <dd className="tabular flex items-center gap-1.5 font-serif text-[28px] font-semibold leading-none tracking-[-0.02em] text-deep-ink">{x.v}{x.star && <Star className="size-5 fill-[#E7AD16] text-[#E7AD16]" />}</dd>
-            <dd className="mt-2 text-[13px] leading-5 text-muted-foreground">{x.l}</dd>
-          </div>
-        ))}
-      </dl>
     </section>
   );
 }
@@ -224,37 +212,62 @@ function About() {
   );
 }
 
-/** What clients say, with where the ratings come from. */
+/** Every trust signal in one place: the rating and where it comes from, the track record, and what clients say. */
 function Reviews() {
+  const sources = [{ s: "Google", r: 4.9, n: 212 }, { s: "Yelp", r: 4.8, n: 64 }];
+  const dist = [[5, 92], [4, 6], [3, 1], [2, 0], [1, 1]] as const;
+  const record = [["1,800+", "returns filed since 2014"], ["640", "clients in Montclair and nearby"], ["98%", "come back the next year"]] as const;
   const reviews = [
-    { name: "Anita R.", where: "Montclair", what: "Individual return", text: "I sent everything the week before. The appointment took forty minutes and I didn't have to come back." },
-    { name: "Marcus L.", where: "Glen Ridge", what: "Self-employed", text: "Claire untangled three years of 1099s from my design work and explained every line. First year I understood my taxes." },
-    { name: "Deepa & Raj S.", where: "Bloomfield", what: "Rental property", text: "The checklist for our rental was spot on. She caught a depreciation item our old preparer missed for years." },
+    { name: "Anita R.", where: "Montclair", what: "Individual return", when: "March 2026", src: "Google", text: "I sent everything the week before. The appointment took forty minutes and I didn't have to come back." },
+    { name: "Marcus L.", where: "Glen Ridge", what: "Self-employed", when: "April 2026", src: "Google", text: "Claire untangled three years of 1099s from my design work and explained every line. First year I understood my taxes." },
+    { name: "Deepa and Raj S.", where: "Bloomfield", what: "Rental property", when: "February 2026", src: "Yelp", text: "The checklist for our rental was spot on. She caught a depreciation item our old preparer missed for years." },
+    { name: "Tom B.", where: "Montclair", what: "IRS letter", when: "July 2026", src: "Google", text: "Got a scary notice in July. Booked the same week, and Claire had it sorted with one phone call to the IRS." },
+    { name: "Olivia G.", where: "Verona", what: "Extension", when: "October 2025", src: "Google", text: "Booked at 10pm, two days before the deadline. Confirmed instantly, filed on time. No phone tag at all." },
+    { name: "Sam C.", where: "Nutley", what: "Bookkeeping", when: "January 2026", src: "Yelp", text: "Set up simple books for my shop in an hour. Tax time this year was the easiest it's ever been." },
   ];
-  const sources = [{ s: "Google", r: "4.9", n: "212 reviews" }, { s: "Yelp", r: "4.8", n: "64 reviews" }];
+  const total = sources.reduce((n, x) => n + x.n, 0);
   return (
     <section id="reviews" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <SectionHead title="Why clients come back." sub="98% return the next year." />
-        <ul className="flex gap-6">
-          {sources.map((x) => (
-            <li key={x.s}>
-              <p className="flex items-center gap-1.5"><span className="tabular text-xl font-semibold text-deep-ink">{x.r}</span><Stars /></p>
-              <p className="text-xs text-muted-foreground">{x.s}, {x.n}</p>
+      <SectionHead title="What clients say." />
+      <div className="mt-10 grid gap-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-12">
+        <aside>
+          <div className="flex items-end gap-3">
+            <span className="tabular font-serif text-[56px] font-semibold leading-none tracking-[-0.03em] text-deep-ink">4.9</span>
+            <div className="pb-1"><Stars /><p className="mt-1 text-xs text-muted-foreground">{total} reviews</p></div>
+          </div>
+          <ul className="mt-5 space-y-1.5">
+            {dist.map(([star, pct]) => (
+              <li key={star} className="grid grid-cols-[24px_1fr_36px] items-center gap-2 text-xs text-muted-foreground">
+                <span className="tabular">{star}★</span>
+                <span className="h-1.5 overflow-hidden rounded-full bg-fill-neutral"><span className="block h-full rounded-full bg-[#E7AD16]" style={{ width: `${pct}%` }} /></span>
+                <span className="tabular text-right">{pct}%</span>
+              </li>
+            ))}
+          </ul>
+          <ul className="mt-6 divide-y divide-line-1 border-y border-line-1">
+            {sources.map((x) => (
+              <li key={x.s} className="flex items-center justify-between py-2.5 text-sm"><span className="text-deep-ink">{x.s}</span><span className="tabular text-muted-foreground"><span className="font-semibold text-deep-ink">{x.r}</span> · {x.n} reviews</span></li>
+            ))}
+          </ul>
+          <dl className="mt-6 space-y-3">
+            {record.map(([v, l]) => (
+              <div key={l} className="flex items-baseline gap-3"><dt className="sr-only">{l}</dt><dd className="tabular w-16 shrink-0 text-lg font-semibold text-deep-ink">{v}</dd><dd className="text-sm text-muted-foreground">{l}</dd></div>
+            ))}
+          </dl>
+        </aside>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {reviews.map((r) => (
+            <li key={r.name} className="flex flex-col rounded-2xl bg-surface-2 p-5">
+              <div className="flex items-center justify-between gap-2"><Stars /><span className="text-[11px] text-muted-foreground">{r.src}</span></div>
+              <p className="mt-3 flex-1 text-[15px] leading-6 text-deep-ink">“{r.text}”</p>
+              <div className="mt-5 flex items-end justify-between gap-3">
+                <div><p className="text-sm font-medium text-deep-ink">{r.name}</p><p className="text-xs text-muted-foreground">{r.where}, {r.what}</p></div>
+                <p className="shrink-0 text-[11px] text-muted-foreground">{r.when}</p>
+              </div>
             </li>
           ))}
         </ul>
       </div>
-      <ul className="mt-10 grid gap-4 md:grid-cols-3">
-        {reviews.map((r) => (
-          <li key={r.name} className="flex flex-col rounded-2xl bg-surface-2 p-5">
-            <Stars />
-            <p className="mt-3 flex-1 text-[15px] leading-6 text-deep-ink">“{r.text}”</p>
-            <p className="mt-5 text-sm font-medium text-deep-ink">{r.name}</p>
-            <p className="text-xs text-muted-foreground">{r.where}, {r.what}</p>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
@@ -263,12 +276,6 @@ function Stars() {
   return <span className="inline-flex" aria-label="5 out of 5 stars">{[0, 1, 2, 3, 4].map((i) => <Star key={i} className="size-4 fill-[#E7AD16] text-[#E7AD16]" />)}</span>;
 }
 
-const PROOF = [
-  { v: "4.9", l: "Google rating, 212 reviews", star: true },
-  { v: "1,800+", l: "returns filed since 2014" },
-  { v: "640", l: "clients in Montclair and nearby" },
-  { v: "98%", l: "come back the next year" },
-];
 function Privacy() {
   const points = [
     { icon: Lock, title: "Private storage", text: "Only your preparer can open your files." },

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "./demo";
+import type { Block } from "./email.server";
 
 async function owner(context: { supabase: import("@supabase/supabase-js").SupabaseClient; userId: string }) {
   const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
@@ -326,7 +327,7 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
     if (!key) return { ok: false as const, reason: "no_key" as const };
     const { data: m } = await s.from("messages").select("subject, body, recipient").eq("id", data.id).eq("channel", "email").maybeSingle();
     if (!m || !/@example\.(com|org|net)$/i.test(m.recipient ?? "")) return { ok: false as const, reason: "missing" as const };
-    const { renderEmail, toText, type Block } = await import("./email.server");
+    const { renderEmail, toText } = await import("./email.server");
     const parts = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
     parts.shift(); // The stored plain-text message starts with its heading.
     if (parts.at(-1) === "Claire Hartwell, EA") parts.pop();

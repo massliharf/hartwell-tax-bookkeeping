@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
+import { OFFICE_EMAIL, OFFICE_EMAIL_HREF, OFFICE_PHONE, OFFICE_PHONE_HREF } from "@/lib/meeting";
 
 export function AnnouncementBar() {
   return (

@@ -143,7 +143,12 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
   const feed = useServerFn(phoneFeed);
   const q = useQuery({ queryKey: ["owner", "phone"], queryFn: () => feed() as Promise<Msg[]>, refetchInterval: 3000 });
   // Never let an unexpected response take the page down; the preview just stays empty.
-  const data: Msg[] = Array.isArray(q.data) ? q.data : [];
+  // Links in stored emails point at the live site; in the phone preview, open them on this same site so they always work.
+  const data: Msg[] = useMemo(() => {
+    const raw: Msg[] = Array.isArray(q.data) ? q.data : [];
+    const here = typeof window !== "undefined" ? window.location.origin : "";
+    return raw.map((m) => ({ ...m, body: (m.body ?? "").replace(/https:\/\/[a-z0-9-]+\.lovable\.app(?=\/)/g, here) }));
+  }, [q.data]);
   const [pick, setPick] = useState<string>("latest");
   const [tab, setTab] = useState<"mail" | "sms">("mail");
   const [open, setOpen] = useState<string | null>(null);

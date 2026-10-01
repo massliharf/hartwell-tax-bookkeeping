@@ -96,41 +96,67 @@ function Hero() {
   );
 }
 function Year() {
-  const months = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-  const peak = new Set([1, 2, 3, 8, 9]);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const peak = new Set([1, 2, 3, 9]);
   return (
-    <section className={`${panel} grid gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[1fr_1.2fr] md:items-center`}>
-      <SectionHead title="Open all year, busiest twice." sub="February to mid-April and before October 15, times fill a few weeks ahead. Book early, or join a day's waitlist and we'll offer you the first cancellation. The rest of the year there's usually an opening the same week." />
-      <div aria-hidden="true">
-        <div className="grid grid-cols-12 gap-1">
-          {months.map((m, i) => (
-            <div key={i} className="text-center">
-              <div className={`h-16 rounded-md ${peak.has(i) ? "bg-ink" : "bg-fill-neutral"}`} />
-              <p className={`mt-1.5 text-[11px] ${peak.has(i) ? "font-medium text-deep-ink" : "text-muted-foreground"}`}>{m}</p>
-            </div>
-          ))}
+    <section className="rounded-[28px] bg-ink px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
+      <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-16">
+        <div>
+          <p className="text-sm font-medium text-primary-foreground/70">Planning ahead</p>
+          <h2 className="t-section mt-3 max-w-[13ch] text-balance">Open all year. Book early when it counts.</h2>
+          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">February to mid-April and before October 15, times fill a few weeks ahead. Outside those weeks, there’s usually an opening the same week.</p>
+          <Button asChild variant="secondary" className="mt-7 bg-sheet text-ink hover:bg-paper-deep active:bg-fill-neutral"><Link to="/book">See open times</Link></Button>
         </div>
-        <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground"><span className="size-2.5 rounded-sm bg-ink" />Busy season</p>
+        <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
+          <p className="text-sm font-medium text-primary-foreground/70">When to plan your visit</p>
+          <div className="mt-6 space-y-0 divide-y divide-primary-foreground/20">
+            <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 first:pt-0 sm:grid-cols-[7rem_1fr]">
+              <span className="font-semibold text-primary-foreground">Feb–Apr</span>
+              <p className="text-sm leading-6 text-primary-foreground/75">Tax season fills weeks ahead. Book early so you can send your documents afterwards.</p>
+            </div>
+            <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 sm:grid-cols-[7rem_1fr]">
+              <span className="font-semibold text-primary-foreground">Oct 15</span>
+              <p className="text-sm leading-6 text-primary-foreground/75">The extension deadline brings another rush. If your day is full, join its waitlist for the first cancellation.</p>
+            </div>
+            <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 last:pb-0 sm:grid-cols-[7rem_1fr]">
+              <span className="font-semibold text-primary-foreground">All year</span>
+              <p className="text-sm leading-6 text-primary-foreground/75">Outside the busy weeks, there’s usually an opening the same week.</p>
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-12 gap-1" aria-label="Busier months: February, March, April and October">
+            {months.map((month, i) => (
+              <div key={month} className="min-w-0 text-center">
+                <div className={`h-2 rounded-full ${peak.has(i) ? "bg-primary-foreground" : "bg-primary-foreground/20"}`} />
+                <span className={`mt-2 block text-[10px] sm:text-xs ${peak.has(i) ? "font-semibold text-primary-foreground" : "text-primary-foreground/60"}`}><span className="sm:hidden">{month.slice(0, 1)}</span><span className="hidden sm:inline">{month}</span></span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 function HowItWorks() {
   const steps = [
-    { t: "Book a time", d: "Pick an open slot online. You're confirmed right away." },
-    { t: "Answer five questions", d: "They become the exact list of documents to bring." },
-    { t: "Send your documents", d: "From your phone. We check each one as it arrives." },
-    { t: "Meet Claire, then sign and pay", d: "One appointment. Then sign and pay online, and we e-file." },
+    { t: "Book a time", d: "Pick an open slot online. You're confirmed right away.", note: "Your place is yours" },
+    { t: "Answer five questions", d: "They become the exact list of documents to bring.", note: "Know what to gather" },
+    { t: "Send your documents", d: "From your phone. We check each one as it arrives.", note: "Get ready at your pace" },
+    { t: "Meet Claire, then sign and pay", d: "One appointment. Then sign and pay online, and we e-file.", note: "Finish without another visit" },
   ];
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="How it works." sub="No phone tag, and no second visit for a missing form." />
-      <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="max-w-3xl">
+        <p className="text-sm font-medium text-ink">How it works</p>
+        <h2 className="t-section mt-3 text-balance text-deep-ink">Book first. Get ready next. Come in once.</h2>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">No phone tag, and no second visit for a missing form.</p>
+      </div>
+      <ol className="mt-10 grid gap-x-8 gap-y-8 border-t border-line-2 pt-7 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
-          <li key={x.t} className="border-t-2 border-deep-ink pt-4">
-            <span className="tabular text-sm font-medium text-muted-foreground">{i + 1}</span>
-            <h3 className="mt-1 t-sub">{x.t}</h3>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">{x.d}</p>
+          <li key={x.t} className="min-w-0">
+            <span className="flex size-9 items-center justify-center rounded-full bg-ink text-sm font-semibold tabular-nums text-primary-foreground">{i + 1}</span>
+            <p className="mt-5 text-xs font-medium text-ink">{x.note}</p>
+            <h3 className="mt-1 text-lg font-semibold leading-snug text-deep-ink">{x.t}</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{x.d}</p>
           </li>
         ))}
       </ol>

@@ -132,14 +132,14 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
           const received = items.filter((i) => i.status === "uploaded" && !eyes.includes(i));
           const open = items.filter((i) => i.status !== "uploaded");
           const group = (title: string, list: typeof items, tone?: "warn") => list.length > 0 && (
-            <div className="mt-4">
-              <p className={cn("mb-1.5 t-label", tone === "warn" && "text-alert-warning-fg")}>{title} · {list.length}</p>
+             <div className="mt-3">
+               <p className={cn("mb-1 t-label", tone === "warn" && "text-alert-warning-fg")}>{title} · {list.length}</p>
               <ul className="divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1">
                 {list.map((i) => (
-                  <li key={i.id} className="px-3 py-2.5">
-                    <div className="flex flex-wrap items-center gap-2.5 text-sm">
+                   <li key={i.id} className="px-3 py-1.5">
+                     <div className="flex flex-wrap items-center gap-2 text-sm">
                       <button type="button" disabled={i.status !== "uploaded"} onClick={() => setGallery(true)}
-                        className="flex min-w-0 flex-1 items-center gap-2.5 text-left disabled:cursor-default">
+                         className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:cursor-default">
                         <span className={cn("grid size-7 shrink-0 place-items-center rounded-lg", i.status === "uploaded" ? "bg-fill-neutral text-deep-ink" : "border border-dashed border-line-2 text-muted-foreground")}><FileText className="size-3.5" /></span>
                         <span className={cn("min-w-0 truncate", i.status === "uploaded" ? "text-deep-ink" : "text-muted-foreground")}>{i.document_name}</span>
                       </button>

@@ -4,7 +4,7 @@ import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Cl
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { NextOpen } from "@/components/site/NextOpen";
+import { OpenTimes } from "@/components/site/OpenTimes";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
@@ -55,8 +55,8 @@ function Home() {
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
         <Services />
-        <Year />
         <HowItWorks />
+        <Year />
         <BeforeAfter />
         <About />
         <Privacy />
@@ -70,13 +70,14 @@ function Home() {
 
 
 function Hero() {
+  const facts: [string, string][] = [["IRS Enrolled Agent", "Licensed to prepare returns and represent you"], ["12 years in Montclair", "1,800+ returns filed"], ["Federal, NJ and NY", "Included in every price"]];
   return (
     <section className="enter overflow-hidden">
-      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.45fr_1fr] md:gap-12 md:pb-12 md:pt-14">
+      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.35fr_1fr] md:gap-12 md:pb-12 md:pt-14">
         <div>
           <p className="text-sm font-medium text-ink">Tax preparation and bookkeeping in Montclair, NJ</p>
-          <h1 className="enter-title mt-4 max-w-[19ch] text-balance t-hero text-deep-ink">Your taxes, handled by someone who knows your name.</h1>
-          <p className="mt-6 max-w-[35rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
+          <h1 className="enter-title mt-4 max-w-[19ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, handled by someone who knows your name.</h1>
+          <p className="mt-6 max-w-[34rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
             Hartwell Tax is a one-person practice run by Claire Hartwell, an IRS Enrolled Agent. She prepares federal and New Jersey returns for families, freelancers, landlords and small businesses, and deals with the IRS when a letter arrives.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -85,20 +86,20 @@ function Hero() {
           </div>
           <p className="mt-4 max-w-[34rem] text-sm leading-6 text-muted-foreground">Open all year, Monday to Saturday. From February to mid-April and before October 15, times fill a few weeks ahead, so schedule early or join the waitlist for a cancellation.</p>
         </div>
-        <figure className="enter-spot relative min-w-0 overflow-hidden rounded-2xl bg-ink-900" style={{ animationDelay: "200ms" }}>
-          <img src={claire} alt="Claire Hartwell at her desk in Montclair" className="aspect-[4/5] w-full object-cover opacity-90 sm:aspect-[5/5]" />
-          <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-5 pt-16 text-white">
-            <p className="text-[15px] font-medium">Claire Hartwell, EA</p>
-            <p className="text-[13px] text-white/70">Enrolled to practice before the IRS. 12 years in Montclair.</p>
-            <div className="mt-4 border-t border-white/20 pt-3"><NextOpen /></div>
-          </figcaption>
-        </figure>
+        <div className="enter-spot min-w-0" style={{ animationDelay: "200ms" }}><OpenTimes /></div>
       </div>
+      <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
+        {facts.map(([k, v], i) => (
+          <li key={k} className="flex items-center gap-3 bg-sheet px-5 py-4">
+            {i === 0 && <img src={claire} alt="" width={36} height={36} className="size-9 shrink-0 rounded-full object-cover" />}
+            <div><p className="text-sm font-medium text-deep-ink">{k}</p><p className="text-[13px] text-muted-foreground">{v}</p></div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
 
-/** The year, as clients live it: open all year, two rushes. This is the business's main quirk, said plainly. */
 function Year() {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const peak = new Set([1, 2, 3, 8, 9]);

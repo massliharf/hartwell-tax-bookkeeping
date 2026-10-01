@@ -16,3 +16,5 @@
 - [ ] Full product QA: list issues, fix by severity, re-test affected flows, reset demo data.
 - [ ] Audit information hierarchy and placement across public, booking, portal, and owner screens; align with Studio Shell without changing features.
 - [ ] Verify changed screens at phone and desktop widths and check for overflow.
+- [ ] Remove non-demo customer records and keep one usable demo record for every service and key appointment state; refresh the demo reset snapshot.
+- [ ] Refine the homepage header, opening section and trust strip against the supplied screenshots; check mobile and desktop.

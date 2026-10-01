@@ -39,11 +39,14 @@ handles exceptions.
 
 | Service | Duration | Price |
 | --- | --- | --- |
+| Free 15-minute call | 15 min | Free |
 | Individual return (W-2 income) | 45 min | from $250 |
 | Self-employed / freelancer (1099, Schedule C) | 75 min | from $450 |
 | Rental property | 60 min | from $400 |
-| Extension / IRS letter review | 30 min | $150 |
-| Small business bookkeeping consult | 60 min | $200 |
+| IRS or state letter | 30 min | $150 |
+| Extension or late return | 45 min | from $200 |
+| Tax planning and quarterly estimates | 45 min | $175 |
+| Small business bookkeeping | 60 min | $200 |
 
 **Office hours:** Mon–Fri 9:00–18:00, Sat 10:00–14:00.
 **Buffer:** 15 minutes between appointments.

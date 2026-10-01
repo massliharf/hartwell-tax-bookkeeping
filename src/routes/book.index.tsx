@@ -257,7 +257,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   const fetchWindow = useServerFn(getAvailabilityWindow);
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 21 } }), staleTime: 30_000 });
   // Clients see 30-minute starts only; every label, chip and "Next available" uses the same list.
-  const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
+  // Closed days are hidden entirely; only days Claire could take you appear.
+  const days = (q.data?.days ?? []).filter((d) => !d.closed).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);

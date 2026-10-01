@@ -4,7 +4,7 @@ import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Cl
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { OpenTimes } from "@/components/site/OpenTimes";
+import { NextOpen } from "@/components/site/NextOpen";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
@@ -40,7 +40,6 @@ function SectionHead({ title, sub, action, eyebrow }: { title: string; sub?: str
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 [&_h2]:text-balance">
       <div className="max-w-2xl">
-        {eyebrow && <p className="mb-4 inline-flex h-7 items-center rounded-full border border-line-1 bg-surface-2 px-3 text-[12px] font-medium text-body">{eyebrow}</p>}
         <h2 className="t-section text-deep-ink">{title}</h2>
         {sub && <p className="mt-2 text-sm leading-[22px] text-muted-foreground sm:text-base sm:leading-6">{sub}</p>}
       </div>
@@ -55,9 +54,10 @@ function Home() {
       <SiteHeader warm />
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
+        <Services />
+        <Year />
         <HowItWorks />
         <BeforeAfter />
-        <Services />
         <About />
         <Privacy />
         <Faq />
@@ -70,32 +70,64 @@ function Home() {
 
 
 function Hero() {
-  const facts: [string, string][] = [["IRS Enrolled Agent", "licensed to prepare returns and represent you"], ["12 years in Montclair", "1,800+ returns filed"], ["Federal, NJ and NY", "returns included in every price"]];
   return (
     <section className="enter overflow-hidden">
-      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pb-12 md:pt-14">
+      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.1fr_1fr] md:gap-12 md:pb-12 md:pt-14">
         <div>
-          <p className="text-sm font-medium text-ink">Tax preparation in Montclair, NJ</p>
-          <h1 className="enter-title mt-4 max-w-[15ch] text-balance t-hero text-deep-ink">Your tax return, done in one visit.</h1>
-          <p className="mt-6 max-w-[34rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            Hartwell Tax prepares returns for families, freelancers, landlords and small businesses. Pick an open time, get a list of exactly which documents to bring, and send them from your phone. Claire Hartwell checks everything before you arrive, so one appointment is all it takes.
+          <p className="text-sm font-medium text-ink">Tax preparation and bookkeeping in Montclair, NJ</p>
+          <h1 className="enter-title mt-4 max-w-[16ch] text-balance t-hero text-deep-ink">Your taxes, handled by someone who knows your name.</h1>
+          <p className="mt-6 max-w-[35rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
+            Hartwell Tax is a one-person practice run by Claire Hartwell, an IRS Enrolled Agent. She prepares federal and New Jersey returns for families, freelancers, landlords and small businesses, and deals with the IRS when a letter arrives.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button>
+            <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book/returning">Manage my appointment</Link></Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">Confirmed right away. Nothing to pay until your return is filed.</p>
+          <p className="mt-4 max-w-[34rem] text-sm leading-6 text-muted-foreground">Open all year. From February to April and in the weeks before October 15, Claire adds evening and Saturday times.</p>
         </div>
-        <div className="enter-spot min-w-0" style={{ animationDelay: "200ms" }}><OpenTimes /></div>
+        <figure className="enter-spot relative min-w-0 overflow-hidden rounded-2xl bg-ink-900" style={{ animationDelay: "200ms" }}>
+          <img src={claire} alt="Claire Hartwell at her desk in Montclair" className="aspect-[4/5] w-full object-cover opacity-90 sm:aspect-[5/5]" />
+          <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-5 pt-16 text-white">
+            <p className="text-[15px] font-medium">Claire Hartwell, EA</p>
+            <p className="text-[13px] text-white/70">Enrolled to practice before the IRS. 12 years in Montclair.</p>
+            <div className="mt-4 border-t border-white/20 pt-3"><NextOpen /></div>
+          </figcaption>
+        </figure>
       </div>
-      <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
-        {facts.map(([k, v]) => (
-          <li key={k} className="flex items-center gap-3 bg-sheet px-5 py-4">
-            <img src={claire} alt="" width={32} height={32} className={`size-8 shrink-0 rounded-full object-cover ${k === "IRS Enrolled Agent" ? "" : "hidden"}`} />
-            <div><p className="text-sm font-medium text-deep-ink">{k}</p><p className="text-[13px] text-muted-foreground">{v}</p></div>
-          </li>
+    </section>
+  );
+}
+
+/** The year, as clients live it: open all year, two rushes. This is the business's main quirk, said plainly. */
+function Year() {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const peak = new Set([1, 2, 3, 8, 9]);
+  const rows = [
+    { t: "February to mid-April", d: "Filing season. Times fill two to three weeks ahead, so Claire adds evenings and Saturdays. Booking early gets you the time you want." },
+    { t: "September to October 15", d: "Extension deadline. If you filed an extension in April, this is when your return gets finished." },
+    { t: "The rest of the year", d: "Quieter, and usually open the same week: IRS letters, quarterly estimates for freelancers, bookkeeping, and catching up on past returns." },
+  ];
+  return (
+    <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
+      <SectionHead title="Open all year, busiest twice." sub="Most people only think about taxes in April. Claire works with clients all year, and plans her calendar around the two rushes." />
+      <div className="mt-10" aria-hidden="true">
+        <div className="grid grid-cols-12 gap-1">
+          {months.map((m, i) => (
+            <div key={m} className="text-center">
+              <div className={`h-10 rounded-md ${peak.has(i) ? "bg-ink" : "bg-fill-neutral"}`} />
+              <p className={`mt-1.5 text-[11px] ${peak.has(i) ? "font-medium text-deep-ink" : "text-muted-foreground"}`}>{m}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        {rows.map((r, i) => (
+          <div key={r.t} className="flex gap-3">
+            <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${i < 2 ? "bg-ink" : "bg-line-3"}`} />
+            <div><h3 className="text-[15px] font-medium text-deep-ink">{r.t}</h3><p className="mt-1.5 text-[15px] leading-6 text-muted-foreground">{r.d}</p></div>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
@@ -168,7 +200,7 @@ function StepPreviewReminders() {
 /** magnific.com/desktop "sticky index" section: the list on the left follows the text on the right. */
 function HowItWorks() {
   const steps = [
-    { title: "Pick a time.", text: "Every open slot is right there, evenings and Saturdays in season. You're confirmed on the spot, no call back needed.", preview: <StepPreviewTime /> },
+    { title: "Pick a time.", text: "See every open time online, evenings and Saturdays included in season. You're confirmed on the spot, without waiting for a call back.", preview: <StepPreviewTime /> },
     { title: "Send what's on your list.", text: "A few quick questions build a checklist for your return. Snap documents with your phone; each one is checked as it arrives, and gentle reminders cover the rest.", preview: <StepPreviewDocs /> },
     { title: "Meet Claire once.", text: "In person in Montclair or on a video call. She's already seen your documents, so the hour goes to your return, not to paperwork.", preview: <StepPreviewReady /> },
     { title: "Sign, pay, filed.", text: "When your return is ready you get one email: review it, sign Form 8879 and pay from your phone. Claire files, and you're told when it's done.", preview: <StepPreviewReminders /> },
@@ -184,7 +216,7 @@ function HowItWorks() {
   }, []);
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-20`}>
-      <SectionHead eyebrow="How it works" title="Booked, prepared, done." sub="From picking a time to a filed return, without a single back-and-forth email." />
+      <SectionHead eyebrow="How it works" title="From first click to filed return." sub="Four steps, no back-and-forth emails. You only come in for one of them." />
       <div className="mt-12 grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
         <nav aria-label="Steps" className="hidden lg:block">
           <ol className="sticky top-28 space-y-1">
@@ -243,7 +275,7 @@ function BeforeAfter() {
 function Services() {
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead eyebrow="Prices" title="Clear prices, set in advance." sub="Fees are paid when your return is filed. Nothing is charged at booking." />
+      <SectionHead title="What Claire can do for you." sub="Each price is agreed before any work starts, and you pay when your return is filed. Federal and New Jersey returns are included; a New York return too if you work in the city." />
       <ul className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border">
         {SERVICES.map((s) => {
           const st = serviceStyle(s.id);
@@ -351,6 +383,7 @@ function DeadlineCta() {
 
 function Faq() {
   const qs = [
+    { q: "Are you open all year, or only in tax season?", a: "All year. February to mid-April and the weeks before October 15 are the busiest, so Claire adds evening and Saturday times then. The rest of the year is quieter: IRS letters, quarterly estimates, bookkeeping and past returns, usually with an opening the same week." },
     { q: "What is an Enrolled Agent?", a: "An Enrolled Agent is licensed by the IRS itself to prepare tax returns and to represent taxpayers in audits, collections and appeals. It is the highest credential the IRS awards, and it requires ongoing education every year." },
     { q: "How much will my return cost?", a: "Prices start at the amounts listed above and are confirmed before any work starts. You pay once your return is ready to file, never at booking." },
     { q: "Do you prepare New York returns too?", a: "Yes. Many Montclair clients work in New York, so non-resident New York returns are included when you need one." },

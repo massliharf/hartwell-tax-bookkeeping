@@ -23,6 +23,7 @@ import { APPT_SELECT, fmtLong, fmtTime, missingOf, type Appt } from "./lib";
 import { ErrorNote, StatusPill } from "./ui";
 import { ReviewGallery } from "./review-gallery";
 import { AiTag, CloseoutBlock, DocReview, FinishForm } from "./closeout";
+import { MeetingNotes } from "./meeting-notes";
 import { reviewDocument } from "@/lib/owner.functions";
 import type { ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
@@ -160,6 +161,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
       </section>}
       </div>
       <div className="min-w-0">
+      <MeetingNotes a={a} now={now} />
       <CloseoutBlock a={a} />
       <FollowUps a={a} now={now} />
       </div>

@@ -1,6 +1,7 @@
 // Email + SMS delivery with a single log in `messages`. Every send is claimed
 // first via a unique dedupe_key, so the same message can never go out twice.
 import type { Database } from "@/integrations/supabase/types";
+import { OFFICE_EMAIL, OFFICE_EMAIL_HREF } from "./meeting";
 
 type MsgType = Database["public"]["Enums"]["message_type"];
 const TZ = "America/New_York";
@@ -45,7 +46,7 @@ export function renderEmail(heading: string, blocks: Block[]) {
 ${body}
 <p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:#353535">Warmly,<br><strong style="color:#1A1A1A">Claire Hartwell, EA</strong></p>
 </td></tr>
-<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#737373">${OFFICE} &middot; (973) 555-0142<br>We never ask for your Social Security number by email.</td></tr>
+<tr><td style="padding:16px 4px;font-size:12px;line-height:1.5;color:#737373">${OFFICE} &middot; (973) 555-0142<br><a href="${OFFICE_EMAIL_HREF}" style="color:#737373">${OFFICE_EMAIL}</a><br>We never ask for your Social Security number by email.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 

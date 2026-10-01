@@ -290,7 +290,7 @@ function Faq() {
   ];
   return (
     <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
-      <div className="self-start"><SectionHead title="Questions." sub="Anything else? Call (973) 555-0142." /></div>
+      <div className="self-start"><SectionHead title="Questions." sub="Anything else? Call (973) 555-0142 or email claire@hartwelltax.com." /></div>
       <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-4">
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-border">

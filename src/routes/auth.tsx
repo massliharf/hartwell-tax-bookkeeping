@@ -85,6 +85,7 @@ function AuthPage() {
         <div className="relative flex flex-wrap gap-x-5 gap-y-1.5 border-t border-white/10 pt-5 text-xs text-white/50">
           <span>412 Bloomfield Avenue, Montclair, NJ</span>
           <span>(973) 555-0142</span>
+          <span>claire@hartwelltax.com</span>
           <span>Mon to Fri 9 to 6, Sat 10 to 2</span>
         </div>
       </section>

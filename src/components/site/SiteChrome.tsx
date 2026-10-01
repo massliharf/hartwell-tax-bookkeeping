@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
+import { OFFICE_EMAIL, OFFICE_EMAIL_HREF, OFFICE_PHONE, OFFICE_PHONE_HREF } from "@/lib/meeting";
 
 export function AnnouncementBar() {
   return (
@@ -53,6 +54,7 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   );
 }
 
+// Contact lines in the footer stack evenly with the address.
 export function SiteFooter() {
   return (
     <footer className="mt-16 bg-night text-white/80 lg:mt-24">
@@ -70,11 +72,12 @@ export function SiteFooter() {
             <li><a href="/#faq" className="hover:text-white">FAQ</a></li>
           </ul>
         </div>
-        <div className="text-sm">
+        <div className="flex flex-col text-sm">
           <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
-          <a href="tel:+19735550142" className="tabular mt-1 flex min-h-10 items-center hover:text-white">(973) 555-0142</a>
+          <a href={OFFICE_PHONE_HREF} className="tabular -my-2 flex min-h-9 items-center hover:text-white">{OFFICE_PHONE}</a>
+          <a href={OFFICE_EMAIL_HREF} className="-my-2 flex min-h-9 items-center hover:text-white">{OFFICE_EMAIL}</a>
         </div>
         <div className="text-sm">
           <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Hours</p>

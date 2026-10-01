@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { EmailCard, parseEmailText } from "./email-preview";
 import { LogoMark } from "@/components/brand/Logo";
-import { demoAbandon, demoCancelTomorrow, demoClaim, demoClientPays, demoJump, demoPortalLink, demoFillWeek, demoPreventNoShow, demoReset, demoRun, demoUpload, demoWrongDoc, phoneFeed } from "@/lib/demo.functions";
+import { demoAbandon, demoCancelTomorrow, demoClaim, demoClientPays, demoJump, demoPortalLink, demoFillWeek, demoPreventNoShow, demoReset, demoRun, demoUpload, demoWrongDoc, phoneFeed, demoSendCopy } from "@/lib/demo.functions";
 
 type Msg = { id: string; channel: string; type: string; subject: string | null; body: string; sent_at: string; recipient: string | null; name: string | null };
 
@@ -193,6 +193,7 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
                   </div>
                 </div>
                 {(() => { const e = parseEmailText(current.body ?? ""); return <EmailCard compact heading={e.heading} blocks={e.blocks} />; })()}
+                <SendCopy id={current.id} />
               </div>
             </>
           ) : (
@@ -241,5 +242,30 @@ function PhonePanel({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </aside>
+  );
+}
+
+/** Send a real copy of the open message to your own inbox. */
+function SendCopy({ id }: { id: string }) {
+  const send = useServerFn(demoSendCopy);
+  const [to, setTo] = useState("");
+  useEffect(() => { setTo(localStorage.getItem("demo:copy-to") ?? ""); }, []);
+  const [state, setState] = useState<"idle" | "busy" | "ok" | "no_key" | "email" | "failed" | "missing">("idle");
+  const go = async (e: FormEvent) => {
+    e.preventDefault(); setState("busy");
+    localStorage.setItem("demo:copy-to", to);
+    try { const r = await send({ data: { id, to } }); setState(r.ok ? "ok" : r.reason); } catch { setState("failed"); }
+  };
+  const msg = { ok: "Sent. Check your inbox (and spam).", no_key: "Real email isn't connected yet.", email: "Enter a valid email.", failed: "Couldn't send. Try again.", missing: "Message not found." } as Record<string, string>;
+  return (
+    <form onSubmit={go} className="mt-4 rounded-xl border border-black/10 p-3">
+      <p className="text-[12px] font-semibold text-black">Get this email in your real inbox</p>
+      <div className="mt-2 flex gap-2">
+        <input type="email" required value={to} onChange={(e) => setTo(e.target.value)} placeholder="you@email.com" aria-label="Your email"
+          className="h-9 min-w-0 flex-1 rounded-lg border border-black/15 px-2 text-[13px] text-black outline-none focus-visible:outline-2 focus-visible:outline-offset-2" />
+        <Button type="submit" size="sm" disabled={state === "busy"}>{state === "busy" ? "Sending…" : "Send"}</Button>
+      </div>
+      {msg[state] && <p role="status" className="mt-2 text-[12px] text-black/60">{msg[state]}</p>}
+    </form>
   );
 }

@@ -50,7 +50,7 @@ export const demoRun = createServerFn({ method: "POST" }).middleware([requireSup
 export const demoJump = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ days: z.union([z.literal(1), z.literal(2), z.literal(7)]) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { s, origin } = await owner(context);
+    const { s } = await owner(context);
     const { data: st } = await s.from("settings").select("demo_time_offset_minutes").eq("id", 1).single();
     await s.from("settings").update({ demo_time_offset_minutes: (st?.demo_time_offset_minutes ?? 0) + data.days * 1440 }).eq("id", 1);
     const { runAutomations } = await import("./automations.server");
@@ -328,7 +328,7 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
     const { data: m } = await s.from("messages").select("subject, body, recipient").eq("id", data.id).eq("channel", "email").maybeSingle();
     if (!m || !/@example\.(com|org|net)$/i.test(m.recipient ?? "")) return { ok: false as const, reason: "missing" as const };
     const { renderEmail, toText } = await import("./email.server");
-    const parts = m.body.replace(/https:\/\/[a-z0-9-]+\.lovable\.app(?=\/)/g, origin).split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+    const parts = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
     parts.shift(); // The stored plain-text message starts with its heading.
     if (parts.at(-1) === "Claire Hartwell, EA") parts.pop();
     const blocks = parts.flatMap((part): Block[] => {

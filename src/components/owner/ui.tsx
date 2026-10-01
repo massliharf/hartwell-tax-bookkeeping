@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Send, Sparkles, CalendarCheck } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Send, Sparkles, CalendarCheck, MessageCircleQuestion } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { Tag } from "@/components/ui/tag";
@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getDocumentUrl } from "@/lib/portal.functions";
+import { replyInquiry } from "@/lib/inquiry.functions";
+import { Textarea } from "@/components/ui/textarea";
 import { markNoShow, dismissAttention, nudgeSignature, remindPayment } from "@/lib/owner.functions";
 import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, money, type Appt, type Item, type NeedItem } from "./lib";
 import { useApptPanel } from "./drawer-context";
@@ -145,6 +147,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
   else if (it.kind === "signature") { icon = <PenLine />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
   else if (it.kind === "file") { icon = <Send />; title = `${it.appt.clients?.name}: signed and paid, file the return`; reason = `Paid ${fmtDay(it.appt.paid_at ?? it.appt.end_at)}. Everything is ready to e-file.`; action = "Open"; appointmentId = it.appt.id; }
   else if (it.kind === "wrap") { icon = <CalendarCheck />; title = `${it.appt.clients?.name}: meeting has ended`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. Finish the return, or book another meeting if you ran out of time.`; action = "Open"; appointmentId = it.appt.id; }
+  else if (it.kind === "question") { icon = <MessageCircleQuestion />; title = `${it.q.name} asked a question`; reason = it.q.question; action = "Reply"; }
   else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
   else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
   return (
@@ -161,11 +164,13 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
 export function NeedsList({ items }: { items: NeedItem[] }) {
   const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature), payNudge = useServerFn(remindPayment); const openAppt = useApptPanel();
   const [all, setAll] = useState(false);
-  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review" || it.kind === "wrap" || it.kind === "file") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
+  const [q, setQ] = useState<Extract<NeedItem, { kind: "question" }>["q"] | null>(null);
+  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "question") { setQ(it.q); return { ok: true, silent: true }; } if (it.kind === "review" || it.kind === "wrap" || it.kind === "file") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const shown = all ? items : items.slice(0, 3);
   return <div>
     <ul className="overflow-hidden rounded-2xl border border-border">{shown.map((it, i) => <NeedRow idx={i} key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>
     {items.length > 3 && <Button size="sm" variant="ghost" className="mt-2" onClick={() => setAll(v => !v)}>{all ? "Show less" : `Show all ${items.length}`}</Button>}
+    <ReplyDialog q={q} onClose={() => setQ(null)} />
   </div>;
 }
 
@@ -190,4 +195,31 @@ export function DocViewer({ open, onOpenChange, title, items, startId }: { open:
     return () => { live = false; };
   }, [open, currentId, currentPath, fileKey, getUrl]);
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[90dvh] max-w-4xl overflow-auto bg-sheet p-0 sm:rounded-2xl"><DialogHeader className="border-b border-border px-6 py-4"><DialogTitle className="font-sans text-lg font-normal">{title}</DialogTitle><DialogDescription>Private files. Links expire after a minute.</DialogDescription></DialogHeader><div className="grid md:grid-cols-[220px_1fr]"><ul className="max-h-[60vh] overflow-auto border-b border-border p-3 md:border-b-0 md:border-r">{files.map((f, i) => <li key={f.id}><Button variant="ghost" onClick={() => setIndex(i)} className={cn("h-auto w-full justify-start whitespace-normal py-2 text-left", index === i && "bg-fill-selected")}><span><span className="block text-sm text-deep-ink">{f.document_name}</span>{f.uploaded_at && <span className="text-xs text-muted-foreground">Received {fmtLong(f.uploaded_at)}</span>}</span></Button></li>)}</ul><div className="min-h-[50vh] bg-sheet p-4"><div className="flex items-center justify-end gap-2 pb-2"><Button size="icon" variant="outline" aria-label="Previous document" disabled={index === 0} onClick={() => setIndex(i => i - 1)}><ChevronLeft /></Button><span className="tabular text-xs text-muted-foreground">{files.length ? index + 1 : 0} / {files.length}</span><Button size="icon" variant="outline" aria-label="Next document" disabled={index >= files.length - 1} onClick={() => setIndex(i => i + 1)}><ChevronRight /></Button></div><div className="grid min-h-[40vh] place-items-center">{sel?.loading && <Skeleton className="h-[40vh] w-full" />}{sel && !sel.loading && !sel.url && <p className="text-sm text-warning">This file couldn't be opened.</p>}{sel?.url && (sel.path.toLowerCase().endsWith(".pdf") ? <iframe title="Document" src={sel.url} className="h-[55vh] w-full rounded-lg border border-border" /> : <img src={sel.url} alt="Uploaded document" className="max-h-[55vh] rounded-lg border border-border object-contain" />)}{sel?.url && <a href={sel.url} target="_blank" rel="noreferrer" className="mt-3 text-xs text-ink underline">Open in a new tab</a>}</div></div></div></DialogContent></Dialog>;
+}
+
+function ReplyDialog({ q, onClose }: { q: Extract<NeedItem, { kind: "question" }>["q"] | null; onClose: () => void }) {
+  const qc = useQueryClient(); const send = useServerFn(replyInquiry);
+  const [text, setText] = useState("");
+  useEffect(() => { setText(q?.ai_reply ?? ""); }, [q]);
+  const m = useMutation({
+    mutationFn: () => send({ data: { id: q!.id, reply: text } }),
+    onSuccess: (r) => { if (!r.ok) return void toast.error("Couldn't send. Try again."); toast.success("Reply sent."); void qc.invalidateQueries({ queryKey: ["owner"] }); onClose(); },
+    onError: () => toast.error("Couldn't send. Try again."),
+  });
+  return (
+    <Dialog open={!!q} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Reply to {q?.name}</DialogTitle><DialogDescription>{q?.email}{q ? `, ${fmtStamp(q.created_at)}` : ""}</DialogDescription></DialogHeader>
+        <p className="whitespace-pre-line rounded-xl bg-surface-2 p-3 text-sm leading-[22px] text-body">{q?.question}</p>
+        <div className="grid gap-1.5">
+          <span className="text-xs text-muted-foreground">{q?.ai_reply ? "Suggested reply. Edit it before sending." : "Your reply"}</span>
+          <Textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} aria-label="Reply" />
+        </div>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button disabled={!text.trim() || m.isPending} onClick={() => m.mutate()}>{m.isPending ? "Sending…" : "Send reply"}</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

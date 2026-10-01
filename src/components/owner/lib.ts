@@ -97,6 +97,8 @@ export const MSG_LABEL: Record<string, string> = {
   doc_fix_request: "Document needs a fix",
   review_sign_pay: "Review, sign and pay",
   return_filed: "Return filed",
+  inquiry_reply: "Question answered",
+  file_reminder: "Ready to e-file",
 };
 
 export type NeedItem =
@@ -106,6 +108,7 @@ export type NeedItem =
   | { kind: "unpaid"; id: string; appt: Appt }
   | { kind: "wrap"; id: string; appt: Appt }
   | { kind: "file"; id: string; appt: Appt }
+  | { kind: "question"; id: string; q: { id: string; name: string; email: string; question: string; ai_reply: string | null; created_at: string } }
   | { kind: "failed"; id: string; msg: { id: string; subject: string | null; recipient: string | null; error: string | null; sent_at: string; type: string } }
   | { kind: "claimed"; id: string; offer: { id: string; slot_start: string; name: string; service: string } };
 
@@ -118,7 +121,7 @@ export const needsYou = (nowIso: string) =>
       const ago3 = new Date(now - 3 * 86400e3).toISOString();
       const ago5 = new Date(now - 5 * 86400e3).toISOString();
       const ago1 = new Date(now - 86400e3).toISOString();
-      const [low, sig, failed, claimed, rev, unpaid, wrap, file] = await Promise.all([
+      const [low, sig, failed, claimed, rev, unpaid, wrap, file, qs] = await Promise.all([
         supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lt("ready_score", 70)
           .gt("start_at", nowIso).lte("start_at", in48).order("start_at"),
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").is("filed_at", null).lt("end_at", ago3).order("end_at"),
@@ -130,8 +133,9 @@ export const needsYou = (nowIso: string) =>
         supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lte("end_at", nowIso).order("end_at"),
         // Signed and paid over 24h ago, still not marked filed.
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "signed").is("filed_at", null).not("paid_at", "is", null).lt("paid_at", ago1).lt("signed_at", ago1).order("paid_at"),
+        supabase.from("inquiries").select("id, name, email, question, ai_reply, created_at").eq("status", "needs_claire").order("created_at"),
       ]);
-      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error ?? wrap.error ?? file.error;
+      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error ?? wrap.error ?? file.error ?? qs.error;
       if (err) throw err;
       const revRows = (rev.data ?? []) as unknown as { appointment_id: string; appointments: { start_at: string } }[];
       let review: NeedItem[] = [];
@@ -141,6 +145,7 @@ export const needsYou = (nowIso: string) =>
         if (fa) review = [{ kind: "review", id: firstId, count: revRows.length, appt: fa as unknown as Appt }];
       }
       return [
+        ...(qs.data ?? []).map((q) => ({ kind: "question" as const, id: q.id, q })),
         ...((wrap.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "wrap" as const, id: a.id, appt: a })),
         ...((file.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "file" as const, id: a.id, appt: a })),
         ...review,

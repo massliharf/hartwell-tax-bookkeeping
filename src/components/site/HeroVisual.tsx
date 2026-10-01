@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { DocumentStack, type StackDoc } from "@/components/brand/DocumentStack";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { BellRing, CalendarCheck } from "lucide-react";

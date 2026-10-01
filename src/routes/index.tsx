@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowUpRight, BadgeCheck, CreditCard, MapPinned } from "lucide-react";
+import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowUpRight, CreditCard, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HeroVisual } from "@/components/site/HeroVisual";

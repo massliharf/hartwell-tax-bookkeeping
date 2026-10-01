@@ -72,7 +72,7 @@ export function MeetingNotes({ a, now }: { a: Appt; now: string }) {
       {actions.length > 0 && <>
         <p className="mt-4 t-label">Next steps</p>
         <ul className="mt-1.5 divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1">
-          {actions.map((x) => <li key={x.text} className="flex items-center gap-2 px-3 py-1.5 text-sm"><Tag tone={x.who === "Claire" ? "info" : "neutral"}>{x.who}</Tag><span className="min-w-0 text-deep-ink">{x.text}</span></li>)}
+          {actions.map((x) => <li key={x.text} className="flex items-center gap-2 px-3 py-1.5 text-sm"><Tag tone={x.who === "Claire" ? "accent" : "neutral"}>{x.who}</Tag><span className="min-w-0 text-deep-ink">{x.text}</span></li>)}
         </ul>
       </>}
       {lines.length > 0 && (

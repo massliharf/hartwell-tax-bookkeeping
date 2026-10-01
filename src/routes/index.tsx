@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowRight } from "lucide-react";
+import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowUpRight, BadgeCheck, CreditCard, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HeroVisual } from "@/components/site/HeroVisual";
@@ -71,7 +71,7 @@ function Hero() {
   return (
     <section className="overflow-hidden">
       <div className="grid items-center gap-10 px-2 pb-10 pt-10 sm:px-4 md:min-h-[530px] md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-14 md:pt-16">
-        <div className="reveal-children min-w-0">
+        <div className="min-w-0">
           <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping in Montclair, NJ</p>
           <h1 className="mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
@@ -83,12 +83,12 @@ function Hero() {
           </div>
           
         </div>
-        <div className="reveal min-w-0 rounded-[24px] bg-ink-50 px-4 py-4 sm:px-8 sm:py-6" style={{ ["--d" as string]: "250ms" }}><HeroVisual /></div>
+        <div className="min-w-0 rounded-[28px] bg-surface-2 px-4 py-4 sm:px-8 sm:py-6"><HeroVisual /></div>
       </div>
       <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
         {facts.map(([k, v], i) => (
           <li key={k} className="flex min-w-0 items-center gap-3.5 bg-sheet px-5 py-5 sm:px-6">
-            {i === 0 ? <img src={claire} alt="" width={44} height={44} className="size-11 shrink-0 rounded-full object-cover" /> : <span aria-hidden="true" className="text-xl font-semibold text-muted-foreground">0{i + 1}</span>}
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink">{i === 0 ? <img src={claire} alt="" width={40} height={40} className="size-10 rounded-xl object-cover" /> : i === 1 ? <MapPinned className="size-[18px]" strokeWidth={1.75} /> : <CreditCard className="size-[18px]" strokeWidth={1.75} />}</span>
             <div className="min-w-0"><p className="text-sm font-semibold text-deep-ink">{k}</p><p className="mt-0.5 text-[13px] leading-5 text-muted-foreground">{v}</p></div>
           </li>
         ))}
@@ -188,9 +188,9 @@ function Services() {
           </div>
         ))}
       </div>
-      <Link to="/book" search={{ service: "intro" }} className="group mt-10 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-ink-50 px-5 py-4">
-        <span className="flex items-center gap-3 text-[15px] text-deep-ink"><ServiceIcon service="intro" size={32} /><span><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span></span>
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">Choose a call time<ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" /></span>
+      <Link to="/book" search={{ service: "intro" }} className="group mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line-1 pt-6 focus-visible:outline-offset-4">
+        <span className="flex items-center gap-3 text-[15px] leading-6 text-deep-ink"><ServiceIcon service="intro" size={32} /><span><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span></span>
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink group-hover:underline group-hover:underline-offset-4">Choose a call time<ArrowUpRight className="size-4" /></span>
       </Link>
     </section>
   );
@@ -287,9 +287,9 @@ function Faq() {
   return (
     <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
       <div className="self-start"><SectionHead title="Questions." sub="Anything else? Ask below, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
-      <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-4">
+      <Accordion type="single" collapsible className="overflow-hidden rounded-2xl border border-line-1 bg-sheet px-4">
         {qs.map((x) => (
-          <AccordionItem key={x.q} value={x.q} className="border-border">
+          <AccordionItem key={x.q} value={x.q} className="border-line-1 last:border-b-0">
             <AccordionTrigger className="py-4 text-left text-[15px] font-medium text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
             <AccordionContent className="pb-4 text-sm leading-[22px] text-body">{x.a}</AccordionContent>
           </AccordionItem>

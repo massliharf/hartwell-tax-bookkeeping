@@ -35,10 +35,10 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
       <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
         <Wordmark />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-          {LINKS.map((l) => <a key={l.href} href={l.href} className="flex h-10 items-center rounded-lg px-2 text-[13px] font-medium text-body transition-colors duration-150 hover:bg-fill-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{l.label}</a>)}
+          {LINKS.map((l) => <a key={l.href} href={l.href} className="relative flex h-10 items-center px-2 text-[13px] font-medium text-body transition-colors duration-150 after:absolute after:inset-x-2 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-150 hover:text-ink hover:after:scale-x-100 focus-visible:text-ink focus-visible:after:scale-x-100">{l.label}</a>)}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
-          <Button asChild variant="link"><Link to="/book/returning">My appointment</Link></Button>
+          <Button asChild variant="ghost" className="text-ink hover:text-ink"><Link to="/book/returning">My appointment</Link></Button>
           <Button asChild><Link to="/book">Schedule an appointment</Link></Button>
         </div>
         <DropdownMenu>

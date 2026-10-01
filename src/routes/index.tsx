@@ -296,11 +296,17 @@ function Services() {
               </div>
               <p className="tabular hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><Clock className="size-3.5" />{s.minutes} min</p>
               <p className="hidden whitespace-nowrap text-right text-deep-ink sm:block">
-                {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                <span className="tabular text-lg font-semibold">${s.price}</span>
+                {s.price === 0 ? (
+                  <span className="text-lg font-semibold">Free</span>
+                ) : (
+                  <>
+                    {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                    <span className="tabular text-lg font-semibold">${s.price}</span>
+                  </>
+                )}
               </p>
               <div className="flex flex-col items-end gap-1">
-                <span className="tabular text-sm font-semibold text-deep-ink sm:hidden">{s.from ? "from " : ""}${s.price}</span>
+                <span className="tabular text-sm font-semibold text-deep-ink sm:hidden">{s.price === 0 ? "Free" : `${s.from ? "from " : ""}$${s.price}`}</span>
                 <Button asChild size="sm" variant="secondary"><Link to="/book" search={{ service: s.id }}>Schedule</Link></Button>
               </div>
             </li>

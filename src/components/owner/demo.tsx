@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { EmailCard, parseEmailText } from "./email-preview";
 import { LogoMark } from "@/components/brand/Logo";
-import { demoAbandon, demoCancelTomorrow, demoClaim, demoClientPays, demoJump, demoPortalLink, demoReset, demoRun, demoUpload, demoWrongDoc, phoneFeed } from "@/lib/demo.functions";
+import { demoAbandon, demoCancelTomorrow, demoClaim, demoClientPays, demoJump, demoPortalLink, demoPreventNoShow, demoReset, demoRun, demoUpload, demoWrongDoc, phoneFeed } from "@/lib/demo.functions";
 
 type Msg = { id: string; channel: string; type: string; subject: string | null; body: string; sent_at: string; recipient: string | null; name: string | null };
 
@@ -23,6 +23,7 @@ const STORY: { title: string; actions: { k: string; label: string; hint: string;
   ] },
   { title: "Before the appointment", actions: [
     { k: "j1", label: "Jump ahead 1 day", hint: "Runs reminders and the 48-hour readiness check." },
+    { k: "prevent", label: "A client who isn't ready moves later", hint: "Two days out with documents missing: offered later times, takes one. An empty chair avoided." },
     { k: "j7", label: "Jump ahead 7 days", hint: "Sends document reminders for next week's clients." },
     { k: "run", label: "Run automations now", hint: "Sends anything due. Nothing is ever sent twice." },
   ] },
@@ -51,7 +52,7 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
   const fns = {
     run: useServerFn(demoRun), jump: useServerFn(demoJump), upload: useServerFn(demoUpload),
     cancel: useServerFn(demoCancelTomorrow), claim: useServerFn(demoClaim), abandon: useServerFn(demoAbandon), reset: useServerFn(demoReset),
-    wrong: useServerFn(demoWrongDoc), pays: useServerFn(demoClientPays), portal: useServerFn(demoPortalLink),
+    wrong: useServerFn(demoWrongDoc), pays: useServerFn(demoClientPays), portal: useServerFn(demoPortalLink), prevent: useServerFn(demoPreventNoShow),
   };
 
   const act = async (key: string, fn: () => Promise<{ message: string }>) => {
@@ -73,7 +74,7 @@ export function DemoTools({ inline = false, rows = false, collapsed = false }: {
     if (k === "book") return openTab("/book");
     if (k === "portal") return act(k, async () => { const r = await fns.portal(); if (r.token) openTab(`/a/${r.token}`); return { message: r.token ? "Opened the client's appointment page in a new tab." : "No upcoming appointment to open." }; });
     const map: Record<string, () => Promise<{ message: string }>> = {
-      run: () => fns.run(), j1: () => fns.jump({ data: { days: 1 } }), j2: () => fns.jump({ data: { days: 2 } }), j7: () => fns.jump({ data: { days: 7 } }),
+      run: () => fns.run(), prevent: () => fns.prevent(), j1: () => fns.jump({ data: { days: 1 } }), j2: () => fns.jump({ data: { days: 2 } }), j7: () => fns.jump({ data: { days: 7 } }),
       up: () => fns.upload(), wrong: () => fns.wrong(), cx: () => fns.cancel(), cl: () => fns.claim(), ab: () => fns.abandon(), pays: () => fns.pays(), rs: () => fns.reset(),
     };
     return act(k, map[k]!);

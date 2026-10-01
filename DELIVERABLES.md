@@ -35,7 +35,6 @@
 - Loading skeletons, empty states with a next action, retryable error states on every data-driven screen; file inputs and icon buttons have accessible names; axe WCAG AA serious/critical: 0.
 
 ## 2. Remaining known issues
-- Minor: seed data has no pre-made "prevented no-show"; produce it live with Demo tools → Jump ahead 1 day, then the client takes the offered time.
 - Minor: Stripe is not connected; the client's Pay step is a clearly labelled test checkout.
 - Minor: final read-through of booking and client-page microcopy for voice.
 
@@ -47,7 +46,7 @@
 | 2 | Back to the top; tap a time in "Open times" → fill name and email → Book this time | "A client asks 'can you do my taxes?' at 9 pm. Two minutes later they're booked, and Claire never picked up the phone." |
 | 3 | Confirmation → Answer the questions → answer five → checklist appears | "Five yes-or-no questions become the exact list of documents to bring." |
 | 4 | Owner view (footer) → sign in → Demo tools → "Client uploads last year's W-2" | "Each upload is checked as it arrives. The wrong year is caught before Claire ever sees it." |
-| 5 | Today | "This week: 4 appointments confirmed without her, 11 reminders sent, an empty chair avoided, two hours given back." |
+| 5 | Demo tools → "A client who isn't ready moves later" → Today | "A client two days out is missing documents; they're offered later times and take one. Today: appointments confirmed without her, reminders sent, empty chairs avoided, hours given back." |
 | 6 | Open an appointment → Timeline | "Every confirmation, reminder and follow-up: sent, scheduled, or sent now with one click." |
 | 7 | Finish appointment → (Demo tools) Client signs and pays → Mark filed | "From the meeting to e-filed with one email and two clicks. That's the whole season." |
 

@@ -167,3 +167,40 @@ export const demoReset = createServerFn({ method: "POST" }).middleware([requireS
   if (error) throw new Error("Could not reset demo data.");
   return { message: "Demo data reset. The clock is back to today." };
 });
+
+/**
+ * Demo: the no-show the readiness check prevents. A client two days out is still missing documents;
+ * they're offered later times (the same email the 48-hour check sends) and take one. Claire does nothing.
+ */
+export const demoPreventNoShow = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { s, origin, getNow } = await owner(context);
+  const now = await getNow();
+  const { data: list } = await s.from("appointments").select("id, service_id, start_at, ready_score, manage_token, clients(id, name, email)")
+    .in("status", ["booked", "confirmed"]).gte("start_at", new Date(now.getTime() + 2 * 3600e3).toISOString()).lte("start_at", new Date(now.getTime() + 4 * 86400e3).toISOString())
+    .lt("ready_score", 100).order("ready_score").limit(1);
+  const a = list?.[0] as { id: string; service_id: string; start_at: string; ready_score: number; manage_token: string; clients: { id: string; name: string; email: string } | null } | undefined;
+  if (!a || !a.clients) return { message: "No upcoming appointment is missing documents right now. Try 'Client uploads last year's W-2' first, or reset the demo." };
+  const { data: slots } = await s.rpc("available_slots", { _service_id: a.service_id, _from: a.start_at.slice(0, 10), _to: new Date(Date.parse(a.start_at) + 21 * 86400e3).toISOString().slice(0, 10), _now: now.toISOString() });
+  const later = ((slots ?? []) as string[]).filter((x) => Date.parse(x) > Date.parse(a.start_at) + 86400e3 && new Date(x).getUTCMinutes() % 30 === 0);
+  const to = later[0];
+  if (!to) return { message: "No later time is open for this service. Add hours in Settings, or reset the demo." };
+  const tz = { timeZone: "America/New_York" } as const;
+  const when = (iso: string) => `${new Date(iso).toLocaleDateString("en-US", { ...tz, weekday: "long", month: "long", day: "numeric" })} at ${new Date(iso).toLocaleTimeString("en-US", { ...tz, hour: "numeric", minute: "2-digit" })}`;
+  const first = a.clients.name.split(" ")[0];
+  const { sendMessage } = await import("./email.server");
+  // The offer goes out as if the 48-hour check had just run (sent well before the appointment).
+  await sendMessage({
+    dedupeKey: `ready48:${a.id}:${a.start_at}`, type: "reschedule_offer", minutesSaved: 10, clientId: a.clients.id, appointmentId: a.id, to: a.clients.email,
+    subject: "Want to move your appointment so it's not wasted?", heading: "Want a little more time?",
+    blocks: [
+      { p: `Hi ${first}, your appointment is ${when(a.start_at)}, and a few documents are still missing. If you'd like more time to gather them, you can move to a later slot with one tap.` },
+      { buttons: later.slice(0, 3).map((x) => ({ label: when(x), href: `${origin}/move/${a.manage_token}?to=${encodeURIComponent(x)}` })) },
+      { button: { label: "Keep my time and upload now", href: `${origin}/a/${a.manage_token}` } },
+      { note: "Either way is completely fine. We just want your visit to count." },
+    ],
+  });
+  const { data: res } = await s.rpc("reschedule_appointment", { _id: a.id, _start: to, _now: now.toISOString() });
+  if (!(res as { ok: boolean } | null)?.ok) return { message: `${first} was offered a later time, but it was just taken. Run it again.` };
+  await s.from("appointments").update({ needs_attention: false, attention_reason: "handled" }).eq("id", a.id);
+  return { message: `${first} was ${a.ready_score}% ready two days out, got offered later times, and moved to ${when(to)}. An empty chair avoided, without you.` };
+});

@@ -188,9 +188,10 @@ function Services() {
           </div>
         ))}
       </div>
-      <Link to="/book" search={{ service: "intro" }} className="group mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line-1 pt-6 focus-visible:outline-offset-4">
-        <span className="flex items-center gap-3 text-[15px] leading-6 text-deep-ink"><ServiceIcon service="intro" size={40} /><span><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span></span>
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink group-hover:underline group-hover:underline-offset-4">Choose a call time<ArrowUpRight className="size-4" /></span>
+      <Link to="/book" search={{ service: "intro" }} className="group mt-8 grid grid-cols-[40px_minmax(0,1fr)] items-center gap-x-3 gap-y-3 rounded-xl bg-surface-2 px-4 py-5 transition-colors duration-150 hover:bg-fill-selected focus-visible:outline-2 focus-visible:outline-ring sm:grid-cols-[40px_minmax(0,1fr)_auto]">
+        <ServiceIcon service="intro" size={40} className="transition-transform duration-150 group-hover:scale-110" />
+        <span className="min-w-0 text-[15px] leading-6 text-deep-ink"><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span>
+        <span className="col-start-2 inline-flex items-center gap-1.5 text-sm font-semibold text-ink group-hover:underline group-hover:underline-offset-4 sm:col-start-3 sm:justify-self-end">Choose a call time<ArrowUpRight className="size-4" /></span>
       </Link>
     </section>
   );

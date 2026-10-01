@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
+import { AskForm } from "@/components/site/AskForm";
 import { GROUPS, SERVICES } from "@/lib/services";
 import claire from "@/assets/claire-portrait.jpg";
 
@@ -290,7 +291,7 @@ function Faq() {
   ];
   return (
     <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
-      <div className="self-start"><SectionHead title="Questions." sub="Anything else? Call (973) 555-0142 or email claire@hartwelltax.com." /></div>
+      <div className="self-start"><SectionHead title="Questions." sub="Anything else? Ask below, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
       <Accordion type="single" collapsible className="overflow-hidden rounded-2xl bg-surface-2 px-4">
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-border">

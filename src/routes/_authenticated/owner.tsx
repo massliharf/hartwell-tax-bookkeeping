@@ -74,7 +74,7 @@ function OwnerLayout() {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-6 text-center">
         <div className="max-w-sm">
-          <h1 className="t-page text-deep-ink">This area is for Claire only.</h1>
+          <h1 className="t-page text-deep-ink">This area is for the practice owner.</h1>
           <p className="mt-2 text-sm text-muted-foreground">You're signed in with an account that doesn't have access.</p>
           <Button className="mt-6" variant="outline" onClick={signOut}>Sign out</Button>
         </div>

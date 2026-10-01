@@ -145,7 +145,7 @@ function TimeStep({ service, services, draft, update }: { service: Service; serv
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 1 of 2" title="Pick a time for your tax appointment" sub="All times are Eastern. You can move or cancel later from your link." />
+        <StepTitle hideEyebrow eyebrow="Step 1 of 2" title="Pick a time for your tax appointment" sub="All times are Eastern. Not sure which service? Pick the closest one; Claire adjusts it if needed. You can move or cancel later from your link." />
       <div role="radiogroup" aria-label="Service" className="mb-5 flex flex-wrap gap-1.5">
         {services.map((x) => (
           <button key={x.slug} type="button" role="radio" aria-checked={x.slug === service.slug} onClick={() => { if (x.slug !== service.slug) update({ serviceSlug: x.slug, slot: undefined, date: undefined }); }}

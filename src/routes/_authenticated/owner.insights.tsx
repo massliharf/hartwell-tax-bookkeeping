@@ -93,13 +93,13 @@ function Insights() {
         <Metric title="Arrived fully ready" value={`${ready30}%`} note={`before: ~${BEFORE.ready}%`} good={ready30 >= BEFORE.ready}>
           <AreaSpark data={ready} baseline={BEFORE.ready} max={100} suffix="%" />
         </Metric>
-        <Metric title="Wasted appointments avoided" value={String(avoided30)} note="moved after the readiness check">
+        <Metric title="Moved instead of wasted" value={String(avoided30)} note="moved after the readiness check">
           <Bars data={avoided} />
         </Metric>
         <Metric title="Slots refilled from the waitlist" value={String(refilled30)} note="freed times claimed by someone waiting">
           <Bars data={refilled} tone="marigold" />
         </Metric>
-        <Metric title="Booked with zero involvement" value={`${zero30}%`} note="no call, no email from you">
+        <Metric title="Booked without you" value={`${zero30}%`} note="no call or email from you">
           <AreaSpark data={zero} max={100} suffix="%" />
         </Metric>
         <Metric title="No-show rate" value={`${noShow30}%`} note={`before: ~${BEFORE.noShow}%`} good={noShow30 <= BEFORE.noShow}>
@@ -135,7 +135,7 @@ function Hero({ hours, minutes }: { hours: number; minutes: number }) {
     <>
       <PageHead title="Report" meta="Last 30 days, and every message sent for you" />
       <section className="relative overflow-hidden rounded-[22px] bg-ink-900 p-6 text-white sm:p-8">
-        <p className="text-[13px] font-medium text-white/70">Hours given back to Claire</p>
+        <p className="text-[13px] font-medium text-white/70">Hours given back to you</p>
         <p className="tabular mt-3 font-serif text-[64px] font-semibold leading-none tracking-[-0.04em]">{hours}<span className="ml-3 font-sans text-lg font-normal tracking-normal text-white/70">hour{hours === 1 ? "" : "s"}</span></p>
         <p className="tabular mt-4 max-w-md text-sm leading-6 text-white/75">{minutes.toLocaleString()} minutes of confirmations, reminders, follow-ups and payment chases that went out on their own instead of by hand.</p>
       </section>

@@ -21,9 +21,9 @@ export const Route = createFileRoute("/_authenticated/owner")({
   head: () => ({
     meta: [
       { title: "Practice — Hartwell Tax & Bookkeeping" },
-      { name: "description", content: "Claire's practice app: today, calendar, clients and follow-ups." },
+      { name: "description", content: "Hartwell Tax owner dashboard: today, calendar, clients and messages." },
       { property: "og:title", content: "Practice — Hartwell Tax & Bookkeeping" },
-      { property: "og:description", content: "Claire's practice app: today, calendar, clients and follow-ups." },
+      { property: "og:description", content: "Hartwell Tax owner dashboard: today, calendar, clients and messages." },
       { name: "robots", content: "noindex" },
     ],
   }),

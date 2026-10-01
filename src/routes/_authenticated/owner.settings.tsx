@@ -74,8 +74,8 @@ function SettingsPage() {
           ))}
         </nav>
         <div key={tab} className="enter min-w-0 max-w-2xl">
-        {tab === "integrations" && <Card title="Integrations" note="Where your bookings and messages go."><Integrations /></Card>}
-        {tab === "hours" && <Card title="Office hours" note="Bookings only offer times inside these hours.">
+        {tab === "integrations" && <Card title="Integrations" note="Where your appointments and messages go."><Integrations /></Card>}
+        {tab === "hours" && <Card title="Office hours" note="Clients can only schedule inside these hours.">
           <ul className="divide-y divide-border">
             {DAYS.map(([k, label]) => {
               const h = hours[k];
@@ -102,7 +102,7 @@ function SettingsPage() {
           <TimeOff />
         </Card>}
 
-        {tab === "services" && <Card title="Services and prices" note="What clients can book, how long it takes, and the starting fee.">
+        {tab === "services" && <Card title="Services and prices" note="What clients can schedule, how long it takes, and the starting fee.">
           <div className="space-y-3">
             {svcs.map((s, i) => {
               const set = (p: Partial<Svc>) => setSvcs(svcs.map((x, j) => (j === i ? { ...x, ...p } : x)));
@@ -122,9 +122,9 @@ function SettingsPage() {
         {tab === "reminders" && <Card title="Reminder timings" note="When the automatic messages go out.">
           <div className="grid gap-4 sm:grid-cols-2">
             <Num label="Document reminder" unit="days before" v={tm.docs_reminder_days} on={(n) => setTm({ ...tm, docs_reminder_days: n })} />
-            <Num label="Readiness check" unit="hours before" v={tm.readiness_check_hours} on={(n) => setTm({ ...tm, readiness_check_hours: n })} />
+            <Num label="Document check" unit="hours before" v={tm.readiness_check_hours} on={(n) => setTm({ ...tm, readiness_check_hours: n })} />
             <Num label="Final reminder" unit="hours before" v={tm.final_reminder_hours} on={(n) => setTm({ ...tm, final_reminder_hours: n })} />
-            <Num label="Unfinished booking nudge" unit="hours after" v={tm.abandoned_nudge_hours} on={(n) => setTm({ ...tm, abandoned_nudge_hours: n })} />
+            <Num label="Unfinished scheduling reminder" unit="hours after" v={tm.abandoned_nudge_hours} on={(n) => setTm({ ...tm, abandoned_nudge_hours: n })} />
           </div>
           <Button className="mt-5" disabled={saving === "tm"} onClick={() => save("tm", async () => [await supabase.from("settings").update({ reminder_timings: tm }).eq("id", 1)])}>Save timings</Button>
         </Card>}

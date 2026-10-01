@@ -90,7 +90,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
       await qc.invalidateQueries({ queryKey: ["owner"] });
       onDone();
       openAppt({ appointmentId: r.appointmentId });
-    } catch { setErr("Couldn't book it. Try again."); }
+    } catch { setErr("Couldn't schedule it. Try again."); }
     finally { setBusy(false); }
   };
 
@@ -98,7 +98,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b border-border px-5 pb-4 pr-14 pt-5 sm:px-6">
         <DialogTitle className="text-[18px] font-semibold leading-6 text-deep-ink">New appointment</DialogTitle>
-        <DialogDescription className="mt-0.5 text-sm text-muted-foreground">They get the same confirmation and reminders as an online booking.</DialogDescription>
+        <DialogDescription className="mt-0.5 text-sm text-muted-foreground">They get the same confirmation and reminders as clients who schedule online.</DialogDescription>
       </header>
 
       <div className="space-y-6 px-6 py-5">

@@ -37,7 +37,7 @@ export function Integrations() {
   return (
     <ul className="divide-y divide-border">
       <Row icon={<CalendarDays />} title="Google Calendar" status={<Tag tone="success">Ready</Tag>}>
-        <p>Every booking, move and cancellation shows up in your own calendar within a few hours. Works with Google, Apple and Outlook.</p>
+        <p>Every new, moved and cancelled appointment shows up in your own calendar within a few hours. Works with Google, Apple and Outlook.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild size="sm"><a href={google} target="_blank" rel="noreferrer">Add to Google Calendar</a></Button>
           <Button size="sm" variant="secondary" onClick={copy}><Copy />Copy calendar link</Button>

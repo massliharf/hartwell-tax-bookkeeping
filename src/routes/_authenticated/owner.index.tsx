@@ -133,7 +133,7 @@ function TodaySchedule({ appts, now, ymd }: { appts: import("@/components/owner/
   }
   type Row = { kind: "appt"; a: (typeof list)[number]; at: number } | { kind: "gap"; from: number; to: number; at: number };
   const rows: Row[] = [...ahead.map((a) => ({ kind: "appt" as const, a, at: et(a.start_at).minutes })), ...gaps.map((g) => ({ kind: "gap" as const, ...g, at: g.from }))].sort((x, y) => x.at - y.at);
-  if (!list.length && !gaps.length) return <Empty title="A quiet day.">Nothing on the calendar. New bookings show up here on their own.</Empty>;
+  if (!list.length && !gaps.length) return <Empty title="A quiet day.">Nothing on the calendar. New appointments show up here on their own.</Empty>;
   return (
     <div className="overflow-hidden rounded-2xl border border-border">
       {past.map((a, i) => <div key={a.id} className="enter-item border-b border-border opacity-60 last:border-0" style={{ animationDelay: `${150 + i * 30}ms` }}><ApptList appts={[a]} bare /></div>)}

@@ -56,7 +56,7 @@ export function TimeOff() {
   return (
     <div className="mt-6 border-t border-border pt-5">
       <h3 className="t-sub">Time off</h3>
-      <p className="mt-0.5 text-xs text-muted-foreground">Blocked times disappear from online booking, rescheduling and New appointment.</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">Blocked times disappear from online scheduling, rescheduling and New appointment.</p>
 
       <div className="mt-4 space-y-3 rounded-xl border border-border bg-paper p-3">
         <div className="flex flex-wrap items-center gap-3">

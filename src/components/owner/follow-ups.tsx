@@ -55,7 +55,7 @@ export function FollowUps({ a, now }: { a: Appt; now: string }) {
   const future = (ms: number) => ms > t;
 
   const steps: Step[] = [];
-  steps.push({ key: "confirm", label: "Booking confirmation", state: last("booking_confirmation") ? "sent" : "due", at: last("booking_confirmation"),
+  steps.push({ key: "confirm", label: "Confirmation", state: last("booking_confirmation") ? "sent" : "due", at: last("booking_confirmation"),
     action: { label: "Resend link", run: () => fns.link({ data: { id: a.id } }) } });
   if (a.status !== "completed" && a.status !== "no_show" && a.status !== "cancelled") {
     const docsAt = start - docsD * D;
@@ -63,7 +63,7 @@ export function FollowUps({ a, now }: { a: Appt; now: string }) {
       state: last("docs_reminder_7d") ? "sent" : !missing ? "skipped" : future(docsAt) ? "scheduled" : "skipped", at: last("docs_reminder_7d") ?? at(docsAt),
       action: open && missing ? { label: "Send now", run: () => fns.docs({ data: { id: a.id } }) } : undefined });
     const readyAt = start - readyH * H;
-    steps.push({ key: "ready", label: "Readiness check", note: last("readiness_check_48h", "reschedule_offer") || future(readyAt) ? "Offers a later time if documents are still missing" : "Booked after its date",
+    steps.push({ key: "ready", label: "Document check", note: last("readiness_check_48h", "reschedule_offer") || future(readyAt) ? "Offers a later time if documents are still missing" : "Booked after its date",
       state: last("readiness_check_48h", "reschedule_offer") ? "sent" : future(readyAt) ? "scheduled" : "skipped", at: last("readiness_check_48h", "reschedule_offer") ?? at(readyAt) });
     const finalAt = start - finalH * H;
     steps.push({ key: "final", label: "Appointment reminder", note: last("final_reminder_24h") || future(finalAt) ? undefined : "Booked after its date", state: last("final_reminder_24h") ? "sent" : future(finalAt) ? "scheduled" : "skipped", at: last("final_reminder_24h") ?? at(finalAt),
@@ -84,7 +84,7 @@ export function FollowUps({ a, now }: { a: Appt; now: string }) {
       action: !paid && a.fee_cents != null ? { label: "Send now", run: () => fns.pay({ data: { id: a.id } }) } : undefined });
   }
   if (a.status === "no_show") {
-    steps.push({ key: "rebook", label: "Rebooking link", state: last("reschedule_offer") ? "sent" : "due", at: last("reschedule_offer"),
+    steps.push({ key: "rebook", label: "Link to schedule again", state: last("reschedule_offer") ? "sent" : "due", at: last("reschedule_offer"),
       action: { label: "Send now", run: () => fns.rebook({ data: { id: a.id } }) } });
   }
 
@@ -95,7 +95,7 @@ export function FollowUps({ a, now }: { a: Appt; now: string }) {
   return (
     <section className="border-t border-border px-6 py-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="t-sub">Handled for you</h3>
+        <h3 className="t-sub">Automatic messages</h3>
         <span className="text-xs text-muted-foreground">{sentMsgs.length} message{sentMsgs.length === 1 ? "" : "s"} sent</span>
       </div>
       {next.length === 0 ? (
@@ -140,7 +140,7 @@ export function MeetingPicker({ a, mode, onBack, onDone }: { a: Appt; mode: "mov
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="t-sub">{mode === "follow_up" ? "Book the next meeting" : "Reschedule"}</h3>
+        <h3 className="t-sub">{mode === "follow_up" ? "Schedule the next meeting" : "Reschedule"}</h3>
         <p className="mt-1 text-sm text-muted-foreground">{mode === "follow_up" ? `Out of time? Pick when to continue. ${first}'s documents and answers carry over, and ${first} is emailed the new time.` : `${first} is emailed the new time. Documents and answers stay with the appointment.`}</p>
       </div>
       <SlotPicker serviceId={a.service_id} value={slot} onChange={setSlot} />
@@ -150,7 +150,7 @@ export function MeetingPicker({ a, mode, onBack, onDone }: { a: Appt; mode: "mov
         <Button disabled={!slot || send.isPending} onClick={() => slot && send.mutate(
           () => mode === "follow_up" ? follow({ data: { id: a.id, start: slot, note: note.trim() || undefined } }) : move({ data: { id: a.id, start: slot } }).then((r) => ({ ok: r.ok, message: r.ok ? `Moved. ${first} has been emailed the new time.` : r.error ?? "That time isn't free." })),
           { onSuccess: (r) => { if (r.ok) onDone(); } })}>
-          {send.isPending ? "Saving…" : mode === "follow_up" ? "Book and email" : "Move and email"}
+          {send.isPending ? "Saving…" : mode === "follow_up" ? "Schedule and email" : "Move and email"}
         </Button>
       </div>
     </div>
@@ -194,7 +194,7 @@ export function MoreActions({ a, onClosed, canNoShow = false }: { a: Appt; onClo
         <DropdownMenuContent align="end" side="top" className="w-60">
           {a.manage_token && <DropdownMenuItem onSelect={() => window.open(`/a/${a.manage_token}`, "_blank", "noopener")}>See the client's page</DropdownMenuItem>}
           <DropdownMenuItem onSelect={() => send.mutate(() => link({ data: { id: a.id } }))}>Resend the appointment link</DropdownMenuItem>
-          {a.status === "no_show" && <DropdownMenuItem onSelect={() => send.mutate(() => rebook({ data: { id: a.id } }))}>Send a rebooking link</DropdownMenuItem>}
+          {a.status === "no_show" && <DropdownMenuItem onSelect={() => send.mutate(() => rebook({ data: { id: a.id } }))}>Send a link to schedule again</DropdownMenuItem>}
           {canNoShow && <DropdownMenuItem onSelect={() => setNoShowAsk(true)} className="text-alert-negative-fg focus:text-alert-negative-fg">Mark as no-show…</DropdownMenuItem>}
           {open && <><DropdownMenuSeparator /><DropdownMenuItem onSelect={() => setConfirm(true)} className="text-alert-negative-fg focus:text-alert-negative-fg">Cancel appointment…</DropdownMenuItem></>}
         </DropdownMenuContent>
@@ -203,7 +203,7 @@ export function MoreActions({ a, onClosed, canNoShow = false }: { a: Appt; onClo
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle>Mark {a.clients?.name} as a no-show?</AlertDialogTitle>
-            <AlertDialogDescription>The appointment is closed. You can send a rebooking link from this menu afterwards.</AlertDialogDescription>
+            <AlertDialogDescription>The appointment is closed. You can send a link to schedule again from this menu afterwards.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Keep it open</AlertDialogCancel>
@@ -215,7 +215,7 @@ export function MoreActions({ a, onClosed, canNoShow = false }: { a: Appt; onClo
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel {a.clients?.name}'s appointment?</AlertDialogTitle>
-            <AlertDialogDescription>They get an email with a link to pick a new time, and the waitlist is offered the slot.</AlertDialogDescription>
+            <AlertDialogDescription>They get an email with a link to pick a new time, and the waitlist is offered the time.</AlertDialogDescription>
           </AlertDialogHeader>
           <Input aria-label="Note to the client (optional)" placeholder="Note to the client (optional)" value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} />
           <AlertDialogFooter>

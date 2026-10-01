@@ -14,26 +14,26 @@ type Msg = { id: string; channel: string; type: string; subject: string | null; 
 
 const STORY: { title: string; actions: { k: string; label: string; hint: string; link?: boolean }[] }[] = [
   { title: "Set the scene", actions: [
-    { k: "fill", label: "Fill this week with sample clients", hint: "Every state at once: missing documents, needs your eyes, ready, a free call, now, just ended, signature, payment, to file, filed, a no-show, a full day with a waitlist." },
+    { k: "fill", label: "Fill this week with sample clients", hint: "Every state at once: missing documents, documents to check, ready, a free call, now, ended, signature, payment, to file, filed, a no-show, a full day with a waitlist." },
   ] },
   { title: "A client books", actions: [
-    { k: "book", label: "Open the booking page", hint: "Book as a client in a new tab. It appears in Today right away.", link: true },
+    { k: "book", label: "Open the scheduling page", hint: "Schedule as a client in a new tab. It appears in Today right away.", link: true },
     { k: "portal", label: "Open a client's appointment page", hint: "The page every confirmation email links to.", link: true },
   ] },
   { title: "Documents come in", actions: [
     { k: "up", label: "Client uploads a document", hint: "Checked and accepted automatically. Nothing lands on your desk." },
-    { k: "wrong", label: "Client uploads last year's W-2", hint: "The AI warns the client. If they keep it anyway, only then does Claire look." },
+    { k: "wrong", label: "Client uploads last year's W-2", hint: "The client is warned about the wrong year. Only if they keep it does it reach you." },
   ] },
   { title: "Before the appointment", actions: [
-    { k: "j1", label: "Jump ahead 1 day", hint: "Runs reminders and the 48-hour readiness check." },
+    { k: "j1", label: "Jump ahead 1 day", hint: "Sends reminders and the document check two days before." },
     { k: "prevent", label: "A client who isn't ready moves later", hint: "Two days out with documents missing: offered later times, takes one. An empty chair avoided." },
     { k: "j7", label: "Jump ahead 7 days", hint: "Sends document reminders for next week's clients." },
-    { k: "run", label: "Run automations now", hint: "Sends anything due. Nothing is ever sent twice." },
+    { k: "run", label: "Send due messages now", hint: "Sends anything due. Nothing is ever sent twice." },
   ] },
   { title: "Someone cancels", actions: [
-    { k: "cx", label: "A client cancels tomorrow", hint: "The waitlist is offered the freed slot by email." },
-    { k: "cl", label: "Waitlist client claims it", hint: "The slot refills with no work from Claire." },
-    { k: "ab", label: "Someone leaves a booking half-done", hint: "A friendly nudge goes out an hour later." },
+    { k: "cx", label: "A client cancels tomorrow", hint: "The waitlist is offered the free time by email." },
+    { k: "cl", label: "Waitlist client claims it", hint: "The time fills again without any work from you." },
+    { k: "ab", label: "Someone leaves scheduling half-done", hint: "A friendly nudge goes out an hour later." },
   ] },
   { title: "After the appointment", actions: [
     { k: "pays", label: "Client signs and pays", hint: "Use after Finish appointment. The return moves to Ready to file." },

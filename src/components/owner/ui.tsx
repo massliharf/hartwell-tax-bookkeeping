@@ -84,7 +84,7 @@ export function ApptActionButtons({ a, onDone, onFinish }: { a: Appt; onDone?: (
       <AlertDialogContent className="max-w-sm">
         <AlertDialogHeader>
           <AlertDialogTitle>Mark {name} as a no-show?</AlertDialogTitle>
-          <AlertDialogDescription>The appointment is closed and the client gets a link to book again.</AlertDialogDescription>
+          <AlertDialogDescription>The appointment is closed and the client gets a link to schedule again.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>

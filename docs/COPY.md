@@ -30,3 +30,19 @@ Made with the `web-ux-copywriter` skill. Check changes with:
 - No device assumptions ("from your phone"), no internal mechanics, no exclamation marks.
 - Done states say it's done, show what was done, then offer the next step.
 - Section titles end with a period; product UI titles (booking steps, cards) don't.
+
+# Owner dashboard
+
+The dashboard speaks to Claire as "you". Same glossary as the customer side, plus:
+
+| Concept | Use | Never |
+|---|---|---|
+| Documents waiting for Claire | To check | Needs your eyes, review queue |
+| The 2-day-before check | Document check | readiness check |
+| Messages that go out on their own | Automatic messages | automations, handled for you |
+| A link to rebook | Link to schedule again | rebooking link |
+| An open period | time, open time | slot |
+| Filing | Mark filed, filed | e-filed |
+
+Section names stay short and stable: Today, Needs you, Today's schedule, Ready to file, Calendar, Clients, Report, Settings.
+Message names in history read as plain events: Confirmation, Document reminder, Document check: all in, Document check: later time offered, Day-before reminder, Review, sign and pay, Return filed.

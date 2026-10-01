@@ -251,7 +251,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
               </ul>
             </div>
           );
-          return <>{group("Needs your eyes", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}<RequestDocument a={a} /></>;
+          return <>{group("To check", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}<RequestDocument a={a} /></>;
         })()}
         </DocsWrap>
       </section>}
@@ -277,7 +277,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
                   <Button onClick={() => setFinishing(true)}>Finish appointment</Button>
                   <Button variant="secondary" onClick={() => setPicking("follow_up")}>Needs another meeting</Button>
                 </>}
-                {(finished || stage === "cancelled" || stage === "no_show") && <p className="text-xs text-muted-foreground sm:col-span-2">{intro && stage === "filed" ? "Call done." : stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed above when it's submitted." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
+                {(finished || stage === "cancelled" || stage === "no_show") && <p className="text-xs text-muted-foreground sm:col-span-2">{intro && stage === "filed" ? "Call done." : stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed once you've filed it." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
               </div>
               <MoreActions a={a} onClosed={onClose} canNoShow={stage === "meeting" || stage === "wrap_up"} />
             </div>

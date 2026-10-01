@@ -29,7 +29,7 @@ export function nowOf(a: Appt, nowIso: string): { turn: Turn; text: string } {
   if (st === "sign_pay") return a.signature_status !== "signed"
     ? { turn: "client", text: `Waiting for ${first} to sign Form 8879. Reminders go out on their own.` }
     : { turn: "client", text: `Signed. Waiting for payment of ${a.fee_cents != null ? money(a.fee_cents) : "the fee"}. Reminders go out on days 1, 3 and 5.` };
-  if (st === "wrap_up") return { turn: "you", text: "The meeting has ended. Finish the return, or book another meeting." };
+  if (st === "wrap_up") return { turn: "you", text: "The meeting has ended. Finish the return, or schedule another meeting." };
   if (st === "meeting") return { turn: "you", text: `${first}'s appointment is now.` };
   if (eyes) return { turn: "you", text: `${eyes} document${eyes === 1 ? " needs" : "s need"} your eyes. Everything else was checked automatically.` };
   if (a.checklist_items.length === 0 || a.intake_answers?.["intake_pending"]) return { turn: "client", text: `Waiting for ${first} to answer the five questions. The checklist builds from them.` };

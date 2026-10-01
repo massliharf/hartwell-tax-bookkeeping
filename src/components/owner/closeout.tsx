@@ -36,7 +36,7 @@ export function FinishForm({ a, onBack, onDone }: { a: Appt; onBack: () => void;
   const preview: PreviewBlock[] = [
     { p: `Hi ${first}, thanks for coming in. Claire has finished your return.${feeText}` },
     ...(note.trim() ? [{ p: `A note from Claire: ${note.trim()}` }] : []),
-    { p: "One short step left: sign your e-file authorization (Form 8879) and pay. Your return is filed as soon as it's signed and paid." },
+    { p: "One short step left: sign the filing authorization (Form 8879) and pay. Your return is filed as soon as it's signed and paid." },
     { button: { label: "Review, sign and pay" } },
   ];
   const sent = () => {
@@ -104,7 +104,7 @@ export function CloseoutBlock({ a }: { a: Appt }) {
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle>{confirm === "paid" ? `Mark ${money(a.fee_cents)} as paid?` : `Mark ${a.clients?.name}'s return filed?`}</AlertDialogTitle>
-            <AlertDialogDescription>{confirm === "paid" ? "Use this for cash, check or the card terminal. Payment reminders stop." : "The client gets an email that their return has been e-filed."}</AlertDialogDescription>
+            <AlertDialogDescription>{confirm === "paid" ? "Use this for cash, check or the card terminal. Payment reminders stop." : "The client gets an email that their return has been filed."}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -125,7 +125,7 @@ export function AiTag({ i }: { i: Item }) {
   if (i.ai_check === "ok") return <Tag tone="success">Auto-checked</Tag>;
   if (i.ai_check === "warning") return <Tag>Client is replacing it</Tag>;
   if (i.ai_check === "unreadable") return <Tag tone="warning">Couldn't be read</Tag>;
-  return <Tag tone="warning">Needs your eyes</Tag>;
+  return <Tag tone="warning">To check</Tag>;
 }
 
 /** Best guess of why a document needs fixing, from the AI note. */

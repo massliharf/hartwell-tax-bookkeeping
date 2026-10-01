@@ -94,10 +94,10 @@ function Insights() {
         <Metric title="Arrived fully ready" value={`${ready30}%`} note={`before: ~${BEFORE.ready}%`} good={ready30 >= BEFORE.ready}>
           <AreaSpark data={ready} baseline={BEFORE.ready} max={100} suffix="%" />
         </Metric>
-        <Metric title="Moved instead of wasted" value={String(avoided30)} note="moved after the readiness check">
+        <Metric title="Moved instead of wasted" value={String(avoided30)} note="moved after the document check">
           <Bars data={avoided} />
         </Metric>
-        <Metric title="Slots refilled from the waitlist" value={String(refilled30)} note="freed times claimed by someone waiting">
+        <Metric title="Times filled from the waitlist" value={String(refilled30)} note="freed times claimed by someone waiting">
           <Bars data={refilled} tone="marigold" />
         </Metric>
         <Metric title="Booked without you" value={`${zero30}%`} note="no call or email from you">
@@ -125,7 +125,7 @@ function Insights() {
           </p>
         </div>
       </section>
-      <p className="mt-3 text-xs text-muted-foreground">"Before" figures are the practice's typical numbers before online booking.</p>
+      <p className="mt-3 text-xs text-muted-foreground">"Before" figures are your typical numbers before online scheduling.</p>
       <div className="mt-10"><MessageLog /></div>
     </>
   );

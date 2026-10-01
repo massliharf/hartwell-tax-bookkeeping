@@ -330,13 +330,11 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
     const parts = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
     parts.shift(); // The stored plain-text message starts with its heading.
     if (parts.at(-1) === "Claire Hartwell, EA") parts.pop();
-    const blocks: Block[] = parts.flatMap((part) => {
+    const blocks = parts.flatMap((part): Block[] => {
       const lines = part.split("\n");
       if (lines.every((line) => line.startsWith("- "))) return [{ list: lines.map((line) => line.slice(2)) }];
       const links = lines.map((line) => line.match(/^(.+?): (https:\/\/\S+)$/));
       if (links.every((link) => link !== null)) return links.map((link) => ({ button: { label: link?.[1] ?? "Open appointment", href: link?.[2] ?? "" } }));
-      const appointmentLink = part.match(/^Open your appointment: (https:\/\/\S+)$/);
-      if (appointmentLink) return [{ button: { label: "Open your appointment", href: appointmentLink[1] ?? "" } }];
       return [{ p: part }];
     });
     const heading = m.subject ?? "Hartwell Tax";

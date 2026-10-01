@@ -255,13 +255,13 @@ function SendCopy({ id }: { id: string }) {
   const send = useServerFn(demoSendCopy);
   const [to, setTo] = useState("");
   useEffect(() => { setTo(localStorage.getItem("demo:copy-to") ?? ""); }, []);
-  const [state, setState] = useState<"idle" | "busy" | "ok" | "no_key" | "email" | "failed" | "missing">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "ok" | "no_key" | "email" | "failed" | "missing" | "sender">("idle");
   const go = async (e: FormEvent) => {
     e.preventDefault(); setState("busy");
     localStorage.setItem("demo:copy-to", to);
     try { const r = await send({ data: { id, to } }); setState(r.ok ? "ok" : r.reason); } catch { setState("failed"); }
   };
-  const msg = { ok: "Sent. Check your inbox (and spam).", no_key: "Real email isn't connected yet.", email: "Enter a valid email.", failed: "Couldn't send. Try again.", missing: "Message not found." } as Record<string, string>;
+  const msg = { ok: "Sent. Check your inbox (and spam).", no_key: "Real email isn't connected yet.", email: "Enter a valid email.", failed: "Couldn't send. Try again.", missing: "Demo email not found.", sender: "This sender can only email the address on its mail account. Verify your sending domain for other inboxes." } as Record<string, string>;
   return (
     <form onSubmit={go} className="mt-4 rounded-xl border border-black/10 p-3">
       <p className="text-[12px] font-semibold text-black">Get this email in your real inbox</p>

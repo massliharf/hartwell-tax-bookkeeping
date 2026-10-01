@@ -19,3 +19,4 @@
 - [x] Remove non-demo customer records and keep one usable demo record for every service and key appointment state; refresh the demo reset snapshot.
 - [x] Refine the homepage header, opening section and trust strip against the supplied screenshots; check mobile and desktop.
 - [ ] Confirm Claire's real business email before launch; the address now shown everywhere is a placeholder (claire@hartwelltax.com).
+- [ ] Verify a real booking confirmation and a demo email in a real inbox; requires a verified sending domain or a test addressed to the mail account owner.

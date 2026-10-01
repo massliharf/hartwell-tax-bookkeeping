@@ -242,7 +242,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
       </div>
       <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
 
-      <footer className="sticky bottom-0 mt-auto border-t border-border bg-sheet px-5 py-4 sm:px-6">
+      <footer className="sticky bottom-0 z-20 mt-auto max-h-[70dvh] overflow-y-auto overscroll-contain border-t border-border bg-sheet px-5 py-4 sm:px-6">
         {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
           : picking ? <MeetingPicker a={a} mode={picking} onBack={() => setPicking(null)} onDone={() => { setPicking(null); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
           : (

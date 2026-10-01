@@ -33,7 +33,7 @@ export const ensureDemoAccount = createServerFn({ method: "POST" }).handler(asyn
 export const phoneFeed = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { s, origin } = await owner(context);
+    const { s } = await owner(context);
     const { data } = await s.from("messages").select("id, channel, type, subject, body, sent_at, recipient, clients(name)")
       .not("recipient", "is", null).order("sent_at", { ascending: false }).limit(300);
     return (data ?? []).map((m) => ({ ...m, name: (m.clients as { name: string } | null)?.name ?? null }));
@@ -322,7 +322,7 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
   .inputValidator((d) => z.object({ id: z.string().uuid(), to: z.string().email().max(200) }).parse(d))
   .handler(async ({ data, context }) => {
     const to = data.to.trim();
-    const { s } = await owner(context);
+    const { s, origin } = await owner(context);
     const key = process.env["RESEND_API_KEY"];
     if (!key) return { ok: false as const, reason: "no_key" as const };
     const { data: m } = await s.from("messages").select("subject, body, recipient").eq("id", data.id).eq("channel", "email").maybeSingle();

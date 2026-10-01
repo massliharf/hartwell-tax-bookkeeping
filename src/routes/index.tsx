@@ -167,11 +167,11 @@ function Services() {
         {GROUPS.map((g) => (
           <div key={g.id}>
             <h3 className="t-sub">{g.title}</h3>
-            <ul className="mt-3 divide-y divide-line-1 border-y border-line-1">
+            <ul className="mt-3 divide-y divide-line-1 overflow-hidden rounded-xl bg-surface-2">
               {SERVICES.filter((x) => x.group === g.id).map((x) => (
                 <li key={x.id}>
-                  <Link to="/book" search={{ service: x.id }} className="group grid grid-cols-[32px_minmax(0,1fr)_auto] items-start gap-x-3 py-4">
-                    <ServiceIcon service={x.id} size={32} />
+                  <Link to="/book" search={{ service: x.id }} className="group grid grid-cols-[40px_minmax(0,1fr)_auto] items-start gap-x-3 px-4 py-5 transition-colors duration-150 hover:bg-fill-selected focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ring">
+                    <ServiceIcon service={x.id} size={40} className="transition-transform duration-150 group-hover:scale-110" />
                     <span className="min-w-0">
                       <span className="block text-[15px] font-medium text-deep-ink group-hover:underline group-hover:underline-offset-4">{x.name}</span>
                       <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">{x.blurb}</span>
@@ -189,7 +189,7 @@ function Services() {
         ))}
       </div>
       <Link to="/book" search={{ service: "intro" }} className="group mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line-1 pt-6 focus-visible:outline-offset-4">
-        <span className="flex items-center gap-3 text-[15px] leading-6 text-deep-ink"><ServiceIcon service="intro" size={32} /><span><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span></span>
+        <span className="flex items-center gap-3 text-[15px] leading-6 text-deep-ink"><ServiceIcon service="intro" size={40} /><span><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span></span>
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink group-hover:underline group-hover:underline-offset-4">Choose a call time<ArrowUpRight className="size-4" /></span>
       </Link>
     </section>

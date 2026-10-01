@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Loader2, Minus, Plus, Video, Users, Lock } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Loader2, Minus, Plus, Video, Users, Lock, CalendarCheck } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +21,7 @@ import { getLeadDraft } from "@/lib/automations.functions";
 import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
-  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional() }),
+  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
   head: () => ({
     meta: [
       { title: "Book an appointment — Hartwell Tax & Bookkeeping" },
@@ -73,13 +73,24 @@ function BookPage() {
       }).catch(() => {});
       return;
     }
+    // A time picked on the homepage: keep it, ask the questions, then confirm it on the time step.
+    if (search.start) {
+      update({ serviceSlug: search.service ?? "individual", slot: search.start, date: nyDay(search.start) });
+      navigate({ search: { step: 1 }, replace: true });
+      return;
+    }
     if (search.service && search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
-  }, [loaded, search.service, search.resume, draft.serviceSlug, update, fetchLead, navigate]);
+  }, [loaded, search.service, search.resume, search.start, draft.serviceSlug, update, fetchLead, navigate]);
 
   const service = services.data?.find((s) => s.slug === draft.serviceSlug);
   let step = search.step ?? 0;
   if (loaded && !draft.serviceSlug) step = 0;
   if (loaded && step === 3 && !draft.slot) step = 2;
+
+  // Steps slide forward or back with the direction of travel (DESIGN_SYSTEM motion: expo-out, 260ms).
+  const prevStep = useRef(step);
+  const dir = step >= prevStep.current ? 1 : -1;
+  useEffect(() => { prevStep.current = step; }, [step]);
 
   const go = (n: number) => {
     navigate({ search: (s) => ({ ...s, step: n }) });
@@ -102,10 +113,10 @@ function BookPage() {
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.2, ease: [0, 0, 0.2, 1] }}
+              initial={reduce ? false : { opacity: 0, x: 16 * dir }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, x: -8 * dir }}
+              transition={{ duration: reduce ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}
             >
               {step === 0 && (
                 <ServiceStep
@@ -117,7 +128,15 @@ function BookPage() {
                 />
               )}
               {step === 1 && (
-                <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} />
+                <>
+                  {draft.slot && (
+                    <p className="mb-6 flex items-center gap-2.5 rounded-2xl bg-ink-50 px-4 py-3 text-sm text-deep-ink">
+                      <CalendarCheck className="size-4 shrink-0 text-ink" />
+                      <span>Your time: <span className="font-medium">{fmtDateLong(draft.slot)} at {fmtTime(draft.slot)}</span>. Answer a few questions and it's yours.</span>
+                    </p>
+                  )}
+                  <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} />
+                </>
               )}
               {step === 2 && service && <TimeStep service={service} draft={draft} update={update} />}
               {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} busy={bookingBusy} setBusy={setBookingBusy} onPickAgain={() => go(2)} />}
@@ -178,7 +197,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
               type="button"
               onClick={() => onPick(s.slug)}
               aria-pressed={active}
-              className={`flex min-h-36 w-full flex-col rounded-[22px] border p-5 text-left transition-[background-color,border-color,box-shadow] duration-150 ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
+              className={`lift flex min-h-36 w-full flex-col rounded-[22px] border p-5 text-left ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <ServiceIcon service={s.slug} size={40} />

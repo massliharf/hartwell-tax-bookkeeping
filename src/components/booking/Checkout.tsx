@@ -28,7 +28,7 @@ export function Checkout({ open, onOpenChange, amountCents, item, email, onPay, 
       <DialogContent className="max-w-[760px] gap-0 overflow-hidden p-0">
         {state === "paid" ? (
           <div className="px-6 py-12 text-center">
-            <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="size-5" strokeWidth={2.5} /></span>
+            <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="draw-check size-5" strokeWidth={2.5} /></span>
             <DialogTitle className="mt-5 font-serif text-[28px] font-medium leading-9 tracking-[-0.02em]">Paid {money(amountCents)}.</DialogTitle>
             <DialogDescription className="mt-2 text-[15px]">Thank you. {email ? <>A receipt is on its way to {email}. </> : "A receipt is on its way to your inbox. "}Claire will file your return today.</DialogDescription>
             <Button size="lg" className="mt-7" onClick={() => { onOpenChange(false); onDone(); }}>Done</Button>

@@ -79,7 +79,7 @@ function ConfirmedPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
-          <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="size-5" strokeWidth={2.5} /></span>
+          <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="draw-check size-5" strokeWidth={2.5} /></span>
           <h1
             className="mt-5 t-page text-deep-ink">
             You're booked{first && `, ${first}`}.

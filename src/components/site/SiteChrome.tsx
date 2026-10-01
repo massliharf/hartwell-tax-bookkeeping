@@ -89,7 +89,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-white/50">
           <span>© {new Date().getFullYear()} Hartwell Tax & Bookkeeping</span>
-          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner login</Link>
+          <span className="flex gap-5"><Link to="/story" className="inline-flex min-h-10 items-center hover:text-white">Case study</Link><Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner login</Link></span>
         </div>
       </div>
     </footer>

@@ -252,3 +252,9 @@
 @utility t-sub { font-family: var(--font-sans); font-weight: 500; font-size: 15px; line-height: 22px; letter-spacing: 0; color: var(--color-deep-ink, #1A1A1A); }
 /* Small group label above a list (e.g. "Received · 2"). */
 @utility t-label { font-family: var(--font-sans); font-weight: 500; font-size: 11px; line-height: 16px; letter-spacing: 0.04em; text-transform: uppercase; color: #7A716B; }
+
+/* Success check draws itself (confirmation, paid, claimed). */
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+@utility draw-check { & path, & polyline { stroke-dasharray: 26; stroke-dashoffset: 26; animation: draw-check 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; } }
+/* Cards that are clickable rise slightly on hover. */
+@utility lift { transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.15s ease, background-color 0.15s ease; &:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -18px rgba(44,20,10,0.35); } &:active { transform: translateY(0); } }

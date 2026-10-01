@@ -4,7 +4,7 @@ import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Cl
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { InquiryVisual } from "@/components/site/InquiryVisual";
+import { OpenTimes } from "@/components/site/OpenTimes";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
@@ -55,10 +55,10 @@ function Home() {
       <SiteHeader warm />
       <main className="mx-auto max-w-6xl space-y-3 px-2 sm:space-y-4 sm:px-5">
         <Hero />
-        <Quirks />
-        <WhatClaireDoes />
         <HowItWorks />
+        <Season />
         <BeforeAfter />
+        <WhatClaireDoes />
         <Services />
         <About />
         <Testimonials />
@@ -97,77 +97,49 @@ function StickyCta() {
 }
 
 function Hero() {
-  const trust = ["IRS Enrolled Agent", "12 years in Montclair", "In person or video", "Your documents stay private"];
   return (
     <section className="enter overflow-hidden">
-      <div className="grid items-center gap-6 px-1 pb-10 pt-6 sm:px-4 md:grid-cols-[1.1fr_1fr] md:gap-12 md:pb-16 md:pt-14">
+      <div className="grid items-center gap-8 px-1 pb-10 pt-6 sm:px-4 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pb-16 md:pt-14">
         <div>
-          <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-border bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:bg-surface-2">
-            <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-primary-foreground">Oct 15</span>
-            Extensions are due. <span className="font-medium text-ink group-hover:underline">Book your slot</span>
+          <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-line-1 bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:border-line-2">
+            <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-white">Oct 15</span>
+            Extended returns are due. <span className="font-medium text-ink group-hover:underline">Book a slot</span>
           </Link>
-          <h1 className="enter-title mt-6 max-w-[13ch] text-balance t-hero text-deep-ink">
-            From “can I book?” to “you’re booked.”
-          </h1>
-          <p className="mt-6 max-w-[34rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            Claire Hartwell is a one-person tax practice in Montclair, NJ. Pick a time in two minutes, get a checklist of exactly what to bring, and arrive with everything already checked.
+          <h1 className="enter-title mt-6 max-w-[14ch] text-balance t-hero text-deep-ink">Book Claire in two minutes. Come in once.</h1>
+          <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
+            Pick an open time, get a checklist made for your return, and send your documents from your phone. No phone tag, and no second visit for a missing form.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book/returning">I already have a booking</Link></Button>
           </div>
-          <div className="mt-6 flex items-center gap-3">
-            <img src={claire} alt="" width={36} height={36} className="size-9 rounded-full object-cover" />
-            <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span><br />Confirmed instantly. No payment until you file.</p>
+          <div className="mt-7 flex items-center gap-3">
+            <img src={claire} alt="" width={40} height={40} className="size-10 rounded-full object-cover" />
+            <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span> · Montclair, NJ<br />Confirmed instantly. You pay when your return is filed.</p>
           </div>
         </div>
-        <div className="min-w-0 rounded-[28px] bg-ink-50 px-4 sm:px-8"><InquiryVisual /></div>
-      </div>
-      <div className="rounded-[24px] bg-sheet px-5 py-5 sm:px-8">
-        <p className="mb-3 text-xs font-medium text-muted-foreground">Start with what you need</p>
-        <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-5 sm:overflow-visible">
-          {SERVICES.map((s, si) => {
-            const st = serviceStyle(s.id);
-            const Icon = st.icon;
-            return (
-              <li key={s.id} className="enter-tile shrink-0" style={{ animationDelay: `${300 + si * 80}ms` }}>
-                <Link to="/book" search={{ service: s.id }} className="group flex h-full w-40 items-center gap-3 rounded-2xl border border-line-1 bg-sheet p-3 transition-colors duration-150 hover:border-line-2 hover:bg-surface-2 sm:w-auto">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${st.rgb},0.1)` }}>
-                    <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${st.rgb})` }} />
-                  </span>
-                  <span className="min-w-0 text-[13px] font-medium leading-4 text-deep-ink">{s.name}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-        <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-          {trust.map((t) => (
-            <li key={t} className="flex items-center gap-1.5 text-xs text-body"><Check className="size-3.5 text-ink" strokeWidth={2.5} />{t}</li>
-          ))}
-        </ul>
+        <div className="enter-spot min-w-0" style={{ animationDelay: "200ms" }}><OpenTimes /></div>
       </div>
     </section>
   );
 }
 
-/** The client brief: a real solo practice with real problems, and what the product does about each. */
-function Quirks() {
+/** Busy season, plans that change, the one missing form: what booking here does about each, in the client's words. */
+function Season() {
   const rows = [
-    { stat: "40+", unit: "calls a week", when: "every April and October", before: "Claire answered them between returns, then played phone tag to find a time.", after: "Clients pick an open slot themselves and are confirmed on the spot." },
-    { stat: "1 in 6", unit: "appointments stalled", when: "last season", before: "A no-show, or a client who arrived without their W-2 and needed a second visit.", after: "A checklist made for each client, reminders until it's done, and a later time offered if it isn't." },
-    { stat: "0", unit: "receptionists", when: "it's just Claire", before: "Every confirmation, reminder, reschedule and payment chase was hers to do.", after: "They go out on their own. Claire only sees the exceptions." },
+    { k: "Busy weeks", t: "February to April, and the run-up to October 15, fill fast.", d: "You see every open time, evenings and Saturdays included. If a day is full, join the waitlist and the first cancellation is offered to you." },
+    { k: "Plans change", t: "Move or cancel from your link, any time.", d: "No call needed. Your old slot is offered to the next person on the waitlist, so nobody's afternoon is wasted, including yours." },
+    { k: "The missing form", t: "Find out before you come, not at the desk.", d: "Your checklist is built from your answers. Claire checks each upload, and you're reminded only about what's still missing." },
   ];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-20`}>
-      <SectionHead eyebrow="The brief" title="A busy solo practice, and the three things eating Claire's day." sub="Hartwell Tax & Bookkeeping, 412 Bloomfield Avenue, Montclair, NJ. One Enrolled Agent, two deadline peaks a year." />
+      <SectionHead eyebrow="Made for tax season" title="Built around the way tax season actually goes." sub="It's a one-person practice with two deadline rushes a year. These are the parts that used to go wrong, and what happens now." />
       <ul className="mt-12 grid gap-4 md:grid-cols-3">
-        {rows.map((r) => (
-          <li key={r.unit} className="flex flex-col rounded-[22px] border border-line-1 p-6">
-            <p className="font-serif text-[56px] font-semibold leading-none tracking-[-0.04em] text-ink">{r.stat}</p>
-            <p className="mt-2 text-[15px] font-medium text-deep-ink">{r.unit} <span className="font-normal text-muted-foreground">{r.when}</span></p>
-            <p className="mt-5 text-sm leading-6 text-muted-foreground"><span className="font-medium text-deep-ink">Before. </span>{r.before}</p>
-            <p className="mt-3 border-t border-line-1 pt-3 text-sm leading-6 text-body"><span className="font-medium text-alert-success-fg">Now. </span>{r.after}</p>
+        {rows.map((r, i) => (
+          <li key={r.k} className="enter-item lift flex flex-col rounded-[22px] border border-line-1 p-6" style={{ animationDelay: `${i * 80}ms` }}>
+            <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-ink">{r.k}</p>
+            <p className="mt-3 font-serif text-[22px] font-semibold leading-7 tracking-[-0.02em] text-deep-ink">{r.t}</p>
+            <p className="mt-3 text-[15px] leading-6 text-muted-foreground">{r.d}</p>
           </li>
         ))}
       </ul>
@@ -262,9 +234,9 @@ function StepPreviewReady() {
 
 function StepPreviewReminders() {
   const msgs = [
-    { when: "7 days before", text: "2 documents to go. Upload them from your phone." },
-    { when: "2 days before", text: "All set. Claire has everything for Thursday." },
-    { when: "1 day before", text: "See you tomorrow at 10:30 am." },
+    { when: "Thursday, 4:12 pm", text: "Your return is ready. Review, sign and pay: $250." },
+    { when: "Thursday, 6:40 pm", text: "Signed and paid. Thank you, Jane." },
+    { when: "Friday, 9:05 am", text: "Your return has been e-filed." },
   ];
   return (
     <ul className="w-full space-y-2">
@@ -281,10 +253,10 @@ function StepPreviewReminders() {
 /** magnific.com/desktop "sticky index" section: the list on the left follows the text on the right. */
 function HowItWorks() {
   const steps = [
-    { title: "Book a time.", text: "Pick a service and a slot that suits you. You're confirmed on the spot, with no emails back and forth.", preview: <StepPreviewTime /> },
-    { title: "Upload what's on your list.", text: "Your answers build a short checklist made for your return. Add documents from your phone whenever you have them.", preview: <StepPreviewDocs /> },
-    { title: "Reminders do the chasing.", text: "Friendly nudges go out until everything is in, so nothing is missing on the day.", preview: <StepPreviewReminders /> },
-    { title: "Arrive ready, file once.", text: "Claire reviews everything beforehand. Your appointment is the only one you need.", preview: <StepPreviewReady /> },
+    { title: "Pick a time.", text: "Every open slot is right there, evenings and Saturdays in season. You're confirmed on the spot, no call back needed.", preview: <StepPreviewTime /> },
+    { title: "Send what's on your list.", text: "A few quick questions build a checklist for your return. Snap documents with your phone; each one is checked as it arrives, and gentle reminders cover the rest.", preview: <StepPreviewDocs /> },
+    { title: "Meet Claire once.", text: "In person in Montclair or on a video call. She's already seen your documents, so the hour goes to your return, not to paperwork.", preview: <StepPreviewReady /> },
+    { title: "Sign, pay, filed.", text: "When your return is ready you get one email: review it, sign Form 8879 and pay from your phone. Claire files, and you're told when it's done.", preview: <StepPreviewReminders /> },
   ];
   const [active, setActive] = useState(0);
   const refs = useRef<(HTMLLIElement | null)[]>([]);
@@ -297,7 +269,7 @@ function HowItWorks() {
   }, []);
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-20`}>
-      <SectionHead eyebrow="How it works" title="Four steps. One appointment." sub="No back-and-forth emails, no second visit for a missing form." />
+      <SectionHead eyebrow="How it works" title="Booked, prepared, done." sub="From picking a time to a filed return, without a single back-and-forth email." />
       <div className="mt-12 grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
         <nav aria-label="Steps" className="hidden lg:block">
           <ol className="sticky top-28 space-y-1">
@@ -326,11 +298,11 @@ function HowItWorks() {
 }
 
 function BeforeAfter() {
-  const before = ["Six emails to find a time", "A list of documents you have to guess", "Arrive, find out a form is missing", "Book a second visit to finish"];
-  const after = ["One link, confirmed on the spot", "A checklist made for your return", "Reminders until everything is in", "One appointment, filed the same week"];
+  const before = ["Call, leave a voicemail, wait for a call back", "Guess which documents to bring", "Arrive and find out a form is missing", "Book a second visit to finish", "Get a paper bill, mail a check"];
+  const after = ["Pick an open time, confirmed on the spot", "A checklist made for your answers", "Every upload checked before you come", "One appointment, then sign and pay online", "Filed, with an email to say so"];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead eyebrow="Before and after" title="The same return. Half the hassle." sub="What booking a tax appointment usually looks like, and what it looks like here." />
+      <SectionHead eyebrow="Before and after" title="Same return. None of the chasing." sub="What booking a tax appointment usually looks like, and what it looks like with Claire." />
       <div className="mt-10 grid gap-3 md:grid-cols-2">
         <div className="rounded-2xl bg-surface-2 p-6">
           <p className="text-sm font-medium text-muted-foreground">The usual way</p>
@@ -396,10 +368,10 @@ function About() {
           <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
-          <h2 className="t-section text-deep-ink">A neighbor who happens to love the tax code.</h2>
+          <h2 className="t-section text-deep-ink">It's just me, on purpose.</h2>
           <div className="mt-5 space-y-3 text-base leading-7 text-body">
             <p>I'm an IRS Enrolled Agent, which means I'm licensed to prepare returns and represent you before the IRS. For twelve years I've helped families, freelancers and landlords in Montclair file with confidence.</p>
-            <p>My practice is small on purpose. When you book with me, you work with me, from the first document to the final signature.</p>
+            <p>There's no front desk. When you book, you work with me from the first document to the final signature. That's also why booking is online: in season I'm with clients, not on the phone, and this way you never wait for a call back.</p>
           </div>
           <p className="mt-5 text-base font-medium text-deep-ink">Claire Hartwell, EA</p>
           <dl className="mt-8 grid grid-cols-3 gap-2">

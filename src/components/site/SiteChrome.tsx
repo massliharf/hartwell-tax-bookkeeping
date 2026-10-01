@@ -54,6 +54,7 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   );
 }
 
+// Contact lines in the footer stack evenly with the address.
 export function SiteFooter() {
   return (
     <footer className="mt-16 bg-night text-white/80 lg:mt-24">

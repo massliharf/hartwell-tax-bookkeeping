@@ -185,7 +185,7 @@ function PortalPage() {
 
         {/* Side exits. */}
         {(cancelled || stage === "no_show") && (
-          <StatusCard icon={<CalendarClock />} title={cancelled ? "Pick a new time whenever you're ready." : "Let's find you a new time."} action={<Button asChild size="lg"><Link to="/book">Book a new time</Link></Button>}>
+          <StatusCard icon={<CalendarClock />} title={cancelled ? "Pick a new time whenever you're ready." : "Let's find you a new time."} action={<Button asChild size="lg"><Link to="/book">Pick a new time</Link></Button>}>
             Your documents and answers are saved, so booking again takes two minutes.
           </StatusCard>
         )}

@@ -243,7 +243,7 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
         <Input required aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className="h-10" />
         <Input required type="email" aria-label="Email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10" />
       </div>
-      {state === "error" && <p className="mt-2 text-sm text-destructive">Something went wrong. Please try again.</p>}
+      {state === "error" && <p className="mt-2 text-sm text-destructive" role="alert">We couldn't add you to the waitlist. Please try again.</p>}
       <Button type="submit" size="md" className="mt-4" disabled={state === "saving"}>
         {state === "saving" && <Loader2 className="animate-spin" />} Join the waitlist
       </Button>

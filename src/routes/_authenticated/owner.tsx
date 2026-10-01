@@ -197,8 +197,9 @@ function OwnerLayout() {
 /** Top-right account menu, Magnific-style: who's signed in, the week at a glance, settings and tools, sign out. */
 function ProfileMenu({ email, onSignOut }: { email: string; onSignOut: () => void }) {
   const row = "h-10 gap-3 rounded-lg px-3 text-[13px] text-deep-ink";
+  // modal={false}: opening the menu must not lock page scroll (that removed the scrollbar and made the page jump sideways).
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger aria-label="Account" className="grid size-9 place-items-center rounded-full bg-fill-neutral text-xs font-semibold text-deep-ink ring-offset-2 transition-shadow duration-150 hover:ring-2 hover:ring-line-2 focus-visible:ring-2 focus-visible:ring-ink">CH</DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="w-[320px] rounded-2xl p-0">
         <div className="flex items-center gap-3 p-4">

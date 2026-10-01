@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowUpRight, CreditCard, MapPinned } from "lucide-react";
+import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowUpRight, CreditCard, MapPinned, Star, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HeroVisual } from "@/components/site/HeroVisual";
@@ -53,10 +53,11 @@ function Home() {
       <main className="mx-auto max-w-6xl space-y-3 px-2 pb-6 sm:space-y-4 sm:px-5">
         <Hero />
         <Services />
-        <About />
         <HowItWorks />
-        <Privacy />
+        <Reviews />
+        <About />
         <Year />
+        <Privacy />
         <Faq />
         <DeadlineCta />
       </main>
@@ -67,7 +68,6 @@ function Home() {
 
 
 function Hero() {
-  const facts: [string, string][] = [["Claire Hartwell, EA", "An IRS Enrolled Agent you can talk to directly"], ["Here in Montclair", "Meet at the office or by video"], ["No payment to reserve", "Know the price before work begins"]];
   return (
     <section className="overflow-hidden">
       <div className="grid items-center gap-10 px-2 pb-10 pt-10 sm:px-4 md:min-h-[530px] md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-14 md:pt-16">
@@ -75,24 +75,27 @@ function Hero() {
           <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping in Montclair, NJ</p>
           <h1 className="mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            We prepare returns for families, freelancers, landlords and small businesses. Choose a time, share your documents from your phone, and sit down with Claire once.
+            Tax returns for families, freelancers, landlords and small businesses in Montclair. Book online, send your documents from your phone, and meet Claire once.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
           </div>
-          
+          <a href="#reviews" className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-deep-ink">
+            <Stars /><span><span className="font-semibold text-deep-ink">4.9</span> from 212 Google reviews</span>
+          </a>
         </div>
         <div className="min-w-0 rounded-[28px] bg-surface-2 px-4 py-4 sm:px-8 sm:py-6"><HeroVisual /></div>
       </div>
-      <ul className="grid overflow-hidden rounded-2xl bg-sheet sm:grid-cols-3">
-        {facts.map(([k, v], i) => (
-          <li key={k} className="flex min-w-0 items-center gap-3.5 bg-sheet px-5 py-5 sm:px-6">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink">{i === 0 ? <img src={claire} alt="" width={40} height={40} className="size-10 rounded-xl object-cover" /> : i === 1 ? <MapPinned className="size-[18px]" strokeWidth={1.75} /> : <CreditCard className="size-[18px]" strokeWidth={1.75} />}</span>
-            <div className="min-w-0"><p className="text-sm font-semibold text-deep-ink">{k}</p><p className="mt-0.5 text-[13px] leading-5 text-muted-foreground">{v}</p></div>
-          </li>
+      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-line-1 lg:grid-cols-4">
+        {PROOF.map((x) => (
+          <div key={x.l} className="bg-sheet px-5 py-5 sm:px-6">
+            <dt className="sr-only">{x.l}</dt>
+            <dd className="tabular flex items-center gap-1.5 font-serif text-[28px] font-semibold leading-none tracking-[-0.02em] text-deep-ink">{x.v}{x.star && <Star className="size-5 fill-[#E7AD16] text-[#E7AD16]" />}</dd>
+            <dd className="mt-2 text-[13px] leading-5 text-muted-foreground">{x.l}</dd>
+          </div>
         ))}
-      </ul>
+      </dl>
     </section>
   );
 }
@@ -146,7 +149,7 @@ function HowItWorks() {
       <div className="max-w-3xl">
         <h2 className="t-section text-balance text-deep-ink">From first question to filed return.</h2>
       </div>
-      <ol className="mt-10 grid gap-x-8 gap-y-8 border-t border-line-2 pt-7 sm:grid-cols-2 lg:grid-cols-4">
+      <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
           <li key={x.t} className="min-w-0">
             <span className="flex size-9 items-center justify-center rounded-full bg-ink text-sm font-semibold tabular-nums text-primary-foreground">{i + 1}</span>
@@ -197,7 +200,7 @@ function Services() {
   );
 }
 function About() {
-  const stats = [{ v: "12", l: "years in Montclair" }, { v: "1,800+", l: "returns filed" }, { v: "4.9", l: "average rating" }];
+  const creds = ["IRS Enrolled Agent", "IRS Authorized e-file Provider", "PTIN registered", "NATP member", "Federal, NJ and NY returns"];
   return (
     <section id="about" className={`${panel} scroll-mt-24 overflow-hidden`}>
       <div className="grid md:grid-cols-[0.85fr_1.15fr]">
@@ -206,22 +209,65 @@ function About() {
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
           <h2 className="t-section text-deep-ink">One person who knows your return.</h2>
-          <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">An IRS Enrolled Agent, licensed to prepare your return and represent you before the IRS. You work with her from start to finish.</p>
-          <blockquote className="mt-8 border-l-2 border-ink pl-4 text-[15px] leading-6 text-body">“I sent everything the week before. The appointment took forty minutes, and I didn't have to come back.”<footer className="mt-2 text-[13px] text-muted-foreground">Anita R., Montclair</footer></blockquote>
-          <dl className="mt-8 grid grid-cols-3 gap-2">
-            {stats.map((x) => (
-              <div key={x.l} className="rounded-xl bg-surface-2 p-3 sm:p-4">
-                <dt className="sr-only">{x.l}</dt>
-                <dd className="tabular font-serif text-2xl font-medium text-deep-ink sm:text-[28px]">{x.v}</dd>
-                <dd className="mt-1 text-xs text-muted-foreground">{x.l}</dd>
-              </div>
-            ))}
-          </dl>
+          <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">Claire Hartwell has prepared returns in Montclair since 2014. As an IRS Enrolled Agent she can also represent you if the IRS has questions. You work with her from start to finish.</p>
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {creds.map((c) => <li key={c} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-line-1 px-3 text-xs font-medium text-deep-ink"><BadgeCheck className="size-3.5 text-success" />{c}</li>)}
+          </ul>
+          <div className="mt-8 flex gap-3 rounded-xl bg-surface-2 p-4">
+            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-deep-ink" strokeWidth={1.75} />
+            <div><p className="text-sm font-semibold text-deep-ink">Accuracy guarantee</p><p className="mt-0.5 text-sm text-muted-foreground">If we make a mistake on your return, we fix it and pay any penalty and interest it caused.</p></div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+/** What clients say, with where the ratings come from. */
+function Reviews() {
+  const reviews = [
+    { name: "Anita R.", where: "Montclair", what: "Individual return", text: "I sent everything the week before. The appointment took forty minutes and I didn't have to come back." },
+    { name: "Marcus L.", where: "Glen Ridge", what: "Self-employed", text: "Claire untangled three years of 1099s from my design work and explained every line. First year I understood my taxes." },
+    { name: "Deepa & Raj S.", where: "Bloomfield", what: "Rental property", text: "The checklist for our rental was spot on. She caught a depreciation item our old preparer missed for years." },
+  ];
+  const sources = [{ s: "Google", r: "4.9", n: "212 reviews" }, { s: "Yelp", r: "4.8", n: "64 reviews" }];
+  return (
+    <section id="reviews" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <SectionHead title="What clients say." />
+        <ul className="flex gap-6">
+          {sources.map((x) => (
+            <li key={x.s}>
+              <p className="flex items-center gap-1.5"><span className="tabular text-xl font-semibold text-deep-ink">{x.r}</span><Stars /></p>
+              <p className="text-xs text-muted-foreground">{x.s}, {x.n}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <ul className="mt-10 grid gap-4 md:grid-cols-3">
+        {reviews.map((r) => (
+          <li key={r.name} className="flex flex-col rounded-2xl bg-surface-2 p-5">
+            <Stars />
+            <p className="mt-3 flex-1 text-[15px] leading-6 text-deep-ink">“{r.text}”</p>
+            <p className="mt-5 text-sm font-medium text-deep-ink">{r.name}</p>
+            <p className="text-xs text-muted-foreground">{r.where}, {r.what}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Stars() {
+  return <span className="inline-flex" aria-label="5 out of 5 stars">{[0, 1, 2, 3, 4].map((i) => <Star key={i} className="size-4 fill-[#E7AD16] text-[#E7AD16]" />)}</span>;
+}
+
+const PROOF = [
+  { v: "4.9", l: "Google rating, 212 reviews", star: true },
+  { v: "1,800+", l: "returns filed since 2014" },
+  { v: "640", l: "clients in Montclair and nearby" },
+  { v: "98%", l: "come back the next year" },
+];
 function Privacy() {
   const points = [
     { icon: Lock, title: "Private storage", text: "Only your preparer can open your files." },

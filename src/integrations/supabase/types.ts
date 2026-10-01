@@ -636,6 +636,7 @@ export type Database = {
         | "doc_fix_request"
         | "review_sign_pay"
         | "return_filed"
+        | "file_reminder"
       signature_status: "not_needed" | "pending" | "signed"
       waitlist_status: "waiting" | "offered" | "booked" | "expired"
     }
@@ -792,6 +793,7 @@ export const Constants = {
         "doc_fix_request",
         "review_sign_pay",
         "return_filed",
+        "file_reminder",
       ],
       signature_status: ["not_needed", "pending", "signed"],
       waitlist_status: ["waiting", "offered", "booked", "expired"],

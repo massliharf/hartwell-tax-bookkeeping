@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Sparkles, CalendarCheck } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, CreditCard, FileSearch, MailX, PenLine, Send, Sparkles, CalendarCheck } from "lucide-react";
 import { toast } from "sonner";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { Tag } from "@/components/ui/tag";
@@ -143,6 +143,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
   else if (it.kind === "unpaid") { icon = <CreditCard />; title = `${it.appt.clients?.name} hasn't paid yet`; reason = `${it.appt.fee_cents ? money(it.appt.fee_cents) : "Fee"} due since ${fmtDay(it.appt.finished_at ?? it.appt.end_at)}. Three reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
   else if (it.kind === "low") { icon = <AlertTriangle />; title = `${it.appt.clients?.name} is ${it.appt.ready_score}% ready`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. ${missingOf(it.appt).length} documents missing, a later time was offered.`; action = "Keep appointment"; appointmentId = it.appt.id; }
   else if (it.kind === "signature") { icon = <PenLine />; title = `${it.appt.clients?.name} hasn't signed Form 8879`; reason = `Appointment was ${fmtDay(it.appt.start_at)}. Automatic reminders already went out.`; action = "Send reminder"; appointmentId = it.appt.id; }
+  else if (it.kind === "file") { icon = <Send />; title = `${it.appt.clients?.name}: signed and paid, file the return`; reason = `Paid ${fmtDay(it.appt.paid_at ?? it.appt.end_at)}. Everything is ready to e-file.`; action = "Open"; appointmentId = it.appt.id; }
   else if (it.kind === "wrap") { icon = <CalendarCheck />; title = `${it.appt.clients?.name}: meeting has ended`; reason = `${fmtDay(it.appt.start_at)} at ${fmtTime(it.appt.start_at)}. Finish the return, or book another meeting if you ran out of time.`; action = "Open"; appointmentId = it.appt.id; }
   else if (it.kind === "failed") { icon = <MailX />; title = `An email didn't arrive`; reason = `${it.msg.subject ?? "Message"} to ${it.msg.recipient} on ${fmtStamp(it.msg.sent_at)}.`; action = "Dismiss"; }
   else { icon = <Sparkles />; title = `${it.offer.name} took a freed slot`; reason = `${it.offer.service}, ${fmtDay(it.offer.slot_start)} at ${fmtTime(it.offer.slot_start)}. Nothing to do.`; action = "Dismiss"; }
@@ -160,7 +161,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
 export function NeedsList({ items }: { items: NeedItem[] }) {
   const qc = useQueryClient(); const dismiss = useServerFn(dismissAttention), nudge = useServerFn(nudgeSignature), payNudge = useServerFn(remindPayment); const openAppt = useApptPanel();
   const [all, setAll] = useState(false);
-  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review" || it.kind === "wrap") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
+  const act = useMutation({ mutationFn: async (it: NeedItem) => { if (it.kind === "review" || it.kind === "wrap" || it.kind === "file") { openAppt({ appointmentId: it.id }); return { ok: true, silent: true }; } if (it.kind === "unpaid") return payNudge({ data: { id: it.id } }); if (it.kind === "signature") return nudge({ data: { id: it.id } }); return dismiss({ data: { kind: it.kind === "low" ? "appointment" : it.kind === "failed" ? "message" : "offer", id: it.id } }); }, onSuccess: (r, it) => { if (!r.ok) { toast.error("Couldn't do that. Try again."); return; } if ("silent" in r) return; toast.success(it.kind === "signature" || it.kind === "unpaid" ? "Reminder sent." : "Done."); void qc.invalidateQueries({ queryKey: ["owner"] }); }, onError: () => toast.error("Couldn't do that. Try again.") });
   const shown = all ? items : items.slice(0, 3);
   return <div>
     <ul className="overflow-hidden rounded-2xl border border-border">{shown.map((it, i) => <NeedRow idx={i} key={`${it.kind}-${it.id}`} it={it} busy={act.isPending && act.variables?.id === it.id} onAct={() => act.mutate(it)} />)}</ul>

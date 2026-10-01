@@ -131,9 +131,9 @@ const TINTS = ["122,31,31", "125,91,166", "62,125,96", "196,128,20", "79,106,168
 function HowItWorks() {
   const steps = [
     { t: "Choose a time online", d: "Pick any available time. You're confirmed right away, no phone call needed." },
-    { t: "Get your document checklist", d: "Answer a few yes-or-no questions and we'll list exactly which documents to bring." },
-    { t: "Upload your documents", d: "Upload them any time before your appointment. We check each one and tell you if anything is missing." },
-    { t: "Meet with Claire", d: "In person or by video. For a tax return, you then sign and pay online and we file it with the IRS." },
+    { t: "Get your document checklist", d: "Answer a few yes-or-no questions and I'll list exactly which documents to bring." },
+    { t: "Upload your documents", d: "Upload them any time before your appointment. I check each one and tell you if anything is missing." },
+    { t: "Meet with Claire", d: "In person or by video. For a tax return, you then sign and pay online and I file it with the IRS." },
   ];
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
@@ -207,7 +207,7 @@ function About() {
           </ul>
           <div className="mt-8 flex gap-3 rounded-xl bg-surface-2 p-4">
             <ShieldCheck className="mt-0.5 size-5 shrink-0 text-deep-ink" strokeWidth={1.75} />
-            <div><p className="text-sm font-semibold text-deep-ink">Accuracy guarantee</p><p className="mt-0.5 text-sm text-muted-foreground">If we make a mistake on your return, we fix it and pay any penalty and interest it caused.</p></div>
+            <div><p className="text-sm font-semibold text-deep-ink">Accuracy guarantee</p><p className="mt-0.5 text-sm text-muted-foreground">If I make a mistake on your return, I fix it and pay any penalty and interest it caused.</p></div>
           </div>
         </div>
       </div>
@@ -283,8 +283,8 @@ function Privacy() {
   const points = [
     { icon: Lock, title: "Private storage", text: "Files are stored privately, not in email." },
     { icon: KeyRound, title: "Links that expire", text: "Files open only through a link that expires after a few minutes." },
-    { icon: ShieldCheck, title: "No Social Security number online", text: "We never ask for your Social Security number online." },
-    { icon: Trash2, title: "Only what's needed", text: "We only ask for the documents on your checklist." },
+    { icon: ShieldCheck, title: "No Social Security number online", text: "I never ask for your Social Security number online." },
+    { icon: Trash2, title: "Only what's needed", text: "I only ask for the documents on your checklist." },
   ];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
@@ -303,9 +303,9 @@ function Privacy() {
 /** The closing call to action follows the season, so it's never out of date. */
 function seasonCta(now = new Date()) {
   const m = now.getMonth(), d = now.getDate();
-  if ((m === 8) || (m === 9 && d <= 15)) return { title: "The October 15 deadline is close.", body: "If you filed an extension, your return is due October 15. Schedule now, upload your documents this week, and we'll file on time.", cta: "Schedule an extension appointment", service: "extension" };
-  if ((m >= 1 && m <= 2) || (m === 3 && d <= 15)) return { title: "April 15 is coming.", body: "Tax season is our busiest time. Schedule now and upload your documents as they arrive.", cta: "Schedule your tax return", service: "individual" };
-  return { title: "Got a letter from the IRS?", body: "We usually have openings this week for IRS and state letters, tax planning, bookkeeping and past-year returns.", cta: "Schedule a letter review", service: "extension" };
+  if ((m === 8) || (m === 9 && d <= 15)) return { title: "The October 15 deadline is close.", body: "If you filed an extension, your return is due October 15. Schedule now, upload your documents this week, and I'll file on time.", cta: "Schedule an extension appointment", service: "extension" };
+  if ((m >= 1 && m <= 2) || (m === 3 && d <= 15)) return { title: "April 15 is coming.", body: "Tax season is my busiest time. Schedule now and upload your documents as they arrive.", cta: "Schedule your tax return", service: "individual" };
+  return { title: "Got a letter from the IRS?", body: "I usually have openings this week for IRS and state letters, tax planning, bookkeeping and past-year returns.", cta: "Schedule a letter review", service: "extension" };
 }
 
 function DeadlineCta() {
@@ -344,7 +344,7 @@ function Faq() {
   ];
   return (
     <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
-      <div className="self-start"><SectionHead title="Questions." sub="Can't find your answer? Ask us below, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
+      <div className="self-start"><SectionHead title="Questions." sub="Can't find your answer? Ask me below, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
       <Accordion type="single" collapsible className="overflow-hidden rounded-2xl border border-line-1 bg-sheet px-4">
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-line-1 last:border-b-0">

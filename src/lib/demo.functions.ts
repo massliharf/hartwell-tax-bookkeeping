@@ -50,7 +50,7 @@ export const demoRun = createServerFn({ method: "POST" }).middleware([requireSup
 export const demoJump = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ days: z.union([z.literal(1), z.literal(2), z.literal(7)]) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { s } = await owner(context);
+    const { s, origin } = await owner(context);
     const { data: st } = await s.from("settings").select("demo_time_offset_minutes").eq("id", 1).single();
     await s.from("settings").update({ demo_time_offset_minutes: (st?.demo_time_offset_minutes ?? 0) + data.days * 1440 }).eq("id", 1);
     const { runAutomations } = await import("./automations.server");
@@ -322,7 +322,7 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
   .inputValidator((d) => z.object({ id: z.string().uuid(), to: z.string().email().max(200) }).parse(d))
   .handler(async ({ data, context }) => {
     const to = data.to.trim();
-    const { s, origin } = await owner(context);
+    const { s } = await owner(context);
     const key = process.env["RESEND_API_KEY"];
     if (!key) return { ok: false as const, reason: "no_key" as const };
     const { data: m } = await s.from("messages").select("subject, body, recipient").eq("id", data.id).eq("channel", "email").maybeSingle();

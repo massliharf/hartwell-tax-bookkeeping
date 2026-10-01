@@ -71,7 +71,7 @@ export function SiteFooter() {
             <li><a href="/#faq" className="hover:text-white">FAQ</a></li>
           </ul>
         </div>
-        <div className="text-sm">
+        <div className="flex flex-col text-sm">
           <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>

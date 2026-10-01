@@ -51,6 +51,12 @@
   --color-fill-neutral: var(--fill-neutral);
   --color-fill-subtle: var(--fill-subtle);
   --color-fill-selected: var(--fill-selected);
+  --color-avatar-rose: var(--avatar-rose); --color-avatar-rose-ink: var(--avatar-rose-ink);
+  --color-avatar-sage: var(--avatar-sage); --color-avatar-sage-ink: var(--avatar-sage-ink);
+  --color-avatar-sky: var(--avatar-sky); --color-avatar-sky-ink: var(--avatar-sky-ink);
+  --color-avatar-gold: var(--avatar-gold); --color-avatar-gold-ink: var(--avatar-gold-ink);
+  --color-avatar-lilac: var(--avatar-lilac); --color-avatar-lilac-ink: var(--avatar-lilac-ink);
+  --color-avatar-teal: var(--avatar-teal); --color-avatar-teal-ink: var(--avatar-teal-ink);
   --color-ink-hover: var(--ink-hover);
   --color-ink-pressed: var(--ink-pressed);
   --color-dark-0: var(--dark-0); --color-dark-1: var(--dark-1); --color-dark-2: var(--dark-2);
@@ -117,6 +123,13 @@
   --fill-neutral: #EDEAE3;
   --fill-subtle: rgba(115,115,115,0.05);
   --fill-selected: rgba(115,115,115,0.15);
+  /* Muted, distinct client initials; each pair keeps contrast on its own surface. */
+  --avatar-rose: #F2DBD9; --avatar-rose-ink: #753536;
+  --avatar-sage: #DDE9D9; --avatar-sage-ink: #315D40;
+  --avatar-sky: #DDE8F3; --avatar-sky-ink: #355776;
+  --avatar-gold: #F5E9CE; --avatar-gold-ink: #75551D;
+  --avatar-lilac: #E9E0ED; --avatar-lilac-ink: #614470;
+  --avatar-teal: #D9EBE8; --avatar-teal-ink: #2D605A;
   --paper: #F4F3EF;
   --paper-deep: #EDEAE3;
   --ink-green: #2C0000;

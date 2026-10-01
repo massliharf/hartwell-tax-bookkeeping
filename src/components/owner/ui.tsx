@@ -19,6 +19,7 @@ import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
 import { useOwnerCtx } from "./ctx";
 import { isIntroAppt, stageOf } from "@/lib/lifecycle";
+import { ClientAvatar } from "./client-avatar";
 
 export function PageHead({ title, meta, actions, children }: { eyebrow?: string; title: ReactNode; meta?: ReactNode; actions?: ReactNode; children?: ReactNode }) {
   return (
@@ -122,7 +123,7 @@ export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; s
     <button type="button" onClick={() => openAppt({ appointmentId: a.id })}
       className={cn("flex min-h-14 w-full items-center gap-3 border-b border-border px-3 py-2 text-left transition-colors duration-150 last:border-0 hover:bg-surface-2", done && "opacity-60")}>
       <span className={cn("tabular shrink-0 text-[13px] font-medium text-deep-ink", showDate ? "w-[92px]" : "w-[76px]")}>{showDate ? fmtDay(a.start_at) : fmtTime(a.start_at)}{showDate && <span className="block text-[11px] font-normal text-muted-foreground">{fmtTime(a.start_at)}</span>}</span>
-      <ServiceIcon service={a.services?.name} size={32} className="hidden sm:grid" />
+       {showClient ? <ClientAvatar name={a.clients?.name} id={a.clients?.id} className="hidden sm:grid" /> : <ServiceIcon service={a.services?.name} size={32} className="hidden sm:grid" />}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium text-deep-ink">{showClient ? a.clients?.name ?? "Client" : a.services?.name}</span>
         <span className="block truncate text-xs text-muted-foreground">{showClient ? a.services?.name : a.meeting_type === "video" ? "Video" : "In person"}</span>

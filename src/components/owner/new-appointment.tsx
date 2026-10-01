@@ -16,6 +16,7 @@ import { ownerBookAppointment } from "@/lib/owner.functions";
 import { fmtDateLong, fmtDayChip, fmtTime } from "@/lib/intake";
 import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
+import { ClientAvatar } from "./client-avatar";
 
 type Client = { id: string; name: string; email: string; phone: string | null };
 
@@ -107,7 +108,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
           {!picked && <Segmented className="mb-3" label="Client" value={mode} onChange={(v) => setMode(v)} options={[{ value: "find", label: "Existing client" }, { value: "new", label: "New client" }]} />}
           {picked ? (
             <div className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5">
-              <span className="grid size-8 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{picked.name.charAt(0)}</span>
+               <ClientAvatar name={picked.name} id={picked.id} />
               <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-deep-ink">{picked.name}</span><span className="block truncate text-xs text-muted-foreground">{picked.email}</span></span>
               <Button size="icon" variant="ghost" aria-label="Choose a different client" onClick={() => setPicked(null)}><X /></Button>
             </div>

@@ -8,6 +8,7 @@ import { NowBanner } from "./now";
 import { useApptPanel } from "./drawer-context";
 import { useOwnerCtx } from "./ctx";
 import { ApptList, ErrorNote, LoadingRows } from "./ui";
+import { ClientAvatar } from "./client-avatar";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return <section><h2 className="mb-3 t-sub">{title}</h2>{children}</section>;
@@ -53,7 +54,7 @@ export function ClientProfile({ id }: { id: string }) {
         return (
           <header>
             <div className="flex flex-wrap items-center gap-4">
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-fill-neutral text-lg font-medium text-deep-ink">{client.name.charAt(0)}</span>
+               <ClientAvatar name={client.name} id={client.id} className="size-12 text-lg" />
               <div className="min-w-0 flex-1">
                 <h1 className="t-owner text-deep-ink">{client.name}</h1>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground"><span className="break-all">{client.email}</span>{client.phone && <span className="tabular">{client.phone}</span>}{client.is_returning ? <Tag>Returning</Tag> : <Tag tone="accent">New this season</Tag>}</p>

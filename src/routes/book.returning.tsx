@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, Loader2, Mail, RotateCcw } from "lucide-react";
+import { ArrowUpRight, CalendarClock, Loader2, Mail, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,24 +40,38 @@ function ReturningPage() {
 
   return (
     <BookingShell>
-      <div className="mx-auto max-w-md">
+      <div className={`mx-auto ${state === "sent" && demo ? "max-w-xl" : "max-w-md"}`}>
         {state === "sent" && demo ? (
-          <ResultPanel icon={<Mail />} tone="success" title="Welcome back."
-            actions={<Button size="lg" variant="secondary" onClick={() => { setState("idle"); setDemo(null); }}><RotateCcw />Use a different email</Button>}>
-            Demo address, so here are the links from the email.
-            <div className="mt-5 space-y-2 text-left">
-              {demo.appointments.map((a) => (
-                <Button key={a.token} asChild size="lg" className="w-full justify-start">
-                  <Link to="/a/$token" params={{ token: a.token }}>{a.label}</Link>
-                </Button>
-              ))}
+          <div className="py-6 sm:py-10">
+            <span className="grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Mail className="size-5" /></span>
+            <h1 className="mt-5 t-page text-deep-ink">Welcome back.</h1>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Demo address, so here are the links from the email.</p>
+            <div className="mt-8 space-y-3">
+              {demo.appointments.map((a) => {
+                const separator = a.label.indexOf(", ");
+                const service = separator < 0 ? a.label : a.label.slice(0, separator);
+                const date = separator < 0 ? "" : a.label.slice(separator + 2);
+                return (
+                  <Button key={a.token} asChild variant="outline" className="h-auto min-h-20 w-full justify-start gap-4 rounded-2xl border-line-1 bg-sheet px-5 py-4 text-left hover:border-line-2 hover:bg-surface-2 max-sm:min-h-20">
+                    <Link to="/a/$token" params={{ token: a.token }}>
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-alert-info text-alert-info-fg"><CalendarClock className="size-5" /></span>
+                      <span className="min-w-0 flex-1 whitespace-normal">
+                        <span className="block text-[15px] font-semibold leading-5 text-deep-ink">{service}</span>
+                        {date && <span className="mt-1 block text-[13px] font-normal leading-5 text-muted-foreground">{date}</span>}
+                      </span>
+                      <ArrowUpRight className="size-4 shrink-0 text-ink" />
+                    </Link>
+                  </Button>
+                );
+              })}
               {demo.resumeId && (
-                <Button asChild size="lg" variant="secondary" className="w-full">
+                <Button asChild size="lg" variant="secondary" className="h-auto min-h-12 w-full whitespace-normal px-5 py-3 text-center leading-5">
                   <Link to="/book" search={{ resume: demo.resumeId } as never}>Book again with last year's answers</Link>
                 </Button>
               )}
             </div>
-          </ResultPanel>
+            <Button size="lg" variant="ghost" className="mt-6 px-0 text-muted-foreground" onClick={() => { setState("idle"); setDemo(null); }}><RotateCcw />Use a different email</Button>
+          </div>
         ) : state === "sent" ? (
           <ResultPanel icon={<Mail />} tone="success" title="Check your inbox."
             actions={<><Button size="lg" variant="secondary" onClick={() => setState("idle")}><RotateCcw />Use a different email</Button><Button asChild size="lg" variant="ghost"><Link to="/book">Schedule a new appointment</Link></Button></>}>

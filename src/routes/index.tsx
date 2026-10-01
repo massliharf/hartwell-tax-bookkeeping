@@ -52,10 +52,10 @@ function Home() {
       <main className="mx-auto max-w-6xl space-y-3 px-2 pb-6 sm:space-y-4 sm:px-5">
         <Hero />
         <Services />
-        <HowItWorks />
-        <Year />
         <About />
+        <HowItWorks />
         <Privacy />
+        <Year />
         <Faq />
         <DeadlineCta />
       </main>
@@ -80,7 +80,7 @@ function Hero() {
             <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">Open all year. Busiest February to April and before October 15.</p>
+          <p className="mt-4 text-sm text-muted-foreground">In person in Montclair or by video, whichever works for you.</p>
         </div>
         <div className="min-w-0 rounded-2xl bg-ink-50 px-4 py-2 sm:px-8"><HeroVisual /></div>
       </div>
@@ -102,24 +102,24 @@ function Year() {
     <section className="rounded-[28px] bg-ink px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-16">
         <div>
-          <p className="text-sm font-medium text-primary-foreground/70">Planning ahead</p>
-          <h2 className="t-section mt-3 max-w-[13ch] text-balance">There’s a good time to get started.</h2>
-          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">We’re here all year. Here’s what to expect when finding time with Claire.</p>
+          <p className="text-sm font-medium text-primary-foreground/70">When to come in</p>
+          <h2 className="t-section mt-3 max-w-[13ch] text-balance">Here all year, not just at tax time.</h2>
+          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">A return in spring, an extension in fall, or a question in between: you can come to Claire when you need her.</p>
         </div>
         <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
           <p className="text-sm font-medium text-primary-foreground/70">When to plan your visit</p>
           <div className="mt-6 space-y-0 divide-y divide-primary-foreground/20">
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 first:pt-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Feb–Apr</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Tax season fills weeks ahead. You can secure a time before your documents are ready.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">The busiest stretch for returns. Choose your time early; your documents can follow.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Oct 15</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">The extension deadline brings another rush. If your day is full, join its waitlist for the first cancellation.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Extended returns are due. If your day is full, the waitlist gives you a chance at a cancelled time.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 last:pb-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">All year</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Outside the busy weeks, there’s usually an opening the same week.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Letters, planning and bookkeeping don't have to wait for filing season.</p>
             </div>
           </div>
           <div className="mt-8 grid grid-cols-12 gap-1" aria-label="Busier months: February, March, April and October">
@@ -147,7 +147,7 @@ function HowItWorks() {
       <div className="max-w-3xl">
         <p className="text-sm font-medium text-ink">How it works</p>
         <h2 className="t-section mt-3 text-balance text-deep-ink">From first question to filed return.</h2>
-        <p className="mt-3 text-base leading-7 text-muted-foreground">No phone tag, and no second visit for a missing form.</p>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">You know what to gather before you meet. Claire can spend your time together on the return, not on chasing paperwork.</p>
       </div>
       <ol className="mt-10 grid gap-x-8 gap-y-8 border-t border-line-2 pt-7 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
@@ -166,7 +166,7 @@ function Services() {
   const price = (x: (typeof SERVICES)[number]) => (x.price === 0 ? "Free" : `${x.from ? "from " : ""}$${x.price}`);
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Services and prices." sub="Fixed prices, agreed before we start. You pay when the work is done." />
+      <SectionHead title="What can we help with?" sub="From a quick question to a full return. Starting prices are shown here; your fee is agreed before work begins, and nothing is due when you choose a time." />
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         {GROUPS.map((g) => (
           <div key={g.id}>
@@ -208,7 +208,7 @@ function About() {
           <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
-          <h2 className="t-section text-deep-ink">Meet Claire.</h2>
+          <h2 className="t-section text-deep-ink">One person who knows your return.</h2>
           <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">Claire Hartwell is an IRS Enrolled Agent: licensed to prepare your return and to represent you if the IRS has questions. Hartwell Tax is her practice. You work with her from your first document to the final signature.</p>
           <blockquote className="mt-8 border-l-2 border-ink pl-4 text-[15px] leading-6 text-body">“I sent everything the week before. The appointment took forty minutes, and I didn't have to come back.”<footer className="mt-2 text-[13px] text-muted-foreground">Anita R., Montclair</footer></blockquote>
           <dl className="mt-8 grid grid-cols-3 gap-2">
@@ -234,7 +234,7 @@ function Privacy() {
   ];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Your documents stay private." />
+      <SectionHead title="Your documents stay between us." sub="Send what your checklist asks for, knowing Claire is the only person who can open it." />
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {points.map((x) => (
           <li key={x.title} className="flex gap-3">
@@ -260,7 +260,7 @@ function DeadlineCta() {
      <section id="deadline" className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
-          <h2 className="t-section text-white">{c.title}</h2>
+          <h2 className="t-section text-primary-foreground">{c.title}</h2>
           <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">{c.body}</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">

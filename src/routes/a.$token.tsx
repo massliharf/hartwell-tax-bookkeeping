@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon, Hourglass, RotateCcw, Copy, CalendarPlus } from "lucide-react";
 import { useRef, useState } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -30,6 +31,7 @@ import { userTz, fmtDateLong, fmtDayChip, fmtTime, toIntakePayload, type Answers
 import { docGuide } from "@/lib/doc-guide";
 
 export const Route = createFileRoute("/a/$token")({
+  validateSearch: z.object({ booked: z.boolean().optional() }),
   head: () => ({
     meta: [
       { title: "Your appointment — Hartwell Tax & Bookkeeping" },
@@ -80,6 +82,7 @@ type Item = { id: string; uploaded_at?: string | null; document_name: string; de
 
 function PortalPage() {
   const { token } = Route.useParams();
+  const { booked } = Route.useSearch();
   const fetchAppt = useServerFn(getAppointmentByToken);
   const q = useQuery({ queryKey: ["portal", token], queryFn: () => fetchAppt({ data: { token } }), retry: false });
   const refresh = () => q.refetch();
@@ -159,11 +162,11 @@ function PortalPage() {
   return (
     <BookingShell>
       <div className="reveal-children mx-auto max-w-2xl space-y-10">
-        <div>
-          <p className="text-[13px] text-muted-foreground">Your appointment</p>
-          <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
-          <p className="mt-2 text-deep-ink/70">{(intro && introSub[stage]) || sub[stage]}</p>
-        </div>
+         <div>
+           <p className="text-[13px] text-muted-foreground">Your appointment</p>
+           <h1 className="mt-2 t-page text-deep-ink">{booked && ahead ? `You're booked, ${first}.` : `Hello, ${first}.`}</h1>
+           <p className="mt-2 text-deep-ink/70">{booked && ahead ? "We've emailed you a confirmation. Your appointment details and next steps are below." : (intro && introSub[stage]) || sub[stage]}</p>
+         </div>
         {!cancelled && (intro ? <Stepper steps={INTRO_STEPS} current={introStepOf(stage)} label="Call progress" /> : <Stepper steps={STEPS} current={stepOf(stage)} label="Appointment progress" />)}
 
         {/* 1. Before the meeting: when and where, confirm/move/cancel, then the checklist. */}

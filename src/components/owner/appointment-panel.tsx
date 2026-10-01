@@ -9,6 +9,7 @@ import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
 import { FollowUps, MeetingPicker, MoreActions, RequestDocument } from "./follow-ups";
 import { NowBanner } from "./now";
+import { meetingLink } from "@/lib/meeting";
 import { useOwnerMutation } from "./closeout";
 import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, stepOf } from "@/lib/lifecycle";
 import { completeIntroCall } from "@/lib/owner.functions";
@@ -49,6 +50,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const [picking, setPicking] = useState<"move" | "follow_up" | null>(null);
   const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const [accepting, setAccepting] = useState(false);
+  const videoSetting = useQuery({ queryKey: ["owner", "video-link-value"], queryFn: async () => (await supabase.from("settings").select("video_link").eq("id", 1).maybeSingle()).data?.video_link ?? null });
   const completeIntro = useServerFn(completeIntroCall);
   const introDone = useOwnerMutation((id: string) => completeIntro({ data: { id } }), "Call marked done.");
   const review = useServerFn(reviewDocument);
@@ -94,7 +96,9 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
           <DialogTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</DialogTitle>
           <DialogDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span>{a.services?.name}</span>
-            <span className="inline-flex items-center gap-1">{a.meeting_type === "video" ? <Video className="size-3.5" /> : <MapPin className="size-3.5" />}{a.meeting_type === "video" ? "Video" : "In person"}</span>
+            {a.meeting_type === "video"
+              ? <a href={meetingLink(videoSetting.data, a.id)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-ink hover:underline"><Video className="size-3.5" />Join video call</a>
+              : <span className="inline-flex items-center gap-1"><MapPin className="size-3.5" />In person</span>}
             {a.clients && <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose} className="inline-flex items-center gap-0.5 font-medium text-deep-ink hover:underline">{a.clients.name}<ChevronRight className="size-3.5" /></Link>}
           </DialogDescription>
         </div>

@@ -1,3 +1,4 @@
+import { meetingLink } from "./meeting";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -38,7 +39,7 @@ export const getAppointmentByToken = createServerFn({ method: "GET" })
       getNow(),
       supabaseAdmin.from("settings").select("video_link").eq("id", 1).maybeSingle(),
     ]);
-    return { appointment: appt, checklist: items ?? [], now: now.toISOString(), videoLink: appt.meeting_type === "video" ? st?.video_link ?? null : null };
+    return { appointment: appt, checklist: items ?? [], now: now.toISOString(), videoLink: appt.meeting_type === "video" ? meetingLink(st?.video_link, appt.id) : null };
   });
 
 /** Returns a one-time signed upload URL scoped to this appointment's folder. */

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
+import { downloadIcs, gcalStamp } from "@/lib/meeting";
 import { getAppointmentByToken } from "@/lib/portal.functions";
 import { fmtDateLong, fmtTime } from "@/lib/intake";
 
@@ -24,21 +25,7 @@ export const Route = createFileRoute("/book/confirmed")({
 });
 
 const ADDRESS = "412 Bloomfield Avenue, Montclair, NJ 07042";
-const gcalStamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
-function downloadIcs(title: string, start: string, end: string, where: string, details: string) {
-  const ics = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Hartwell Tax//Booking//EN", "BEGIN:VEVENT",
-    `UID:${gcalStamp(start)}-hartwell-tax`, `DTSTAMP:${gcalStamp(new Date().toISOString())}`,
-    `DTSTART:${gcalStamp(start)}`, `DTEND:${gcalStamp(end)}`,
-    `SUMMARY:${title}`, `LOCATION:${where}`, `DESCRIPTION:${details.replace(/\n/g, "\\n")}`,
-    "END:VEVENT", "END:VCALENDAR",
-  ].join("\r\n");
-  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
-  const a = document.createElement("a");
-  a.href = url; a.download = "hartwell-tax-appointment.ics"; a.click();
-  URL.revokeObjectURL(url);
-}
 
 function ConfirmedPage() {
   const { token } = Route.useSearch();
@@ -75,7 +62,7 @@ function ConfirmedPage() {
   const items = (q.data.checklist ?? []) as { id: string; document_name: string; description: string | null; required: boolean; status: string }[];
   const service = a.services?.name ?? "Appointment";
   const first = a.clients?.name?.split(" ")[0] ?? "";
-  const where = a.meeting_type === "video" ? "Video call (link will be emailed)" : ADDRESS;
+  const where = a.meeting_type === "video" ? ((q.data as { videoLink?: string | null }).videoLink ?? "Video call") : ADDRESS;
   const title = `${service} with Claire Hartwell, EA`;
   const manageUrl = typeof window !== "undefined" ? `${window.location.origin}/a/${token}` : "";
   const details = `Upload your documents: ${manageUrl}`;

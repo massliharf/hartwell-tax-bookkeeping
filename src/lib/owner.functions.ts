@@ -1,3 +1,4 @@
+import { OFFICE, OFFICE_ADDRESS, meetingLink } from "./meeting";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -273,7 +274,7 @@ export const sendApptReminder = createServerFn({ method: "POST" }).middleware([r
     const { db, a, c, origin, sendMessage, now } = await followAppt(context, data.id);
     if (!a || !c || !["booked", "confirmed"].includes(a.status)) return { ok: false, message: "This appointment isn't open." };
     const { data: st } = await db.from("settings").select("video_link").eq("id", 1).maybeSingle();
-    const place = a.meeting_type === "video" ? (st?.video_link ? `Video call: ${st.video_link}` : "Video call. Claire will send the link.") : "In person at 412 Bloomfield Avenue, Montclair, NJ 07042.";
+    const place = a.meeting_type === "video" ? `Video call: ${meetingLink(st?.video_link, a.id)}` : `In person at ${OFFICE_ADDRESS}. ${OFFICE.parking}`;
     const ok = await sendMessage({
       dedupeKey: hourKey("remind", a.id, now), type: "final_reminder_24h", minutesSaved: 4, clientId: c.id, appointmentId: a.id, to: c.email,
       subject: `Reminder: ${a.services?.name ?? "your appointment"}, ${when(a.start_at)}`, heading: "See you soon.",

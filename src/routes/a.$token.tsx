@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon, Hourglass, RotateCcw } from "lucide-react";
+import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon, Hourglass, RotateCcw, Copy, CalendarPlus } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
+import { DIRECTIONS, MAP_EMBED, OFFICE, OFFICE_ADDRESS, downloadIcs, joinState } from "@/lib/meeting";
 import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
 import { Checkout } from "@/components/booking/Checkout";
 import { Segmented } from "@/components/ui/segmented";
@@ -168,14 +169,14 @@ function PortalPage() {
         {/* 1. Before the meeting: when and where, confirm/move/cancel, then the checklist. */}
         {ahead && <>
           {!!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
-          <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} />
+          <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} nowIso={nowIso} />
           <Actions token={token} appt={a} onChange={refresh} />
           {intro || a.intake_answers?.["intake_pending"] || items.length === 0 ? null : stage === "ready" ? sentDocs : checklist}
         </>}
 
         {/* 2. The meeting itself. */}
         {stage === "meeting" && <>
-          <AppointmentCard appt={a} mode="now" videoLink={q.data.videoLink ?? null} />
+          <AppointmentCard appt={a} mode="now" videoLink={q.data.videoLink ?? null} nowIso={nowIso} />
           {intro || items.length === 0 ? null : todo > 0 ? checklist : sentDocs}
         </>}
 
@@ -259,36 +260,54 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
 }
 
 /* ---------- Appointment card ---------- */
-function AppointmentCard({ appt, mode, videoLink }: { appt: Appt; mode: "upcoming" | "now"; videoLink: string | null }) {
+function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: "upcoming" | "now"; videoLink: string | null; nowIso: string }) {
   const video = appt.meeting_type === "video";
-  const cancelled = false, postAppointment = false;
+  const intro = isIntroAppt(appt);
+  const join = joinState(appt.start_at, appt.end_at, nowIso);
+  const [copied, setCopied] = useState(false);
+  const copy = async () => { if (!videoLink) return; try { await navigator.clipboard.writeText(videoLink); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* the link is visible to copy by hand */ } };
+  const icsTitle = `Hartwell Tax: ${appt.services?.name ?? "Appointment"}`;
   return (
-    <div className={`sheet-stack p-6 ${cancelled ? "opacity-70" : ""}`}>
-         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+    <div className="sheet-stack overflow-hidden p-0">
+      {/* When */}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 p-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-[11px] font-medium text-muted-foreground">{appt.services?.name}</p>
             {mode === "now" ? <Tag tone="accent">Happening now</Tag> : appt.status === "confirmed" && <Tag tone="success">Confirmed</Tag>}
-            {cancelled && <Tag tone="danger">Cancelled</Tag>}
           </div>
-          <p className={`mt-1 t-card text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
+          <p className="mt-1 t-card text-deep-ink">{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
-        {!cancelled && !postAppointment && !appt.intake_answers?.["intake_pending"] && <ReadyRing value={appt.ready_score} size={84} />}
+        {!intro && !appt.intake_answers?.["intake_pending"] && <ReadyRing value={appt.ready_score} size={76} />}
       </div>
-      {!cancelled && (
-        <div className="mt-5 border-t border-border pt-4 text-sm">
-          {video ? (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Video className="size-4 text-muted-foreground" /> {postAppointment ? "Video call" : videoLink ? "Video call. Join from here at your appointment time." : "Video call. Claire will send the link by email."}</span>
-              {videoLink && !postAppointment && <Button size={mode === "now" ? "md" : "sm"} variant={mode === "now" ? "default" : "outline"} asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>}
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-deep-ink/80"><Users className="size-4 text-muted-foreground" /> In person, {ADDRESS}</span>
-              <Button size="sm" variant="outline" asChild><a href={MAP_URL} target="_blank" rel="noreferrer"><MapPin /> Open map</a></Button>
+
+      {/* Where: a working link for video, the office for in person */}
+      {video ? (
+        <div className="border-t border-border bg-surface-2 px-6 py-5">
+          <p className="flex items-center gap-2 text-sm font-medium text-deep-ink"><Video className="size-4" />Video call{intro ? " with Claire" : ""}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{join === "open" ? "Your call is open. Join now." : "The Join button opens 10 minutes before. Works in your browser; no app needed."}</p>
+          {videoLink && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {join === "open" ? <Button size="lg" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>
+                : <Button size="lg" variant="secondary" disabled><Video /> Join call</Button>}
+              <Button size="sm" variant="ghost" onClick={copy}>{copied ? <><Check />Copied</> : <><Copy />Copy link</>}</Button>
+              <Button size="sm" variant="ghost" onClick={() => downloadIcs(icsTitle, appt.start_at, appt.end_at, videoLink, `Join: ${videoLink}`)}><CalendarPlus />Add to calendar</Button>
             </div>
           )}
+        </div>
+      ) : (
+        <div className="grid border-t border-border sm:grid-cols-[1.1fr_1fr]">
+          <div className="px-6 py-5">
+            <p className="flex items-center gap-2 text-sm font-medium text-deep-ink"><MapPin className="size-4" />In person</p>
+            <p className="mt-1 text-sm text-deep-ink">{OFFICE.line1}<br />{OFFICE.line2}</p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">{OFFICE.parking}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button size="sm" asChild><a href={DIRECTIONS} target="_blank" rel="noreferrer"><MapPin /> Directions</a></Button>
+              <Button size="sm" variant="ghost" onClick={() => downloadIcs(icsTitle, appt.start_at, appt.end_at, OFFICE_ADDRESS, `Directions: ${DIRECTIONS}`)}><CalendarPlus />Add to calendar</Button>
+            </div>
+          </div>
+          <iframe title={`Map of ${OFFICE_ADDRESS}`} src={MAP_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="h-40 w-full border-0 border-t border-border sm:h-full sm:min-h-[180px] sm:border-l sm:border-t-0" />
         </div>
       )}
     </div>

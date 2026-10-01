@@ -77,7 +77,7 @@ function VideoLinkRow() {
   };
   return (
     <Row icon={<Video />} title="Video meeting link" status={q.data ? <Tag tone="success">Set</Tag> : <Tag>Not set</Tag>}>
-      <p>Your personal Zoom or Google Meet link. Video clients see a "Join call" button, and it's in the reminder the day before. If it's empty, clients are told you'll send the link by email.</p>
+      <p>Your personal Zoom or Google Meet link. Video clients see a "Join call" button, and it's in the reminder the day before. If it's empty, each appointment gets its own private video room automatically, so there's never a link to send by hand.</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Input aria-label="Video meeting link" placeholder="https://meet.google.com/abc-defg-hij" value={val} onChange={(e) => setVal(e.target.value)} className="h-10 sm:max-w-sm" />
         <Button size="sm" className="h-10" disabled={!valid || busy || val === (q.data ?? "")} onClick={save}>{busy ? "Saving…" : "Save"}</Button>

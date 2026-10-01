@@ -1,4 +1,5 @@
 // Follow-through automations. Everything uses getNow() and is idempotent via messages.dedupe_key.
+import { DIRECTIONS, OFFICE as PLACE, OFFICE_ADDRESS, meetingLink } from "./meeting";
 import { sendMessage, buildIcs, fmtDate, fmtTime, OFFICE, MAP_URL, type Block } from "./email.server";
 
 const H = 3_600_000;
@@ -43,6 +44,8 @@ export async function sendBookingConfirmation(apptId: string, origin: string) {
   const when = `${fmtDate(a.start_at)} at ${fmtTime(a.start_at)}`;
   const { data: ia } = await s.from("appointments").select("intake_answers").eq("id", a.id).maybeSingle();
   const pending = !!(ia?.intake_answers as Record<string, unknown> | null)?.["intake_pending"];
+  const { data: vs } = await s.from("settings").select("video_link").eq("id", 1).maybeSingle();
+  const join = meetingLink(vs?.video_link, a.id);
   await sendMessage({
     dedupeKey: `confirm:${a.id}:${a.start_at}`, type: "booking_confirmation", minutesSaved: 5,
     clientId: a.clients.id, appointmentId: a.id, to: a.clients.email,
@@ -54,10 +57,11 @@ export async function sendBookingConfirmation(apptId: string, origin: string) {
       ...(pending
         ? [{ p: "One more minute: answer five yes-or-no questions about your year, and you'll get the exact list of documents to bring." } as Block, { button: { label: "Answer the questions", href: portal } } as Block]
         : [...(docs.all.length ? [{ p: "Here is your personal checklist. Upload whenever it suits you, there's no rush today." } as Block, { list: docs.all } as Block] : []), { button: { label: "Open your appointment", href: portal } } as Block]),
-      { note: "A calendar invite is attached. Your documents go to private storage that only Claire can see." },
+      a.meeting_type === "video" ? { p: `Video call. Join here at your time: ${join}` } as Block : { p: `In person at ${OFFICE_ADDRESS}. ${PLACE.parking}` } as Block,
+      { note: "A calendar invite is attached. Your documents go to private storage that only your preparer can open." },
     ],
     ics: buildIcs({ id: a.id, start: a.start_at, end: a.end_at, title: `Hartwell Tax: ${a.services?.name ?? "Appointment"}`,
-      location: a.meeting_type === "video" ? "Video call" : OFFICE, description: `Your checklist: ${portal}` }),
+      location: a.meeting_type === "video" ? join : OFFICE, description: a.meeting_type === "video" ? `Join: ${join}\nYour appointment: ${portal}` : `Directions: ${DIRECTIONS}\nYour appointment: ${portal}` }),
     sms: `Hartwell Tax: you're booked for ${when}. Your checklist: ${portal}`,
   });
 }
@@ -181,7 +185,7 @@ export async function runAutomations(origin: string) {
     // 24 hours before: final reminder
     if (until <= finalH * H) {
       const { all } = await missingDocs(a.id);
-      const join = a.meeting_type === "video" && videoLink ? [{ button: { label: "Join the video call", href: videoLink } } as Block] : [];
+      const join = a.meeting_type === "video" ? [{ button: { label: "Join the video call", href: meetingLink(videoLink, a.id) } } as Block] : [{ p: `We're at ${OFFICE_ADDRESS}. ${PLACE.parking}` } as Block, { button: { label: "Directions", href: DIRECTIONS } } as Block];
       hit("final_reminder_24h", await sendMessage({
         dedupeKey: key("final24"), type: "final_reminder_24h", minutesSaved: 4, clientId: c.id, appointmentId: a.id, to: c.email,
         subject: `See you tomorrow, ${fmtTime(a.start_at)}`,

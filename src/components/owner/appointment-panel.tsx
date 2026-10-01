@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ import { ReviewGallery } from "./review-gallery";
 import { AiTag, CloseoutBlock, DocReview, FinishForm } from "./closeout";
 import { MeetingNotes } from "./meeting-notes";
 import { reviewDocument } from "@/lib/owner.functions";
-import type { ApptPanelTarget } from "./drawer-context";
+import { useApptPanel, type ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
 import { useDocked } from "./use-docked";
 export { useDocked } from "./use-docked";
@@ -54,7 +54,7 @@ export function AppointmentPanel({ target, onClose, expanded, setExpanded }: { t
             className={`panel-in fixed bottom-2 right-2 top-2 z-40 flex flex-col overflow-hidden rounded-2xl bg-sheet transition-[width] duration-300 ease-expo ${expanded ? "w-[760px]" : "w-[440px]"}`}>
             {expandBtn}
             <DialogPrimitive.Close aria-label="Close panel" className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink"><X className="size-4" /></DialogPrimitive.Close>
-            <div className="min-h-0 flex-1 overflow-y-auto">{target && <AppointmentContent key={target.appointmentId} id={target.appointmentId} onClose={close} expanded={expanded} />}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto">{target && <AppointmentContent id={target.appointmentId} onClose={close} expanded={expanded} />}</div>
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
@@ -68,7 +68,7 @@ export function AppointmentPanel({ target, onClose, expanded, setExpanded }: { t
         <DialogPrimitive.Content onOpenAutoFocus={(e) => e.preventDefault()} className="sheet-up fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] flex-col overflow-hidden rounded-t-[20px] bg-sheet sm:mx-auto sm:w-[680px]">
           <div className="flex justify-center pb-1 pt-2.5" aria-hidden="true"><span className="h-1 w-10 rounded-full bg-line-2" /></div>
           <DialogPrimitive.Close aria-label="Close" className="absolute right-3 top-3 z-10 grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-tint-1 hover:text-deep-ink"><X className="size-4" /></DialogPrimitive.Close>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{target && <AppointmentContent key={target.appointmentId} id={target.appointmentId} onClose={close} expanded={false} />}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{target && <AppointmentContent id={target.appointmentId} onClose={close} expanded={false} />}</div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
@@ -80,8 +80,26 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const [finishing, setFinishing] = useState(false);
   const [picking, setPicking] = useState<"move" | "follow_up" | null>(null);
   const [tab, setTab] = useState<"overview" | "documents" | "activity" | "notes">("overview");
+  // A different appointment starts fresh: first tab, no half-finished form.
+  useEffect(() => { setTab("overview"); setFinishing(false); setPicking(null); if (!keepGallery.current) setGallery(false); keepGallery.current = false; }, [id]);
   const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const [accepting, setAccepting] = useState(false);
+  const openAppt = useApptPanel();
+  const reviewQueue = useQuery({
+    queryKey: ["owner", "review-queue"], enabled: gallery,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("checklist_items").select("appointment_id, ai_check, review_status, status, appointments(start_at, clients(name))").eq("status", "uploaded").eq("review_status", "pending");
+      if (error) throw error;
+      const by = new Map<string, { apptId: string; name: string; count: number; at: string }>();
+      for (const r of (data ?? []) as unknown as { appointment_id: string; ai_check: string | null; appointments: { start_at: string; clients: { name: string } | null } | null }[]) {
+        if (r.ai_check === "ok" || r.ai_check === "warning") continue;
+        const cur = by.get(r.appointment_id) ?? { apptId: r.appointment_id, name: r.appointments?.clients?.name ?? "Client", count: 0, at: r.appointments?.start_at ?? "" };
+        cur.count++; by.set(r.appointment_id, cur);
+      }
+      return [...by.values()].sort((x, y) => x.at.localeCompare(y.at));
+    },
+  });
+  const keepGallery = useRef(false);
   const videoSetting = useQuery({ queryKey: ["owner", "video-link-value"], queryFn: async () => (await supabase.from("settings").select("video_link").eq("id", 1).maybeSingle()).data?.video_link ?? null });
   const completeIntro = useServerFn(completeIntroCall);
   const introDone = useOwnerMutation((id: string) => completeIntro({ data: { id } }), "Call marked done.");
@@ -89,6 +107,8 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["owner", "appt", id],
+    // Switching appointments in the docked panel keeps the last one on screen until the next has loaded (no flash).
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const { data, error } = await supabase.from("appointments").select(APPT_SELECT).eq("id", id).maybeSingle();
       if (error) throw error;
@@ -240,7 +260,8 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
         {tab === "activity" && <FollowUps a={a} now={now} />}
         {tab === "notes" && <MeetingNotes a={a} now={now} />}
       </div>
-      <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
+      <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting}
+        queue={reviewQueue.data ? { list: reviewQueue.data, currentId: a.id, onSwitch: (apptId) => { keepGallery.current = true; openAppt({ appointmentId: apptId }); } } : undefined} />
 
       <footer className="sticky bottom-0 z-20 mt-auto max-h-[70dvh] overflow-y-auto overscroll-contain border-t border-border bg-sheet px-5 py-4 sm:px-6">
         {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />

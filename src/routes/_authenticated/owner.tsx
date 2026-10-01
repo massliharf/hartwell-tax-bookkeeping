@@ -91,7 +91,7 @@ function OwnerLayout() {
   const wide = path === "/owner" || path.startsWith("/owner/calendar") || path.startsWith("/owner/clients") || path.startsWith("/owner/settings") || path.startsWith("/owner/insights");
 
   return (
-    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper transition-[padding] duration-300 ease-expo sm:flex sm:bg-canvas sm:py-2 sm:pr-2" style={docked && panel ? { paddingRight: panelWide ? 776 : 456 } : undefined}>
+    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper sm:flex sm:bg-canvas sm:py-2 sm:pr-2" style={docked && panel ? { paddingRight: panelWide ? 776 : 456 } : undefined}>
       {/* DESIGN_SYSTEM v2 §5: the sidebar sits on the canvas (no card); the main panel is the white card. */}
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-3 transition-[width,padding] duration-300 ease-expo sm:flex ${collapsed ? "w-[60px] px-2" : "w-[220px] px-3"}`}>
         <div className={`flex h-9 items-center ${collapsed ? "justify-center" : "justify-between"}`}>
@@ -118,7 +118,7 @@ function OwnerLayout() {
           ))}
         </nav>
         <div className="flex-1" />
-        <div className="hidden"><DemoTools rows collapsed /></div>
+        <div className="border-t border-line-1 pt-2"><DemoTools rows collapsed={collapsed} /></div>
       </aside>
 
       <div className="min-w-0 flex-1">
@@ -211,11 +211,6 @@ function ProfileMenu({ email, onSignOut }: { email: string; onSignOut: () => voi
           <DropdownMenuItem asChild className={row}><Link to="/owner/settings"><Settings className="size-4" />Settings</Link></DropdownMenuItem>
           <DropdownMenuItem asChild className={row}><Link to="/owner/insights"><BarChart3 className="size-4" />Report</Link></DropdownMenuItem>
           <DropdownMenuItem asChild className={row}><a href="/" target="_blank" rel="noreferrer"><Globe className="size-4" />View the website</a></DropdownMenuItem>
-        </div>
-        <DropdownMenuSeparator className="my-0" />
-        <div className="p-1.5">
-          <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event("owner:demo"))} className={row}><FlaskConical className="size-4" />Demo tools</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event("owner:phone"))} className={row}><Smartphone className="size-4" />Phone preview</DropdownMenuItem>
         </div>
         <DropdownMenuSeparator className="my-0" />
         <div className="p-1.5">

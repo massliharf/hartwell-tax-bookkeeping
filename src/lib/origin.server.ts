@@ -1,13 +1,19 @@
 import { getRequest } from "@tanstack/react-start/server";
 
-// Canonical public URL for links inside emails — never localhost, even in preview.
-const CANONICAL = process.env["SITE_URL"] ?? "https://patel-ready-book.lovable.app";
+// Canonical public URL for links in emails and demo links. Clients must never get a localhost or Lovable
+// preview link (those need a Lovable login), so anything that isn't the public site or a custom domain
+// falls back to the published address.
+const CANONICAL = process.env["SITE_URL"] ?? "https://hartwell-tax-bookkeeping.lovable.app";
 
 export function requestOrigin() {
   try {
-    const origin = new URL(getRequest().url).origin;
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return CANONICAL;
-    return origin;
+    const url = new URL(getRequest().url);
+    const host = url.hostname;
+    const isLocal = /^(localhost|127\.0\.0\.1)$/.test(host);
+    const isPreview = host.endsWith("lovableproject.com") || host.endsWith("lovableproject-dev.com") || host.startsWith("id-preview--") || host.includes("--") && host.endsWith("lovable.app");
+    const isOldName = host === "patel-ready-book.lovable.app";
+    if (isLocal || isPreview || isOldName) return CANONICAL;
+    return url.origin;
   } catch {
     return CANONICAL;
   }

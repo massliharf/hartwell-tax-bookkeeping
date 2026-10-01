@@ -42,9 +42,12 @@ async function pdfPages(blob: Blob): Promise<string[]> {
 
 const safeName = (s: string) => s.replace(/[^\w\- ]+/g, "").trim().slice(0, 60) || "document";
 
-export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, accepting }: {
+/** Other clients with documents waiting for Claire, so she can move person to person without closing the viewer. */
+export type ReviewQueue = { list: { apptId: string; name: string; count: number }[]; currentId: string; onSwitch: (apptId: string) => void };
+
+export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, accepting, queue }: {
   open: boolean; onOpenChange: (o: boolean) => void; title: string; items: Item[];
-  onAcceptAll: () => void; accepting: boolean;
+  onAcceptAll: () => void; accepting: boolean; queue?: ReviewQueue | undefined;
 }) {
   const getUrl = useServerFn(getDocumentUrl);
   const files = items.filter((i) => i.status === "uploaded").sort((x, y) => x.sort_order - y.sort_order);
@@ -56,6 +59,13 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
   const cur = files[Math.min(index, Math.max(0, files.length - 1))];
   const curLoaded = cur ? loaded[`${cur.id}:${cur.file_path}`] : undefined;
   const looksRight = files.filter((i) => i.review_status === "pending" && i.ai_check === "ok");
+  const toCheck = (f: Item) => f.review_status === "pending" && f.ai_check !== "ok" && f.ai_check !== "warning";
+  const checked = files.filter((f) => !toCheck(f)).length;
+  // The current client is always in the queue, even once everything is checked, so the arrows still make sense.
+  const qList = queue ? (queue.list.some((x) => x.apptId === queue.currentId) ? queue.list : [{ apptId: queue.currentId, name: title, count: 0 }, ...queue.list]) : [];
+  const qIdx = queue ? qList.findIndex((x) => x.apptId === queue.currentId) : -1;
+  const switchTo = (d: number) => { const t = qList[qIdx + d]; if (t && queue) queue.onSwitch(t.apptId); };
+  const nextClient = queue ? qList.slice(qIdx + 1).find((x) => x.count > 0) : undefined;
 
   // Fetch each private file once per open, through a one-minute signed URL; keep it in memory only.
   const fileKey = files.map((f) => `${f.id}:${f.file_path}`).join("|");
@@ -95,6 +105,12 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
     const first = files.findIndex((f) => f.review_status === "pending" && f.ai_check !== "warning" && f.ai_check !== "ok");
     setIndex(first >= 0 ? first : 0);
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Switching to another client starts on their first document that needs checking.
+  useEffect(() => {
+    if (!open || !queue) return;
+    const first = files.findIndex((f) => toCheck(f));
+    setIndex(first >= 0 ? first : 0);
+  }, [queue?.currentId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { setZoom("fit"); setRot(0); setPage(0); }, [cur?.id]);
 
   const go = useCallback((d: number) => setIndex((i) => Math.min(Math.max(0, i + d), files.length - 1)), [files.length]);
@@ -111,12 +127,14 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
       if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
       else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+      else if ((e.key === "ArrowDown" || e.key === "]") && queue) { e.preventDefault(); switchTo(1); }
+      else if ((e.key === "ArrowUp" || e.key === "[") && queue) { e.preventDefault(); switchTo(-1); }
       else if (e.key === "+" || e.key === "=") { e.preventDefault(); zoomBy(1.25); }
       else if (e.key === "-" || e.key === "_") { e.preventDefault(); zoomBy(0.8); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, go, zoomBy]);
+  }, [open, go, zoomBy, queue, qIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const downloadAll = async () => {
     const ready = files.map((f) => ({ f, l: loaded[`${f.id}:${f.file_path}`] })).filter((x): x is { f: Item; l: Extract<Loaded, { url: string }> } => !!x.l && !("error" in x.l));
@@ -168,9 +186,15 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="data-[state=open]:animate-[overlay-in_200ms_cubic-bezier(0.16,1,0.3,1)] left-0 top-0 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 p-0 sm:rounded-none">
         <header className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 pr-16 sm:px-6 sm:pr-16">
-          <div className="min-w-0 flex-1">
-            <DialogTitle className="truncate text-sm font-medium text-deep-ink">Review documents, {title}</DialogTitle>
-            <DialogDescription className="hidden text-xs text-muted-foreground sm:block">{files.length} file{files.length === 1 ? "" : "s"}. Private, loaded through links that expire after a minute.</DialogDescription>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            {queue && qList.length > 1 && <Button size="icon" variant="ghost" aria-label="Previous client" disabled={qIdx <= 0} onClick={() => switchTo(-1)}><ChevronLeft /></Button>}
+            <div className="min-w-0">
+              <DialogTitle className="truncate text-[15px] font-semibold text-deep-ink">{title}</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                {checked} of {files.length} checked{queue && qList.length > 1 ? ` · client ${qIdx + 1} of ${qList.length} with documents to check` : ""}
+              </DialogDescription>
+            </div>
+            {queue && qList.length > 1 && <Button size="icon" variant="ghost" aria-label="Next client" disabled={qIdx >= qList.length - 1} onClick={() => switchTo(1)}><ChevronRight /></Button>}
           </div>
           {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={onAcceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
           <Button size="sm" variant="secondary" aria-label="Download all" onClick={downloadAll}><Download /><span className="hidden sm:inline">Download all</span></Button>
@@ -178,8 +202,15 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col md:grid md:grid-cols-[200px_minmax(0,1fr)_320px]">
-          <ul aria-label="Files" className="flex shrink-0 gap-2 overflow-x-auto border-b border-border p-3 md:flex-col md:overflow-y-auto md:border-b-0 md:border-r">
-            {files.map((f, i) => (
+          <div aria-label="Files" className="flex shrink-0 gap-2 overflow-x-auto border-b border-border p-3 md:flex-col md:gap-4 md:overflow-y-auto md:border-b-0 md:border-r">
+            {(["check", "done"] as const).map((group) => {
+              const n = files.filter((f) => (group === "check" ? toCheck(f) : !toCheck(f))).length;
+              if (!n) return null;
+              return (
+                <div key={group} className="flex shrink-0 gap-2 md:flex-col">
+                  <p className={cn("hidden t-label md:block", group === "check" && "text-alert-warning-fg")}>{group === "check" ? `To check · ${n}` : `Checked · ${n}`}</p>
+                  <ul className="flex gap-2 md:flex-col">
+            {files.map((f, i) => ({ f, i })).filter(({ f }) => group === "check" ? toCheck(f) : !toCheck(f)).map(({ f, i }) => (
               <li key={f.id} className="shrink-0">
                 <button type="button" onClick={() => setIndex(i)} aria-current={i === index}
                   className={cn("flex w-24 flex-col gap-1 rounded-xl border p-2 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:w-full", i === index ? "border-deep-ink bg-surface-2" : "border-border")}>
@@ -191,7 +222,11 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
                 </button>
               </li>
             ))}
-          </ul>
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
 
           <section className="relative flex min-h-0 flex-1 flex-col bg-surface-2">
             <div className="flex items-center justify-center gap-1 border-b border-border bg-sheet px-2 py-1.5">
@@ -228,9 +263,17 @@ export function ReviewGallery({ open, onOpenChange, title, items, onAcceptAll, a
             {cur && <>
               <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-deep-ink">{cur.document_name}</p><AiTag i={cur} /></div>
               {curLoaded && !("error" in curLoaded) && curLoaded.sample && <p className="mt-2 rounded-lg bg-fill-subtle px-2.5 py-1.5 text-[11px] text-muted-foreground">Demo data: a sample document is shown in place of the client's file.</p>}
+              {queue && qList.length > 1 && <p className="mt-4 hidden text-[11px] text-muted-foreground md:block">↑ ↓ switch client · ← → switch document</p>}
               {cur.ai_note && <p className={cn("mt-2 text-xs", cur.ai_check === "warning" || cur.ai_check === "kept" ? "text-warning" : "text-muted-foreground")}>{cur.ai_note}{cur.ai_check === "kept" && " The client chose to keep it."}</p>}
               <div className="mt-3"><DocReview key={cur.id} i={cur} inline onDone={next} /></div>
-              {cur.review_status === "accepted" && <p className="mt-2 text-xs text-muted-foreground">Accepted. Use the arrows to keep going.</p>}
+              {cur.review_status === "accepted" && <p className="mt-2 text-xs text-muted-foreground">Accepted. Use ← → to move between documents.</p>}
+              {files.length > 0 && checked === files.length && (
+                <div className="mt-4 rounded-xl bg-alert-success p-3">
+                  <p className="text-sm font-medium text-alert-success-fg">Everything for {title} is checked.</p>
+                  {nextClient && queue ? <Button size="sm" className="mt-2" onClick={() => queue.onSwitch(nextClient.apptId)}>Next: {nextClient.name}<ChevronRight /></Button>
+                    : <Button size="sm" variant="secondary" className="mt-2" onClick={() => onOpenChange(false)}>Done</Button>}
+                </div>
+              )}
             </>}
           </aside>
         </div>

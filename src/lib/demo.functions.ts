@@ -33,7 +33,7 @@ export const ensureDemoAccount = createServerFn({ method: "POST" }).handler(asyn
 export const phoneFeed = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { s } = await owner(context);
+    const { s, origin } = await owner(context);
     const { data } = await s.from("messages").select("id, channel, type, subject, body, sent_at, recipient, clients(name)")
       .not("recipient", "is", null).order("sent_at", { ascending: false }).limit(300);
     return (data ?? []).map((m) => ({ ...m, name: (m.clients as { name: string } | null)?.name ?? null }));
@@ -328,7 +328,7 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
     const { data: m } = await s.from("messages").select("subject, body, recipient").eq("id", data.id).eq("channel", "email").maybeSingle();
     if (!m || !/@example\.(com|org|net)$/i.test(m.recipient ?? "")) return { ok: false as const, reason: "missing" as const };
     const { renderEmail, toText } = await import("./email.server");
-    const parts = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+    const parts = m.body.replace(/https:\/\/[a-z0-9-]+\.lovable\.app(?=\/)/g, origin).split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
     parts.shift(); // The stored plain-text message starts with its heading.
     if (parts.at(-1) === "Claire Hartwell, EA") parts.pop();
     const blocks = parts.flatMap((part): Block[] => {
@@ -336,6 +336,8 @@ export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requi
       if (lines.every((line) => line.startsWith("- "))) return [{ list: lines.map((line) => line.slice(2)) }];
       const links = lines.map((line) => line.match(/^(.+?): (https:\/\/\S+)$/));
       if (links.every((link) => link !== null)) return links.map((link) => ({ button: { label: link?.[1] ?? "Open appointment", href: link?.[2] ?? "" } }));
+      const trailing = part.match(/^(.*?)(?:\n+)(Open your appointment): (https:\/\/\S+)$/s);
+      if (trailing) return [{ p: trailing[1] ?? "" }, { button: { label: trailing[2] ?? "Open your appointment", href: trailing[3] ?? "" } }];
       return [{ p: part }];
     });
     const heading = m.subject ?? "Hartwell Tax";

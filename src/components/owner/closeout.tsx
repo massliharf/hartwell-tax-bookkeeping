@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailCard, type PreviewBlock } from "./email-preview";
 import { Input } from "@/components/ui/input";
@@ -56,11 +57,16 @@ export function FinishForm({ a, onBack, onDone }: { a: Appt; onBack: () => void;
             <Textarea id="note" value={note} maxLength={600} onChange={(e) => setNote(e.target.value)} className="mt-1.5" rows={3} />
           </div>
         </div>
-        <div>
-          <p className="t-label mb-2">What {first} gets</p>
-          <p className="mb-2 text-xs text-muted-foreground">Email to {a.clients?.email}{a.clients?.phone ? ", plus a text with the link" : ""}. Subject: Review, sign and pay</p>
-          <EmailCard heading="Your return is ready." blocks={preview} />
-        </div>
+        <details className="group rounded-xl border border-line-1">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 text-[13px] font-medium text-deep-ink [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0">See the exact message {first} gets</span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-90" />
+          </summary>
+          <div className="border-t border-line-1 p-3">
+            <p className="mb-2 text-xs text-muted-foreground">Email to {a.clients?.email}{a.clients?.phone ? ", plus a text with the link" : ""}. Subject: Review, sign and pay</p>
+            <EmailCard heading="Your return is ready." blocks={preview} />
+          </div>
+        </details>
         <div className="flex gap-2"><Button variant="secondary" onClick={onBack}>Back</Button>
           <Button disabled={!valid || m.isPending} onClick={() => m.mutate({ feeCents: cents, note }, { onSuccess: (r) => { if (r.ok) sent(); } })}>{m.isPending ? "Saving…" : "Finish and send"}</Button></div>
     </div>

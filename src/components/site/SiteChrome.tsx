@@ -75,8 +75,8 @@ export function SiteFooter() {
           <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Visit</p>
           <p>412 Bloomfield Avenue</p>
           <p>Montclair, NJ 07042</p>
-          <a href={OFFICE_PHONE_HREF} className="tabular flex min-h-9 items-center hover:text-white">{OFFICE_PHONE}</a>
-          <a href={OFFICE_EMAIL_HREF} className="flex min-h-9 items-center hover:text-white">{OFFICE_EMAIL}</a>
+          <a href={OFFICE_PHONE_HREF} className="tabular -my-2 flex min-h-9 items-center hover:text-white">{OFFICE_PHONE}</a>
+          <a href={OFFICE_EMAIL_HREF} className="-my-2 flex min-h-9 items-center hover:text-white">{OFFICE_EMAIL}</a>
         </div>
         <div className="text-sm">
           <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Hours</p>

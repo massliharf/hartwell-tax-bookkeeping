@@ -217,5 +217,15 @@ export const sendReturningLinks = createServerFn({ method: "POST" })
       dedupeKey: `access:${client.id}:${hour}`, type: "booking_confirmation", minutesSaved: 3, clientId: client.id, to: email,
       subject: "Your Hartwell Tax links", heading: "Welcome back.", blocks,
     });
+    // Demo addresses (@example.com) never receive real email, so hand the same links back on screen.
+    if (/@example\.(com|org|net)$/i.test(email)) {
+      return {
+        ok: true,
+        demo: {
+          appointments: (upcoming ?? []).map((a) => ({ label: `${(a.services as { name: string } | null)?.name ?? "Appointment"}, ${when(a.start_at)}`, token: a.manage_token })),
+          resumeId: lead?.id ?? null,
+        },
+      };
+    }
     return { ok: true };
   });

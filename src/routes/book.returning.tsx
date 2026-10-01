@@ -20,21 +20,45 @@ export const Route = createFileRoute("/book/returning")({
   component: ReturningPage,
 });
 
+type Demo = { appointments: { label: string; token: string }[]; resumeId: string | null };
+
 function ReturningPage() {
   const send = useServerFn(sendReturningLinks);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "sent" | "error">("idle");
+  const [demo, setDemo] = useState<Demo | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setState("busy");
-    try { await send({ data: { email } }); setState("sent"); } catch { setState("error"); }
+    try {
+      const res = (await send({ data: { email } })) as { demo?: Demo };
+      setDemo(res.demo ?? null);
+      setState("sent");
+    } catch { setState("error"); }
   };
 
   return (
     <BookingShell>
       <div className="mx-auto max-w-md">
-        {state === "sent" ? (
+        {state === "sent" && demo ? (
+          <ResultPanel icon={<Mail />} tone="success" title="Welcome back."
+            actions={<Button size="lg" variant="secondary" onClick={() => { setState("idle"); setDemo(null); }}><RotateCcw />Use a different email</Button>}>
+            Demo address, so here are the links from the email.
+            <div className="mt-5 space-y-2 text-left">
+              {demo.appointments.map((a) => (
+                <Button key={a.token} asChild size="lg" className="w-full justify-start">
+                  <Link to="/a/$token" params={{ token: a.token }}>{a.label}</Link>
+                </Button>
+              ))}
+              {demo.resumeId && (
+                <Button asChild size="lg" variant="secondary" className="w-full">
+                  <Link to="/book" search={{ resume: demo.resumeId } as never}>Book again with last year's answers</Link>
+                </Button>
+              )}
+            </div>
+          </ResultPanel>
+        ) : state === "sent" ? (
           <ResultPanel icon={<Mail />} tone="success" title="Check your inbox."
             actions={<><Button size="lg" variant="secondary" onClick={() => setState("idle")}><RotateCcw />Use a different email</Button><Button asChild size="lg" variant="ghost"><Link to="/book">Schedule a new appointment</Link></Button></>}>
             If <strong>{email}</strong> has an appointment with us, a private link is on its way.

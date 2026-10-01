@@ -69,8 +69,10 @@ function ConfirmedPage() {
 
   const a = q.data.appointment as {
     start_at: string; end_at: string; meeting_type: "in_person" | "video"; ready_score: number;
-    services: { name: string } | null; clients: { name: string } | null;
+    services: { name: string } | null; clients: { name: string } | null; intake_answers?: Record<string, unknown> | null;
   };
+  const pending = !!a.intake_answers?.["intake_pending"];
+  const items = (q.data.checklist ?? []) as { id: string; document_name: string; description: string | null; required: boolean; status: string }[];
   const service = a.services?.name ?? "Appointment";
   const first = a.clients?.name?.split(" ")[0] ?? "";
   const where = a.meeting_type === "video" ? "Video call (link will be emailed)" : ADDRESS;
@@ -110,6 +112,7 @@ function ConfirmedPage() {
           </div>
         </div>
 
+        {pending ? (
         <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
           <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more minute, and you're ready</p>
           <div className="p-5 sm:p-6">
@@ -124,6 +127,29 @@ function ConfirmedPage() {
             <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We never ask for your Social Security number online.
           </p>
         </div>
+        ) : (
+          <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
+            <div className="border-b border-line-1 bg-surface-2 px-5 py-4">
+              <p className="t-card text-deep-ink">What to bring</p>
+              <p className="mt-1 text-sm text-muted-foreground">{items.length} document{items.length === 1 ? "" : "s"}, from your answers. Send them from your phone and Claire checks each one before you arrive.</p>
+            </div>
+            <ul className="divide-y divide-line-1">
+              {items.map((i) => (
+                <li key={i.id} className="flex items-start gap-3 px-5 py-3 text-sm">
+                  <span className="mt-0.5 size-4 shrink-0 rounded-[4px] border-[1.5px] border-line-3" />
+                  <span><span className="block text-deep-ink">{i.document_name}</span>{i.description && <span className="block text-xs text-muted-foreground">{i.description}</span>}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="border-t border-line-1 p-5">
+              <Button asChild size="lg" className="w-full sm:w-auto"><Link to="/a/$token" params={{ token: token! }}>Send your documents</Link></Button>
+              <p className="mt-3 text-[13px] text-muted-foreground">Not now? The link is in your confirmation email, and we'll remind you about anything missing.</p>
+            </div>
+            <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
+              <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We never ask for your Social Security number online.
+            </p>
+          </div>
+        )}
       </div>
     </BookingShell>
   );

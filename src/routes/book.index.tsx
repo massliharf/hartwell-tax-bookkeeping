@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { SERVICES } from "@/lib/services";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,10 +18,10 @@ import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
 import { getLeadDraft } from "@/lib/automations.functions";
-import { fmtDateLong, fmtDayChip, fmtTime, type Answers } from "@/lib/intake";
+import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
-  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(1).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
+  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(2).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
   head: () => ({
     meta: [
       { title: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
@@ -33,6 +34,8 @@ export const Route = createFileRoute("/book/")({
 });
 
 type Service = { id: string; name: string; slug: string; duration_min: number; price_from: number; is_from_price: boolean; description: string | null };
+/** "Thursday 1:00 PM" for the confirm button. */
+const fmtWhen = (iso?: string) => (iso ? `${new Date(iso).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" })}, ${fmtTime(iso)}` : "this time");
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 const nyDay = (iso: string) => {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(iso));
@@ -68,23 +71,26 @@ function BookPage() {
       fetchLead({ data: { id: search.resume } }).then((l) => {
         if (!l) { navigate({ search: {}, replace: true }); return; }
         update({ email: l.email, name: l.name, meetingType: l.meetingType, answers: l.answers as Answers, ...(l.service ? { serviceSlug: l.service } : {}), slot: undefined, date: undefined });
-        navigate({ search: { step: 0 }, replace: true });
+        navigate({ search: { step: l.service ? 1 : 0 }, replace: true });
       }).catch(() => {});
       return;
     }
     // A time picked on the homepage: keep it, ask the questions, then confirm it on the time step.
     if (search.start) {
       update({ serviceSlug: search.service ?? "individual", slot: search.start, date: nyDay(search.start) });
-      navigate({ search: { step: 1 }, replace: true });
+      navigate({ search: { step: 2 }, replace: true });
       return;
     }
-    if (search.service && search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
-    else if (!draft.serviceSlug) update({ serviceSlug: "individual" });
+    if (search.service) {
+      if (search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
+      if (search.step === undefined) navigate({ search: { step: 1 }, replace: true });
+    }
   }, [loaded, search.service, search.resume, search.start, draft.serviceSlug, update, fetchLead, navigate]);
 
   const service = services.data?.find((s) => s.slug === draft.serviceSlug);
   let step = search.step ?? 0;
-  if (loaded && step === 1 && !draft.slot) step = 0;
+  if (loaded && step >= 1 && !draft.serviceSlug) step = 0;
+  if (loaded && step === 2 && !draft.slot) step = 1;
 
   // Steps slide forward or back with the direction of travel (DESIGN_SYSTEM motion: expo-out, 260ms).
   const prevStep = useRef(step);
@@ -98,7 +104,12 @@ function BookPage() {
 
   const detailsComplete = draft.name.trim().length > 0 && emailOk(draft.email);
   const slotOk = !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date;
-  const canContinue = step === 0 ? !!service && slotOk : detailsComplete && slotOk && !bookingBusy;
+  const questionsComplete = questionsFor(draft.serviceSlug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean");
+  const preview = previewChecklist(draft.serviceSlug, draft.answers);
+  const canContinue = step === 0 ? !!service : step === 1 ? slotOk : detailsComplete && questionsComplete && slotOk && !bookingBusy;
+  const cta = step === 0 ? (service ? `Continue with ${service.name}` : "Choose what you need")
+    : step === 1 ? (draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time to continue")
+    : bookingBusy ? "Confirming…" : !questionsComplete ? "Answer the questions to confirm" : `Confirm ${fmtWhen(draft.slot)}`;
 
   if (!loaded) {
      return <BookingShell step={0}><div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]"><div><Skeleton className="h-10 w-3/4" /><Skeleton className="mt-3 h-5 w-2/3" /><div className="mt-14 grid gap-5 sm:grid-cols-2">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div></div><div className="hidden lg:block"><Skeleton className="h-48 rounded-2xl" /></div></div></BookingShell>;
@@ -116,44 +127,140 @@ function BookPage() {
               exit={reduce ? { opacity: 0 } : { opacity: 0, x: -8 * dir }}
               transition={{ duration: reduce ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}
             >
-              {step === 0 && (service
-                ? <TimeStep service={service} services={services.data ?? []} draft={draft} update={update} />
-                : <div className="space-y-4"><Skeleton className="h-9 w-2/3" /><Skeleton className="h-9 w-full" /><Skeleton className="h-40 w-full" /></div>)}
-              {step === 1 && service && <DetailsStep service={service} draft={draft} update={update} busy={bookingBusy} setBusy={setBookingBusy} onPickAgain={() => go(0)} />}
+              {step === 0 && <ServiceStep services={services} selected={draft.serviceSlug} onPick={(slug) => { if (slug !== draft.serviceSlug) update({ serviceSlug: slug, slot: undefined, date: undefined }); }} />}
+              {step === 1 && (service
+                ? <TimeStep service={service} draft={draft} update={update} />
+                : <div className="space-y-4"><Skeleton className="h-9 w-2/3" /><Skeleton className="h-24 w-full" /><Skeleton className="h-40 w-full" /></div>)}
+              {step === 2 && service && <DetailsStep service={service} draft={draft} update={update} busy={bookingBusy} setBusy={setBookingBusy} onPickAgain={() => go(1)} />}
             </motion.div>
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button size="lg" className="flex-1 lg:flex-none" type={step === 1 ? "submit" : "button"} form={step === 1 ? "booking-details" : undefined} disabled={!canContinue} onClick={step === 0 ? () => go(1) : undefined}>{step === 1 ? (bookingBusy ? "Booking…" : "Confirm this time") : draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time to continue"}</Button>
+            <Button size="lg" className="flex-1 lg:flex-none" type={step === 2 ? "submit" : "button"} form={step === 2 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 2 ? () => go(step + 1) : undefined}>{cta}</Button>
           </div>
         </div>
-        <aside className="hidden lg:block"><div className="sticky top-8">{service && <BookingSummary service={service} draft={draft} onPickAgain={step === 1 ? () => go(0) : undefined} />}</div></aside>
+        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure which one fits? Pick the closest. Claire adjusts it when she sees your documents, and the price is agreed before any work starts.</p>}</div></aside>
       </div>
     </BookingShell>
   );
 }
 
-function TimeStep({ service, services, draft, update }: { service: Service; services: Service[]; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void }) {
+/* ---------- Step 1: what you need ---------- */
+function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
+  return (
+    <>
+       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Pick the closest fit. Every price is agreed before work starts, and you pay when your return is filed." />
+       {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
+      {services.isError && (
+        <div className="rounded-2xl bg-surface-2 p-6 text-sm">
+          We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
+        </div>
+      )}
+       <div className="grid gap-3 sm:grid-cols-2">
+        {services.data?.map((s) => {
+          const active = s.slug === selected;
+          return (
+             <button
+              key={s.id}
+              type="button"
+              onClick={() => onPick(s.slug)}
+              aria-pressed={active}
+              className={`flex min-h-36 w-full flex-col rounded-xl border p-5 text-left ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <ServiceIcon service={s.slug} size={40} />
+                <span className={`mt-1 size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] duration-150 ${active ? "border-[6px] border-ink" : "border-line-2 bg-sheet"}`} />
+              </div>
+              <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
+              <p className="mt-0.5 text-sm text-muted-foreground">{SERVICES.find((x) => x.id === s.slug)?.blurb ?? s.description}</p>
+              <div className="mt-auto flex items-center justify-between pt-4 text-sm">
+                <span className="tabular text-muted-foreground">{s.duration_min} min</span>
+                <span className="text-deep-ink">
+                  {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                  <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
+                </span>
+              </div>
+             </button>
+          );
+        })}
+      </div>
+      <p className="mt-6 text-sm text-muted-foreground">Already have an appointment? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Find it here</Link></p>
+    </>
+  );
+}
+
+
+function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewChecklist>; complete: boolean }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border bg-sheet">
+      <div className="border-b border-line-1 bg-surface-2 px-4 py-3">
+        <p className="text-xs text-muted-foreground">{complete ? "What you'll bring" : "Your list so far"}</p>
+        <p className="t-card text-deep-ink"><span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}</p>
+      </div>
+      <ul className="max-h-[360px] space-y-2 overflow-y-auto p-4">
+        {docs.map((d) => (
+          <li key={d.id} className="enter-item flex items-start gap-2.5 text-sm">
+            <span className="mt-0.5 size-4 shrink-0 rounded-[4px] border-[1.5px] border-line-3" />
+            <span><span className="block text-deep-ink">{d.title}</span>{d.note && <span className="block text-xs text-muted-foreground">{d.note}</span>}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="border-t border-line-1 px-4 py-3 text-xs text-muted-foreground">Send them from your phone after you confirm. They never hold up your appointment.</p>
+    </div>
+  );
+}
+
+/* ---------- The five questions (shown on the details step) ---------- */
+function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void }) {
+  const qs = questionsFor(slug);
+  const set = (k: keyof Answers, v: boolean | number) => onChange({ ...answers, [k]: v });
+
+  return (
+    <>
+       <div className="mb-4 mt-10 border-t border-line-1 pt-8">
+        <h2 className="t-card text-deep-ink">Tell Claire about your year</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Five quick answers. They become the exact list of documents to bring, shown as you go.</p>
+      </div>
+      <div className="space-y-3">
+         {qs.map((q) => (
+          <div key={q.key} className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-deep-ink">{q.label}</p>
+              {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
+            </div>
+            {q.type === "count" ? (
+              <Segmented className="shrink-0" label={q.label} value={String((answers[q.key] as number) ?? 0)} onChange={(v) => set(q.key, Number(v))}
+                options={[0, 1, 2, 3].map((n) => ({ value: String(n), label: n === 3 ? "3+" : String(n) }))} />
+                        ) : (
+              <Segmented className="shrink-0" label={q.label} value={answers[q.key] === true ? "yes" : answers[q.key] === false ? "no" : ("" as "yes" | "no")}
+                onChange={(v) => set(q.key, v === "yes")} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
+            )}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+
+/* ---------- Step 2: time ---------- */
+function TimeStep({ service, draft, update }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void }) {
   const fetchWindow = useServerFn(getAvailabilityWindow);
-  const strip = useRef<HTMLDivElement>(null);
-  const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 14 } }), staleTime: 30_000 });
+  const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 21 } }), staleTime: 30_000 });
   // Clients see 30-minute starts only; every label, chip and "Next available" uses the same list.
   const days = (q.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const firstOpen = days.find((d) => d.slots.length)?.date;
   const selDate = draft.date && days.some((d) => d.date === draft.date) ? draft.date : firstOpen;
   const day = days.find((d) => d.date === selDate);
+  // One week on screen at a time, so busy weeks read at a glance (no sideways scrolling).
+  const weeks = Math.max(1, Math.ceil(days.length / 7));
+  const [week, setWeek] = useState(() => Math.max(0, Math.floor(Math.max(0, days.findIndex((d) => d.date === selDate)) / 7)));
+  const shown = days.slice(week * 7, week * 7 + 7);
+  const weekLabel = shown.length ? `${fmtDayChip(shown[0]!.date).month} ${fmtDayChip(shown[0]!.date).day} to ${fmtDayChip(shown.at(-1)!.date).month} ${fmtDayChip(shown.at(-1)!.date).day}` : "";
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 1 of 2" title="Pick a time for your tax appointment" sub="All times are Eastern. Not sure which service? Pick the closest one; Claire adjusts it if needed. You can move or cancel later from your link." />
-      <div role="radiogroup" aria-label="Service" className="mb-5 flex flex-wrap gap-1.5">
-        {services.map((x) => (
-          <button key={x.slug} type="button" role="radio" aria-checked={x.slug === service.slug} onClick={() => { if (x.slug !== service.slug) update({ serviceSlug: x.slug, slot: undefined, date: undefined }); }}
-            className={`h-10 rounded-md border px-3.5 text-[13px] font-semibold transition-colors duration-150 ${x.slug === service.slug ? "border-ink bg-ink text-white" : "border-line-1 bg-sheet text-body hover:border-line-3"}`}>
-            {x.name}
-          </button>
-        ))}
-      </div>
+        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes, with Claire. All times are Eastern; you can move or cancel later from your link.`} />
       <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
         options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />
 
@@ -166,29 +273,30 @@ function TimeStep({ service, services, draft, update }: { service: Service; serv
 
       {days.length > 0 && (
         <>
-           <div className="relative">
-              <div className="pointer-events-none absolute right-0 top-0 z-10 h-[76px] w-10 bg-gradient-to-l from-sheet to-transparent" />
-             <div ref={strip} className="flex gap-1 overflow-x-auto pb-2 pr-9 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
-            {days.map((d) => {
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-deep-ink">{weekLabel}</p>
+            <div className="flex gap-1">
+              <Button variant="secondary" size="icon" aria-label="Previous week" disabled={week === 0} onClick={() => setWeek((w) => Math.max(0, w - 1))}><ChevronLeft /></Button>
+              <Button variant="secondary" size="icon" aria-label="Next week" disabled={week >= weeks - 1} onClick={() => setWeek((w) => Math.min(weeks - 1, w + 1))}><ChevronRight /></Button>
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-7 gap-1 sm:gap-1.5" role="listbox" aria-label="Choose a day">
+            {shown.map((d) => {
               const c = fmtDayChip(d.date);
               const active = d.date === selDate;
               const open = d.slots.length;
               const full = !d.closed && open === 0;
               return (
-                 <Button key={d.date} variant="secondary" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
-                   className={`flex h-[76px] w-[76px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border px-2 transition-colors duration-150 ${
-                     active ? "border-deep-ink bg-deep-ink text-primary-foreground hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : full ? "border-transparent bg-fill-subtle text-muted-foreground" : "border-border bg-sheet text-deep-ink hover:bg-surface-2"}`}>
-                  <span className={`text-[11px] ${active ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{c.dow} {c.month}</span>
+                <button key={d.date} type="button" disabled={d.closed} onClick={() => update({ date: d.date, slot: undefined })} role="option" aria-selected={active}
+                  aria-label={`${c.dow} ${c.month} ${c.day}, ${d.closed ? "closed" : full ? "full" : `${open} open`}`}
+                  className={`flex min-h-[72px] flex-col items-center justify-center gap-0.5 rounded-lg border px-0.5 py-2 transition-colors duration-150 ${
+                    active ? "border-deep-ink bg-deep-ink text-primary-foreground" : d.closed ? "border-transparent text-muted-foreground/50" : full ? "border-line-1 bg-surface-2 text-muted-foreground hover:border-line-2" : "border-line-1 bg-sheet text-deep-ink hover:border-line-3"}`}>
+                  <span className={`text-[11px] ${active ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{c.dow}</span>
                   <span className={`tabular text-lg font-medium leading-tight ${full && !active ? "line-through decoration-1" : ""}`}>{c.day}</span>
-                  <span className={`text-[10px] font-medium ${active ? "text-primary-foreground/80" : d.closed ? "" : full ? "text-muted-foreground" : "text-success"}`}>{d.closed ? "Closed" : full ? "Full" : `${open} open`}</span>
-                 </Button>
+                  <span className={`text-[10px] font-medium ${active ? "text-primary-foreground/80" : d.closed ? "" : full ? "" : "text-success"}`}>{d.closed ? "Closed" : full ? "Full" : `${open} open`}</span>
+                </button>
               );
             })}
-             </div>
-             <div className="mt-1 flex justify-end gap-1">
-               <Button variant="secondary" size="icon" aria-label="Earlier dates" onClick={() => strip.current?.scrollBy({ left: -240, behavior: "smooth" })}><ChevronLeft /></Button>
-               <Button variant="secondary" size="icon" aria-label="Later dates" onClick={() => strip.current?.scrollBy({ left: 240, behavior: "smooth" })}><ChevronRight /></Button>
-             </div>
           </div>
 
           <div className="mt-6">
@@ -210,7 +318,7 @@ function TimeStep({ service, services, draft, update }: { service: Service; serv
             )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
              {!firstOpen && !draft.date && (
-              <p className="rounded-2xl bg-surface-2 p-6 text-sm text-deep-ink/80">The next two weeks are fully booked. Pick a day above to join its waitlist.</p>
+              <p className="rounded-2xl bg-surface-2 p-6 text-sm text-deep-ink/80">The next three weeks are fully booked. Pick a day above to join its waitlist; you'll be offered the first cancellation.</p>
             )}
           </div>
         </>
@@ -297,7 +405,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
     try {
       const r = await book({ data: {
         serviceId: service.id, start: slot, name: draft.name.trim(), email: draft.email.trim(),
-        phone: draft.phone.trim() || undefined, meetingType: draft.meetingType, intake: { intake_pending: true },
+        phone: draft.phone.trim() || undefined, meetingType: draft.meetingType, intake: toIntakePayload(service.slug, draft.answers),
       } });
       if (r.ok) {
         clearDraft();
@@ -316,7 +424,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
 
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 2 of 2" title="Your details" sub="Where to send your confirmation. That's all we need to book." />
+       <StepTitle hideEyebrow eyebrow="Step 3 of 3" title="Your details" sub="Where to send your confirmation and reminders." />
        <div className="mb-6 lg:hidden"><BookingSummary service={service} draft={draft} onPickAgain={onPickAgain} /></div>
        <form id="booking-details" className="w-full space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot && draft.date === nyDay(draft.slot)) submit(draft.slot); }}>
         <div className="space-y-1.5">
@@ -358,6 +466,8 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
           <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed instantly, nothing to pay now. We never ask for your Social Security number online.
         </p>
       </form>
+      <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />
+      <div className="mt-6 lg:hidden"><ChecklistPreview docs={previewChecklist(service.slug, draft.answers)} complete={questionsFor(service.slug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean")} /></div>
     </>
   );
 }

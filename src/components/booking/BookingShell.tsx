@@ -4,7 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { Stepper } from "@/components/ui/stepper";
 import type { ReactNode } from "react";
 
-export const STEPS = ["Pick a time", "Your details"] as const;
+export const STEPS = ["What you need", "Pick a time", "Your details"] as const;
 
 export function BookingShell({ step, children }: { step?: number; children: ReactNode }) {
   return (

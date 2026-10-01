@@ -74,7 +74,7 @@ function OwnerLayout() {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-6 text-center">
         <div className="max-w-sm">
-          <h1 className="t-page text-deep-ink">This area is for the practice owner.</h1>
+          <h1 className="t-page text-deep-ink">This area is for the owner of Hartwell Tax.</h1>
           <p className="mt-2 text-sm text-muted-foreground">You're signed in with an account that doesn't have access.</p>
           <Button className="mt-6" variant="outline" onClick={signOut}>Sign out</Button>
         </div>
@@ -93,7 +93,7 @@ function OwnerLayout() {
       {/* DESIGN_SYSTEM v2 §5: the sidebar sits on the canvas (no card); the main panel is the white card. */}
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-3 transition-[width,padding] duration-300 ease-expo sm:flex ${collapsed ? "w-[60px] px-2" : "w-[220px] px-3"}`}>
         <div className={`flex h-9 items-center ${collapsed ? "justify-center" : "justify-between"}`}>
-          {collapsed ? null : <Link to="/owner" aria-label="Hartwell practice home" className="min-w-0"><Logo size={28} sub="Practice" /></Link>}
+          {collapsed ? null : <Link to="/owner" aria-label="Hartwell Tax owner dashboard" className="min-w-0"><Logo size={28} sub="Owner dashboard" /></Link>}
           <Button size="icon" variant="ghost" onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}><PanelLeft className="size-4" /></Button>
         </div>
         <div className="flex flex-col gap-0.5">
@@ -131,9 +131,7 @@ function OwnerLayout() {
         </header>
         <main className="min-h-[calc(100vh-56px)] bg-sheet sm:min-h-[calc(100vh-16px)] sm:rounded-2xl">
           <div className="hidden h-14 items-center justify-between px-6 sm:flex">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-              <span>Practice</span><span aria-hidden="true">/</span><span className="text-deep-ink">{current.label}</span>
-            </nav>
+            <p className="text-[13px] font-medium text-deep-ink">{current.label}</p>
 
           </div>
           <div className="px-5 pb-28 pt-4 sm:px-8 sm:pb-12 sm:pt-2">

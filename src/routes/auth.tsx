@@ -15,7 +15,7 @@ import { createOwnerAccount, ownerSetupStatus } from "@/lib/owner.functions";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Hartwell Tax practice" },
+      { title: "Sign in — Hartwell Tax owner dashboard" },
       { name: "description", content: "Sign in to the Hartwell Tax & Bookkeeping practice app." },
       { property: "og:title", content: "Owner sign in — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Sign in to the Hartwell Tax & Bookkeeping practice app." },
@@ -64,7 +64,7 @@ function AuthPage() {
   return (
     <main className="grid min-h-screen bg-paper lg:grid-cols-[1fr_1.1fr]">
       <section className="relative hidden flex-col justify-between overflow-hidden bg-ink-900 p-10 text-white lg:flex">
-        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="inline-flex min-h-10 items-center self-start"><Logo tone="light" sub="Practice" /></Link>
+        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="inline-flex min-h-10 items-center self-start"><Logo tone="light" sub="Owner dashboard" /></Link>
         <div className="max-w-md">
           <h2 className="font-serif text-[40px] font-semibold leading-[44px] tracking-[-0.03em]">The front desk you never had to hire.</h2>
           <ul className="mt-10 space-y-6">
@@ -81,11 +81,11 @@ function AuthPage() {
 
       <section className="flex flex-col px-5 py-8 sm:px-10">
         <div className="flex items-center justify-between lg:justify-end">
-          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="inline-flex min-h-10 items-center lg:hidden"><Logo sub="Practice" /></Link>
+          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="inline-flex min-h-10 items-center lg:hidden"><Logo sub="Owner dashboard" /></Link>
           <Link to="/" className="inline-flex min-h-10 items-center text-sm text-muted-foreground hover:text-deep-ink">Back to the website</Link>
         </div>
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
-          <h1 className="t-owner text-deep-ink">{setup ? "Set up your practice" : "Sign in to your practice"}</h1>
+          <h1 className="t-owner text-deep-ink">{setup ? "Set up Hartwell Tax" : "Sign in to Hartwell Tax"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{setup ? "A one-time step. After this, only you can sign in." : "Your day, your clients and everything that went out on its own."}</p>
           {!setup && (
             <button type="button" onClick={useDemo} className="mt-8 flex w-full items-center justify-between gap-3 rounded-xl border border-line-1 bg-sheet px-4 py-3 text-left transition-colors duration-150 hover:border-line-2 hover:bg-surface-2">
@@ -109,7 +109,7 @@ function AuthPage() {
             {err && <p className="rounded-lg bg-alert-negative px-3 py-2 text-sm text-alert-negative-fg" role="alert">{err}</p>}
             <Button type="submit" size="lg" className="w-full" disabled={busy || !data}>{busy ? <><Loader2 className="animate-spin" />Signing in…</> : !data ? "One moment…" : setup ? "Create account" : "Sign in"}</Button>
           </form>
-          <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground"><Lock className="size-3.5" />Only the practice owner can sign in. Clients use the link in their email.</p>
+          <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground"><Lock className="size-3.5" />Only the owner can sign in here. Clients use the link in their email.</p>
         </div>
       </section>
     </main>

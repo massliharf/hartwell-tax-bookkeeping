@@ -15,9 +15,7 @@ export const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encode
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
-/** The Hartwell Seal as a base64 SVG for email clients that support it, or simplified VML/HTML for those that don't. */
-const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#1C1714"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="1.4 1.6"/><path d="M11.4 10v12M20.6 10v12" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/><path d="M11.4 15.3h9.2M11.4 17.6h9.2" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round"/></svg>`;
-const LOGO_DATA = `data:image/svg+xml;base64,${Buffer.from(LOGO_SVG).toString("base64")}`;
+const LOGO_URL = "https://hartwell-tax-bookkeeping.lovable.app/brand-mark.png";
 
 export type Block =
   | { p: string }
@@ -40,7 +38,7 @@ export function renderEmail(heading: string, blocks: Block[]) {
 <table role="presentation" width="100%" style="background:#F4F3EF"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
 <tr><td style="padding:0 4px 16px"><table role="presentation"><tr>
-<td style="width:28px;height:28px;vertical-align:middle"><img src="${LOGO_DATA}" width="28" height="28" alt="" style="display:block;border:0"></td>
+ <td style="width:28px;height:28px;vertical-align:middle"><img src="${LOGO_URL}" width="28" height="28" alt="" style="display:block;border:0"></td>
 <td style="padding-left:10px;font-size:15px;font-weight:600;color:#1A1A1A">Hartwell <span style="font-weight:400;color:#737373">Tax &amp; Bookkeeping</span></td>
 </tr></table></td></tr>
 <tr><td style="background:#FFFFFF;border:1px solid rgba(16,16,16,0.06);border-radius:16px;padding:32px 28px">

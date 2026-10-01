@@ -23,7 +23,7 @@ export type Block =
   | { buttons: { label: string; href: string }[] }
   | { note: string };
 
-/** Brand email (DESIGN_SYSTEM v2): canvas grey, white card, Hartwell blue buttons, logo tile. Table layout for mail clients. */
+/** Brand email: canvas and sheet with the same Hartwell monogram used in the app. */
 export function renderEmail(heading: string, blocks: Block[]) {
   const body = blocks.map((b) => {
     if ("p" in b) return `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#353535">${esc(b.p)}</p>`;
@@ -38,8 +38,8 @@ export function renderEmail(heading: string, blocks: Block[]) {
 <table role="presentation" width="100%" style="background:#F4F3EF"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
 <tr><td style="padding:0 4px 16px"><table role="presentation"><tr>
-<td style="width:28px;height:28px;background:#1C1714;border-radius:50%;text-align:center;vertical-align:middle;color:#FFFFFF;font-weight:700;font-size:15px;line-height:28px">H</td>
-<td style="padding-left:10px;font-size:15px;font-weight:600;color:#1A1A1A">Hartwell <span style="font-weight:400;color:#737373">Tax &amp; Bookkeeping</span></td>
+<td style="width:30px;height:30px;vertical-align:middle"><img src="https://patel-ready-book.lovable.app/brand-mark.png" width="30" height="30" alt="H" style="display:block;width:30px;height:30px;border:0"></td>
+<td style="padding-left:9px;font-size:17px;font-weight:600;color:#1C1714">Hartwell<br><span style="font-size:10px;font-weight:500;color:#6E655F">Tax &amp; Bookkeeping</span></td>
 </tr></table></td></tr>
 <tr><td style="background:#FFFFFF;border:1px solid rgba(16,16,16,0.06);border-radius:16px;padding:32px 28px">
 <h1 style="margin:0 0 18px;font-family:"Bricolage Grotesque",Geist,Helvetica,Arial,sans-serif;font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-0.01em;color:#1A1A1A">${esc(heading)}</h1>

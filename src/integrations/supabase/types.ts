@@ -273,6 +273,42 @@ export type Database = {
           },
         ]
       }
+      inquiries: {
+        Row: {
+          ai_reply: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          question: string
+          replied_at: string | null
+          reply: string | null
+          status: string
+        }
+        Insert: {
+          ai_reply?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          question: string
+          replied_at?: string | null
+          reply?: string | null
+          status?: string
+        }
+        Update: {
+          ai_reply?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          question?: string
+          replied_at?: string | null
+          reply?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           converted: boolean
@@ -637,6 +673,7 @@ export type Database = {
         | "review_sign_pay"
         | "return_filed"
         | "file_reminder"
+        | "inquiry_reply"
       signature_status: "not_needed" | "pending" | "signed"
       waitlist_status: "waiting" | "offered" | "booked" | "expired"
     }
@@ -794,6 +831,7 @@ export const Constants = {
         "review_sign_pay",
         "return_filed",
         "file_reminder",
+        "inquiry_reply",
       ],
       signature_status: ["not_needed", "pending", "signed"],
       waitlist_status: ["waiting", "offered", "booked", "expired"],

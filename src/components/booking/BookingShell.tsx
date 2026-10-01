@@ -8,16 +8,16 @@ export const STEPS = ["What you need", "Pick a time", "Your details"] as const;
 
 export function BookingShell({ step, children }: { step?: number; children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-canvas sm:p-2">
-      <header>
-        <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-6 sm:px-4">
-          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo /></Link>
+    <div className="min-h-screen bg-paper-warm">
+      <header className="border-b border-line-1 bg-paper-warm">
+        <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
+          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>
           <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
             <X className="size-4" />
           </Link>
         </div>
       </header>
-      <div className="mx-auto min-h-[calc(100vh-76px)] max-w-6xl rounded-t-2xl bg-sheet sm:min-h-0 sm:rounded-2xl">
+      <div className="mx-auto min-h-[calc(100vh-68px)] max-w-6xl rounded-t-2xl bg-sheet sm:my-4 sm:min-h-0 sm:rounded-2xl">
         {step !== undefined && <Progress step={step} />}
         <main className="px-6 pb-24 pt-8 sm:px-8 sm:pt-10">{children}</main>
       </div>

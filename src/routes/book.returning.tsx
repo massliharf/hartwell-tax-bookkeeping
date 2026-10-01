@@ -70,7 +70,7 @@ function ReturningPage() {
                 </Button>
               )}
             </div>
-            <Button size="lg" variant="ghost" className="-ml-4 mt-6 text-muted-foreground" onClick={() => { setState("idle"); setDemo(null); }}><RotateCcw />Use a different email</Button>
+            <Button size="lg" variant="ghost" className="mt-3 w-full text-muted-foreground" onClick={() => { setState("idle"); setDemo(null); }}><RotateCcw />Use a different email</Button>
           </div>
         ) : state === "sent" ? (
           <ResultPanel icon={<Mail />} tone="success" title="Check your inbox."

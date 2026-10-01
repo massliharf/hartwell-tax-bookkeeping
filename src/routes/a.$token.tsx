@@ -598,7 +598,7 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
           <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-sheet text-xl" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
-          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" />
+          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" aria-label="I authorize Claire to e-file my return" />
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}

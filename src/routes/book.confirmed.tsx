@@ -57,7 +57,7 @@ function ConfirmedPage() {
   if (!token || (q.data && !q.data.appointment)) {
     return (
       <BookingShell>
-        <ResultPanel icon={<LinkIcon />} tone="warning" title="We couldn't find that appointment." actions={<><Button asChild size="lg"><Link to="/book/returning">Email me my link</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/book">Book an appointment</Link></Button></>}>
+        <ResultPanel icon={<LinkIcon />} tone="warning" title="We couldn't find that appointment." actions={<><Button asChild size="lg"><Link to="/book/returning">Email me my link</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/book">Schedule an appointment</Link></Button></>}>
           Check the link in your confirmation email, or we can send you a fresh one.
         </ResultPanel>
       </BookingShell>

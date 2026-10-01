@@ -2,15 +2,14 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Clock, FilePlus2, Minus, MoreHorizontal } from "lucide-react";
+import { Check, Clock, FilePlus2, Minus, MoreHorizontal, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { bookFollowUpMeeting, nudgeSignature, ownerCancelAppointment, ownerMoveAppointment, remindPayment, requestExtraDocument, resendPortalLink, sendApptReminder, sendDocsReminder, sendRebookLink } from "@/lib/owner.functions";
-import { MSG_LABEL, fmtDay, fmtStamp, missingOf, money, type Appt } from "./lib";
-import { stageOf } from "@/lib/lifecycle";
+import { MSG_LABEL, fmtDay, fmtStamp, missingOf, type Appt } from "./lib";
 import { useApptActions } from "./ui";
 import { SlotPicker } from "./new-appointment";
 import { cn } from "@/lib/utils";
@@ -89,61 +88,44 @@ export function FollowUps({ a, now }: { a: Appt; now: string }) {
       action: { label: "Send now", run: () => fns.rebook({ data: { id: a.id } }) } });
   }
 
-  // Past: milestones from the appointment itself plus every message that went out, oldest first.
-  type Ev = { at: string; label: string; detail?: string | undefined; tone?: "done" | "warn" | undefined };
-  const past: Ev[] = [];
-  if (a.created_at) past.push({ at: a.created_at, label: "Booked", detail: a.services?.name });
-  for (const i of a.checklist_items) if (i.uploaded_at && i.status === "uploaded") past.push({ at: i.uploaded_at, label: `${i.document_name} uploaded`, detail: i.review_status === "needs_fix" ? "Fix requested" : i.review_status === "accepted" ? (i.ai_check === "ok" ? "Auto-checked" : "Accepted") : undefined, tone: i.review_status === "needs_fix" ? "warn" : undefined });
-  for (const m of msgs.data ?? []) past.push({ at: m.sent_at, label: MSG_LABEL[m.type] ?? "Message", detail: "Email to the client" });
-  if (Date.parse(a.end_at) <= t && a.status !== "cancelled") past.push({ at: a.start_at, label: a.status === "no_show" ? "Missed the appointment" : "Met with Claire", tone: a.status === "no_show" ? "warn" : undefined });
-  if (a.finished_at) past.push({ at: a.finished_at, label: "Return finished", detail: a.fee_cents != null ? `Fee ${money(a.fee_cents)}` : undefined });
-  if (a.signed_at) past.push({ at: a.signed_at, label: "Form 8879 signed" });
-  if (a.paid_at) past.push({ at: a.paid_at, label: "Paid", detail: a.paid_method === "in_office" ? "In the office" : a.paid_method === "test" ? "Test payment" : "By card" });
-  if (a.filed_at) past.push({ at: a.filed_at, label: "E-filed" });
-  past.sort((x, y) => x.at.localeCompare(y.at));
-  const [allPast, setAllPast] = useState(false);
-  const shownPast = allPast ? past : past.slice(-5);
-
-  // Next: what goes out on its own and what Claire can send now, soonest first, then the milestones still ahead.
-  const next = steps.filter((s) => s.state === "scheduled" || s.state === "due" || (s.action && s.state === "sent" && s.key !== "confirm"));
-  const st = stageOf(a, now);
-  const ahead: Ev[] = [];
-  if (st === "documents" || st === "ready") ahead.push({ at: a.start_at, label: a.meeting_type === "video" ? "Video call with Claire" : "Meeting with Claire" });
-  if (st === "documents" || st === "ready" || st === "meeting" || st === "wrap_up") ahead.push({ at: "", label: "Finish the return", detail: "The client gets the review, sign and pay email" });
-  if (st === "documents" || st === "ready" || st === "meeting" || st === "wrap_up") ahead.push({ at: "", label: "Client signs and pays", detail: "Form 8879 and the fee, from their page" });
-  if (st !== "filed" && st !== "cancelled" && st !== "no_show") ahead.push({ at: "", label: "File the return", detail: st === "to_file" ? "Signed and paid. Mark it filed when it's submitted" : "Once it's signed and paid; the client is emailed" });
-
-  const dot = (tone: "done" | "warn" | "next" | "later") => <span className={cn("relative z-[1] mt-1 size-2.5 shrink-0 rounded-full ring-4 ring-sheet", tone === "done" ? "bg-ink" : tone === "warn" ? "bg-[#E7AD16]" : tone === "next" ? "border-2 border-ink bg-sheet" : "border-2 border-line-2 bg-sheet")} />;
+  // What the automation will do next for this client, and what it already did. Milestones (uploads, meeting,
+  // signature, payment) live in their own sections above, so this stays short.
+  const next = steps.filter((x) => x.state === "scheduled" || x.state === "due" || (x.action && x.state === "sent" && x.key !== "confirm"));
+  const sentMsgs = msgs.data ?? [];
   return (
     <section className="border-t border-border px-6 py-5">
-      <h3 className="t-sub">Timeline</h3>
-      <p className="mt-0.5 text-xs text-muted-foreground">Everything that happened, in order, and what happens next. Messages go out on their own; send any of them now if you'd rather not wait.</p>
-      <ol className="relative mt-4 space-y-3 before:absolute before:bottom-1 before:left-[4.5px] before:top-1 before:w-px before:bg-line-1">
-        {past.length > 5 && !allPast && <li><button type="button" onClick={() => setAllPast(true)} className="ml-6 text-xs font-medium text-ink hover:underline">Show {past.length - 5} earlier</button></li>}
-        {shownPast.map((e, i) => (
-          <li key={`${e.at}-${e.label}-${i}`} className="flex gap-3.5">
-            {dot(e.tone === "warn" ? "warn" : "done")}
-            <div className="min-w-0 flex-1 text-[13px]"><p className="text-deep-ink">{e.label}{e.detail && <span className="text-muted-foreground"> · {e.detail}</span>}</p><p className="tabular text-[11px] text-muted-foreground">{fmtStamp(e.at)}</p></div>
-          </li>
-        ))}
-        {(next.length > 0 || ahead.length > 0) && <li className="flex items-center gap-3.5"><span className="relative z-[1] ml-[-2px] rounded-full bg-sheet px-0 text-[10px] font-semibold uppercase tracking-[0.06em] text-ink">Now</span></li>}
-        {next.map((s) => (
-          <li key={s.key} className="flex gap-3.5">
-            {dot("next")}
-            <div className="min-w-0 flex-1 text-[13px]">
-              <p className="text-deep-ink">{s.label}</p>
-              <p className="text-[11px] text-muted-foreground">{s.state === "scheduled" ? `Goes out on its own ${s.at ? fmtDay(s.at) : ""}` : s.state === "due" ? "Goes out with the next run" : `Last sent ${s.at ? fmtDay(s.at) : ""}`}{s.note ? `. ${s.note}` : ""}</p>
-            </div>
-            {s.action && <Button size="sm" variant="ghost" className="-my-1" disabled={send.isPending} onClick={() => send.mutate(s.action!.run)}>{s.state === "sent" ? "Send again" : s.action.label}</Button>}
-          </li>
-        ))}
-        {ahead.map((e) => (
-          <li key={e.label} className="flex gap-3.5">
-            {dot("later")}
-            <div className="min-w-0 flex-1 text-[13px]"><p className="text-muted-foreground">{e.label}</p><p className="text-[11px] text-muted-foreground">{e.at ? fmtStamp(e.at) : e.detail}</p></div>
-          </li>
-        ))}
-      </ol>
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="t-sub">Handled for you</h3>
+        <span className="text-xs text-muted-foreground">{sentMsgs.length} message{sentMsgs.length === 1 ? "" : "s"} sent</span>
+      </div>
+      {next.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">Nothing else is scheduled for this client.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1">
+          {next.slice(0, 4).map((x) => (
+            <li key={x.key} className="flex min-h-12 items-center gap-3 px-3 py-2">
+              <Clock className="size-4 shrink-0 text-muted-foreground" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] text-deep-ink">{x.label}</p>
+                <p className="text-[11px] text-muted-foreground">{x.state === "scheduled" ? `Goes out ${x.at ? fmtDay(x.at) : "on its own"}` : x.state === "due" ? "Goes out with the next run" : `Last sent ${x.at ? fmtDay(x.at) : ""}`}{x.note ? `. ${x.note}` : ""}</p>
+              </div>
+              {x.action && <Button size="sm" variant="ghost" disabled={send.isPending} onClick={() => send.mutate(x.action!.run)}>{x.state === "sent" ? "Send again" : x.action.label}</Button>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {sentMsgs.length > 0 && (
+        <details className="group mt-3">
+          <summary className="flex min-h-10 cursor-pointer list-none items-center gap-1.5 text-[13px] font-medium text-ink [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="size-4 transition-transform duration-200 group-open:rotate-90" />See what was sent
+          </summary>
+          <ul className="mt-1 space-y-1.5 pl-6">
+            {[...sentMsgs].reverse().map((m) => (
+              <li key={m.id} className="flex items-center justify-between gap-3 text-[13px]"><span className="text-deep-ink">{MSG_LABEL[m.type] ?? "Message"}</span><span className="tabular text-xs text-muted-foreground">{fmtStamp(m.sent_at)}</span></li>
+            ))}
+          </ul>
+        </details>
+      )}
     </section>
   );
 }

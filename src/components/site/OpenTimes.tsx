@@ -39,7 +39,7 @@ export function OpenTimes() {
   return (
     <div className="rounded-[28px] border border-line-1 bg-sheet p-5 shadow-[0_30px_60px_-30px_rgba(44,20,10,0.25)] sm:p-6">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[13px] font-medium text-deep-ink">Open times</p>
+        <p className="text-[13px] font-medium text-deep-ink">Open times with Claire</p>
         <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground"><span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-success/50 motion-reduce:hidden" /><span className="relative inline-flex size-2 rounded-full bg-success" /></span>Live</span>
       </div>
       <div role="tablist" aria-label="Service" className="-mx-1 mt-3 flex gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">

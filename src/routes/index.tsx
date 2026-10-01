@@ -15,7 +15,7 @@ import claire from "@/assets/claire-portrait.jpg";
 
 
 const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
-const DESC = "Book a tax appointment with Claire Hartwell, EA in Montclair, NJ in two minutes. Get a clear document checklist and arrive ready to file once.";
+const DESC = "Tax preparation in Montclair, NJ for families, freelancers, landlords and small businesses. See open times, schedule in two minutes, and file in one visit.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -70,29 +70,32 @@ function Home() {
 
 
 function Hero() {
+  const facts: [string, string][] = [["IRS Enrolled Agent", "licensed to prepare returns and represent you"], ["12 years in Montclair", "1,800+ returns filed"], ["Federal, NJ and NY", "returns included in every price"]];
   return (
     <section className="enter overflow-hidden">
-      <div className="grid items-center gap-8 px-1 pb-10 pt-6 sm:px-4 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pb-16 md:pt-14">
+      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pb-12 md:pt-14">
         <div>
-          <Link to="/book" search={{ service: "extension" }} className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-line-1 bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:border-line-2">
-            <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-white">Oct 15</span>
-            Extended returns are due. <span className="font-medium text-ink group-hover:underline">Book a slot</span>
-          </Link>
-          <h1 className="enter-title mt-6 max-w-[14ch] text-balance t-hero text-deep-ink">Book Claire in two minutes. Come in once.</h1>
-          <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            Pick an open time, get a checklist made for your return, and send your documents from your phone. No phone tag, and no second visit for a missing form.
+          <p className="text-sm font-medium text-ink">Tax preparation in Montclair, NJ</p>
+          <h1 className="enter-title mt-4 max-w-[15ch] text-balance t-hero text-deep-ink">Your tax return, done in one visit.</h1>
+          <p className="mt-6 max-w-[34rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
+            Hartwell Tax prepares returns for families, freelancers, landlords and small businesses. Pick an open time, get a list of exactly which documents to bring, and send them from your phone. Claire Hartwell checks everything before you arrive, so one appointment is all it takes.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg"><Link to="/book">Book an appointment</Link></Button>
-            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">Find my appointment</Link></Button>
+            <Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button>
+            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">Manage my appointment</Link></Button>
           </div>
-          <div className="mt-7 flex items-center gap-3">
-            <img src={claire} alt="" width={40} height={40} className="size-10 rounded-full object-cover" />
-            <p className="text-sm leading-5 text-muted-foreground"><span className="font-medium text-deep-ink">Claire Hartwell, EA</span> · Montclair, NJ<br />Confirmed instantly. You pay when your return is filed.</p>
-          </div>
+          <p className="mt-4 text-sm text-muted-foreground">Confirmed right away. Nothing to pay until your return is filed.</p>
         </div>
         <div className="enter-spot min-w-0" style={{ animationDelay: "200ms" }}><OpenTimes /></div>
       </div>
+      <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
+        {facts.map(([k, v]) => (
+          <li key={k} className="flex items-center gap-3 bg-sheet px-5 py-4">
+            <img src={claire} alt="" width={32} height={32} className={`size-8 shrink-0 rounded-full object-cover ${k === "IRS Enrolled Agent" ? "" : "hidden"}`} />
+            <div><p className="text-sm font-medium text-deep-ink">{k}</p><p className="text-[13px] text-muted-foreground">{v}</p></div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -210,11 +213,11 @@ function HowItWorks() {
 }
 
 function BeforeAfter() {
-  const before = ["Call, leave a voicemail, wait for a call back", "Guess which documents to bring", "Arrive and find out a form is missing", "Book a second visit to finish", "Get a paper bill, mail a check"];
+  const before = ["Call, leave a voicemail, wait for a call back", "Guess which documents to bring", "Arrive and find out a form is missing", "Come back a second time to finish", "Get a paper bill, mail a check"];
   const after = ["Pick an open time, confirmed on the spot", "A checklist made for your answers", "Every upload checked before you come", "One appointment, then sign and pay online", "Filed, with an email to say so"];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead eyebrow="Before and after" title="Same return. None of the chasing." sub="What booking a tax appointment usually looks like, and what it looks like with Claire." />
+      <SectionHead eyebrow="Before and after" title="Same return. None of the chasing." sub="What getting your taxes done usually looks like, and how it works at Hartwell Tax." />
       <div className="mt-10 grid gap-3 md:grid-cols-2">
         <div className="rounded-2xl bg-surface-2 p-6">
           <p className="text-sm font-medium text-muted-foreground">The usual way</p>
@@ -261,7 +264,7 @@ function Services() {
               </p>
               <div className="flex flex-col items-end gap-1">
                 <span className="tabular text-sm font-semibold text-deep-ink sm:hidden">{s.from ? "from " : ""}${s.price}</span>
-                <Button asChild size="sm" variant="secondary"><Link to="/book" search={{ service: s.id }}>Book</Link></Button>
+                <Button asChild size="sm" variant="secondary"><Link to="/book" search={{ service: s.id }}>Schedule</Link></Button>
               </div>
             </li>
           );
@@ -330,10 +333,10 @@ function DeadlineCta() {
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="t-section text-white">October 15 is close. Your slot doesn't have to be.</h2>
-          <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">Extended returns are due on October 15. Book now, upload your documents this week, and file once.</p>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">Extended returns are due October 15. Schedule now, send your documents this week, and file in one visit.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
-          <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"><Link to="/book" search={{ service: "extension" }}>Book an extension review</Link></Button>
+          <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"><Link to="/book" search={{ service: "extension" }}>Schedule an extension review</Link></Button>
           <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><a href="#services">See all services</a></Button>
         </div>
       </div>
@@ -354,7 +357,7 @@ function Faq() {
     { q: "What should I bring?", a: "After you book, you'll get a checklist made for your return, usually W-2s, 1099s, 1098 mortgage statements, and last year's return. Upload them ahead of time and Claire will confirm everything is there." },
     { q: "Video call or in person?", a: "Whichever you prefer. Both work the same way: documents are uploaded beforehand, and we go through your return together. Choose when you book." },
     { q: "Can I reschedule?", a: "Of course. Use the link in your confirmation email to pick a new time. If you can't make it, please let us know so someone waiting can take your slot." },
-    { q: "Can you file an extension for me?", a: "Yes. An extension gives you until October 15 to file, but any tax owed is still due in April. Book an Extension review and we'll handle it." },
+    { q: "Can you file an extension for me?", a: "Yes. An extension gives you until October 15 to file, but any tax owed is still due in April. Schedule an extension review and we'll handle it." },
     { q: "What are the key deadlines?", a: "Most individual returns are due April 15. Extended returns are due October 15. Estimated taxes are due in April, June, September and January." },
   ];
   return (

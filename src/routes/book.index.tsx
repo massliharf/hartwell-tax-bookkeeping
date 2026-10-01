@@ -23,9 +23,9 @@ export const Route = createFileRoute("/book/")({
   validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(1).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
   head: () => ({
     meta: [
-      { title: "Book an appointment — Hartwell Tax & Bookkeeping" },
+      { title: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
       { name: "description", content: "Book with Claire Hartwell, EA in about two minutes. Confirmed instantly, with a personal document checklist." },
-      { property: "og:title", content: "Book an appointment — Hartwell Tax & Bookkeeping" },
+      { property: "og:title", content: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a service and a time. Confirmed instantly." },
     ],
   }),
@@ -124,7 +124,7 @@ function BookPage() {
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button size="lg" className="flex-1 lg:flex-none" type={step === 1 ? "submit" : "button"} form={step === 1 ? "booking-details" : undefined} disabled={!canContinue} onClick={step === 0 ? () => go(1) : undefined}>{step === 1 ? (bookingBusy ? "Booking…" : "Book this time") : draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time to continue"}</Button>
+            <Button size="lg" className="flex-1 lg:flex-none" type={step === 1 ? "submit" : "button"} form={step === 1 ? "booking-details" : undefined} disabled={!canContinue} onClick={step === 0 ? () => go(1) : undefined}>{step === 1 ? (bookingBusy ? "Booking…" : "Confirm this time") : draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time to continue"}</Button>
           </div>
         </div>
         <aside className="hidden lg:block"><div className="sticky top-8">{service && <BookingSummary service={service} draft={draft} onPickAgain={step === 1 ? () => go(0) : undefined} />}</div></aside>
@@ -145,7 +145,7 @@ function TimeStep({ service, services, draft, update }: { service: Service; serv
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 1 of 2" title="Book a time with Claire" sub="All times are Eastern. You can move or cancel later from your link." />
+        <StepTitle hideEyebrow eyebrow="Step 1 of 2" title="Pick a time for your tax appointment" sub="All times are Eastern. You can move or cancel later from your link." />
       <div role="radiogroup" aria-label="Service" className="mb-5 flex flex-wrap gap-1.5">
         {services.map((x) => (
           <button key={x.slug} type="button" role="radio" aria-checked={x.slug === service.slug} onClick={() => { if (x.slug !== service.slug) update({ serviceSlug: x.slug, slot: undefined, date: undefined }); }}

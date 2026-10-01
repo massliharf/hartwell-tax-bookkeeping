@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ChevronRight, FileText, MapPin, Video } from "lucide-react";
+import { ChevronRight, FileText, MapPin, Video, Maximize2, Minimize2 } from "lucide-react";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
 import { FollowUps, MeetingPicker, MoreActions, RequestDocument } from "./follow-ups";
@@ -25,16 +25,22 @@ import { cn } from "@/lib/utils";
 
 /** One appointment: when, who, how ready, and the two things Claire can do. Nothing else. */
 export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget | null; onClose: () => void }) {
+  // Opens as a focused window; Expand turns it into a full workspace (details left, what's happening right), like Magnific's asset view.
+  const [expanded, setExpanded] = useState(false);
   return (
-    <Dialog open={!!target} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="block max-h-[92dvh] max-w-[520px] gap-0 overflow-y-auto p-0">
-        {target && <AppointmentContent id={target.appointmentId} onClose={onClose} />}
+    <Dialog open={!!target} onOpenChange={(o) => { if (!o) { onClose(); setExpanded(false); } }}>
+      <DialogContent className={`block gap-0 overflow-y-auto p-0 transition-[max-width,height] duration-300 ease-expo ${expanded ? "h-[94dvh] max-h-[94dvh] max-w-[min(1180px,calc(100vw-32px))]" : "max-h-[92dvh] max-w-[680px]"}`}>
+        <button type="button" onClick={() => setExpanded((e) => !e)} aria-label={expanded ? "Shrink window" : "Expand window"} title={expanded ? "Shrink" : "Expand"}
+          className="absolute right-14 top-4 z-10 hidden size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink sm:grid">
+          {expanded ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
+        </button>
+        {target && <AppointmentContent id={target.appointmentId} onClose={onClose} expanded={expanded} />}
       </DialogContent>
     </Dialog>
   );
 }
 
-function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }) {
+function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: () => void; expanded: boolean }) {
   const [gallery, setGallery] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [picking, setPicking] = useState<"move" | "follow_up" | null>(null);
@@ -74,7 +80,7 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
 
   return (
     <div className="flex flex-col">
-      <header className="border-b border-border px-6 pb-5 pr-14 pt-6">
+      <header className="border-b border-border px-6 pb-5 pr-24 pt-6">
         <p className="text-xs text-muted-foreground">Appointment</p>
         <DialogTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</DialogTitle>
         <DialogDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -93,6 +99,8 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
         )}
       </header>
 
+      <div className={expanded ? "grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:divide-x lg:divide-border" : ""}>
+      <div className="min-w-0">
       <section className="px-6 py-5">
         <DocsWrap collapsed={finished} count={items.filter((i) => i.status === "uploaded").length}>
         {a.status !== "completed" && <div className="flex items-center gap-3">
@@ -134,8 +142,12 @@ function AppointmentContent({ id, onClose }: { id: string; onClose: () => void }
         </DocsWrap>
         <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
       </section>
+      </div>
+      <div className="min-w-0">
       <CloseoutBlock a={a} />
       <FollowUps a={a} now={now} />
+      </div>
+      </div>
 
       <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
         {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />

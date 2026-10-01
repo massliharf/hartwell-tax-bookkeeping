@@ -26,7 +26,7 @@ function Wordmark() {
   return <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>;
 }
 
-const LINKS = [{ href: "/#what", label: "What we do" }, { href: "/#how", label: "How it works" }, { href: "/#services", label: "Prices" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
+const LINKS = [{ href: "/#services", label: "Services and prices" }, { href: "/#how", label: "How it works" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
 
 export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   return (
@@ -38,14 +38,14 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
         </nav>
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild variant="ghost"><Link to="/book/returning">My appointment</Link></Button>
-          <Button asChild><Link to="/book">Book an appointment</Link></Button>
+          <Button asChild><Link to="/book">Schedule an appointment</Link></Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="md:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-border p-2 shadow-lift">
             {LINKS.map((l) => <DropdownMenuItem key={l.href} asChild className="h-11 rounded-lg px-3 text-sm"><a href={l.href}>{l.label}</a></DropdownMenuItem>)}
             <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">My appointment</Link></DropdownMenuItem>
-            <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Book an appointment</Link></Button></div>
+            <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Schedule an appointment</Link></Button></div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -62,11 +62,11 @@ export function SiteFooter() {
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">Claire Hartwell, EA, IRS Enrolled Agent. Careful, calm tax work for families and small businesses in Montclair.</p>
         </div>
         <div className="text-sm">
-          <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Book</p>
+          <p className="mb-3 font-serif text-base font-semibold text-[#E7B4A8]">Schedule</p>
           <ul className="space-y-2">
-            <li><Link to="/book" className="hover:text-white">Book an appointment</Link></li>
+            <li><Link to="/book" className="hover:text-white">Schedule an appointment</Link></li>
             <li><Link to="/book/returning" className="hover:text-white">My appointment</Link></li>
-            <li><a href="/#services" className="hover:text-white">Prices</a></li>
+            <li><a href="/#services" className="hover:text-white">Services and prices</a></li>
             <li><a href="/#faq" className="hover:text-white">FAQ</a></li>
           </ul>
         </div>

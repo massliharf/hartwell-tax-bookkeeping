@@ -136,23 +136,23 @@ function PortalPage() {
   };
   const checklist = (
     <section>
-      <div className="mb-4 flex items-end justify-between gap-4">
+       <div className="mb-3 flex items-end justify-between gap-4">
         <h2 className="t-card text-deep-ink">Your checklist</h2>
         <span className="tabular text-sm text-muted-foreground">{doneCount} of {items.length} done</span>
       </div>
-      <p className="mb-5 flex items-start gap-2 rounded-2xl bg-fill-neutral/70 p-4 text-sm text-deep-ink/85">
+       <p className="mb-3 flex items-start gap-2 rounded-xl bg-fill-neutral/70 px-3 py-2.5 text-[13px] leading-5 text-deep-ink/85">
         <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only your preparer can see your files. We never ask for your Social Security number.
       </p>
-      <ul className="space-y-4">{items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
-      <p className="mt-4 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
+       <ul className="space-y-2">{items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
+       <p className="mt-3 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
     </section>
   );
   const sentDocs = (
-    <details className="rounded-2xl border border-border bg-sheet p-5">
+     <details className="rounded-2xl border border-border bg-sheet p-4">
       <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-deep-ink [&::-webkit-details-marker]:hidden">
         Documents you sent ({doneCount})<ChevronDown className="size-4 text-muted-foreground" />
       </summary>
-      <ul className="mt-4 space-y-3">{items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
+       <ul className="mt-3 space-y-2">{items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
     </details>
   );
 
@@ -188,7 +188,7 @@ function PortalPage() {
         )}
         {!intro && stage === "wrap_up" && <>
           <StatusCard icon={<Hourglass />} title="We're finishing your return.">You'll get an email to review, sign and pay, usually the same day.</StatusCard>
-          {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-2">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
         </>}
 
         {/* 4. Sign and pay, then done. */}
@@ -458,34 +458,34 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
   return (
     <li>
         {item.status === "uploaded" && item.review_status === "needs_fix" ? (
-          <div key="fix" className="rounded-2xl border border-warning/40 bg-sheet p-5">
-            <div className="flex items-start gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-warning/10 text-warning"><AlertTriangle className="size-5" /></span>
+           <div key="fix" className="rounded-2xl border border-warning/40 bg-sheet p-4">
+             <div className="flex items-start gap-3">
+               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-warning/10 text-warning"><AlertTriangle className="size-4" /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2"><p className="font-medium text-deep-ink">{item.document_name}</p><Tag tone="warning">Needs a fix</Tag></div>
                 <p className="mt-1 text-sm text-deep-ink/75">{item.fix_reason}{item.fix_note ? `. Claire says: ${item.fix_note}` : "."}</p>
               </div>
             </div>
-            <Button size="sm" className="mt-4" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Replace file</Button>
+             <Button size="sm" className="mt-2.5" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Replace file</Button>
           </div>
         ) : item.status === "uploaded" && item.ai_check === "warning" ? (
-          <div key="warn" className="rounded-2xl border border-warning/40 bg-sheet p-5">
-            <div className="flex items-start gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-warning/10 text-warning"><AlertTriangle className="size-5" /></span>
+           <div key="warn" className="rounded-2xl border border-warning/40 bg-sheet p-4">
+             <div className="flex items-start gap-3">
+               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-warning/10 text-warning"><AlertTriangle className="size-4" /></span>
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-deep-ink">{item.document_name}</p>
                 <p className="mt-1 text-sm text-deep-ink/75">{item.ai_note || "This might not be the right document."}</p>
               </div>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
+             <div className="mt-2.5 flex flex-wrap gap-2">
               <Button size="sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Replace file</Button>
               <Button size="sm" variant="secondary" disabled={busy} onClick={async () => { setBusy(true); try { await keep({ data: { token, itemId: item.id } }); await onChange(); } catch { setErr("Couldn't save that. Please try again."); } setBusy(false); }}>Keep this file</Button>
             </div>
           </div>
         ) : item.status === "uploaded" ? (
-          <div key="up" className="flex items-center gap-4 rounded-2xl border border-success/30 bg-sheet p-5">
+           <div key="up" className="flex items-center gap-3 rounded-2xl border border-success/30 bg-sheet p-3.5 sm:p-4">
             <span
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span>
+               className="grid size-8 shrink-0 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-4" strokeWidth={3} /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink">{item.document_name}</p>
               <p className="text-sm text-success">{busy ? "Checking…" : "Received"}</p>
@@ -493,8 +493,8 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             <Button size="sm" variant="ghost" disabled={busy} onClick={() => fileRef.current?.click()}>Replace</Button>
           </div>
         ) : item.status === "not_applicable" ? (
-          <div key="na" className="flex items-center gap-4 rounded-2xl bg-surface-2/70 p-5">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><X className="size-4" /></span>
+           <div key="na" className="flex items-center gap-3 rounded-2xl bg-surface-2/70 p-3.5 sm:p-4">
+             <span className="grid size-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><X className="size-4" /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-deep-ink/70">{item.document_name}</p>
               <p className="truncate text-sm text-muted-foreground">Doesn't apply: {item.na_reason}</p>
@@ -506,19 +506,20 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           <div key="missing"
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files?.[0]); }}
-            className={`sheet-stack p-5 ${drag ? "ring-2 ring-ring" : ""}`}>
-            <div className="flex items-start gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><FileText className="size-5" strokeWidth={1.75} /></span>
+             className={`sheet-stack p-3.5 sm:p-4 ${drag ? "ring-2 ring-ring" : ""}`}>
+             <div className="flex items-start gap-3">
+               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><FileText className="size-4" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
+                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-deep-ink">{item.document_name}</p>
                   {!item.required && <Tag>If you have it</Tag>}
                 </div>
-                <p className="mt-1 text-sm text-deep-ink/70">{docGuide(item.document_name, item.description)}</p>
+                 <p className="mt-0.5 text-[13px] leading-5 text-deep-ink/70">{docGuide(item.document_name, item.description)}</p>
               </div>
+               {!naOpen && <Button size="sm" variant="ghost" className="hidden shrink-0 px-2 sm:inline-flex" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>}
             </div>
             {naOpen ? (
-              <div className="mt-4 space-y-2">
+               <div className="mt-2.5 space-y-2">
                 <Input autoFocus aria-label="Why this doesn't apply" placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
                 <div className="flex gap-2">
                   <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Mark as not needed</Button>
@@ -526,13 +527,13 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
                 </div>
               </div>
             ) : (
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+               <div className="mt-2.5 flex flex-wrap items-center gap-2">
                 <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
-                <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
+                 <span className="hidden text-xs text-muted-foreground sm:inline">Or drag a file onto this card.</span>
+                 <Button size="sm" variant="ghost" className="min-h-8 w-full justify-start px-0 sm:hidden" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
               </div>
             )}
-            <p className="mt-3 hidden text-xs text-muted-foreground sm:block">Or drag a file onto this card.</p>
           </div>
         )}
       {err && <p className="mt-2 text-sm text-destructive" role="alert">{err}</p>}

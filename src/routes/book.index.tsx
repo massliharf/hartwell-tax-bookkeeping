@@ -223,11 +223,11 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
 function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewChecklist>; complete: boolean }) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-sheet">
-      <div className="border-b border-line-1 bg-surface-2 px-4 py-3">
+       <div className="border-b border-line-1 bg-surface-2 px-4 py-2.5">
         <p className="text-xs text-muted-foreground">{complete ? "What you'll bring" : "Your list so far"}</p>
         <p className="t-card text-deep-ink"><span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}</p>
       </div>
-      <ul className="max-h-[360px] space-y-2 overflow-y-auto p-4">
+       <ul className="max-h-[280px] space-y-1.5 overflow-y-auto px-4 py-3">
         {docs.map((d) => (
           <li key={d.id} className="enter-item flex items-start gap-2.5 text-sm">
             <span className="mt-0.5 size-4 shrink-0 rounded-[4px] border-[1.5px] border-line-3" />
@@ -235,7 +235,7 @@ function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewC
           </li>
         ))}
       </ul>
-      <p className="border-t border-line-1 px-4 py-3 text-xs text-muted-foreground">Send them from your phone after you book.</p>
+       <p className="border-t border-line-1 px-4 py-2.5 text-xs text-muted-foreground">Send them from your phone after you book.</p>
     </div>
   );
 }

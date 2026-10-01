@@ -7,13 +7,13 @@ export type StackDoc = { id: string; title: string; note: string; received: bool
 export function DocumentStack({ docs }: { docs: StackDoc[] }) {
   const reduce = useReducedMotion();
   return (
-    <ul className="flex flex-col gap-2.5">
+     <ul className="flex flex-col gap-1.5">
         {docs.map((d) => (
           <li
             key={d.id}
-            className="flex items-center gap-3 rounded-lg border border-border bg-sheet px-3.5 py-3"
+             className="flex items-center gap-2.5 rounded-lg border border-border bg-sheet px-3 py-2"
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink">
+             <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink">
               <FileText className="size-4" strokeWidth={1.75} />
             </span>
             <span className="min-w-0 flex-1">

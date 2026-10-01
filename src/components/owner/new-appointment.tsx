@@ -4,7 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Plus, Users, Video, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useDocked } from "./use-docked";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Segmented } from "@/components/ui/segmented";
@@ -22,6 +24,7 @@ export const openNewAppointment = () => window.dispatchEvent(new Event("owner:ne
 
 export function NewAppointmentButton({ compact = false, block = false, listen = false, row = false }: { compact?: boolean; block?: boolean; listen?: boolean; row?: boolean }) {
   const [open, setOpen] = useState(false);
+  const docked = useDocked();
   useEffect(() => {
     if (!listen) return;
     const on = () => setOpen(true);
@@ -38,11 +41,19 @@ export function NewAppointmentButton({ compact = false, block = false, listen = 
         : compact
         ? <Button size="icon" aria-label="New appointment" title="New appointment" onClick={() => setOpen(true)} className="size-9 rounded-lg sm:size-9"><Plus /></Button>
         : <Button size={block ? "md" : "sm"} onClick={() => setOpen(true)} className={block ? "w-full justify-start gap-2.5 px-3 text-[13px]" : undefined}><Plus />New appointment</Button>}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="block max-h-[92dvh] max-w-[560px] overflow-y-auto p-0">
-          {open && <NewAppointmentForm onDone={() => setOpen(false)} />}
-        </DialogContent>
-      </Dialog>
+      {/* Same surface as the appointment panel: a right-side panel on wide screens, a bottom sheet on phones. */}
+      <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-overlay-light backdrop-blur-[2px]" />
+          <DialogPrimitive.Content className={docked
+            ? "panel-in fixed bottom-2 right-2 top-2 z-50 flex w-[480px] flex-col overflow-hidden rounded-2xl bg-sheet"
+            : "sheet-up fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] flex-col overflow-hidden rounded-t-[20px] bg-sheet sm:mx-auto sm:w-[600px]"}>
+            {!docked && <div className="flex justify-center pt-2.5" aria-hidden="true"><span className="h-1 w-10 rounded-full bg-line-2" /></div>}
+            <DialogPrimitive.Close aria-label="Close" className="absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-tint-1 hover:text-deep-ink"><X className="size-4" /></DialogPrimitive.Close>
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">{open && <NewAppointmentForm onDone={() => setOpen(false)} />}</div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </>
   );
 }
@@ -84,10 +95,10 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
   };
 
   return (
-    <div className="flex flex-col">
-      <header className="border-b border-border px-6 pb-4 pr-14 pt-6">
-        <DialogTitle className="t-owner text-deep-ink">New appointment</DialogTitle>
-        <DialogDescription className="mt-1 text-xs text-muted-foreground">For a client who called. They get the same confirmation, checklist and reminders as an online booking.</DialogDescription>
+    <div className="flex min-h-full flex-1 flex-col">
+      <header className="border-b border-border px-5 pb-4 pr-14 pt-5 sm:px-6">
+        <DialogTitle className="text-[18px] font-semibold leading-6 text-deep-ink">New appointment</DialogTitle>
+        <DialogDescription className="mt-0.5 text-sm text-muted-foreground">They get the same confirmation and reminders as an online booking.</DialogDescription>
       </header>
 
       <div className="space-y-6 px-6 py-5">
@@ -139,7 +150,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
         {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
       </div>
 
-      <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
+      <footer className="sticky bottom-0 mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border bg-sheet px-5 py-4 sm:px-6">
         <span className="min-w-0 text-xs text-muted-foreground">{!who ? "Choose or add the client." : !serviceId ? "Pick a service." : !slot ? "Pick a time." : `${who.name}: ${svc?.name}, ${fmtDateLong(slot)} at ${fmtTime(slot)}`}</span>
         <div className="flex gap-2"><Button variant="secondary" onClick={onDone}>Cancel</Button><Button disabled={!canBook} onClick={submit}>{busy ? "Scheduling…" : "Schedule and send confirmation"}</Button></div>
       </footer>

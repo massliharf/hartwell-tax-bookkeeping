@@ -19,7 +19,7 @@ import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { APPT_SELECT, fmtLong, fmtTime, missingOf, type Appt } from "./lib";
+import { APPT_SELECT, fmtLong, fmtTime, missingOf, money, type Appt } from "./lib";
 import { ErrorNote, StatusPill } from "./ui";
 import { ReviewGallery } from "./review-gallery";
 import { AiTag, CloseoutBlock, DocReview, FinishForm } from "./closeout";
@@ -27,20 +27,11 @@ import { MeetingNotes } from "./meeting-notes";
 import { reviewDocument } from "@/lib/owner.functions";
 import type { ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
+import { useDocked } from "./use-docked";
+export { useDocked } from "./use-docked";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 /** One appointment: when, who, how ready, and the two things Claire can do. Nothing else. */
-/** True on screens wide enough to keep the panel docked next to the page (Magnific-style right panel). */
-export function useDocked() {
-  const [docked, setDocked] = useState(false);
-  useEffect(() => {
-    const m = window.matchMedia("(min-width: 1180px)");
-    const on = () => setDocked(m.matches);
-    on(); m.addEventListener("change", on);
-    return () => m.removeEventListener("change", on);
-  }, []);
-  return docked;
-}
 
 /**
  * One appointment. On wide screens it docks as a right panel beside the page (the page makes room, nothing is covered,
@@ -88,6 +79,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const [gallery, setGallery] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [picking, setPicking] = useState<"move" | "follow_up" | null>(null);
+  const [tab, setTab] = useState<"overview" | "documents" | "activity" | "notes">("overview");
   const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const [accepting, setAccepting] = useState(false);
   const videoSetting = useQuery({ queryKey: ["owner", "video-link-value"], queryFn: async () => (await supabase.from("settings").select("video_link").eq("id", 1).maybeSingle()).data?.video_link ?? null });
@@ -111,8 +103,23 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const stage = stageOf(a, now);
   const finished = stage === "sign_pay" || stage === "to_file" || stage === "filed";
   const intro = isIntroAppt(a);
+
   const missing = missingOf(a).length;
   const eyesCount = a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length;
+  const docsIn = items.filter((i) => i.status !== "missing").length;
+  const tabs: { id: "overview" | "documents" | "activity" | "notes"; label: string; count?: number | undefined; warn?: boolean }[] = [
+    { id: "overview", label: "Overview" },
+    ...(intro ? [] : [{ id: "documents" as const, label: "Documents", count: eyesCount || (items.length - docsIn) || undefined, warn: eyesCount > 0 }]),
+    { id: "activity", label: "Messages" },
+    ...(a.meeting_type === "video" ? [{ id: "notes" as const, label: "Notes" }] : []),
+  ];
+  const facts: [string, string, ("documents" | "activity" | null)?][] = [
+    ["Service", a.services?.name ?? "Appointment"],
+    ["When", `${fmtLong(a.start_at)}, ${fmtTime(a.start_at)} – ${fmtTime(a.end_at)}`],
+    ["Where", a.meeting_type === "video" ? "Video call" : "412 Bloomfield Ave"],
+    ...(intro ? [] : [["Documents", `${docsIn} of ${items.length} in${eyesCount ? `, ${eyesCount} to check` : ""}`, "documents"] as [string, string, "documents"]]),
+    ...(a.fee_cents != null ? [["Fee", money(a.fee_cents)] as [string, string]] : []),
+  ];
   const looksRight = items.filter(i => i.status === "uploaded" && i.review_status === "pending" && i.ai_check === "ok");
   const acceptAll = async () => {
     setAccepting(true);
@@ -128,7 +135,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-h-full flex-col">
       {/* 1. Who, when, where (information). */}
       <header className="border-b border-border px-5 pb-5 pt-5 sm:px-6">
         <div className="flex items-start gap-3 pr-20">
@@ -151,11 +158,40 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
           eyesCount > 0 ? <Button size="sm" onClick={() => setGallery(true)}>Check {eyesCount} document{eyesCount === 1 ? "" : "s"}</Button> : null} />
       </header>
 
-      <div className={expanded ? "grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:divide-x lg:divide-border" : ""}>
-      <div className="min-w-0">
+      {/* 3. One thing at a time: tabs keep documents, history and notes apart. */}
+      <div role="tablist" aria-label="Appointment details" className="sticky top-0 z-10 flex gap-1 border-b border-border bg-sheet px-4 sm:px-5">
+        {tabs.map((t) => (
+          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}
+            className={cn("relative flex h-11 items-center gap-1.5 px-2 text-[13px] font-medium transition-colors duration-150", tab === t.id ? "text-deep-ink" : "text-muted-foreground hover:text-deep-ink")}>
+            {t.label}{t.count != null && <span className={cn("tabular rounded-full px-1.5 text-[11px] leading-4", t.warn ? "bg-alert-warning text-alert-warning-fg" : "bg-tint-1 text-muted-foreground")}>{t.count}</span>}
+            {tab === t.id && <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-deep-ink" />}
+          </button>
+        ))}
+      </div>
+
+      <div key={tab} className="enter">
+        {tab === "overview" && (
+          <>
+            <section className="px-5 py-5 sm:px-6">
+              <h3 className="t-sub">At a glance</h3>
+              <dl className="mt-3 divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1 text-sm">
+                {facts.map(([k, v, go]) => (
+                  <div key={k} className="grid grid-cols-[110px_1fr_auto] items-center gap-3 px-3 py-2.5">
+                    <dt className="text-muted-foreground">{k}</dt><dd className="min-w-0 text-deep-ink">{v}</dd>
+                    {go ? <button type="button" onClick={() => setTab(go)} className="text-xs font-medium text-ink hover:underline">View</button> : <span />}
+                  </div>
+                ))}
+              </dl>
+              {intro && <p className="mt-3 text-sm text-muted-foreground">No documents for this one. After the call, mark it done; {a.clients?.name.split(" ")[0] ?? "the client"} gets a link to schedule the appointment you suggested.</p>}
+            </section>
+            <CloseoutBlock a={a} />
+          </>
+        )}
+        {tab === "documents" && !intro && (
+          <>
       {/* 3. Documents: summary, then the list; row actions only where a decision is needed. */}
-      {intro ? <section className="px-5 py-5 sm:px-6"><h3 className="t-sub">Free 15-minute call</h3><p className="mt-1 text-sm text-muted-foreground">No documents for this one. After the call, mark it done; {a.clients?.name.split(" ")[0] ?? "the client"} gets a link to schedule the appointment you suggested.</p></section> : <section className="px-6 py-5">
-        <DocsWrap collapsed={finished} count={items.filter((i) => i.status === "uploaded").length}>
+      {intro ? <section className="hidden"><h3 className="t-sub">Free 15-minute call</h3><p className="mt-1 text-sm text-muted-foreground">No documents for this one. After the call, mark it done; {a.clients?.name.split(" ")[0] ?? "the client"} gets a link to schedule the appointment you suggested.</p></section> : <section className="px-6 py-5">
+        <DocsWrap collapsed={false} count={items.filter((i) => i.status === "uploaded").length}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <ReadyRing value={a.ready_score} size={36} stroke={4} />
@@ -198,17 +234,15 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
           return <>{group("Needs your eyes", eyes, "warn")}{group("Received", received)}{group("Still to come", open)}<RequestDocument a={a} /></>;
         })()}
         </DocsWrap>
-        <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
       </section>}
+          </>
+        )}
+        {tab === "activity" && <FollowUps a={a} now={now} />}
+        {tab === "notes" && <MeetingNotes a={a} now={now} />}
       </div>
-      <div className="min-w-0">
-      <MeetingNotes a={a} now={now} />
-      <CloseoutBlock a={a} />
-      <FollowUps a={a} now={now} />
-      </div>
-      </div>
+      <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
 
-      <footer className="sticky bottom-0 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
+      <footer className="sticky bottom-0 mt-auto border-t border-border bg-sheet px-5 py-4 sm:px-6">
         {finishing ? <FinishForm a={a} onBack={() => setFinishing(false)} onDone={() => { setFinishing(false); onClose(); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
           : picking ? <MeetingPicker a={a} mode={picking} onBack={() => setPicking(null)} onDone={() => { setPicking(null); void qc.invalidateQueries({ queryKey: ["owner"] }); }} />
           : (

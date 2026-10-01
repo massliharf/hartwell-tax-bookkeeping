@@ -85,7 +85,7 @@ function Hero() {
         </div>
         <div className="min-w-0 rounded-[28px] bg-surface-2 px-4 py-4 sm:px-8 sm:py-6"><HeroVisual /></div>
       </div>
-      <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
+      <ul className="grid overflow-hidden rounded-2xl bg-sheet sm:grid-cols-3">
         {facts.map(([k, v], i) => (
           <li key={k} className="flex min-w-0 items-center gap-3.5 bg-sheet px-5 py-5 sm:px-6">
             <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink">{i === 0 ? <img src={claire} alt="" width={40} height={40} className="size-10 rounded-xl object-cover" /> : i === 1 ? <MapPinned className="size-[18px]" strokeWidth={1.75} /> : <CreditCard className="size-[18px]" strokeWidth={1.75} />}</span>

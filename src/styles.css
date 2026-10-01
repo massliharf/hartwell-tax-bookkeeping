@@ -280,3 +280,6 @@
 
 /* Opening a sheet or menu locks scroll; keeping the scrollbar's space reserved stops the page jumping sideways. */
 html { scrollbar-gutter: stable; }
+
+/* Hero service tabs: the ring fills while each service is on screen. */
+@keyframes hero-progress { to { stroke-dashoffset: 0; } }

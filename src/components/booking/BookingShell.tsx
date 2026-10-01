@@ -17,7 +17,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
           </Link>
         </div>
       </header>
-      <div className="mx-auto min-h-[calc(100vh-76px)] max-w-6xl rounded-t-2xl bg-sheet sm:rounded-2xl">
+      <div className="mx-auto min-h-[calc(100vh-76px)] max-w-6xl rounded-t-2xl bg-sheet sm:min-h-0 sm:rounded-2xl">
         {step !== undefined && <Progress step={step} />}
         <main className="px-6 pb-24 pt-8 sm:px-8 sm:pt-10">{children}</main>
       </div>

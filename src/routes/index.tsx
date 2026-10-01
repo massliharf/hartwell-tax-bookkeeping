@@ -14,7 +14,7 @@ import claire from "@/assets/claire-portrait.jpg";
 
 
 
-const TITLE = "Hartwell Tax & Bookkeeping — Taxes, without the chase";
+const TITLE = "Hartwell Tax & Bookkeeping — Tax preparation in Montclair, NJ";
 const DESC = "Tax preparation in Montclair, NJ for families, freelancers, landlords and small businesses. See open times, schedule in two minutes, and file in one visit.";
 
 export const Route = createFileRoute("/")({
@@ -72,18 +72,18 @@ function Home() {
 function Hero() {
   return (
     <section className="enter overflow-hidden">
-      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.1fr_1fr] md:gap-12 md:pb-12 md:pt-14">
+      <div className="grid items-center gap-8 px-1 pb-8 pt-6 sm:px-4 md:grid-cols-[1.45fr_1fr] md:gap-12 md:pb-12 md:pt-14">
         <div>
           <p className="text-sm font-medium text-ink">Tax preparation and bookkeeping in Montclair, NJ</p>
-          <h1 className="enter-title mt-4 max-w-[16ch] text-balance t-hero text-deep-ink">Your taxes, handled by someone who knows your name.</h1>
+          <h1 className="enter-title mt-4 max-w-[19ch] text-balance t-hero text-deep-ink">Your taxes, handled by someone who knows your name.</h1>
           <p className="mt-6 max-w-[35rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
             Hartwell Tax is a one-person practice run by Claire Hartwell, an IRS Enrolled Agent. She prepares federal and New Jersey returns for families, freelancers, landlords and small businesses, and deals with the IRS when a letter arrives.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
-            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">Manage my appointment</Link></Button>
+            <Button asChild size="lg" variant="secondary"><Link to="/book/returning">My appointment</Link></Button>
           </div>
-          <p className="mt-4 max-w-[34rem] text-sm leading-6 text-muted-foreground">Open all year. From February to April and in the weeks before October 15, Claire adds evening and Saturday times.</p>
+          <p className="mt-4 max-w-[34rem] text-sm leading-6 text-muted-foreground">Open all year, Monday to Saturday. From February to mid-April and before October 15, times fill a few weeks ahead, so schedule early or join the waitlist for a cancellation.</p>
         </div>
         <figure className="enter-spot relative min-w-0 overflow-hidden rounded-2xl bg-ink-900" style={{ animationDelay: "200ms" }}>
           <img src={claire} alt="Claire Hartwell at her desk in Montclair" className="aspect-[4/5] w-full object-cover opacity-90 sm:aspect-[5/5]" />
@@ -103,8 +103,8 @@ function Year() {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const peak = new Set([1, 2, 3, 8, 9]);
   const rows = [
-    { t: "February to mid-April", d: "Filing season. Times fill two to three weeks ahead, so Claire adds evenings and Saturdays. Booking early gets you the time you want." },
-    { t: "September to October 15", d: "Extension deadline. If you filed an extension in April, this is when your return gets finished." },
+    { t: "February to mid-April", d: "Filing season. Times fill two to three weeks ahead. Schedule early, and if a day is full, join its waitlist: the first cancellation is offered to you by email." },
+    { t: "September to October 15", d: "The extension deadline. If you filed an extension in April, this is when your return gets finished, and the calendar fills again." },
     { t: "The rest of the year", d: "Quieter, and usually open the same week: IRS letters, quarterly estimates for freelancers, bookkeeping, and catching up on past returns." },
   ];
   return (
@@ -200,7 +200,7 @@ function StepPreviewReminders() {
 /** magnific.com/desktop "sticky index" section: the list on the left follows the text on the right. */
 function HowItWorks() {
   const steps = [
-    { title: "Pick a time.", text: "See every open time online, evenings and Saturdays included in season. You're confirmed on the spot, without waiting for a call back.", preview: <StepPreviewTime /> },
+    { title: "Pick a time.", text: "See every open time online, Saturdays included. You're confirmed on the spot, without waiting for a call back.", preview: <StepPreviewTime /> },
     { title: "Send what's on your list.", text: "A few quick questions build a checklist for your return. Snap documents with your phone; each one is checked as it arrives, and gentle reminders cover the rest.", preview: <StepPreviewDocs /> },
     { title: "Meet Claire once.", text: "In person in Montclair or on a video call. She's already seen your documents, so the hour goes to your return, not to paperwork.", preview: <StepPreviewReady /> },
     { title: "Sign, pay, filed.", text: "When your return is ready you get one email: review it, sign Form 8879 and pay from your phone. Claire files, and you're told when it's done.", preview: <StepPreviewReminders /> },
@@ -208,11 +208,15 @@ function HowItWorks() {
   const [active, setActive] = useState(0);
   const refs = useRef<(HTMLLIElement | null)[]>([]);
   useEffect(() => {
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset["i"]));
-    }, { rootMargin: "-45% 0px -50% 0px" });
-    refs.current.forEach((el) => el && io.observe(el));
-    return () => io.disconnect();
+    const onScroll = () => {
+      const line = window.innerHeight * 0.4;
+      let idx = 0;
+      refs.current.forEach((el, i) => { if (el && el.getBoundingClientRect().top <= line) idx = i; });
+      setActive(idx);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-20`}>
@@ -359,16 +363,25 @@ function Privacy() {
   );
 }
 
+/** The closing call to action follows the season, so it's never out of date. */
+function seasonCta(now = new Date()) {
+  const m = now.getMonth(), d = now.getDate();
+  if ((m === 8) || (m === 9 && d <= 15)) return { title: "October 15 is close. Your slot doesn't have to be.", body: "Extended returns are due October 15. Schedule now, send your documents this week, and file in one visit.", cta: "Schedule an extension review", service: "extension" };
+  if ((m >= 1 && m <= 2) || (m === 3 && d <= 15)) return { title: "April 15 is coming. Times are filling.", body: "Filing season is the busiest time of the year. Schedule now and send your documents as they arrive.", cta: "Schedule your return", service: "individual" };
+  return { title: "Got a letter from the IRS?", body: "Quieter months mean openings this week: IRS and New Jersey letters, quarterly estimates, bookkeeping, and past returns.", cta: "Schedule a letter review", service: "extension" };
+}
+
 function DeadlineCta() {
+  const c = seasonCta();
   return (
      <section id="deadline" className="overflow-hidden rounded-2xl bg-ink-900 px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid items-center gap-8 md:grid-cols-[1.4fr_1fr]">
         <div>
-          <h2 className="t-section text-white">October 15 is close. Your slot doesn't have to be.</h2>
-          <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">Extended returns are due October 15. Schedule now, send your documents this week, and file in one visit.</p>
+          <h2 className="t-section text-white">{c.title}</h2>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-primary-foreground/70 sm:text-base">{c.body}</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
-          <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"><Link to="/book" search={{ service: "extension" }}>Schedule an extension review</Link></Button>
+          <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"><Link to="/book" search={{ service: c.service }}>{c.cta}</Link></Button>
           <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><a href="#services">See all services</a></Button>
         </div>
       </div>
@@ -383,7 +396,7 @@ function DeadlineCta() {
 
 function Faq() {
   const qs = [
-    { q: "Are you open all year, or only in tax season?", a: "All year. February to mid-April and the weeks before October 15 are the busiest, so Claire adds evening and Saturday times then. The rest of the year is quieter: IRS letters, quarterly estimates, bookkeeping and past returns, usually with an opening the same week." },
+    { q: "Are you open all year, or only in tax season?", a: "All year. February to mid-April and the weeks before October 15 are the busiest, so times fill a few weeks ahead; schedule early or join the waitlist for a cancellation. The rest of the year is quieter: IRS letters, quarterly estimates, bookkeeping and past returns, usually with an opening the same week." },
     { q: "What is an Enrolled Agent?", a: "An Enrolled Agent is licensed by the IRS itself to prepare tax returns and to represent taxpayers in audits, collections and appeals. It is the highest credential the IRS awards, and it requires ongoing education every year." },
     { q: "How much will my return cost?", a: "Prices start at the amounts listed above and are confirmed before any work starts. You pay once your return is ready to file, never at booking." },
     { q: "Do you prepare New York returns too?", a: "Yes. Many Montclair clients work in New York, so non-resident New York returns are included when you need one." },

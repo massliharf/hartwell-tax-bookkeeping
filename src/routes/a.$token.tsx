@@ -5,6 +5,7 @@ import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
 import { STEPS, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
@@ -117,7 +118,7 @@ function PortalPage() {
   const doneCount = items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length;
   const day = new Date(a.start_at).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" });
   const sub: Record<Stage, string> = {
-    documents: todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
+    documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer five quick questions so Claire knows what to ask you for." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
     ready: `Everything is in. See you ${day}.`,
     meeting: a.meeting_type === "video" ? "Your appointment is now. Join the call below." : "Your appointment is now. Claire is expecting you.",
     wrap_up: "Thanks for meeting with Claire. She's finishing your return.",
@@ -164,7 +165,7 @@ function PortalPage() {
           {!!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
           <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} />
           <Actions token={token} appt={a} onChange={refresh} />
-          {stage === "ready" ? sentDocs : checklist}
+          {a.intake_answers?.["intake_pending"] ? null : stage === "ready" ? sentDocs : checklist}
         </>}
 
         {/* 2. The meeting itself. */}
@@ -186,7 +187,7 @@ function PortalPage() {
         {/* Side exits. */}
         {(cancelled || stage === "no_show") && (
           <StatusCard icon={<CalendarClock />} title={cancelled ? "Pick a new time whenever you're ready." : "Let's find you a new time."} action={<Button asChild size="lg"><Link to="/book">Pick a new time</Link></Button>}>
-            Your documents and answers are saved, so booking again takes two minutes.
+            Your documents and answers are saved, so scheduling again takes two minutes.
           </StatusCard>
         )}
 
@@ -222,7 +223,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
   const done = qs.every((x) => ans[x.key] !== undefined);
   const submit = async () => {
     setBusy(true); setErr(null);
-    try { const r = await save({ data: { token, intake: toIntakePayload(slug ?? "individual", ans) } }); if (!r.ok) throw new Error(); onDone(); }
+    try { const r = await save({ data: { token, intake: toIntakePayload(slug ?? "individual", ans) } }); if (!r.ok) throw new Error(); toast.success("Thanks. Your document list is ready below."); onDone(); }
     catch { setErr("We couldn't save your answers. Please try again."); }
     finally { setBusy(false); }
   };
@@ -235,7 +236,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
           <div key={x.key} className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm text-deep-ink">{x.label}</span>
             {x.type === "count" ? (
-              <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" className="min-w-10" variant={ans[x.key] === n ? "dark" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
+              <Segmented label={x.label} value={typeof ans[x.key] === "number" ? String(ans[x.key]) : ""} onChange={(v) => setAns({ ...ans, [x.key]: Number(v) })} options={[0, 1, 2, 3].map((n) => ({ value: String(n), label: n === 3 ? "3+" : String(n) }))} />
             ) : (
               <Segmented label={x.label} value={ans[x.key] === true ? "yes" : ans[x.key] === false ? "no" : ("" as "yes" | "no")} onChange={(v) => setAns({ ...ans, [x.key]: v === "yes" })} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
             )}
@@ -264,7 +265,7 @@ function AppointmentCard({ appt, mode, videoLink }: { appt: Appt; mode: "upcomin
           <p className={`mt-1 t-card text-deep-ink ${cancelled ? "line-through" : ""}`}>{fmtDateLong(appt.start_at)}</p>
           <p className="tabular mt-1 text-deep-ink/80">{fmtTime(appt.start_at)} – {fmtTime(appt.end_at)}</p>
         </div>
-        {!cancelled && !postAppointment && <ReadyRing value={appt.ready_score} size={84} />}
+        {!cancelled && !postAppointment && !appt.intake_answers?.["intake_pending"] && <ReadyRing value={appt.ready_score} size={84} />}
       </div>
       {!cancelled && (
         <div className="mt-5 border-t border-border pt-4 text-sm">

@@ -502,9 +502,9 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             </div>
             {naOpen ? (
               <div className="mt-4 space-y-2">
-                <Input autoFocus placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
+                <Input autoFocus aria-label="Why this doesn't apply" placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
                 <div className="flex gap-2">
-                  <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Save</Button>
+                  <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Mark as not needed</Button>
                   <Button size="sm" variant="ghost" onClick={() => setNaOpen(false)}>Never mind</Button>
                 </div>
               </div>

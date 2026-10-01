@@ -124,7 +124,7 @@ function BookPage() {
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button size="lg" className="flex-1 lg:flex-none" type={step === 1 ? "submit" : "button"} form={step === 1 ? "booking-details" : undefined} disabled={!canContinue} onClick={step === 0 ? () => go(1) : undefined}>{step === 1 ? (bookingBusy ? "Booking…" : "Book this time") : "Continue"}</Button>
+            <Button size="lg" className="flex-1 lg:flex-none" type={step === 1 ? "submit" : "button"} form={step === 1 ? "booking-details" : undefined} disabled={!canContinue} onClick={step === 0 ? () => go(1) : undefined}>{step === 1 ? (bookingBusy ? "Booking…" : "Book this time") : draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time to continue"}</Button>
           </div>
         </div>
         <aside className="hidden lg:block"><div className="sticky top-8">{service && <BookingSummary service={service} draft={draft} onPickAgain={step === 1 ? () => go(0) : undefined} />}</div></aside>

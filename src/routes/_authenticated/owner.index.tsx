@@ -61,24 +61,47 @@ function Today() {
   );
 }
 
-/** Owner-effort, up front: what went out on its own this week, linking to the Report. */
+/** Owner-effort, up front: what this week would have cost Claire by hand, from real messages and appointments. */
 function SavedBanner({ now }: { now: string }) {
   const q = useQuery({
     queryKey: ["owner", "saved-week", now.slice(0, 13)],
     queryFn: async () => {
-      const from = new Date(Date.parse(now) - 7 * 86400e3).toISOString();
-      const { data, error } = await supabase.from("messages").select("minutes_saved").gte("sent_at", from).lte("sent_at", now);
-      if (error) throw error;
-      return { count: data?.length ?? 0, minutes: (data ?? []).reduce((n, m) => n + (m.minutes_saved ?? 0), 0) };
+      const t = Date.parse(now);
+      const from = new Date(t - 7 * 86400e3).toISOString();
+      const [m, o, a] = await Promise.all([
+        supabase.from("messages").select("type, minutes_saved, sent_at, appointment_id").gte("sent_at", from).lte("sent_at", now),
+        supabase.from("waitlist_offers").select("status, created_at").in("status", ["claimed", "claimed_seen"]).gte("created_at", from),
+        supabase.from("appointments").select("id, start_at").gte("start_at", from),
+      ]);
+      if (m.error ?? o.error ?? a.error) throw m.error ?? o.error ?? a.error;
+      const msgs = m.data ?? [];
+      const startById = new Map((a.data ?? []).map((x) => [x.id, x.start_at]));
+      const reminders = msgs.filter((x) => ["docs_reminder_7d", "readiness_check_48h", "final_reminder_24h", "signature_reminder", "payment_reminder"].includes(x.type)).length;
+      const confirmed = msgs.filter((x) => x.type === "booking_confirmation").length;
+      // A later time was offered more than 49 hours before the appointment and taken: an empty chair avoided.
+      const avoided = msgs.filter((x) => x.type === "reschedule_offer" && x.appointment_id && startById.get(x.appointment_id) && Date.parse(startById.get(x.appointment_id)!) - Date.parse(x.sent_at) > 49 * 3600e3).length;
+      const minutes = msgs.reduce((n, x) => n + (x.minutes_saved ?? 0), 0);
+      return { count: msgs.length, confirmed, reminders, avoided, refilled: o.data?.length ?? 0, minutes };
     },
   });
   if (!q.data || q.data.count === 0) return null;
   const h = q.data.minutes / 60;
+  const hours = h >= 1 ? `${Math.round(h * 10) / 10}h` : `${q.data.minutes}m`;
+  const stats: [string, string][] = [
+    [String(q.data.confirmed), `appointment${q.data.confirmed === 1 ? "" : "s"} confirmed without you`],
+    [String(q.data.reminders), `reminder${q.data.reminders === 1 ? "" : "s"} sent`],
+    [String(q.data.avoided + q.data.refilled), "empty chairs avoided"],
+    [hours, "given back to you"],
+  ];
   return (
-    <Link to="/owner/insights" className="enter-tile group mt-6 flex items-center gap-4 rounded-[22px] lg:max-w-[760px] bg-ink-900 px-5 py-4 text-white transition-opacity duration-150 hover:opacity-95" style={{ animationDelay: "650ms" }}>
-      <span className="tabular font-serif text-[34px] font-semibold leading-none tracking-[-0.03em]">{h >= 1 ? `${Math.round(h * 10) / 10}h` : `${q.data.minutes}m`}</span>
-      <span className="min-w-0 flex-1 text-sm leading-5 text-white/80"><span className="font-medium text-white">given back to you this week.</span> {q.data.count} confirmations, reminders and follow-ups went out on their own.</span>
-      <ChevronRight className="size-4 shrink-0 text-white/60 transition-transform duration-150 group-hover:translate-x-0.5" />
+    <Link to="/owner/insights" className="enter-tile group mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-ink-900 text-white transition-opacity duration-150 hover:opacity-95 sm:grid-cols-4" style={{ animationDelay: "650ms" }} aria-label="This week, handled automatically. Open the report.">
+      {stats.map(([v, l]) => (
+        <span key={l} className="flex flex-col gap-1 px-4 py-4 sm:px-5">
+          <span className="tabular font-serif text-[28px] font-semibold leading-none tracking-[-0.03em]">{v}</span>
+          <span className="text-[12px] leading-4 text-white/75">{l}</span>
+        </span>
+      ))}
+      <span className="col-span-2 flex items-center justify-between gap-2 border-t border-white/10 px-4 py-2.5 text-[12px] text-white/75 sm:col-span-4 sm:px-5">This week, handled without you.<ChevronRight className="size-4 shrink-0 transition-transform duration-150 group-hover:translate-x-0.5" /></span>
     </Link>
   );
 }

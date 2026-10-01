@@ -15,7 +15,7 @@ import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, st
 import { completeIntroCall } from "@/lib/owner.functions";
 import { useOwnerCtx } from "./ctx";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ReadyRing } from "@/components/brand/ReadyRing";
@@ -60,7 +60,7 @@ export function AppointmentPanel({ target, onClose, expanded, setExpanded }: { t
       <DialogPrimitive.Root open={!!target} modal={false} onOpenChange={(o) => { if (!o) close(); }}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content onInteractOutside={(e) => e.preventDefault()} onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`panel-in fixed bottom-2 right-2 top-2 z-40 flex flex-col overflow-hidden rounded-2xl border border-line-1 bg-sheet shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_40px_-12px_rgba(18,18,18,0.18)] transition-[width] duration-300 ease-expo ${expanded ? "w-[760px]" : "w-[440px]"}`}>
+            className={`panel-in fixed bottom-2 right-2 top-2 z-40 flex flex-col overflow-hidden rounded-2xl bg-sheet transition-[width] duration-300 ease-expo ${expanded ? "w-[760px]" : "w-[440px]"}`}>
             {expandBtn}
             <DialogPrimitive.Close aria-label="Close panel" className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink"><X className="size-4" /></DialogPrimitive.Close>
             <div className="min-h-0 flex-1 overflow-y-auto">{target && <AppointmentContent key={target.appointmentId} id={target.appointmentId} onClose={close} expanded={expanded} />}</div>
@@ -69,13 +69,18 @@ export function AppointmentPanel({ target, onClose, expanded, setExpanded }: { t
       </DialogPrimitive.Root>
     );
   }
+  // Phones and narrow windows: a bottom sheet with a grab handle, over a light overlay.
   return (
-    <Dialog open={!!target} onOpenChange={(o) => { if (!o) close(); }}>
-      <DialogContent className={`block gap-0 overflow-y-auto p-0 transition-[max-width,height] duration-300 ease-expo ${expanded ? "h-[94dvh] max-h-[94dvh] max-w-[min(1180px,calc(100vw-32px))]" : "max-h-[92dvh] max-w-[680px]"}`}>
-        {expandBtn}
-        {target && <AppointmentContent id={target.appointmentId} onClose={close} expanded={expanded} />}
-      </DialogContent>
-    </Dialog>
+    <DialogPrimitive.Root open={!!target} onOpenChange={(o) => { if (!o) close(); }}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-overlay-light backdrop-blur-[2px] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content onOpenAutoFocus={(e) => e.preventDefault()} className="sheet-up fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] flex-col overflow-hidden rounded-t-[20px] bg-sheet sm:mx-auto sm:w-[680px]">
+          <div className="flex justify-center pb-1 pt-2.5" aria-hidden="true"><span className="h-1 w-10 rounded-full bg-line-2" /></div>
+          <DialogPrimitive.Close aria-label="Close" className="absolute right-3 top-3 z-10 grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-tint-1 hover:text-deep-ink"><X className="size-4" /></DialogPrimitive.Close>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{target && <AppointmentContent key={target.appointmentId} id={target.appointmentId} onClose={close} expanded={false} />}</div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
 
@@ -124,30 +129,32 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
 
   return (
     <div className="flex flex-col">
-      {/* 1. What and where it stands (information). */}
-      <header className="border-b border-border px-6 pb-5 pt-6">
-        <div className="pr-20">
-          <p className="text-xs text-muted-foreground">Appointment</p>
-          <DialogTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</DialogTitle>
-          <DialogDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span>{a.services?.name}</span>
-            {a.meeting_type === "video"
-              ? <a href={meetingLink(videoSetting.data, a.id)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-ink hover:underline"><Video className="size-3.5" />Join video call</a>
-              : <span className="inline-flex items-center gap-1"><MapPin className="size-3.5" />In person</span>}
-            {a.clients && <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose} className="inline-flex items-center gap-0.5 font-medium text-deep-ink hover:underline">{a.clients.name}<ChevronRight className="size-3.5" /></Link>}
-          </DialogDescription>
+      {/* 1. Who, when, where (information). */}
+      <header className="border-b border-border px-5 pb-5 pt-5 sm:px-6">
+        <div className="flex items-start gap-3 pr-20">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-fill-neutral text-sm font-semibold text-deep-ink">{a.clients?.name.charAt(0) ?? "?"}</span>
+          <div className="min-w-0">
+            <DialogTitle className="truncate text-[18px] font-semibold leading-6 text-deep-ink">{a.clients?.name ?? "Appointment"}</DialogTitle>
+            <DialogDescription className="tabular text-sm text-muted-foreground">{fmtLong(a.start_at)}, {fmtTime(a.start_at)} – {fmtTime(a.end_at)}</DialogDescription>
+          </div>
         </div>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="inline-flex h-8 items-center rounded-lg bg-tint-1 px-2.5 text-xs font-medium text-deep-ink">{a.services?.name}</span>
+          {a.meeting_type === "video"
+            ? <Button size="sm" asChild><a href={meetingLink(videoSetting.data, a.id)} target="_blank" rel="noreferrer"><Video />Join video call</a></Button>
+            : <span className="inline-flex h-8 items-center gap-1 rounded-lg bg-tint-1 px-2.5 text-xs font-medium text-deep-ink"><MapPin className="size-3.5" />In person</span>}
+          {a.clients && <Button size="sm" variant="ghost" asChild><Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose}>Client profile<ChevronRight /></Link></Button>}
+        </div>
+        {/* 2. Where it is, and whose move it is (status + the one decision the footer doesn't carry). */}
         {stage !== "cancelled" && (intro ? <Stepper steps={INTRO_STEPS} current={introStepOf(stage)} className="mt-5" /> : <Stepper steps={STEPS} current={stepOf(stage)} className="mt-5" />)}
-        {/* 2. Whose move it is, with the one action that moves it forward (control). */}
         <NowBanner a={a} nowIso={now} className="mt-4" action={
-          // Stage actions (Finish, Reschedule) live in the footer; the banner only carries a decision the footer doesn't.
           eyesCount > 0 ? <Button size="sm" onClick={() => setGallery(true)}>Check {eyesCount} document{eyesCount === 1 ? "" : "s"}</Button> : null} />
       </header>
 
       <div className={expanded ? "grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:divide-x lg:divide-border" : ""}>
       <div className="min-w-0">
       {/* 3. Documents: summary, then the list; row actions only where a decision is needed. */}
-      {intro ? <section className="px-6 py-5"><h3 className="t-sub">Free 15-minute call</h3><p className="mt-1 text-sm text-muted-foreground">No documents for this one. After the call, mark it done; {a.clients?.name.split(" ")[0] ?? "the client"} gets a link to schedule the appointment you suggested.</p></section> : <section className="px-6 py-5">
+      {intro ? <section className="px-5 py-5 sm:px-6"><h3 className="t-sub">Free 15-minute call</h3><p className="mt-1 text-sm text-muted-foreground">No documents for this one. After the call, mark it done; {a.clients?.name.split(" ")[0] ?? "the client"} gets a link to schedule the appointment you suggested.</p></section> : <section className="px-6 py-5">
         <DocsWrap collapsed={finished} count={items.filter((i) => i.status === "uploaded").length}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">

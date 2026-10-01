@@ -28,23 +28,12 @@ export function joinState(startIso: string, endIso: string, nowIso: string): "ea
 
 export const gcalStamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
-/** Google Calendar's `ctz` applies to local date/time strings, not UTC `Z` stamps. */
-const newYorkCalendarStamp = (iso: string) => {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
-  }).formatToParts(new Date(iso));
-  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
-  return `${part("year")}${part("month")}${part("day")}T${part("hour")}${part("minute")}${part("second")}`;
-};
-
-/** Open Google's event form with New York appointment instants; the visitor chooses Save there. */
+/** UTC instants let Google Calendar display the event in the visitor's calendar time zone. */
 export function googleCalendarLink(title: string, start: string, end: string, where: string, details: string) {
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: title,
-    dates: `${newYorkCalendarStamp(start)}/${newYorkCalendarStamp(end)}`,
-    ctz: "America/New_York",
+    dates: `${gcalStamp(start)}/${gcalStamp(end)}`,
     location: where,
     details,
   });

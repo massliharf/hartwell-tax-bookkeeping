@@ -7,6 +7,10 @@ export const OFFICE = { line1: "412 Bloomfield Avenue", line2: "Montclair, NJ 07
 export const OFFICE_ADDRESS = `${OFFICE.line1}, ${OFFICE.line2}`;
 export const MAP_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(OFFICE_ADDRESS)}&output=embed`;
 export const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(OFFICE_ADDRESS)}`;
+export const OFFICE_PHONE = "(973) 555-0142";
+export const OFFICE_PHONE_HREF = "tel:+19735550142";
+export const OFFICE_EMAIL = "claire@hartwelltax.com";
+export const OFFICE_EMAIL_HREF = `mailto:${OFFICE_EMAIL}`;
 
 /** A private, per-appointment room (no account needed to join) when no personal link is set. */
 export function meetingLink(settingsLink: string | null | undefined, appointmentId: string) {

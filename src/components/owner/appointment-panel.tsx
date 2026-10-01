@@ -28,6 +28,7 @@ import { reviewDocument } from "@/lib/owner.functions";
 import { useApptPanel, type ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
 import { useDocked } from "./use-docked";
+import { ClientAvatar } from "./client-avatar";
 export { useDocked } from "./use-docked";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
@@ -159,7 +160,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
       {/* 1. Who, when, where (information). */}
       <header className="border-b border-border px-5 pb-5 pt-5 sm:px-6">
         <div className="flex items-start gap-3 pr-20">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-fill-neutral text-sm font-semibold text-deep-ink">{a.clients?.name.charAt(0) ?? "?"}</span>
+           <ClientAvatar name={a.clients?.name} id={a.clients?.id} className="size-10 text-sm" />
           <div className="min-w-0">
             <DialogTitle className="truncate text-[18px] font-semibold leading-6 text-deep-ink">{a.clients?.name ?? "Appointment"}</DialogTitle>
             <DialogDescription className="tabular text-sm text-muted-foreground">{fmtLong(a.start_at)}, {fmtTime(a.start_at)} – {fmtTime(a.end_at)}</DialogDescription>

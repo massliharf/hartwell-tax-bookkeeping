@@ -29,3 +29,4 @@
 - Demo tooling (src/lib/demo.functions.ts, src/components/owner/demo.tsx): "Reset demo data" restores public.demo_snapshot via demo_restore(); re-take with select demo_take_snapshot() after changing seed data. The public demo account (src/lib/demo.ts) is excluded from the one-owner check. _Why: judges need a repeatable live demo._
 - Visual design: DESIGN_SYSTEM.md ("Studio Shell") is the single source of truth; tokens live in src/styles.css. _Why: user replaced the earlier Calm Ledger / paper brand._
 - Client-side “Add to calendar” opens a prefilled Google Calendar event; Jitsi rooms remain the account-free video default. _Why: users save events in their own calendar without linking the practice's Google account._
+- Owner client initials use one shared deterministic avatar keyed by client ID, with semantic palette tokens. _Why: client identity stays visually consistent across lists and detail views without storing or exposing photos._

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
 import { Empty, ErrorNote, LoadingRows } from "@/components/owner/ui";
 import { useOwnerCtx } from "@/components/owner/ctx";
+import { ClientAvatar } from "@/components/owner/client-avatar";
 
 export const Route = createFileRoute("/_authenticated/owner/clients/")({ head: () => ({ meta: [{ title: "Clients — Hartwell Tax & Bookkeeping" }, { name: "robots", content: "noindex" }] }), component: Clients });
 
@@ -86,7 +87,7 @@ function Clients() {
               <li key={c.id} className="enter-item group relative border-b border-line-1 last:border-0" style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}>
                 <Link to="/owner/clients/$id" params={{ id: c.id }} className="grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 transition-colors duration-150 hover:bg-surface-2 md:grid-cols-[minmax(0,1.6fr)_140px_150px_120px_72px]">
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{c.name.charAt(0)}</span>
+                    <ClientAvatar name={c.name} id={c.id} />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium text-deep-ink">{c.name}{!c.is_returning && <Tag tone="accent" className="ml-2 align-middle">New</Tag>}</span>
                       <span className="block truncate text-xs text-muted-foreground">{c.email}</span>

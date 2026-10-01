@@ -10,7 +10,7 @@ const tones = [
 ] as const;
 
 /** A stable color per client, so the same person looks the same across owner views. */
-export function ClientAvatar({ name, id, className }: { name?: string | null; id?: string | null; className?: string }) {
+export function ClientAvatar({ name, id, className }: { name?: string | null | undefined; id?: string | null | undefined; className?: string }) {
   const key = id || name || "?";
   let hash = 0;
   for (const character of key) hash = (hash * 31 + character.charCodeAt(0)) | 0;

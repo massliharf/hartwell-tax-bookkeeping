@@ -8,6 +8,7 @@ import { ChevronRight, FileText, MapPin, Video, Maximize2, Minimize2 } from "luc
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
 import { FollowUps, MeetingPicker, MoreActions, RequestDocument } from "./follow-ups";
+import { NowBanner } from "./now";
 import { STEPS, meetingAhead, stageOf, stepOf } from "@/lib/lifecycle";
 import { useOwnerCtx } from "./ctx";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,6 +90,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
           <StatusPill status={a.status} />
         </DialogDescription>
         {stage !== "cancelled" && <Stepper steps={STEPS} current={stepOf(stage)} className="mt-4" />}
+        <NowBanner a={a} nowIso={now} className="mt-4" />
         {a.clients && (
           <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose}
             className="mt-4 flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 transition-colors duration-150 hover:bg-surface-2">

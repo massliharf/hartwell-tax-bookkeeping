@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { APPT_SELECT, MSG_LABEL, fmtDay, fmtStamp, fmtTime, money, type Appt } from "./lib";
 import { Tag } from "@/components/ui/tag";
+import { NowBanner } from "./now";
+import { useApptPanel } from "./drawer-context";
+import { useOwnerCtx } from "./ctx";
 import { ApptList, ErrorNote, LoadingRows } from "./ui";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -12,6 +15,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 /** A person: contact details, their appointments (same rows as everywhere), and messages sent to them. */
 export function ClientProfile({ id }: { id: string }) {
+  const ownerNow = useOwnerCtx().data?.now;
+  const openAppt = useApptPanel();
   const q = useQuery({
     queryKey: ["owner", "client", id],
     queryFn: async () => {
@@ -28,7 +33,9 @@ export function ClientProfile({ id }: { id: string }) {
   if (q.isError) return <ErrorNote onRetry={() => q.refetch()} />;
   if (!q.data?.client) return <p className="text-sm text-muted-foreground">This client couldn't be found.</p>;
   const { client, msgs } = q.data;
-  const nowIso = new Date().toISOString();
+  const nowIso = ownerNow ?? new Date().toISOString();
+  // The appointment that is "live" for this client: the next upcoming one, else the latest one still in progress.
+  const active = [...q.data.appts].filter((a) => a.status !== "cancelled" && !a.filed_at).sort((x, y) => x.start_at.localeCompare(y.start_at)).find((a) => a.start_at >= nowIso) ?? q.data.appts.find((a) => a.status !== "cancelled" && !a.filed_at);
   const appts = [...q.data.appts.filter((a) => a.start_at >= nowIso).reverse(), ...q.data.appts.filter((a) => a.start_at < nowIso)];
 
   return (
@@ -67,6 +74,13 @@ export function ClientProfile({ id }: { id: string }) {
           </header>
         );
       })()}
+      {active && (
+        <Section title="Where things stand">
+          <button type="button" onClick={() => openAppt({ appointmentId: active.id })} className="block w-full text-left">
+            <NowBanner a={active} nowIso={nowIso} />
+          </button>
+        </Section>
+      )}
        {client.notes && <Section title="Notes"><p className="rounded-2xl border border-border bg-sheet px-4 py-3 text-sm text-deep-ink">{client.notes}</p></Section>}
       <Section title={`Appointments (${appts.length})`}>
         {appts.length ? <ApptList appts={appts} showDate showClient={false} /> : <p className="text-sm text-muted-foreground">No appointments yet.</p>}

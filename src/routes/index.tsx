@@ -4,7 +4,7 @@ import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Cl
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
-import { HeroVisual } from "@/components/site/HeroVisual";
+import { OpenTimes } from "@/components/site/OpenTimes";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
@@ -86,7 +86,7 @@ function Hero() {
           </div>
           <p className="mt-4 max-w-[34rem] text-sm leading-6 text-muted-foreground">Open all year, Monday to Saturday. From February to mid-April and before October 15, times fill a few weeks ahead, so schedule early or join the waitlist for a cancellation.</p>
         </div>
-        <div className="min-w-0 rounded-2xl bg-ink-50 px-4 py-2 sm:px-8"><HeroVisual /></div>
+        <div className="enter-spot min-w-0" style={{ animationDelay: "200ms" }}><OpenTimes /></div>
       </div>
       <ul className="grid gap-px overflow-hidden rounded-2xl border border-line-1 bg-line-1 sm:grid-cols-3">
         {facts.map(([k, v], i) => (

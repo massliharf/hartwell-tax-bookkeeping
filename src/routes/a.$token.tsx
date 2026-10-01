@@ -182,7 +182,6 @@ function PortalPage() {
 
         {/* 4. Sign and pay, then done. */}
         {(stage === "sign_pay" || stage === "to_file" || stage === "filed") && <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} />}
-        {stage === "sign_pay" && fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
 
         {/* Side exits. */}
         {(cancelled || stage === "no_show") && (
@@ -191,7 +190,7 @@ function PortalPage() {
           </StatusCard>
         )}
 
-        {after && items.length > 0 && sentDocs}
+        {after && doneCount > 0 && sentDocs}
       </div>
     </BookingShell>
   );
@@ -544,27 +543,44 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
       <p className="mt-3 text-sm text-deep-ink/75">Signed and paid ({money(appt.fee_cents!)}). You'll get an email once it's filed.</p>
     </section>
   );
-  return (
-    <section className="rounded-2xl border border-border bg-sheet p-6">
-        <Tag tone="warning">One last step</Tag>
-        <h2 className="mt-2 t-card text-deep-ink">Review, sign and pay</h2>
-        <div className="mt-4 flex items-baseline justify-between gap-4 rounded-lg bg-canvas p-4">
-          <span className="text-sm text-muted-foreground">Fee for {appt.services?.name}</span>
-          <span className="tabular text-xl font-medium text-deep-ink">{money(appt.fee_cents!)}</span>
+  // Two tasks at the same level, in order. Done tasks collapse to one line; the next one is open; later ones wait.
+  const Task = ({ n, title, state, meta, children }: { n: number; title: string; state: "done" | "now" | "later"; meta?: string; children?: React.ReactNode }) => (
+    <li className={`rounded-xl border ${state === "now" ? "border-ink/40 bg-sheet" : "border-line-1 bg-surface-2"}`}>
+      <div className="flex items-center gap-3 px-4 py-3.5">
+        <span className={`grid size-7 shrink-0 place-items-center rounded-full text-[13px] font-semibold ${state === "done" ? "bg-success text-white" : state === "now" ? "bg-ink text-white" : "border border-line-2 text-muted-foreground"}`}>
+          {state === "done" ? <Check className="size-4" strokeWidth={3} /> : n}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className={`text-[15px] font-medium ${state === "later" ? "text-muted-foreground" : "text-deep-ink"}`}>{title}</p>
+          {meta && <p className="text-[13px] text-muted-foreground">{meta}</p>}
         </div>
-        {appt.client_note && <p className="mt-4 text-sm text-deep-ink/80"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
-        <p className="mt-4 text-sm text-muted-foreground">Your return is filed as soon as it's signed and paid.</p>
-        <div className="mt-5 border-t border-border pt-5"><Stepper steps={["Sign Form 8879", "Pay"]} current={signed ? 1 : 0} label="Sign and pay" className="max-w-xs" /></div>
-      {!signed && <SignSection token={token} appt={appt} onDone={onDone} embedded />}
-      {signed && !paid && (
-        <div className="mt-5 border-t border-border pt-5">
-          <h3 className="t-card text-deep-ink">Pay {money(appt.fee_cents!)}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Pay by card. You'll get a receipt by email, and Claire files your return right after.</p>
-          <Button size="lg" className="mt-4" onClick={() => setCheckout(true)}><CreditCard />Pay {money(appt.fee_cents!)}</Button>
+      </div>
+      {state === "now" && children && <div className="border-t border-line-1 px-4 pb-5 pt-4">{children}</div>}
+    </li>
+  );
+  return (
+    <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="t-card text-deep-ink">Review, sign and pay</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Two steps. Claire files your return as soon as both are done.</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">{appt.services?.name}</p>
+          <p className="tabular text-xl font-semibold text-deep-ink">{money(appt.fee_cents!)}</p>
+        </div>
+      </div>
+      {appt.client_note && <p className="mt-4 rounded-lg bg-canvas px-4 py-3 text-sm text-deep-ink/85"><span className="font-medium text-deep-ink">A note from Claire: </span>{appt.client_note}</p>}
+      <ol className="mt-5 space-y-2">
+        <Task n={1} title="Sign your e-file authorization (Form 8879)" state={signed ? "done" : "now"} meta={signed ? "Signed. Thank you." : "Lets Claire file your return with the IRS for you."}>
+          <SignSection token={token} appt={appt} onDone={onDone} embedded />
+        </Task>
+        <Task n={2} title={`Pay ${money(appt.fee_cents!)}`} state={paid ? "done" : signed ? "now" : "later"} meta={paid ? "Paid. A receipt is in your inbox." : signed ? "By card. You'll get a receipt by email." : "Available once you've signed."}>
+          <Button size="lg" onClick={() => setCheckout(true)}><CreditCard />Pay {money(appt.fee_cents!)}</Button>
           <Checkout open={checkout} onOpenChange={setCheckout} amountCents={appt.fee_cents!} item={`${appt.services?.name ?? "Tax return"}, tax year ${new Date().getFullYear() - 1}`} email={clientEmail}
             onPay={async () => { const r = await pay({ data: { token } }); return !!r.ok; }} onDone={() => { void onDone(); }} />
-        </div>
-      )}
+        </Task>
+      </ol>
     </section>
   );
 }
@@ -579,11 +595,9 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
   const ok = name.trim().length >= 2 && agree;
 
   return (
-    <section className={embedded ? "mt-5 border-t border-border pt-5" : "sheet-stack p-6"}>
-      {!embedded && <Tag tone="warning">One last step</Tag>}
-      <h2 className="mt-2 t-card text-deep-ink">Sign your e-file authorization (Form 8879)</h2>
-      <p className="mt-2 text-sm text-deep-ink/75">Claire has finished your return. This form lets her file it with the IRS electronically on your behalf.</p>
-      <dl className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
+    <section className={embedded ? "" : "sheet-stack p-6"}>
+      {!embedded && <><Tag tone="warning">One last step</Tag><h2 className="mt-2 t-card text-deep-ink">Sign your e-file authorization (Form 8879)</h2></>}
+      <dl className="grid grid-cols-2 gap-3 rounded-lg bg-canvas p-4 text-sm">
         <div><dt className="text-muted-foreground">Taxpayer</dt><dd className="font-medium text-deep-ink">{appt.clients?.name}</dd></div>
         <div><dt className="text-muted-foreground">Tax year</dt><dd className="tabular font-medium text-deep-ink">2025</dd></div>
         <div><dt className="text-muted-foreground">Service</dt><dd className="font-medium text-deep-ink">{appt.services?.name}</dd></div>
@@ -596,14 +610,14 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
       }}>
         <div>
           <label htmlFor="sig" className="text-sm font-medium text-deep-ink">Type your full legal name</label>
-          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 h-12 bg-sheet text-xl" />
+          <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder={appt.clients?.name ?? ""} className="mt-1.5 h-12 bg-sheet text-lg" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" aria-label="I authorize Claire to e-file my return" />
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}
-        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign</Button>
+        <Button type="submit" size="lg" disabled={!ok || busy}>{busy ? <Loader2 className="animate-spin" /> : <PenLine />} Sign Form 8879</Button>
       </form>
     </section>
   );

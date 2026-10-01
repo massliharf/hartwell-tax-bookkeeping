@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
-import { STEPS, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
+import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
 import { Checkout } from "@/components/booking/Checkout";
 import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -112,11 +112,16 @@ function PortalPage() {
   const cancelled = stage === "cancelled";
   const ahead = meetingAhead(stage);
   const after = stage === "wrap_up" || stage === "sign_pay" || stage === "to_file" || stage === "filed";
+  const intro = isIntroAppt(a);
   const first = a.clients?.name?.split(" ")[0] ?? "there";
   const todo = items.filter((i) => i.required && (i.status === "missing" || i.review_status === "needs_fix")).length;
   const fixItems = items.filter((i) => i.review_status === "needs_fix");
   const doneCount = items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length;
   const day = new Date(a.start_at).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" });
+  const introSub: Partial<Record<Stage, string>> = {
+    documents: `Your free call with Claire is ${day}. No documents needed.`, ready: `Your free call with Claire is ${day}. No documents needed.`,
+    meeting: "Your call is now. Join from the button below.", wrap_up: "Thanks for talking with Claire.", filed: "Thanks for talking with Claire.",
+  };
   const sub: Record<Stage, string> = {
     documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer five quick questions so Claire knows what to ask you for." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
     ready: `Everything is in. See you ${day}.`,
@@ -156,32 +161,37 @@ function PortalPage() {
         <div>
           <p className="text-[13px] text-muted-foreground">Your appointment</p>
           <h1 className="mt-2 t-page text-deep-ink">Hello, {first}.</h1>
-          <p className="mt-2 text-deep-ink/70">{sub[stage]}</p>
+          <p className="mt-2 text-deep-ink/70">{(intro && introSub[stage]) || sub[stage]}</p>
         </div>
-        {!cancelled && <Stepper steps={STEPS} current={stepOf(stage)} label="Appointment progress" />}
+        {!cancelled && (intro ? <Stepper steps={INTRO_STEPS} current={introStepOf(stage)} label="Call progress" /> : <Stepper steps={STEPS} current={stepOf(stage)} label="Appointment progress" />)}
 
         {/* 1. Before the meeting: when and where, confirm/move/cancel, then the checklist. */}
         {ahead && <>
           {!!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
           <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} />
           <Actions token={token} appt={a} onChange={refresh} />
-          {a.intake_answers?.["intake_pending"] ? null : stage === "ready" ? sentDocs : checklist}
+          {intro || a.intake_answers?.["intake_pending"] || items.length === 0 ? null : stage === "ready" ? sentDocs : checklist}
         </>}
 
         {/* 2. The meeting itself. */}
         {stage === "meeting" && <>
           <AppointmentCard appt={a} mode="now" videoLink={q.data.videoLink ?? null} />
-          {todo > 0 ? checklist : sentDocs}
+          {intro || items.length === 0 ? null : todo > 0 ? checklist : sentDocs}
         </>}
 
         {/* 3. After the meeting, before Claire finishes. */}
-        {stage === "wrap_up" && <>
+        {intro && (stage === "wrap_up" || stage === "filed") && (
+          <StatusCard icon={<CalendarClock />} title="Ready for the next step?" action={<Button asChild size="lg"><Link to="/book">Schedule your appointment</Link></Button>}>
+            Book the appointment Claire suggested. Your details carry over, so it takes about two minutes.
+          </StatusCard>
+        )}
+        {!intro && stage === "wrap_up" && <>
           <StatusCard icon={<Hourglass />} title="Claire is finishing your return.">You'll get an email to review, sign and pay, usually the same day. Nothing to do until then.</StatusCard>
           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-4">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
         </>}
 
         {/* 4. Sign and pay, then done. */}
-        {(stage === "sign_pay" || stage === "to_file" || stage === "filed") && <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} />}
+        {!intro && (stage === "sign_pay" || stage === "to_file" || stage === "filed") && <CloseoutSection token={token} appt={a} onDone={refresh} clientEmail={a.clients?.email ?? ""} />}
 
         {/* Side exits. */}
         {(cancelled || stage === "no_show") && (

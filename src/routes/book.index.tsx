@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { SERVICES } from "@/lib/services";
+import { GROUPS, SERVICES, isIntro, serviceInfo } from "@/lib/services";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -127,7 +127,7 @@ function BookPage() {
               exit={reduce ? { opacity: 0 } : { opacity: 0, x: -8 * dir }}
               transition={{ duration: reduce ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}
             >
-              {step === 0 && <ServiceStep services={services} selected={draft.serviceSlug} onPick={(slug) => { if (slug !== draft.serviceSlug) update({ serviceSlug: slug, slot: undefined, date: undefined }); }} />}
+              {step === 0 && <ServiceStep services={services} selected={draft.serviceSlug} onPick={(slug) => { if (slug !== draft.serviceSlug) update({ serviceSlug: slug, slot: undefined, date: undefined, ...(isIntro(slug) ? { meetingType: "video" as const } : {}) }); }} />}
               {step === 1 && (service
                 ? <TimeStep service={service} draft={draft} update={update} />
                 : <div className="space-y-4"><Skeleton className="h-9 w-2/3" /><Skeleton className="h-24 w-full" /><Skeleton className="h-40 w-full" /></div>)}
@@ -139,7 +139,7 @@ function BookPage() {
             <Button size="lg" className="flex-1 lg:flex-none" type={step === 2 ? "submit" : "button"} form={step === 2 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 2 ? () => go(step + 1) : undefined}>{cta}</Button>
           </div>
         </div>
-        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure which one fits? Pick the closest. Claire adjusts it when she sees your documents, and the price is agreed before any work starts.</p>}</div></aside>
+        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && preview.length > 0 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure which one fits? Pick the closest. Claire adjusts it when she sees your documents, and the price is agreed before any work starts.</p>}</div></aside>
       </div>
     </BookingShell>
   );
@@ -149,47 +149,70 @@ function BookPage() {
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Pick the closest fit. Every price is agreed before work starts, and you pay when your return is filed." />
+       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Pick the closest fit. Every price is agreed before work starts, and nothing is charged when you book." />
        {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
           We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
         </div>
       )}
-       <div className="grid gap-3 sm:grid-cols-2">
-        {services.data?.map((s) => {
+      {(() => {
+        const list = services.data ?? [];
+        const intro = list.find((x) => x.slug === "intro");
+        const card = (s: (typeof list)[number]) => {
           const active = s.slug === selected;
-          return (
-             <button
-              key={s.id}
-              type="button"
-              onClick={() => onPick(s.slug)}
-              aria-pressed={active}
-              className={`flex min-h-36 w-full flex-col rounded-xl border p-5 text-left ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <ServiceIcon service={s.slug} size={40} />
-                <span className={`mt-1 size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] duration-150 ${active ? "border-[6px] border-ink" : "border-line-2 bg-sheet"}`} />
-              </div>
-              <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">{SERVICES.find((x) => x.id === s.slug)?.blurb ?? s.description}</p>
-              <div className="mt-auto flex items-center justify-between pt-4 text-sm">
-                <span className="tabular text-muted-foreground">{s.duration_min} min</span>
-                <span className="text-deep-ink">
-                  {Number(s.price_from) === 0 ? (
-                    <span className="text-base font-semibold">Free</span>
-                  ) : (
-                    <>
-                      {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                      <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
-                    </>
-                  )}
+            return (
+               <button
+                key={s.id}
+                type="button"
+                onClick={() => onPick(s.slug)}
+                aria-pressed={active}
+                className={`flex min-h-36 w-full flex-col rounded-xl border p-5 text-left ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <ServiceIcon service={s.slug} size={40} />
+                  <span className={`mt-1 size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] duration-150 ${active ? "border-[6px] border-ink" : "border-line-2 bg-sheet"}`} />
+                </div>
+                <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
+                <p className="mt-0.5 text-sm text-muted-foreground">{SERVICES.find((x) => x.id === s.slug)?.blurb ?? s.description}</p>
+                <div className="mt-auto flex items-center justify-between pt-4 text-sm">
+                  <span className="tabular text-muted-foreground">{s.duration_min} min</span>
+                  <span className="text-deep-ink">
+                    {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
+                    <span className="tabular text-base font-semibold">{Number(s.price_from) === 0 ? "Free" : `$${Number(s.price_from)}`}</span>
+                  </span>
+                </div>
+               </button>
+            );
+          };
+        return (
+          <>
+            {intro && (
+              <button type="button" onClick={() => onPick(intro.slug)} aria-pressed={intro.slug === selected}
+                className={`mb-8 flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors duration-150 ${intro.slug === selected ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-2 bg-surface-2 hover:border-line-3"}`}>
+                <ServiceIcon service="intro" size={40} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-semibold text-deep-ink">Not sure? Start with a free 15-minute call</span>
+                  <span className="mt-0.5 block text-sm text-muted-foreground">Tell Claire what's going on and she'll point you to the right appointment. No documents needed.</span>
                 </span>
-              </div>
-             </button>
-          );
-        })}
-      </div>
+                <span className="shrink-0 text-sm font-semibold text-deep-ink">Free</span>
+              </button>
+            )}
+            {GROUPS.map((g) => {
+              const items = list.filter((x) => serviceInfo(x.slug)?.group === g.id);
+              if (!items.length) return null;
+              return (
+                <div key={g.id} className="mb-8">
+                  <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2"><h2 className="t-sub">{g.title}</h2><p className="text-xs text-muted-foreground">{g.sub}</p></div>
+                  <div className="grid gap-3 sm:grid-cols-2">{items.map(card)}</div>
+                </div>
+              );
+            })}
+            {/* Anything in the database not described yet still shows, so a new service is never hidden. */}
+            {list.some((x) => !serviceInfo(x.slug)) && <div className="mb-8 grid gap-3 sm:grid-cols-2">{list.filter((x) => !serviceInfo(x.slug)).map(card)}</div>}
+          </>
+        );
+      })()}
       <p className="mt-6 text-sm text-muted-foreground">Already have an appointment? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Find it here</Link></p>
     </>
   );
@@ -267,8 +290,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
   return (
     <>
         <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes, with Claire. All times are Eastern; you can move or cancel later from your link.`} />
-      <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
-        options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />
+      {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">A 15-minute video call. Add your phone number on the next step if you would rather talk by phone.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
+        options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />}
 
        {q.isLoading && <div className="space-y-6"><div className="flex gap-1 overflow-hidden">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[72px] shrink-0 rounded-lg" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-8 rounded-lg" />)}</div></div>}
       {(q.isError || q.data?.error) && (
@@ -370,9 +393,9 @@ function BookingSummary({ service, draft, onPickAgain }: { service: Service; dra
   const rows: [string, string][] = [
     ["Service", service.name],
     ["When", draft.slot ? `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}` : "Pick a time"],
-    ["Where", draft.meetingType === "video" ? "Video call" : "412 Bloomfield Ave, Montclair"],
+    ["Where", isIntro(service.slug) ? "Video call, or phone" : draft.meetingType === "video" ? "Video call" : "412 Bloomfield Ave, Montclair"],
     ["Length", `${service.duration_min} minutes`],
-    ["Fee", Number(service.price_from) === 0 ? "Free" : `${service.is_from_price ? "From " : ""}$${service.price_from}, paid when your return is filed`],
+    ["Fee", Number(service.price_from) === 0 ? "Free" : `${service.is_from_price ? "From " : ""}$${service.price_from}, paid when the work is done`],
   ];
   return (
     <div className="overflow-hidden rounded-xl border border-line-2 bg-sheet">
@@ -411,7 +434,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
     try {
       const r = await book({ data: {
         serviceId: service.id, start: slot, name: draft.name.trim(), email: draft.email.trim(),
-        phone: draft.phone.trim() || undefined, meetingType: draft.meetingType, intake: toIntakePayload(service.slug, draft.answers),
+        phone: draft.phone.trim() || undefined, meetingType: isIntro(service.slug) ? "video" : draft.meetingType, intake: toIntakePayload(service.slug, draft.answers),
       } });
       if (r.ok) {
         clearDraft();
@@ -472,8 +495,8 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
           <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed instantly, nothing to pay now. We never ask for your Social Security number online.
         </p>
       </form>
-      <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />
-      <div className="mt-6 lg:hidden"><ChecklistPreview docs={previewChecklist(service.slug, draft.answers)} complete={questionsFor(service.slug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean")} /></div>
+      {questionsFor(service.slug).length > 0 && <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />}
+      {previewChecklist(service.slug, draft.answers).length > 0 && <div className="mt-6 lg:hidden"><ChecklistPreview docs={previewChecklist(service.slug, draft.answers)} complete={questionsFor(service.slug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean")} /></div>}
     </>
   );
 }

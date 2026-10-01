@@ -117,6 +117,8 @@ export async function runAutomations(origin: string) {
     .in("status", ["booked", "confirmed"]).gt("start_at", iso(t)).lte("start_at", iso(t + Math.max(docsD * D, readyH * H))).order("start_at");
 
   for (const a of (up ?? []) as Appt[]) {
+    // The free intro call has no documents: no document reminders, no readiness check.
+    const intro = (a as Appt & { services?: { slug?: string } | null }).services?.slug === "intro";
     if (!a.clients) continue;
     const c = a.clients;
     const until = new Date(a.start_at).getTime() - t;
@@ -128,7 +130,7 @@ export async function runAutomations(origin: string) {
     await sendBookingConfirmation(a.id, origin);
 
     // 7 days before: missing docs (skip if booked within the last 12h — they just got their list)
-    if (until > readyH * H && until <= docsD * D && t - new Date(a.created_at).getTime() > 12 * H) {
+    if (!intro && until > readyH * H && until <= docsD * D && t - new Date(a.created_at).getTime() > 12 * H) {
       const { missing } = await missingDocs(a.id);
       if (missing.length) {
         hit("docs_reminder_7d", await sendMessage({
@@ -146,7 +148,7 @@ export async function runAutomations(origin: string) {
     }
 
     // 48 hours before: readiness check
-    if (until <= readyH * H && until > finalH * H) {
+    if (!intro && until <= readyH * H && until > finalH * H) {
       if (a.ready_score < 70) {
         const { data: slots } = await s.rpc("available_slots", {
           _service_id: a.service_id, _from: a.start_at.slice(0, 10), _to: iso(new Date(a.start_at).getTime() + 21 * D).slice(0, 10), _now: now.toISOString(),

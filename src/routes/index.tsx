@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock } from "lucide-react";
+import { Check, FileText, KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ReadyRing } from "@/components/brand/ReadyRing";
 import { HeroVisual } from "@/components/site/HeroVisual";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
-import { SERVICES } from "@/lib/services";
+import { GROUPS, SERVICES } from "@/lib/services";
 import { serviceStyle } from "@/lib/service-style";
 import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import claire from "@/assets/claire-portrait.jpg";
@@ -278,41 +278,50 @@ function BeforeAfter() {
 }
 
 function Services() {
+  const intro = SERVICES.find((x) => x.group === "start")!;
+  const price = (x: (typeof SERVICES)[number]) => (x.price === 0 ? "Free" : `${x.from ? "from " : ""}$${x.price}`);
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="What Claire can do for you." sub="Each price is agreed before any work starts, and you pay when your return is filed. Federal and New Jersey returns are included; a New York return too if you work in the city." />
-      <ul className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border">
-        {SERVICES.map((s) => {
-          const st = serviceStyle(s.id);
-          const Icon = st.icon;
-          return (
-            <li key={s.id} className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-4 bg-sheet px-4 py-4 transition-colors duration-150 hover:bg-surface-2 sm:grid-cols-[40px_minmax(0,1fr)_90px_110px_auto] sm:px-5">
-              <span className="grid size-10 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${st.rgb},0.1)` }}>
-                <Icon className="size-5" strokeWidth={1.75} style={{ color: `rgb(${st.rgb})` }} />
-              </span>
-              <div className="min-w-0">
-                <h3 className="text-[15px] font-medium leading-6 text-deep-ink">{s.name}</h3>
-                <p className="text-sm text-muted-foreground">{s.blurb}<span className="sm:hidden">, {s.minutes} min</span></p>
-              </div>
-              <p className="tabular hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><Clock className="size-3.5" />{s.minutes} min</p>
-              <p className="hidden whitespace-nowrap text-right text-deep-ink sm:block">
-                {s.price === 0 ? (
-                  <span className="text-lg font-semibold">Free</span>
-                ) : (
-                  <>
-                    {s.from && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                    <span className="tabular text-lg font-semibold">${s.price}</span>
-                  </>
-                )}
-              </p>
-              <div className="flex flex-col items-end gap-1">
-                <span className="tabular text-sm font-semibold text-deep-ink sm:hidden">{s.price === 0 ? "Free" : `${s.from ? "from " : ""}$${s.price}`}</span>
-                <Button asChild size="sm" variant="secondary"><Link to="/book" search={{ service: s.id }}>Schedule</Link></Button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <SectionHead title="What Claire can do for you." sub="Every price is agreed before any work starts and paid when the work is done. Nothing is charged when you book." />
+
+      <Link to="/book" search={{ service: intro.id }} className="group mt-8 flex flex-col gap-4 rounded-xl border border-line-2 bg-ink-50 p-5 transition-colors duration-150 hover:border-ink sm:flex-row sm:items-center sm:justify-between">
+        <span className="flex items-start gap-4">
+          <ServiceIcon service={intro.id} size={40} />
+          <span>
+            <span className="block text-[17px] font-semibold text-deep-ink">Not sure what you need? Start with a free 15-minute call.</span>
+            <span className="mt-1 block text-sm text-muted-foreground">{intro.includes}</span>
+          </span>
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-ink">Book a free call<ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" /></span>
+      </Link>
+
+      <div className="mt-10 space-y-10">
+        {GROUPS.map((g) => (
+          <div key={g.id}>
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="t-sub">{g.title}</h3>
+              <p className="text-sm text-muted-foreground">{g.sub}</p>
+            </div>
+            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border">
+              {SERVICES.filter((x) => x.group === g.id).map((x) => (
+                <li key={x.id} className="grid grid-cols-[40px_minmax(0,1fr)] gap-x-4 gap-y-3 bg-sheet px-4 py-4 sm:grid-cols-[40px_minmax(0,1fr)_150px_auto] sm:items-center">
+                  <ServiceIcon service={x.id} size={40} />
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-medium leading-6 text-deep-ink">{x.name}</p>
+                    <p className="text-sm text-muted-foreground">{x.blurb}</p>
+                    {x.includes && <p className="mt-1 text-xs text-muted-foreground"><span className="font-medium text-deep-ink">Includes: </span>{x.includes}</p>}
+                  </div>
+                  <div className="col-start-2 sm:col-start-auto sm:text-right">
+                    <p className="tabular text-deep-ink"><span className="text-lg font-semibold">{price(x)}</span></p>
+                    <p className="tabular text-xs text-muted-foreground">{x.minutes} min{x.note ? ` · ${x.note}` : ""}</p>
+                  </div>
+                  <div className="col-start-2 sm:col-start-auto"><Button asChild size="sm" variant="secondary"><Link to="/book" search={{ service: x.id }}>Schedule</Link></Button></div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

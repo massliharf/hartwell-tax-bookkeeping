@@ -112,7 +112,13 @@ function ConfirmedPage() {
           </div>
         </div>
 
-        {pending ? (
+        {items.length === 0 && !pending ? (
+          <div className="mt-6 rounded-xl border border-line-2 bg-sheet p-5 sm:p-6">
+            <p className="t-card text-deep-ink">What happens next</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Claire starts the video call at your time; the link is on your appointment page and in the reminder the day before. Nothing to prepare. Have your questions ready.</p>
+            <Button asChild size="lg" variant="secondary" className="mt-5"><Link to="/a/$token" params={{ token: token! }}>Open your appointment</Link></Button>
+          </div>
+        ) : pending ? (
         <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
           <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more minute, and you're ready</p>
           <div className="p-5 sm:p-6">

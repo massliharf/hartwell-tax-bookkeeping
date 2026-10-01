@@ -11,12 +11,19 @@ export type Stage = "documents" | "ready" | "meeting" | "wrap_up" | "sign_pay" |
 export type LifecycleAppt = {
   status: string; start_at: string; end_at: string; ready_score: number;
   signature_status: string; paid_at: string | null; filed_at: string | null; finished_at?: string | null;
+  services?: { slug?: string | null } | null;
 };
+
+/** The free intro call has no documents, fee or filing: booked, the call, done. */
+export const isIntroAppt = (a: { services?: { slug?: string | null } | null }) => a.services?.slug === "intro";
+export const INTRO_STEPS = ["Booked", "Call", "Done"] as const;
+export const introStepOf = (s: Stage) => (s === "filed" ? 3 : s === "wrap_up" ? 2 : 1);
 
 export function stageOf(a: LifecycleAppt, nowIso: string): Stage {
   if (a.status === "cancelled") return "cancelled";
   if (a.status === "no_show") return "no_show";
   if (a.filed_at) return "filed";
+  if (a.status === "completed" && isIntroAppt(a)) return "filed";
   if (a.status === "completed") return a.signature_status === "signed" && a.paid_at ? "to_file" : "sign_pay";
   const now = Date.parse(nowIso), start = Date.parse(a.start_at), end = Date.parse(a.end_at);
   if (now >= end) return "wrap_up";

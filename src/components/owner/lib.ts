@@ -47,12 +47,12 @@ export type Appt = {
   id: string; start_at: string; end_at: string; status: string; meeting_type: "in_person" | "video"; ready_score: number; manage_token?: string; created_at?: string; signed_at?: string | null; intake_answers?: Record<string, unknown> | null;
   signature_status: string; needs_attention: boolean; attention_reason: string | null; client_id: string; service_id: string;
   clients: { id: string; name: string; email: string; phone: string | null } | null;
-  services: { name: string; duration_min: number; price_from: number } | null;
+  services: { name: string; slug?: string; duration_min: number; price_from: number } | null;
   fee_cents: number | null; paid_at: string | null; paid_method: string | null; filed_at: string | null; finished_at: string | null;
   checklist_items: Item[];
 };
 export const APPT_SELECT =
-  "id, manage_token, created_at, signed_at, intake_answers, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, fee_cents, paid_at, paid_method, filed_at, finished_at, clients(id, name, email, phone), services(name, duration_min, price_from), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order, ai_check, ai_note, review_status, fix_reason, fix_note)";
+  "id, manage_token, created_at, signed_at, intake_answers, start_at, end_at, status, meeting_type, ready_score, signature_status, needs_attention, attention_reason, client_id, service_id, fee_cents, paid_at, paid_method, filed_at, finished_at, clients(id, name, email, phone), services(name, slug, duration_min, price_from), checklist_items(id, document_name, required, status, file_path, uploaded_at, na_reason, sort_order, ai_check, ai_note, review_status, fix_reason, fix_note)";
 
 export const toReview = (a: Appt) => a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok");
 export const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;

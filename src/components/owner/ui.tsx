@@ -16,7 +16,7 @@ import { fmtDay, fmtLong, fmtStamp, fmtTime, missingOf, money, type Appt, type I
 import { useApptPanel } from "./drawer-context";
 import { cn } from "@/lib/utils";
 import { useOwnerCtx } from "./ctx";
-import { stageOf } from "@/lib/lifecycle";
+import { isIntroAppt, stageOf } from "@/lib/lifecycle";
 
 export function PageHead({ title, meta, actions, children }: { eyebrow?: string; title: ReactNode; meta?: ReactNode; actions?: ReactNode; children?: ReactNode }) {
   return (
@@ -102,6 +102,7 @@ export function Readiness({ value }: { value: number }) {
 export function AppointmentStage({ a }: { a: Appt }) {
   const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const st = stageOf(a, now);
+  if (isIntroAppt(a)) return st === "filed" ? <Tag tone="success">Done</Tag> : st === "meeting" ? <Tag tone="accent">Now</Tag> : st === "wrap_up" ? <Tag tone="warning">Mark done</Tag> : <Tag>Free call</Tag>;
   if (st === "documents" || st === "ready") return <Readiness value={a.ready_score} />;
   if (st === "meeting") return <Tag tone="accent">Now</Tag>;
   if (st === "wrap_up") return <Tag tone="warning">Finish up</Tag>;

@@ -366,3 +366,23 @@ export const bookFollowUpMeeting = createServerFn({ method: "POST" }).middleware
     });
     return { ok: true, message: `Follow-up booked for ${when(data.start)}. ${firstName(c.name)} has been emailed.` };
   });
+
+/** The free intro call is over: close it without a fee, signature or filing, and send the client a link to schedule. */
+export const completeIntroCall = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d) => idSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { db, a, c, origin, sendMessage, now } = await followAppt(context, data.id);
+    if (!a || !c || !["booked", "confirmed"].includes(a.status)) return { ok: false };
+    const { error } = await db.from("appointments").update({ status: "completed", finished_at: now.toISOString(), fee_cents: null, needs_attention: false, attention_reason: null }).eq("id", a.id);
+    if (error) return { ok: false };
+    await sendMessage({
+      dedupeKey: `intro-done:${a.id}`, type: "new_season", minutesSaved: 4, clientId: c.id, appointmentId: a.id, to: c.email,
+      subject: "Thanks for talking with Claire", heading: "Ready for the next step?",
+      blocks: [
+        { p: `Hi ${firstName(c.name)}, thanks for the call. When you're ready, schedule the appointment Claire suggested. It takes about two minutes, and you'll get a list of exactly what to bring.` },
+        { button: { label: "Schedule your appointment", href: `${origin}/book` } },
+      ],
+      sms: `Hartwell Tax: thanks for the call. Schedule your appointment here: ${origin}/book`,
+    });
+    return { ok: true };
+  });

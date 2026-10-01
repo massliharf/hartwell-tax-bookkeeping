@@ -9,7 +9,9 @@ import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
 import { FollowUps, MeetingPicker, MoreActions, RequestDocument } from "./follow-ups";
 import { NowBanner } from "./now";
-import { STEPS, meetingAhead, stageOf, stepOf } from "@/lib/lifecycle";
+import { useOwnerMutation } from "./closeout";
+import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, stepOf } from "@/lib/lifecycle";
+import { completeIntroCall } from "@/lib/owner.functions";
 import { useOwnerCtx } from "./ctx";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -47,6 +49,8 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const [picking, setPicking] = useState<"move" | "follow_up" | null>(null);
   const now = useOwnerCtx().data?.now ?? new Date().toISOString();
   const [accepting, setAccepting] = useState(false);
+  const completeIntro = useServerFn(completeIntroCall);
+  const introDone = useOwnerMutation((id: string) => completeIntro({ data: { id } }), "Call marked done.");
   const review = useServerFn(reviewDocument);
   const qc = useQueryClient();
   const q = useQuery({
@@ -64,6 +68,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const items = [...a.checklist_items].sort((x, y) => x.sort_order - y.sort_order);
   const stage = stageOf(a, now);
   const finished = stage === "sign_pay" || stage === "to_file" || stage === "filed";
+  const intro = isIntroAppt(a);
   const missing = missingOf(a).length;
   const eyesCount = a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length;
   const looksRight = items.filter(i => i.status === "uploaded" && i.review_status === "pending" && i.ai_check === "ok");
@@ -93,7 +98,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
             {a.clients && <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose} className="inline-flex items-center gap-0.5 font-medium text-deep-ink hover:underline">{a.clients.name}<ChevronRight className="size-3.5" /></Link>}
           </DialogDescription>
         </div>
-        {stage !== "cancelled" && <Stepper steps={STEPS} current={stepOf(stage)} className="mt-5" />}
+        {stage !== "cancelled" && (intro ? <Stepper steps={INTRO_STEPS} current={introStepOf(stage)} className="mt-5" /> : <Stepper steps={STEPS} current={stepOf(stage)} className="mt-5" />)}
         {/* 2. Whose move it is, with the one action that moves it forward (control). */}
         <NowBanner a={a} nowIso={now} className="mt-4" action={
           // Stage actions (Finish, Reschedule) live in the footer; the banner only carries a decision the footer doesn't.
@@ -103,7 +108,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
       <div className={expanded ? "grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:divide-x lg:divide-border" : ""}>
       <div className="min-w-0">
       {/* 3. Documents: summary, then the list; row actions only where a decision is needed. */}
-      <section className="px-6 py-5">
+      {intro ? <section className="px-6 py-5"><h3 className="t-sub">Free 15-minute call</h3><p className="mt-1 text-sm text-muted-foreground">No documents for this one. After the call, mark it done; {a.clients?.name.split(" ")[0] ?? "the client"} gets a link to schedule the appointment you suggested.</p></section> : <section className="px-6 py-5">
         <DocsWrap collapsed={finished} count={items.filter((i) => i.status === "uploaded").length}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -148,7 +153,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
         })()}
         </DocsWrap>
         <ReviewGallery open={gallery} onOpenChange={setGallery} title={a.clients?.name ?? "Client"} items={items} onAcceptAll={acceptAll} accepting={accepting} />
-      </section>
+      </section>}
       </div>
       <div className="min-w-0">
       <CloseoutBlock a={a} />
@@ -165,11 +170,12 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
                 {meetingAhead(stage) && <>
                   <Button variant="secondary" className="sm:col-span-2" onClick={() => setPicking("move")}>Reschedule</Button>
                 </>}
-                {(stage === "meeting" || stage === "wrap_up") && <>
+                {intro && (stage === "meeting" || stage === "wrap_up") && <Button className="sm:col-span-2" disabled={introDone.isPending} onClick={() => introDone.mutate(a.id)}>{introDone.isPending ? "Saving…" : "Mark call done"}</Button>}
+                {!intro && (stage === "meeting" || stage === "wrap_up") && <>
                   <Button onClick={() => setFinishing(true)}>Finish appointment</Button>
                   <Button variant="secondary" onClick={() => setPicking("follow_up")}>Needs another meeting</Button>
                 </>}
-                {(finished || stage === "cancelled" || stage === "no_show") && <p className="text-xs text-muted-foreground sm:col-span-2">{stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed above when it's submitted." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
+                {(finished || stage === "cancelled" || stage === "no_show") && <p className="text-xs text-muted-foreground sm:col-span-2">{intro && stage === "filed" ? "Call done." : stage === "filed" ? "Return filed. Nothing left to do." : stage === "to_file" ? "Signed and paid. Mark it filed above when it's submitted." : stage === "sign_pay" ? "Waiting for the client to sign and pay." : stage === "no_show" ? "Marked as a no-show." : "This appointment was cancelled."}</p>}
               </div>
               <MoreActions a={a} onClosed={onClose} canNoShow={stage === "meeting" || stage === "wrap_up"} />
             </div>

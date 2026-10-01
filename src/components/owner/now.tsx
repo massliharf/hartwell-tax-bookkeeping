@@ -1,5 +1,5 @@
 import { Tag } from "@/components/ui/tag";
-import { stageOf } from "@/lib/lifecycle";
+import { isIntroAppt, stageOf } from "@/lib/lifecycle";
 import { fmtDay, missingOf, money, type Appt } from "./lib";
 
 type Turn = "you" | "client" | "auto" | "done";
@@ -17,6 +17,12 @@ export function nowOf(a: Appt, nowIso: string): { turn: Turn; text: string } {
   const missing = missingOf(a).length;
   const eyes = a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length;
   if (st === "cancelled") return { turn: "done", text: "Cancelled. The time was offered to the waitlist." };
+  if (isIntroAppt(a)) {
+    if (st === "filed") return { turn: "done", text: "Call done." };
+    if (st === "wrap_up") return { turn: "you", text: "The call is over. Mark it done." };
+    if (st === "meeting") return { turn: "you", text: `Free call with ${first} is now.` };
+    return { turn: "auto", text: "Free 15-minute call. The reminder goes out the day before; no documents needed." };
+  }
   if (st === "no_show") return { turn: "done", text: `${first} didn't come. You can send a rebooking link from the … menu.` };
   if (st === "filed") return { turn: "done", text: `Filed ${fmtDay(a.filed_at!)}. ${first} was emailed.` };
   if (st === "to_file") return { turn: "you", text: `Signed and paid. File the return, then mark it filed.` };

@@ -27,8 +27,11 @@ const BY_SERVICE: Record<string, (keyof typeof Q)[]> = {
   individual: ["w2_count", "mortgage", "student_loans", "dependents", "filed_with_us"],
   "self-employed": ["w2_count", "mortgage", "dependents", "filed_with_us"],
   rental: ["w2_count", "mortgage", "filed_with_us"],
-  extension: ["w2_count", "freelance", "irs_letter", "filed_with_us"],
+  extension: ["w2_count", "freelance", "filed_with_us"],
+  letter: ["filed_with_us"],
+  planning: ["w2_count", "freelance", "filed_with_us"],
   bookkeeping: ["w2_count", "interest", "filed_with_us"],
+  intro: [],
 };
 
 export const questionsFor = (slug?: string | null): Question[] => (BY_SERVICE[slug ?? ""] ?? BY_SERVICE["individual"]!).map((k) => Q[k]!);
@@ -44,6 +47,7 @@ const employerLabels = (n: number) => (n <= 1 ? (n === 1 ? ["your employer"] : [
 export type PreviewDoc = { id: string; title: string; note: string };
 
 export function previewChecklist(slug: string | null | undefined, answers: Answers): PreviewDoc[] {
+  if (slug === "intro") return [];
   const a = { ...answers, ...impliedFlags(slug) };
   const docs: PreviewDoc[] = [{ id: "id", title: "Photo ID", note: "A clear phone photo is fine" }];
   if (a.filed_with_us === false) docs.push({ id: "prior", title: "Last year's tax return", note: "Federal and state" });
@@ -61,10 +65,12 @@ export function previewChecklist(slug: string | null | undefined, answers: Answe
     docs.push({ id: "rent", title: "Rental income & expenses", note: "Rent, repairs, insurance" });
     docs.push({ id: "ptax", title: "Property tax bill", note: "For the rental" });
   }
-  if (slug === "extension") {
-    docs.push({ id: "irs", title: "The IRS letter", note: "Every page" });
-    if (a.filed_with_us !== false) docs.push({ id: "prior2", title: "Prior year return", note: "The one in question" });
+  if (slug === "letter") {
+    docs.push({ id: "letter", title: "The letter", note: "Every page, front and back" });
+    docs.push({ id: "letter-ret", title: "The return the letter is about", note: "If you have it" });
   }
+  if (slug === "extension") docs.push({ id: "years", title: "Income documents for each year you need to file", note: "W-2s and 1099s for those years" });
+  if (slug === "planning") docs.push({ id: "ytd", title: "Year-to-date income and expenses", note: "Pay stubs, invoices or a summary" });
   return docs;
 }
 

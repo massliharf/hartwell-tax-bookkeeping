@@ -19,7 +19,7 @@ function AskPage() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="mx-auto w-full max-w-2xl px-5 py-12 sm:py-16">
-        <h1 className="font-display text-[32px] font-semibold leading-tight tracking-tight text-deep-ink sm:text-[40px]">Ask a question.</h1>
+        <h1 className="t-page text-deep-ink">Ask a question.</h1>
         <p className="mt-3 text-[15px] leading-6 text-body">Questions about prices, hours or how it works get an answer right away. Anything about your own taxes goes straight to Claire, and she replies by email.</p>
         <AskForm className="mt-8" />
       </main>

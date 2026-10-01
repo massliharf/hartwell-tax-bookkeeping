@@ -51,7 +51,8 @@ function Insights() {
   const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
 
   const minutes30 = msgs.filter((x) => in30(x.sent_at)).reduce((s, x) => s + x.minutes_saved, 0);
-  const hours30 = Math.round(minutes30 / 60);
+  // Same rounding as the Today strip (one decimal), so the two never disagree.
+  const hours30 = Math.round((minutes30 / 60) * 10) / 10;
 
   const held = appts.filter((x) => (x.status === "completed" || x.status === "no_show") && new Date(x.start_at).getTime() <= t);
   const completed = held.filter((x) => x.status === "completed");

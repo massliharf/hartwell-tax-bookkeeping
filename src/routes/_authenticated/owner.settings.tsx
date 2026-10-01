@@ -107,8 +107,8 @@ function SettingsPage() {
             {svcs.map((s, i) => {
               const set = (p: Partial<Svc>) => setSvcs(svcs.map((x, j) => (j === i ? { ...x, ...p } : x)));
               return (
-                <div key={s.id} className="grid grid-cols-2 items-center gap-3 rounded-xl border border-border bg-paper p-3 sm:grid-cols-[1fr_110px_110px_auto]">
-                  <Input value={s.name} onChange={(e) => set({ name: e.target.value })} className="col-span-2 bg-sheet sm:col-span-1" aria-label="Service name" />
+                <div key={s.id} className="grid grid-cols-2 items-center gap-3 rounded-xl border border-border bg-paper p-3 sm:grid-cols-[120px_120px_1fr]">
+                  <Input value={s.name} onChange={(e) => set({ name: e.target.value })} className="col-span-2 bg-sheet sm:col-span-3" aria-label="Service name" />
                   <label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Input type="number" min={15} step={15} value={s.duration_min} onChange={(e) => set({ duration_min: Number(e.target.value) })} className="bg-sheet" aria-label="Minutes" />min</label>
                   <label className="flex items-center gap-1.5 text-xs text-muted-foreground">$<Input type="number" min={0} step={5} value={s.price_from} onChange={(e) => set({ price_from: Number(e.target.value) })} className="bg-sheet" aria-label="Price" /></label>
                   <label className="flex items-center gap-2 text-xs text-muted-foreground"><Switch checked={s.active} onCheckedChange={(v) => set({ active: v })} aria-label={`${s.name} bookable`} />Bookable</label>

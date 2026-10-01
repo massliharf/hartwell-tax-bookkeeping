@@ -35,8 +35,6 @@ export const Route = createFileRoute("/book/")({
 });
 
 type Service = { id: string; name: string; slug: string; duration_min: number; price_from: number; is_from_price: boolean; description: string | null };
-/** "Thursday 1:00 PM" for the confirm button. */
-const fmtWhen = (iso?: string) => (iso ? `${new Date(iso).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" })}, ${fmtTime(iso)}` : "this time");
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 const nyDay = (iso: string) => {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(iso));
@@ -108,9 +106,11 @@ function BookPage() {
   const questionsComplete = intakeComplete(draft.serviceSlug, draft.answers);
   const preview = previewChecklist(draft.serviceSlug, draft.answers);
   const canContinue = step === 0 ? !!service : step === 1 ? slotOk : detailsComplete && questionsComplete && slotOk && !bookingBusy;
-  const cta = step === 0 ? (service ? `Continue with ${service.name}` : "Choose what you need")
-    : step === 1 ? (draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time to continue")
-    : bookingBusy ? "Confirming…" : !questionsComplete ? "Answer the questions to confirm" : `Confirm ${fmtWhen(draft.slot)}`;
+  // Short enough to fit a phone's sticky footer; the selection itself is visible on the page.
+  const short = (iso?: string) => (iso ? `${new Date(iso).toLocaleDateString("en-US", { weekday: "short", timeZone: "America/New_York" })} ${fmtTime(iso)}` : "");
+  const cta = step === 0 ? (service ? "Continue" : "Choose a service")
+    : step === 1 ? (draft.slot ? `Continue with ${fmtTime(draft.slot)}` : "Pick a time")
+    : bookingBusy ? "Confirming…" : !questionsComplete ? "Answer the questions" : `Confirm ${short(draft.slot)}`;
 
   if (!loaded) {
      return <BookingShell step={0}><div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]"><div><Skeleton className="h-10 w-3/4" /><Skeleton className="mt-3 h-5 w-2/3" /><div className="mt-14 grid gap-5 sm:grid-cols-2">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div></div><div className="hidden lg:block"><Skeleton className="h-48 rounded-2xl" /></div></div></BookingShell>;
@@ -137,7 +137,7 @@ function BookPage() {
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button size="lg" className="flex-1 lg:flex-none" type={step === 2 ? "submit" : "button"} form={step === 2 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 2 ? () => go(step + 1) : undefined}>{cta}</Button>
+            <Button size="lg" className="min-w-0 flex-1 truncate lg:flex-none" type={step === 2 ? "submit" : "button"} form={step === 2 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 2 ? () => go(step + 1) : undefined}>{cta}</Button>
           </div>
         </div>
         <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && preview.length > 0 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure? Pick the closest. We adjust it when we see your documents, and agree the price before we start.</p>}</div></aside>

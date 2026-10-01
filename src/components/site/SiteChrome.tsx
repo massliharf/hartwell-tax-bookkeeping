@@ -69,7 +69,7 @@ export function SiteFooter() {
             <li><Link to="/book" className="inline-flex min-h-10 items-center hover:text-white">Schedule an appointment</Link></li>
             <li><Link to="/book/returning" className="inline-flex min-h-10 items-center hover:text-white">My appointment</Link></li>
             <li><a href="/#services" className="inline-flex min-h-10 items-center hover:text-white">Services and prices</a></li>
-            <li><a href="/#faq" className="inline-flex min-h-10 items-center hover:text-white">FAQ</a></li>
+            <li><a href="/#faq" className="inline-flex min-h-10 min-w-10 items-center hover:text-white">FAQ</a></li>
           </ul>
         </div>
         <div className="flex flex-col text-sm">

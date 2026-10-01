@@ -557,7 +557,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
   );
   if (signed && paid) return (
     <section className="rounded-2xl border border-success/30 bg-sheet p-6">
-      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">All done. Claire will file your return today.</h2></div>
+      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">All done. We'll file your return today.</h2></div>
       <p className="mt-3 text-sm text-deep-ink/75">Signed and paid ({money(appt.fee_cents!)}). You'll get an email once it's filed.</p>
     </section>
   );
@@ -631,7 +631,7 @@ function SignSection({ token, appt, onDone, embedded = false }: { token: string;
           <Input id="sig" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder={appt.clients?.name ?? ""} className="mt-1.5 h-12 bg-sheet text-lg" />
         </div>
         <label className="flex items-start gap-3 text-sm text-deep-ink/80">
-          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" aria-label="I authorize Claire to e-file my return" />
+          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5 size-5" aria-label="I authorize Claire to e-file my return" />
           I've reviewed my return with Claire and authorize her to file it electronically. Typing my name counts as my signature.
         </label>
         {err && <p className="text-sm text-destructive">We couldn't save your signature. Please try again.</p>}

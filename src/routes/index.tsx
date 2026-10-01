@@ -3,6 +3,7 @@ import { KeyRound, Lock, ShieldCheck, Trash2, Video, MapPin, Clock, ArrowRight }
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HeroVisual } from "@/components/site/HeroVisual";
+import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { GROUPS, SERVICES } from "@/lib/services";
 import claire from "@/assets/claire-portrait.jpg";
@@ -148,7 +149,8 @@ function Services() {
             <ul className="mt-3 divide-y divide-line-1 border-y border-line-1">
               {SERVICES.filter((x) => x.group === g.id).map((x) => (
                 <li key={x.id}>
-                  <Link to="/book" search={{ service: x.id }} className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 py-4">
+                  <Link to="/book" search={{ service: x.id }} className="group grid grid-cols-[32px_minmax(0,1fr)_auto] items-start gap-x-3 py-4">
+                    <ServiceIcon service={x.id} size={32} />
                     <span className="min-w-0">
                       <span className="block text-[15px] font-medium text-deep-ink group-hover:underline group-hover:underline-offset-4">{x.name}</span>
                       <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">{x.blurb}</span>
@@ -166,7 +168,7 @@ function Services() {
         ))}
       </div>
       <Link to="/book" search={{ service: "intro" }} className="group mt-10 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-ink-50 px-5 py-4">
-        <span className="text-[15px] text-deep-ink"><span className="font-semibold">Not sure which one?</span> Book a free 15-minute call with Claire.</span>
+        <span className="flex items-center gap-3 text-[15px] text-deep-ink"><ServiceIcon service="intro" size={32} /><span><span className="font-semibold">Not sure which one?</span> Book a free 15-minute call with Claire.</span></span>
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">Book a free call<ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" /></span>
       </Link>
     </section>

@@ -292,7 +292,7 @@ function Faq() {
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-line-1 last:border-b-0">
             <AccordionTrigger className="py-4 text-left text-[15px] font-medium text-deep-ink hover:no-underline">{x.q}</AccordionTrigger>
-            <AccordionContent className="pb-0 text-sm leading-[22px] text-body">{x.a}</AccordionContent>
+            <AccordionContent className="pb-5 text-sm leading-[22px] text-body">{x.a}</AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>

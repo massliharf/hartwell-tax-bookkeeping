@@ -1,4 +1,4 @@
-import { LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
 export type PreviewBlock = { p: string } | { list: string[] } | { button: { label: string; href?: string } } | { note: string };
@@ -27,8 +27,7 @@ export function EmailCard({ heading, blocks, compact = false, className }: { hea
   return (
     <div className={cn("bg-canvas", compact ? "px-3 py-4" : "rounded-xl p-4", className)}>
       <div className="mb-3 flex items-center gap-2 px-1">
-        <LogoMark size={20} />
-        <span className="text-[12px] font-semibold text-deep-ink">Hartwell <span className="font-normal text-muted-foreground">Tax &amp; Bookkeeping</span></span>
+        <Logo size={24} sub="Tax & Bookkeeping" />
       </div>
       <div className={cn("rounded-2xl border border-line-0 bg-white", compact ? "p-4" : "p-5")}>
         <p className={cn("font-serif font-semibold leading-tight tracking-[-0.01em] text-deep-ink", compact ? "text-[18px]" : "text-[20px]")}>{heading}</p>

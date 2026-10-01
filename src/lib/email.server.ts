@@ -1,5 +1,4 @@
-// Email + SMS delivery with a single log in `messages`. Every send is claimed
-// first via a unique dedupe_key, so the same message can never go out twice.
+/** Brand email (DESIGN_SYSTEM v2): canvas grey, white card, Hartwell blue buttons, logo tile. Table layout for mail clients. */
 import type { Database } from "@/integrations/supabase/types";
 import { OFFICE_EMAIL, OFFICE_EMAIL_HREF } from "./meeting";
 
@@ -16,6 +15,10 @@ export const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encode
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
+/** The Hartwell Seal as a base64 SVG for email clients that support it, or simplified VML/HTML for those that don't. */
+const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#1C1714"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="1.4 1.6"/><path d="M11.4 10v12M20.6 10v12" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/><path d="M11.4 15.3h9.2M11.4 17.6h9.2" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+const LOGO_DATA = `data:image/svg+xml;base64,${Buffer.from(LOGO_SVG).toString("base64")}`;
+
 export type Block =
   | { p: string }
   | { list: string[] }
@@ -23,7 +26,6 @@ export type Block =
   | { buttons: { label: string; href: string }[] }
   | { note: string };
 
-/** Brand email (DESIGN_SYSTEM v2): canvas grey, white card, Hartwell blue buttons, logo tile. Table layout for mail clients. */
 export function renderEmail(heading: string, blocks: Block[]) {
   const body = blocks.map((b) => {
     if ("p" in b) return `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#353535">${esc(b.p)}</p>`;
@@ -38,11 +40,11 @@ export function renderEmail(heading: string, blocks: Block[]) {
 <table role="presentation" width="100%" style="background:#F4F3EF"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:520px">
 <tr><td style="padding:0 4px 16px"><table role="presentation"><tr>
-<td style="width:28px;height:28px;background:#1C1714;border-radius:50%;text-align:center;vertical-align:middle;color:#FFFFFF;font-weight:700;font-size:15px;line-height:28px">H</td>
+<td style="width:28px;height:28px;vertical-align:middle"><img src="${LOGO_DATA}" width="28" height="28" alt="" style="display:block;border:0"></td>
 <td style="padding-left:10px;font-size:15px;font-weight:600;color:#1A1A1A">Hartwell <span style="font-weight:400;color:#737373">Tax &amp; Bookkeeping</span></td>
 </tr></table></td></tr>
 <tr><td style="background:#FFFFFF;border:1px solid rgba(16,16,16,0.06);border-radius:16px;padding:32px 28px">
-<h1 style="margin:0 0 18px;font-family:"Bricolage Grotesque",Geist,Helvetica,Arial,sans-serif;font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-0.01em;color:#1A1A1A">${esc(heading)}</h1>
+<h1 style="margin:0 0 18px;font-family:Helvetica,Arial,sans-serif;font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-0.01em;color:#1A1A1A">${esc(heading)}</h1>
 ${body}
 <p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:#353535">Warmly,<br><strong style="color:#1A1A1A">Claire Hartwell, EA</strong></p>
 </td></tr>
@@ -75,10 +77,9 @@ type SendArgs = {
   heading: string;
   blocks: Block[];
   ics?: string;
-  sms?: string; // also log a simulated SMS
+  sms?: string;
 };
 
-/** Returns true if this call sent it, false if it was already sent before. */
 export async function sendMessage(a: SendArgs): Promise<boolean> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { getNow } = await import("./clock.server");
@@ -88,13 +89,13 @@ export async function sendMessage(a: SendArgs): Promise<boolean> {
     dedupe_key: a.dedupeKey, type: a.type, channel: "email", client_id: a.clientId, appointment_id: a.appointmentId ?? null,
     subject: a.subject, body: text, sent_at: now, minutes_saved: a.minutesSaved, recipient: a.to, delivery: "pending",
   }).select("id").maybeSingle();
-  if (error || !claimed) return false; // unique dedupe_key → already sent
+  if (error || !claimed) return false;
 
   let delivery = "sent";
   let err: string | null = null;
   const key = process.env["RESEND_API_KEY"];
   if (!key) delivery = "simulated";
-  else if (/@example\.(com|org|net)$/i.test(a.to)) delivery = "simulated"; // demo clients
+  else if (/@example\.(com|org|net)$/i.test(a.to)) delivery = "simulated";
   else {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

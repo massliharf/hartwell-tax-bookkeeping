@@ -63,20 +63,30 @@ function AuthPage() {
   ];
   return (
     <main className="grid min-h-screen bg-paper lg:grid-cols-[1fr_1.1fr]">
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-ink-900 p-10 text-white lg:flex">
-        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="inline-flex min-h-10 items-center self-start"><Logo tone="light" sub="Owner dashboard" /></Link>
-        <div className="max-w-md">
-          <h2 className="font-serif text-[40px] font-semibold leading-[44px] tracking-[-0.03em]">The front desk you never had to hire.</h2>
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-ink-900 p-10 text-white lg:flex xl:p-14">
+        <LogoMark size={560} tone="light" className="pointer-events-none absolute -right-32 -top-32 opacity-[0.06]" />
+        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="relative inline-flex min-h-10 items-center self-start"><Logo tone="light" sub="Owner dashboard" /></Link>
+        <div className="relative max-w-md">
+          <h2 className="t-section text-white">The front desk you never had to hire.</h2>
           <ul className="mt-10 space-y-6">
             {points.map(([t, d]) => (
-              <li key={t} className="border-t border-white/15 pt-4">
-                <p className="text-[15px] font-medium">{t}</p>
-                <p className="mt-1 text-sm leading-6 text-white/70">{d}</p>
+              <li key={t} className="flex gap-3.5">
+                <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-white/10">
+                  <Check className="size-3.5" strokeWidth={2.5} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[15px] font-medium leading-6">{t}</p>
+                  <p className="mt-1 text-sm leading-6 text-white/60">{d}</p>
+                </div>
               </li>
             ))}
           </ul>
         </div>
-        <p className="text-xs text-white/50">412 Bloomfield Avenue, Montclair, NJ</p>
+        <div className="relative flex flex-wrap gap-x-5 gap-y-1.5 border-t border-white/10 pt-5 text-xs text-white/50">
+          <span>412 Bloomfield Avenue, Montclair, NJ</span>
+          <span>(973) 555-0142</span>
+          <span>Mon to Fri 9 to 6, Sat 10 to 2</span>
+        </div>
       </section>
 
       <section className="flex flex-col px-5 py-8 sm:px-10">

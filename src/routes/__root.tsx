@@ -22,7 +22,7 @@ function NotFoundComponent() {
   return (
     <BookingShell>
       <ResultPanel icon={<Compass />} title="This page isn't here." actions={<><Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button></>}>
-        The link may be old or mistyped. Booking takes about two minutes.
+        The link may be old or mistyped. Scheduling an appointment takes about two minutes.
       </ResultPanel>
     </BookingShell>
   );

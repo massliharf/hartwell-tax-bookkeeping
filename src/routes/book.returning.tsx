@@ -12,9 +12,9 @@ export const Route = createFileRoute("/book/returning")({
   head: () => ({
     meta: [
       { title: "Your appointment — Hartwell Tax & Bookkeeping" },
-      { name: "description", content: "See, move or cancel your appointment, or book again with last year's answers." },
+      { name: "description", content: "See, move or cancel your appointment, or schedule again with last year's answers." },
       { property: "og:title", content: "Your appointment — Hartwell Tax & Bookkeeping" },
-      { property: "og:description", content: "See, move or cancel your appointment, or book again." },
+      { property: "og:description", content: "See, move or cancel your appointment, or schedule again." },
     ],
   }),
   component: ReturningPage,
@@ -66,7 +66,7 @@ function ReturningPage() {
               })}
               {demo.resumeId && (
                 <Button asChild size="lg" variant="secondary" className="h-auto min-h-12 w-full whitespace-normal px-5 py-3 text-center leading-5">
-                  <Link to="/book" search={{ resume: demo.resumeId } as never}>Book again with last year's answers</Link>
+                  <Link to="/book" search={{ resume: demo.resumeId } as never}>Schedule again with last year's answers</Link>
                 </Button>
               )}
             </div>
@@ -80,10 +80,10 @@ function ReturningPage() {
           </ResultPanel>
         ) : (
           <>
-            <StepTitle hideEyebrow eyebrow="" title="Find your appointment" sub="Enter the email you booked with. We'll send you a private link." />
+            <StepTitle hideEyebrow eyebrow="" title="Find your appointment" sub="Enter the email you used to schedule. We'll email you a private link to your appointment." />
             <ul className="mb-6 space-y-3">
-              <li className="flex items-start gap-3 text-sm text-body"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><CalendarClock className="size-4" /></span><span><span className="block font-medium text-deep-ink">Already booked?</span>See your appointment, upload documents, move or cancel it.</span></li>
-              <li className="flex items-start gap-3 text-sm text-body"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><RotateCcw className="size-4" /></span><span><span className="block font-medium text-deep-ink">Coming back this year?</span>Your answers from last time come filled in.</span></li>
+              <li className="flex items-start gap-3 text-sm text-body"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><CalendarClock className="size-4" /></span><span><span className="block font-medium text-deep-ink">Have an appointment?</span>See it, upload documents, or move or cancel it.</span></li>
+              <li className="flex items-start gap-3 text-sm text-body"><span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><RotateCcw className="size-4" /></span><span><span className="block font-medium text-deep-ink">Coming back this year?</span>Schedule again with last year's answers already filled in.</span></li>
             </ul>
             <form onSubmit={submit} className="space-y-4 border-t border-line-1 pt-6">
               <div className="space-y-1.5">

@@ -12,7 +12,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
       <header className="sticky top-0 z-40 border-b border-line-1 bg-paper-warm/95 backdrop-blur-lg">
         <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-5">
           <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>
-          <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
+          <Link to="/" aria-label="Close" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
             <X className="size-4" />
           </Link>
         </div>
@@ -26,7 +26,7 @@ export function BookingShell({ step, children }: { step?: number; children: Reac
 }
 
 function Progress({ step }: { step: number }) {
-  return <div className="px-6 pt-6 sm:px-8"><Stepper steps={STEPS} current={step} label="Booking progress" className="max-w-xl" /></div>;
+  return <div className="px-6 pt-6 sm:px-8"><Stepper steps={STEPS} current={step} label="Progress" className="max-w-xl" /></div>;
 }
 
 export function StepTitle({ eyebrow, title, sub, hideEyebrow = false }: { eyebrow: string; title: string; sub?: string; hideEyebrow?: boolean }) {

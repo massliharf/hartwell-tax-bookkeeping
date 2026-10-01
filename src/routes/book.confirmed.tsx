@@ -78,7 +78,7 @@ function ConfirmedPage() {
             You're booked{first && `, ${first}`}.
           </h1>
           <p className="mt-3 text-[15px] text-muted-foreground">
-            A confirmation is on its way to your inbox.
+            We've emailed you a confirmation.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ function ConfirmedPage() {
               {a.meeting_type === "video" ? "Video call" : `In person, ${ADDRESS}`}
             </span>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">{a.meeting_type === "video" ? "The Join link is on your appointment page." : "Directions are on your appointment page."}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{a.meeting_type === "video" ? "You'll find the video call link on your appointment page." : "You'll find the address and directions on your appointment page."}</p>
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button variant="outline" size="sm" onClick={() => downloadIcs(title, a.start_at, a.end_at, where, details)}><Download /> Add to calendar (.ics)</Button>
             <Button variant="outline" size="sm" asChild><a href={gcal} target="_blank" rel="noreferrer"><CalendarPlus /> Google Calendar</a></Button>
@@ -103,29 +103,29 @@ function ConfirmedPage() {
         {items.length === 0 && !pending ? (
           <div className="mt-6 rounded-xl border border-line-2 bg-sheet p-5 sm:p-6">
             <p className="t-card text-deep-ink">What happens next</p>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Claire starts the video call at your time. The link is on your appointment page and in tomorrow's reminder. Nothing to prepare.</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">At your appointment time, open your appointment page and click Join. We'll also email you the link the day before. You don't need to prepare anything.</p>
             <Button asChild size="lg" variant="secondary" className="mt-5"><Link to="/a/$token" params={{ token: token! }}>Open your appointment</Link></Button>
           </div>
         ) : pending ? (
         <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
-          <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more minute, and you're ready</p>
+          <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more step</p>
           <div className="p-5 sm:p-6">
             <p className="t-card text-deep-ink">Tell us about your year.</p>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Five yes-or-no questions, like whether you have a mortgage or freelance income. Your answers turn into the exact list of documents to bring, and you can send them from your phone.</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Answer a few yes-or-no questions, like whether you have a mortgage or freelance income. We'll turn your answers into a checklist of exactly which documents to bring.</p>
             <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
               <Link to="/a/$token" params={{ token: token! }}>Answer the questions</Link>
             </Button>
-            <p className="mt-3 text-[13px] text-muted-foreground">Not now? The link is in your confirmation email, and we'll remind you.</p>
+            <p className="mt-3 text-[13px] text-muted-foreground">You can also do this later from the link in your confirmation email.</p>
           </div>
           <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
-            <Lock className="mt-0.5 size-3.5 shrink-0" /> Private storage. Only your preparer can open your files.
+            <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files are stored privately. Only Claire can open them.
           </p>
         </div>
         ) : (
           <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
              <div className="border-b border-line-1 bg-surface-2 px-5 py-3">
               <p className="t-card text-deep-ink">What to bring</p>
-              <p className="mt-1 text-sm text-muted-foreground">Send them from your phone.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Upload them from your phone before your appointment.</p>
             </div>
             <ul className="divide-y divide-line-1">
               {items.map((i) => (
@@ -136,10 +136,10 @@ function ConfirmedPage() {
               ))}
             </ul>
              <div className="border-t border-line-1 px-5 py-4">
-              <Button asChild size="lg" className="w-full sm:w-auto"><Link to="/a/$token" params={{ token: token! }}>Send your documents</Link></Button>
+              <Button asChild size="lg" className="w-full sm:w-auto"><Link to="/a/$token" params={{ token: token! }}>Upload your documents</Link></Button>
             </div>
             <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
-              <Lock className="mt-0.5 size-3.5 shrink-0" /> Private storage. Only your preparer can open your files.
+              <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files are stored privately. Only Claire can open them.
             </p>
           </div>
         )}

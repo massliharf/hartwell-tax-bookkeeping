@@ -73,12 +73,12 @@ function Hero() {
       <div className="grid items-center gap-10 px-2 pb-10 pt-10 sm:px-4 md:min-h-[530px] md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-14 md:pt-16">
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping in Montclair, NJ</p>
-          <h1 className="mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
+          <h1 className="mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your tax return, done in one appointment.</h1>
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            Tax returns for families, freelancers, landlords and small businesses in Montclair. Book online, send your documents from your phone, and meet Claire once.
+            We prepare tax returns for families, freelancers, landlords and small businesses in Montclair, NJ. Choose a time online, upload your documents before you come in, and leave with your return done.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
+            <Button asChild size="lg"><Link to="/book">See available times</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
           </div>
         </div>
@@ -94,25 +94,25 @@ function Year() {
     <section className="rounded-[28px] bg-ink px-5 py-12 text-primary-foreground sm:px-10 sm:py-16">
       <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-16">
         <div>
-          <p className="text-sm font-medium text-primary-foreground/70">When to come in</p>
-          <h2 className="t-section mt-3 max-w-[13ch] text-balance">Here all year, not just at tax time.</h2>
+          <p className="text-sm font-medium text-primary-foreground/70">When to book</p>
+          <h2 className="t-section mt-3 max-w-[13ch] text-balance">Open all year. Busiest in spring and October.</h2>
         </div>
         <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
           <div className="space-y-0 divide-y divide-primary-foreground/20">
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 first:pt-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Feb–Apr</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Busiest for returns. Book early.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Tax season. Times fill up weeks ahead, so schedule early.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Oct 15</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Extended returns due. Full days have a waitlist.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Deadline for extended returns. If a day is full, join its waitlist.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 last:pb-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">All year</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Letters, planning and bookkeeping.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">IRS letters, tax planning and bookkeeping, usually with openings the same week.</p>
             </div>
           </div>
-          <div className="mt-8 grid grid-cols-12 gap-1" aria-label="Busier months: February, March, April and October">
+          <div className="mt-8 grid grid-cols-12 gap-1" aria-label="Busiest months">
             {months.map((month, i) => (
               <div key={month} className="min-w-0 text-center">
                 <div className={`h-2 rounded-full ${peak.has(i) ? "bg-primary-foreground" : "bg-primary-foreground/20"}`} />
@@ -127,16 +127,16 @@ function Year() {
 }
 function HowItWorks() {
   const steps = [
-    { t: "Book in two minutes", d: "See every open time, day or night. You're confirmed on the spot." },
-    { t: "Get your exact checklist", d: "A few quick answers decide which documents you need. Nothing extra." },
-    { t: "Send documents from your phone", d: "We check each one as it arrives and tell you if something's off." },
-    { t: "Meet Claire once", d: "Then sign and pay online, and we e-file. No second visit." },
+    { t: "Choose a time online", d: "Pick any available time. You're confirmed right away, no phone call needed." },
+    { t: "Get your document checklist", d: "Answer a few yes-or-no questions and we'll list exactly which documents to bring." },
+    { t: "Upload your documents", d: "Send them from your phone before your appointment. We check each one and tell you if anything is missing." },
+    { t: "Go over your return with Claire", d: "In person or by video. Afterwards you sign and pay online, and we file your return with the IRS." },
   ];
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
       <div className="max-w-3xl">
-        <h2 className="t-section text-balance text-deep-ink">No phone tag. No guessing. No second visit.</h2>
-        <p className="mt-3 text-base leading-7 text-muted-foreground">How a tax appointment works with us.</p>
+        <h2 className="t-section text-balance text-deep-ink">How it works.</h2>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">Four steps, from choosing a time to your filed return. Most clients only need one appointment.</p>
       </div>
       <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
@@ -154,7 +154,7 @@ function Services() {
   const price = (x: (typeof SERVICES)[number]) => (x.price === 0 ? "Free" : `${x.from ? "from " : ""}$${x.price}`);
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Services and fixed prices." sub="Agreed before we start. Nothing due when you book." />
+      <SectionHead title="Services and prices." sub="Your price is agreed before any work starts. You pay when the work is done, not when you schedule." />
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         {GROUPS.map((g) => (
           <div key={g.id}>
@@ -182,8 +182,8 @@ function Services() {
       </div>
       <Link to="/book" search={{ service: "intro" }} className="group mt-8 grid grid-cols-[40px_minmax(0,1fr)] items-center gap-x-3 gap-y-3 rounded-xl bg-surface-2 px-4 py-5 transition-colors duration-150 hover:bg-fill-selected focus-visible:outline-2 focus-visible:outline-ring sm:grid-cols-[40px_minmax(0,1fr)_auto]">
         <ServiceIcon service="intro" size={40} className="transition-transform duration-150 group-hover:scale-110" />
-        <span className="min-w-0 text-[15px] leading-6 text-deep-ink"><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span>
-        <span className="col-start-2 inline-flex items-center gap-1.5 text-sm font-semibold text-ink group-hover:underline group-hover:underline-offset-4 sm:col-start-3 sm:justify-self-end">Choose a call time<ArrowUpRight className="size-4" /></span>
+        <span className="min-w-0 text-[15px] leading-6 text-deep-ink"><span className="font-semibold">Not sure which service you need?</span> Schedule a free 15-minute call and Claire will help you choose.</span>
+        <span className="col-start-2 inline-flex items-center gap-1.5 text-sm font-semibold text-ink group-hover:underline group-hover:underline-offset-4 sm:col-start-3 sm:justify-self-end">Schedule a free call<ArrowUpRight className="size-4" /></span>
       </Link>
     </section>
   );
@@ -197,8 +197,8 @@ function About() {
           <img src={claire} alt="Claire Hartwell, EA, in her office" width={800} height={1008} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
-          <h2 className="t-section text-deep-ink">One person who knows your return.</h2>
-          <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">Claire Hartwell has prepared returns in Montclair since 2014. As an IRS Enrolled Agent she can also represent you if the IRS has questions. You work with her from start to finish.</p>
+          <h2 className="t-section text-deep-ink">Meet Claire Hartwell, EA.</h2>
+          <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">Claire has prepared tax returns in Montclair since 2014. As an IRS Enrolled Agent, she is licensed to prepare your return and to represent you if the IRS contacts you. You work with her directly, from your first document to your filed return.</p>
           <ul className="mt-6 flex flex-wrap gap-2">
             {creds.map((c) => <li key={c} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-line-1 px-3 text-xs font-medium text-deep-ink"><BadgeCheck className="size-3.5 text-success" />{c}</li>)}
           </ul>
@@ -278,14 +278,14 @@ function Stars() {
 
 function Privacy() {
   const points = [
-    { icon: Lock, title: "Private storage", text: "Only your preparer can open your files." },
-    { icon: KeyRound, title: "Links that expire", text: "Every file opens through a link that lasts minutes." },
-    { icon: ShieldCheck, title: "No Social Security number online", text: "We never ask for it here." },
-    { icon: Trash2, title: "Only what's needed", text: "Just what's on your checklist." },
+    { icon: Lock, title: "Private storage", text: "Files are stored privately, not in email." },
+    { icon: KeyRound, title: "Links that expire", text: "Files open only through a link that expires after a few minutes." },
+    { icon: ShieldCheck, title: "No Social Security number online", text: "We never ask for your Social Security number online." },
+    { icon: Trash2, title: "Only what's needed", text: "We only ask for the documents on your checklist." },
   ];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Your documents stay between us." sub="Only Claire can open your files." />
+      <SectionHead title="Your documents are private." sub="Only Claire can open the files you upload." />
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {points.map((x) => (
           <li key={x.title} className="flex gap-3">
@@ -300,9 +300,9 @@ function Privacy() {
 /** The closing call to action follows the season, so it's never out of date. */
 function seasonCta(now = new Date()) {
   const m = now.getMonth(), d = now.getDate();
-  if ((m === 8) || (m === 9 && d <= 15)) return { title: "October 15 is close. Your slot doesn't have to be.", body: "Extended returns are due October 15. Schedule now, send your documents this week, and file in one visit.", cta: "Schedule an extension review", service: "extension" };
-  if ((m >= 1 && m <= 2) || (m === 3 && d <= 15)) return { title: "April 15 is coming. Times are filling.", body: "Filing season is the busiest time of the year. Schedule now and send your documents as they arrive.", cta: "Schedule your return", service: "individual" };
-  return { title: "Got a letter from the IRS?", body: "Quieter months mean openings this week: IRS and New Jersey letters, quarterly estimates, bookkeeping, and past returns.", cta: "Schedule a letter review", service: "extension" };
+  if ((m === 8) || (m === 9 && d <= 15)) return { title: "The October 15 deadline is close.", body: "If you filed an extension, your return is due October 15. Schedule now, upload your documents this week, and we'll file on time.", cta: "Schedule an extension appointment", service: "extension" };
+  if ((m >= 1 && m <= 2) || (m === 3 && d <= 15)) return { title: "April 15 is coming.", body: "Tax season is our busiest time. Schedule now and upload your documents as they arrive.", cta: "Schedule your tax return", service: "individual" };
+  return { title: "Got a letter from the IRS?", body: "We usually have openings this week for IRS and state letters, tax planning, bookkeeping and past-year returns.", cta: "Schedule a letter review", service: "extension" };
 }
 
 function DeadlineCta() {
@@ -330,18 +330,18 @@ function DeadlineCta() {
 
 function Faq() {
   const qs = [
-    { q: "Are you open all year?", a: "Yes. February to mid-April and before October 15 are the busiest; the rest of the year there's usually an opening the same week." },
+    { q: "Are you open all year?", a: "Yes. February to mid-April and the weeks before October 15 are busiest, so schedule early then. The rest of the year there's usually an opening the same week." },
     { q: "What is an Enrolled Agent?", a: "A tax professional licensed by the IRS to prepare returns and to represent you in audits, collections and appeals." },
-    { q: "How much will it cost?", a: "The prices above, confirmed before any work starts. You pay when the work is done, never when you book." },
+    { q: "How much will it cost?", a: "See the prices above. Your exact price is agreed before any work starts, and you pay when the work is done." },
     { q: "Do you do New York returns?", a: "Yes. If you work in New York, your non-resident return is included." },
-    { q: "What should I bring?", a: "After you book, five quick questions give you an exact list. Send the documents from your phone before your appointment." },
-    { q: "Video call or in person?", a: "Either. You choose when you book; both work the same way." },
-    { q: "Can I reschedule or cancel?", a: "Yes, any time, from the link in your confirmation email. Your old time goes to someone on the waitlist." },
+    { q: "What should I bring?", a: "When you schedule, you answer a few questions and get a checklist of exactly what to bring. You can upload everything from your phone." },
+    { q: "Video call or in person?", a: "Either. You choose when you schedule. Video calls work in your browser, no app needed." },
+    { q: "Can I reschedule or cancel?", a: "Yes. Use the link in your confirmation email to move or cancel any time, no phone call needed." },
     { q: "What are the key deadlines?", a: "April 15 for most returns, October 15 for extended returns. Quarterly estimates are due in April, June, September and January." },
   ];
   return (
     <section id="faq" className={`${panel} grid scroll-mt-24 gap-8 px-5 py-12 sm:px-10 sm:py-16 md:grid-cols-[0.8fr_1.2fr]`}>
-      <div className="self-start"><SectionHead title="Questions." sub="Anything else? Ask below, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
+      <div className="self-start"><SectionHead title="Questions." sub="Can't find your answer? Send us a question, call (973) 555-0142 or email claire@hartwelltax.com." /><AskForm className="mt-6" /></div>
       <Accordion type="single" collapsible className="overflow-hidden rounded-2xl border border-line-1 bg-sheet px-4">
         {qs.map((x) => (
           <AccordionItem key={x.q} value={x.q} className="border-line-1 last:border-b-0">

@@ -120,19 +120,19 @@ function PortalPage() {
   const doneCount = items.filter((i) => i.status !== "missing" && i.review_status !== "needs_fix").length;
   const day = new Date(a.start_at).toLocaleDateString("en-US", { weekday: "long", timeZone: "America/New_York" });
   const introSub: Partial<Record<Stage, string>> = {
-    documents: `Your free call with Claire is ${day}. No documents needed.`, ready: `Your free call with Claire is ${day}. No documents needed.`,
-    meeting: "Your call is now. Join from the button below.", wrap_up: "Thanks for talking with Claire.", filed: "Thanks for talking with Claire.",
+    documents: `Your free call with Claire is ${day}. You don't need any documents.`, ready: `Your free call with Claire is ${day}. You don't need any documents.`,
+    meeting: "Your call is starting. Click Join below.", wrap_up: "Thanks for talking with Claire.", filed: "Thanks for talking with Claire.",
   };
   const sub: Record<Stage, string> = {
-    documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer five quick questions to get your document list." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to send. Everything else is set.` : "Everything is set.",
-    ready: `Everything is in. See you ${day}.`,
+    documents: a.intake_answers?.["intake_pending"] ? "You're booked. Answer a few quick questions so we know which documents to ask for." : todo ? `${todo} document${todo === 1 ? "" : "s"} left to upload. Everything else is set.` : "Everything is set.",
+    ready: `We have all your documents. See you ${day}.`,
     meeting: a.meeting_type === "video" ? "Your appointment is now. Join the call below." : "Your appointment is now. See you at 412 Bloomfield Avenue.",
-    wrap_up: "Thanks for coming in. We're finishing your return.",
-    sign_pay: a.signature_status === "signed" ? "Signed. One payment and your return is filed." : "Your return is ready. Sign and pay to have it filed.",
-    to_file: "All done. We'll file your return today.",
-    filed: "Your return has been e-filed.",
+    wrap_up: "Thanks for coming in. We're finishing your return now.",
+    sign_pay: a.signature_status === "signed" ? "Thanks for signing. Once you pay, we'll file your return." : "Your return is ready. Review it, sign and pay, and we'll file it.",
+    to_file: "Thank you. We'll file your return today.",
+    filed: "Your return has been filed with the IRS.",
     cancelled: "This appointment was cancelled.",
-    no_show: "We missed you at your appointment.",
+    no_show: "We missed you at your appointment. Choose a new time below.",
   };
   const checklist = (
     <section>
@@ -141,10 +141,10 @@ function PortalPage() {
         <span className="tabular text-sm text-muted-foreground">{doneCount} of {items.length} done</span>
       </div>
        <p className="mb-3 flex items-start gap-2 rounded-xl bg-fill-neutral/70 px-3 py-2.5 text-[13px] leading-5 text-deep-ink/85">
-        <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only your preparer can see your files. We never ask for your Social Security number.
+        <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only Claire can see your files. We never ask for your Social Security number online.
       </p>
        <ul className="space-y-2">{items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
-       <p className="mt-3 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB.</p>
+       <p className="mt-3 text-xs text-muted-foreground">PDF or photo (JPG, PNG, HEIC), up to 15MB each.</p>
     </section>
   );
   const sentDocs = (
@@ -183,12 +183,12 @@ function PortalPage() {
         {/* 3. After the meeting, before Claire finishes. */}
         {intro && (stage === "wrap_up" || stage === "filed") && (
           <StatusCard icon={<CalendarClock />} title="Ready for the next step?" action={<Button asChild size="lg"><Link to="/book">Schedule your appointment</Link></Button>}>
-            Book the appointment Claire suggested. Your details carry over.
+            Schedule the appointment Claire recommended. Your details are already filled in.
           </StatusCard>
         )}
         {!intro && stage === "wrap_up" && <>
-          <StatusCard icon={<Hourglass />} title="We're finishing your return.">You'll get an email to review, sign and pay, usually the same day.</StatusCard>
-           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents needing a fix</h2><ul className="space-y-2">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
+          <StatusCard icon={<Hourglass />} title="We're finishing your return.">We'll email you when it's ready to review, sign and pay, usually the same day.</StatusCard>
+           {fixItems.length > 0 && <div><h2 className="mb-3 t-card text-deep-ink">Documents to send again</h2><ul className="space-y-2">{fixItems.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul></div>}
         </>}
 
         {/* 4. Sign and pay, then done. */}
@@ -197,7 +197,7 @@ function PortalPage() {
         {/* Side exits. */}
         {(cancelled || stage === "no_show") && (
           <StatusCard icon={<CalendarClock />} title={cancelled ? "Pick a new time whenever you're ready." : "Let's find you a new time."} action={<Button asChild size="lg"><Link to="/book">Pick a new time</Link></Button>}>
-            Your documents and answers are saved, so scheduling again takes two minutes.
+            Your documents and answers are saved, so scheduling again only takes a minute.
           </StatusCard>
         )}
 
@@ -239,7 +239,7 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
   return (
     <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
       <h2 className="t-card text-deep-ink">Tell us about your year.</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Your answers become your document list.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Your answers tell us which documents to ask you for.</p>
       <div className="mt-5"><IntakeQuestions slug={slug} answers={ans} onChange={setAns} /></div>
       {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
       <Button className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
@@ -326,7 +326,7 @@ function Actions({ token, appt, onChange }: { token: string; appt: Appt; onChang
           <AlertDialogContent className="max-w-sm">
             <AlertDialogHeader>
               <AlertDialogTitle>Cancel this appointment?</AlertDialogTitle>
-              <AlertDialogDescription>That's completely fine. Your slot will be offered to someone on the waitlist. If another time would work better, you can reschedule instead.</AlertDialogDescription>
+              <AlertDialogDescription>That's fine. If another time would work better, you can reschedule instead.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Keep my appointment</AlertDialogCancel>
@@ -412,7 +412,7 @@ function ReschedulePicker({ token, serviceId, onDone, onClose }: { token: string
             )}
           </div>
         )}
-        <p className="mt-4 text-xs text-muted-foreground">Tap a time and you're moved. Your checklist stays the same.</p>
+        <p className="mt-4 text-xs text-muted-foreground">Choose a new time. Your documents and checklist stay the same.</p>
       </div>
     </div>
   );
@@ -520,7 +520,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
             </div>
             {naOpen ? (
                <div className="mt-2.5 space-y-2">
-                <Input autoFocus aria-label="Why this doesn't apply" placeholder="In one line, why doesn't this apply?" maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
+                <Input autoFocus aria-label="Why this doesn't apply" placeholder="For example: I didn't have a mortgage this year." maxLength={200} value={reason} onChange={(e) => setReason(e.target.value)} className="h-10" />
                 <div className="flex gap-2">
                   <Button size="sm" disabled={reason.trim().length < 2 || busy} onClick={saveNa}>Mark as not needed</Button>
                   <Button size="sm" variant="ghost" onClick={() => setNaOpen(false)}>Never mind</Button>
@@ -530,7 +530,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
                <div className="mt-2.5 flex flex-wrap items-center gap-2">
                 <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
-                 <span className="hidden text-xs text-muted-foreground sm:inline">Or drag a file onto this card.</span>
+                 <span className="hidden text-xs text-muted-foreground sm:inline">Or drag a file here.</span>
                  <Button size="sm" variant="ghost" className="min-h-8 w-full justify-start px-0 sm:hidden" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
               </div>
             )}
@@ -552,7 +552,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
   if (appt.filed_at) return (
     <section className="rounded-2xl border border-success/30 bg-sheet p-6">
       <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-5" strokeWidth={3} /></span><h2 className="t-card text-deep-ink">Your return has been e-filed.</h2></div>
-      <p className="mt-3 text-sm text-deep-ink/75">You'll hear from the IRS directly about any refund. Thank you.</p>
+      <p className="mt-3 text-sm text-deep-ink/75">Any refund comes directly from the IRS. Thank you for choosing Hartwell Tax.</p>
     </section>
   );
   if (signed && paid) return (

@@ -31,9 +31,9 @@ export function IntakeQuestions({ slug, answers, onChange }: { slug?: string | n
       ))}
       {chips.length > 0 && (
         <fieldset className="rounded-xl bg-surface-2 p-4">
-          <legend className="sr-only">Which of these applied this year?</legend>
-          <p className="text-sm font-medium text-deep-ink" aria-hidden="true">Which of these applied this year?</p>
-          <p className="text-xs text-muted-foreground">Pick all that fit.</p>
+          <legend className="sr-only">Which of these apply to you this year?</legend>
+          <p className="text-sm font-medium text-deep-ink" aria-hidden="true">Which of these apply to you this year?</p>
+          <p className="text-xs text-muted-foreground">Select all that apply.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {chips.map((k) => {
               const on = answers[k] === true;

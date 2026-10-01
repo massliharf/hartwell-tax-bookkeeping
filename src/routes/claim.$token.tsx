@@ -12,9 +12,9 @@ import { fmtDateLong, fmtTime } from "@/lib/intake";
 export const Route = createFileRoute("/claim/$token")({
   head: () => ({
     meta: [
-      { title: "A spot opened up — Hartwell Tax & Bookkeeping" },
+      { title: "A time opened up — Hartwell Tax & Bookkeeping" },
       { name: "description", content: "Claim an open appointment with Claire Hartwell, EA." },
-      { property: "og:title", content: "A spot opened up — Hartwell Tax & Bookkeeping" },
+      { property: "og:title", content: "A time opened up — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "First to claim gets it." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -31,7 +31,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Missed() {
   return (
     <ResultPanel icon={<Clock />} title="Just missed it." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See other times</Link></Button>}>
-      Someone claimed this time a moment before you. You're still on the waitlist, and we'll email you the moment another spot opens.
+      Someone took this time just before you. You're still on the waitlist, and we'll email you as soon as another time opens.
     </ResultPanel>
   );
 }
@@ -51,14 +51,14 @@ function ClaimPage() {
     return (
       <Shell>
         <ResultPanel icon={<Check />} tone="success" title="It's yours." actions={<Button asChild size="lg"><Link to="/a/$token" params={{ token: state.token }}>Open your appointment</Link></Button>}>
-          <strong>{fmtDateLong(q.data.slotStart)} at {fmtTime(q.data.slotStart)}</strong>. A confirmation is on its way with your document checklist.
+          <strong>{fmtDateLong(q.data.slotStart)} at {fmtTime(q.data.slotStart)}</strong>. We've emailed you a confirmation with your document checklist.
         </ResultPanel>
       </Shell>
     );
   }
   return (
     <Shell>
-      <ResultPanel icon={<CalendarCheck />} eyebrow="A spot opened up" title={`${fmtDateLong(q.data.slotStart)}, ${fmtTime(q.data.slotStart)}`}
+      <ResultPanel icon={<CalendarCheck />} eyebrow="A time opened up" title={`${fmtDateLong(q.data.slotStart)}, ${fmtTime(q.data.slotStart)}`}
         actions={<Button size="lg" className="w-full sm:w-auto" disabled={state === "busy"} onClick={async () => {
           setState("busy");
           try {

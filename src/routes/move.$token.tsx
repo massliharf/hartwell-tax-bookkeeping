@@ -35,14 +35,14 @@ function MovePage() {
   return (
     <BookingShell>
       {!to ? (
-        <ResultPanel icon={<CalendarClock />} title="Pick a new time from your appointment page." actions={back} />
+        <ResultPanel icon={<CalendarClock />} title="Choose a new time from your appointment page." actions={back} />
       ) : state === "done" ? (
-        <ResultPanel icon={<Check />} tone="success" title="You're moved." actions={back}>
-          New time: <strong>{fmtDateLong(to)} at {fmtTime(to)}</strong>. More time to gather your documents.
+        <ResultPanel icon={<Check />} tone="success" title="Your appointment has moved." actions={back}>
+          New time: <strong>{fmtDateLong(to)} at {fmtTime(to)}</strong>. You now have more time to gather your documents.
         </ResultPanel>
       ) : state === "taken" ? (
         <ResultPanel icon={<Clock />} tone="warning" title="That time was just taken." actions={back}>
-          Your original appointment is still booked. You can pick another time from your appointment page.
+          Your original appointment is unchanged. You can choose another time from your appointment page.
         </ResultPanel>
       ) : (
         <ResultPanel icon={<CalendarClock />} eyebrow="Move your appointment to" title={`${fmtDateLong(to)}, ${fmtTime(to)}`}

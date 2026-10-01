@@ -26,7 +26,7 @@ export const Route = createFileRoute("/book/")({
   head: () => ({
     meta: [
       { title: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
-      { name: "description", content: "Book a tax appointment in Montclair, NJ in about two minutes. Confirmed right away, with your own document list." },
+      { name: "description", content: "Schedule a tax appointment in Montclair, NJ in about two minutes. You're confirmed right away and get your own document checklist." },
       { property: "og:title", content: "Schedule an appointment — Hartwell Tax & Bookkeeping" },
       { property: "og:description", content: "Pick a service and a time. Confirmed instantly." },
     ],
@@ -150,7 +150,7 @@ function BookPage() {
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Nothing to pay now." />
+       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Choose the service that fits best. You won't pay anything today." />
        {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
@@ -190,8 +190,8 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
                 className={`mb-8 flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors duration-150 ${intro.slug === selected ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-2 bg-surface-2 hover:border-line-3"}`}>
                 <ServiceIcon service="intro" size={40} />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-semibold text-deep-ink">Not sure? Start with a free 15-minute call</span>
-                  <span className="mt-0.5 block text-sm text-muted-foreground">15 minutes with Claire to find the right appointment. No documents needed.</span>
+                  <span className="block text-[15px] font-semibold text-deep-ink">Not sure which service you need?</span>
+                  <span className="mt-0.5 block text-sm text-muted-foreground">Schedule a free 15-minute call and Claire will help you choose. No documents needed.</span>
                 </span>
                 <span className="shrink-0 text-sm font-semibold text-deep-ink">Free</span>
               </button>
@@ -220,7 +220,7 @@ function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewC
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-sheet">
        <div className="border-b border-line-1 bg-surface-2 px-4 py-2.5">
-        <p className="text-xs text-muted-foreground">{complete ? "What you'll bring" : "Your list so far"}</p>
+        <p className="text-xs text-muted-foreground">{complete ? "Documents to bring" : "Documents so far"}</p>
         <p className="t-card text-deep-ink"><span className="tabular">{docs.length}</span> document{docs.length === 1 ? "" : "s"}</p>
       </div>
        <ul className="max-h-[280px] space-y-1.5 overflow-y-auto px-4 py-3">
@@ -240,8 +240,8 @@ function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined;
   return (
     <>
       <div className="mb-4 mt-10 border-t border-line-1 pt-8">
-        <h2 className="t-card text-deep-ink">Tell us about your year</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Your answers become your document list.</p>
+        <h2 className="t-card text-deep-ink">A few questions about your year</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Your answers tell us which documents to ask you for.</p>
       </div>
       <IntakeQuestions slug={slug} answers={answers} onChange={onChange} />
     </>
@@ -267,8 +267,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub="Eastern time" />
-      {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">A 15-minute video call.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
+        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Choose a time" sub="All times are Eastern Time (New York)." />
+      {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">This is a 15-minute video call.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
         options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />}
 
        {q.isLoading && <div className="space-y-6"><div className="flex gap-1 overflow-hidden">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[72px] shrink-0 rounded-lg" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-8 rounded-lg" />)}</div></div>}
@@ -325,7 +325,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
             )}
             {day && !day.closed && day.slots.length === 0 && <WaitlistPanel service={service} date={day.date} draft={draft} />}
              {!firstOpen && !draft.date && (
-              <p className="rounded-2xl bg-surface-2 p-6 text-sm text-deep-ink/80">The next three weeks are fully booked. Pick a day above to join its waitlist; you'll be offered the first cancellation.</p>
+              <p className="rounded-2xl bg-surface-2 p-6 text-sm text-deep-ink/80">The next three weeks are full. Choose a day above to join its waitlist. If someone cancels, we'll email you the time.</p>
             )}
           </div>
         </>

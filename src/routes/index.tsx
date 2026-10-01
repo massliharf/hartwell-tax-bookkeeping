@@ -67,14 +67,6 @@ function Home() {
 }
 
 
-const HERO_SERVICES = [
-  { id: "individual", label: "Tax returns" },
-  { id: "letter", label: "IRS letters" },
-  { id: "extension", label: "Extensions and past years" },
-  { id: "planning", label: "Tax planning" },
-  { id: "bookkeeping", label: "Bookkeeping" },
-];
-
 function Hero() {
   return (
     <section className="overflow-hidden">
@@ -85,16 +77,6 @@ function Hero() {
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
             Tax returns, IRS letters, tax planning and bookkeeping for families, freelancers, landlords and small businesses. Choose a time online, upload your documents, and most work is done in one appointment.
           </p>
-          {/* Everything Claire does, at a glance; each one opens scheduling with that service picked. */}
-          <ul aria-label="Services" className="mt-6 flex flex-wrap gap-2">
-            {HERO_SERVICES.map((x) => (
-              <li key={x.id}>
-                <Link to="/book" search={{ service: x.id }} className="inline-flex h-9 items-center gap-2 rounded-full border border-line-1 bg-sheet pl-1.5 pr-3 text-[13px] font-medium text-deep-ink transition-colors duration-150 hover:border-line-3">
-                  <ServiceIcon service={x.id} size={28} />{x.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>

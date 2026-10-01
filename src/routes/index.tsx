@@ -74,7 +74,7 @@ function Hero() {
           <p className="text-sm font-medium text-ink">Tax preparation and bookkeeping in Montclair, NJ</p>
           <h1 className="enter-title mt-4 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes, done in one visit.</h1>
           <p className="mt-6 max-w-[32rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            We prepare returns for families, freelancers, landlords and small businesses. Book online, send your documents from your phone, and come in once.
+            We prepare returns for families, freelancers, landlords and small businesses. Choose a time, share your documents from your phone, and sit down with Claire once.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
@@ -103,16 +103,15 @@ function Year() {
       <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-16">
         <div>
           <p className="text-sm font-medium text-primary-foreground/70">Planning ahead</p>
-          <h2 className="t-section mt-3 max-w-[13ch] text-balance">Open all year. Book early when it counts.</h2>
-          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">February to mid-April and before October 15, times fill a few weeks ahead. Outside those weeks, there’s usually an opening the same week.</p>
-          <Button asChild variant="secondary" className="mt-7 bg-sheet text-ink hover:bg-paper-deep active:bg-fill-neutral"><Link to="/book">See open times</Link></Button>
+          <h2 className="t-section mt-3 max-w-[13ch] text-balance">There’s a good time to get started.</h2>
+          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">We’re here all year. Here’s what to expect when finding time with Claire.</p>
         </div>
         <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
           <p className="text-sm font-medium text-primary-foreground/70">When to plan your visit</p>
           <div className="mt-6 space-y-0 divide-y divide-primary-foreground/20">
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 first:pt-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Feb–Apr</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Tax season fills weeks ahead. Book early so you can send your documents afterwards.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Tax season fills weeks ahead. You can secure a time before your documents are ready.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Oct 15</span>
@@ -138,7 +137,7 @@ function Year() {
 }
 function HowItWorks() {
   const steps = [
-    { t: "Book a time", d: "Pick an open slot online. You're confirmed right away.", note: "Your place is yours" },
+    { t: "Choose a time", d: "Pick an open slot online. You're confirmed right away.", note: "Your place is yours" },
     { t: "Answer five questions", d: "They become the exact list of documents to bring.", note: "Know what to gather" },
     { t: "Send your documents", d: "From your phone. We check each one as it arrives.", note: "Get ready at your pace" },
     { t: "Meet Claire, then sign and pay", d: "One appointment. Then sign and pay online, and we e-file.", note: "Finish without another visit" },
@@ -147,7 +146,7 @@ function HowItWorks() {
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
       <div className="max-w-3xl">
         <p className="text-sm font-medium text-ink">How it works</p>
-        <h2 className="t-section mt-3 text-balance text-deep-ink">Book first. Get ready next. Come in once.</h2>
+        <h2 className="t-section mt-3 text-balance text-deep-ink">From first question to filed return.</h2>
         <p className="mt-3 text-base leading-7 text-muted-foreground">No phone tag, and no second visit for a missing form.</p>
       </div>
       <ol className="mt-10 grid gap-x-8 gap-y-8 border-t border-line-2 pt-7 sm:grid-cols-2 lg:grid-cols-4">
@@ -194,8 +193,8 @@ function Services() {
         ))}
       </div>
       <Link to="/book" search={{ service: "intro" }} className="group mt-10 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-ink-50 px-5 py-4">
-        <span className="flex items-center gap-3 text-[15px] text-deep-ink"><ServiceIcon service="intro" size={32} /><span><span className="font-semibold">Not sure which one?</span> Book a free 15-minute call with Claire.</span></span>
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">Book a free call<ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" /></span>
+        <span className="flex items-center gap-3 text-[15px] text-deep-ink"><ServiceIcon service="intro" size={32} /><span><span className="font-semibold">Not sure which one?</span> Talk it through with Claire in a free 15-minute call.</span></span>
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">Choose a call time<ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" /></span>
       </Link>
     </section>
   );

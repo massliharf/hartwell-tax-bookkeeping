@@ -65,6 +65,7 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
   const stage = stageOf(a, now);
   const finished = stage === "sign_pay" || stage === "to_file" || stage === "filed";
   const missing = missingOf(a).length;
+  const eyesCount = a.checklist_items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length;
   const looksRight = items.filter(i => i.status === "uploaded" && i.review_status === "pending" && i.ai_check === "ok");
   const acceptAll = async () => {
     setAccepting(true);
@@ -81,38 +82,42 @@ function AppointmentContent({ id, onClose, expanded }: { id: string; onClose: ()
 
   return (
     <div className="flex flex-col">
-      <header className="border-b border-border px-6 pb-5 pr-24 pt-6">
-        <p className="text-xs text-muted-foreground">Appointment</p>
-        <DialogTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</DialogTitle>
-        <DialogDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span>{a.services?.name}</span>
-          <span className="inline-flex items-center gap-1">{a.meeting_type === "video" ? <Video className="size-3.5" /> : <MapPin className="size-3.5" />}{a.meeting_type === "video" ? "Video" : "In person"}</span>
-          <StatusPill status={a.status} />
-        </DialogDescription>
-        {stage !== "cancelled" && <Stepper steps={STEPS} current={stepOf(stage)} className="mt-4" />}
-        <NowBanner a={a} nowIso={now} className="mt-4" />
-        {a.clients && (
-          <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose}
-            className="mt-4 flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 transition-colors duration-150 hover:bg-surface-2">
-            <span className="grid size-8 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{a.clients.name.charAt(0)}</span>
-            <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-deep-ink">{a.clients.name}</span><span className="block truncate text-xs text-muted-foreground">{a.clients.email}</span></span>
-            <span className="text-xs text-muted-foreground">Client</span><ChevronRight className="size-4 text-muted-foreground" />
-          </Link>
-        )}
+      {/* 1. What and where it stands (information). */}
+      <header className="border-b border-border px-6 pb-5 pt-6">
+        <div className="pr-20">
+          <p className="text-xs text-muted-foreground">Appointment</p>
+          <DialogTitle className="mt-1 t-owner text-deep-ink">{fmtLong(a.start_at)}, {fmtTime(a.start_at)}</DialogTitle>
+          <DialogDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>{a.services?.name}</span>
+            <span className="inline-flex items-center gap-1">{a.meeting_type === "video" ? <Video className="size-3.5" /> : <MapPin className="size-3.5" />}{a.meeting_type === "video" ? "Video" : "In person"}</span>
+            {a.clients && <Link to="/owner/clients/$id" params={{ id: a.clients.id }} onClick={onClose} className="inline-flex items-center gap-0.5 font-medium text-deep-ink hover:underline">{a.clients.name}<ChevronRight className="size-3.5" /></Link>}
+          </DialogDescription>
+        </div>
+        {stage !== "cancelled" && <Stepper steps={STEPS} current={stepOf(stage)} className="mt-5" />}
+        {/* 2. Whose move it is, with the one action that moves it forward (control). */}
+        <NowBanner a={a} nowIso={now} className="mt-4" action={
+          // Stage actions (Finish, Reschedule) live in the footer; the banner only carries a decision the footer doesn't.
+          eyesCount > 0 ? <Button size="sm" onClick={() => setGallery(true)}>Check {eyesCount} document{eyesCount === 1 ? "" : "s"}</Button> : null} />
       </header>
 
       <div className={expanded ? "grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:divide-x lg:divide-border" : ""}>
       <div className="min-w-0">
+      {/* 3. Documents: summary, then the list; row actions only where a decision is needed. */}
       <section className="px-6 py-5">
         <DocsWrap collapsed={finished} count={items.filter((i) => i.status === "uploaded").length}>
-        {a.status !== "completed" && <div className="flex items-center gap-3">
-          <ReadyRing value={a.ready_score} size={40} stroke={4} />
-          <div><p className="text-sm font-medium text-deep-ink">{a.ready_score >= 100 ? "Ready" : `${a.ready_score}% ready`}</p><p className="text-xs text-muted-foreground">{missing ? `${missing} document${missing === 1 ? "" : "s"} missing` : "Every document is in"}</p></div>
-        </div>}
-        {(() => { const n = items.filter((i) => i.status === "uploaded").length; return <div className="mt-4 flex flex-wrap gap-2">
-          {n > 0 && (() => { const eyes = items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok").length; return <Button size="sm" variant={eyes ? "default" : "secondary"} onClick={() => setGallery(true)}>{eyes ? `Check ${eyes} document${eyes === 1 ? "" : "s"}` : `View documents (${n})`}</Button>; })()}
-          {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
-        </div>; })()}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <ReadyRing value={a.ready_score} size={36} stroke={4} />
+            <div>
+              <h3 className="t-sub">Documents</h3>
+              <p className="text-xs text-muted-foreground">{items.filter((i) => i.status !== "missing").length} of {items.length} in{missing ? `, ${missing} missing` : ""}{eyesCount ? `, ${eyesCount} need${eyesCount === 1 ? "s" : ""} your eyes` : ""}</p>
+            </div>
+          </div>
+          <div className="flex gap-1.5">
+            {items.some((i) => i.status === "uploaded") && <Button size="sm" variant="secondary" onClick={() => setGallery(true)}>Open viewer</Button>}
+            {looksRight.length >= 2 && <Button size="sm" variant="secondary" disabled={accepting} onClick={acceptAll}>{accepting ? "Accepting…" : "Accept all that look right"}</Button>}
+          </div>
+        </div>
         {(() => {
           const eyes = items.filter((i) => i.status === "uploaded" && i.review_status === "pending" && i.ai_check !== "warning" && i.ai_check !== "ok");
           const received = items.filter((i) => i.status === "uploaded" && !eyes.includes(i));

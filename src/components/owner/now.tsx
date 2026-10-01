@@ -31,12 +31,13 @@ export function nowOf(a: Appt, nowIso: string): { turn: Turn; text: string } {
   return { turn: "auto", text: "Everything is in. The appointment reminder goes out the day before." };
 }
 
-export function NowBanner({ a, nowIso, className = "" }: { a: Appt; nowIso: string; className?: string }) {
+export function NowBanner({ a, nowIso, className = "", action }: { a: Appt; nowIso: string; className?: string; action?: React.ReactNode }) {
   const n = nowOf(a, nowIso);
   return (
     <div role="status" className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border px-4 py-3 ${n.turn === "you" ? "border-alert-warning-fg/25 bg-alert-warning" : "border-line-1 bg-surface-2"} ${className}`}>
       <Tag tone={TURN[n.turn].tone}>{TURN[n.turn].label}</Tag>
       <p className="min-w-0 flex-1 text-sm text-deep-ink">{n.text}</p>
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }

@@ -63,7 +63,8 @@ export function ClientProfile({ id }: { id: string }) {
                 {client.phone && <Button asChild size="sm" variant="secondary"><a href={`tel:${client.phone}`}><Phone />Call</a></Button>}
               </div>
             </div>
-            <dl className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {active && <button type="button" onClick={() => openAppt({ appointmentId: active.id })} className="mt-5 block w-full text-left"><NowBanner a={active} nowIso={nowIso} /></button>}
+            <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {stats.map(([k, v, tone]) => (
                  <div key={k} className="rounded-2xl border border-border bg-sheet px-3.5 py-3">
                   <dt className="text-xs text-muted-foreground">{k}</dt>
@@ -74,13 +75,6 @@ export function ClientProfile({ id }: { id: string }) {
           </header>
         );
       })()}
-      {active && (
-        <Section title="Where things stand">
-          <button type="button" onClick={() => openAppt({ appointmentId: active.id })} className="block w-full text-left">
-            <NowBanner a={active} nowIso={nowIso} />
-          </button>
-        </Section>
-      )}
        {client.notes && <Section title="Notes"><p className="rounded-2xl border border-border bg-sheet px-4 py-3 text-sm text-deep-ink">{client.notes}</p></Section>}
       <Section title={`Appointments (${appts.length})`}>
         {appts.length ? <ApptList appts={appts} showDate showClient={false} /> : <p className="text-sm text-muted-foreground">No appointments yet.</p>}

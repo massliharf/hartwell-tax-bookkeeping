@@ -78,20 +78,22 @@ export function CloseoutBlock({ a }: { a: Appt }) {
   const reason = !signed && !a.paid_at ? "Waiting for the signature and payment." : !signed ? "Waiting for the Form 8879 signature." : !a.paid_at ? "Waiting for payment." : null;
   return (
     <section className="border-t border-border px-6 py-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm font-medium text-deep-ink">Fee {money(a.fee_cents)}</p>
-        {a.paid_at ? <Tag tone="success">Paid</Tag> : <Tag tone="warning">Unpaid</Tag>}
-        {signed ? <Tag tone="success">Signed</Tag> : <Tag>Not signed</Tag>}
-        {a.filed_at && <Tag tone="success">Filed {fmtDay(a.filed_at)}</Tag>}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="t-sub">Sign, pay and file</h3>
+        <p className="tabular text-sm font-medium text-deep-ink">{money(a.fee_cents)}</p>
       </div>
-      {a.paid_at && <p className="mt-1 text-xs text-muted-foreground">Paid {fmtDay(a.paid_at)}{a.paid_method === "in_office" ? " in the office" : a.paid_method === "test" ? " (test payment)" : " online"}.</p>}
-      {!a.filed_at && (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {!a.paid_at && <Button size="sm" variant="secondary" disabled={paid.isPending} onClick={() => setConfirm("paid")}>{paid.isPending ? "Saving…" : "Paid in office"}</Button>}
-          <Button size="sm" disabled={!!reason || file.isPending} onClick={() => setConfirm("file")}>{file.isPending ? "Saving…" : "Mark filed"}</Button>
-          {reason && <span className="text-xs text-muted-foreground">{reason}</span>}
-        </div>
-      )}
+      <ul className="mt-3 divide-y divide-line-1 overflow-hidden rounded-xl border border-line-1 text-sm">
+        <li className="flex min-h-11 items-center justify-between gap-3 px-3 py-2"><span className="text-deep-ink">Form 8879</span>{signed ? <Tag tone="success">Signed</Tag> : <Tag>Waiting for the client</Tag>}</li>
+        <li className="flex min-h-11 items-center justify-between gap-3 px-3 py-2">
+          <span className="text-deep-ink">Payment{a.paid_at && <span className="text-muted-foreground">, {fmtDay(a.paid_at)}{a.paid_method === "in_office" ? " in the office" : a.paid_method === "test" ? " (test)" : " online"}</span>}</span>
+          {a.paid_at ? <Tag tone="success">Paid</Tag> : <span className="flex items-center gap-2"><Tag tone="warning">Unpaid</Tag>{!a.filed_at && <Button size="sm" variant="ghost" disabled={paid.isPending} onClick={() => setConfirm("paid")}>{paid.isPending ? "Saving…" : "Paid in office"}</Button>}</span>}
+        </li>
+        <li className="flex min-h-11 items-center justify-between gap-3 px-3 py-2">
+          <span className="text-deep-ink">E-file</span>
+          {a.filed_at ? <Tag tone="success">Filed {fmtDay(a.filed_at)}</Tag> : <Button size="sm" disabled={!!reason || file.isPending} onClick={() => setConfirm("file")} title={reason ?? undefined}>{file.isPending ? "Saving…" : "Mark filed"}</Button>}
+        </li>
+      </ul>
+      {!a.filed_at && reason && <p className="mt-2 text-xs text-muted-foreground">Mark filed unlocks when it's signed and paid. {reason}</p>}
       <AlertDialog open={!!confirm} onOpenChange={(v) => { if (!v) setConfirm(null); }}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>

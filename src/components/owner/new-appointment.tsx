@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Plus, Users, Video, X } from "lucide-react";
+import { Plus, Users, Video, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
   const openAppt = useApptPanel();
   const book = useServerFn(ownerBookAppointment);
   const [term, setTerm] = useState("");
+  const [mode, setMode] = useState<"find" | "new">("find");
   const [picked, setPicked] = useState<Client | null>(null);
   const [newClient, setNewClient] = useState({ name: "", email: "", phone: "" });
   const [serviceId, setServiceId] = useState<string | null>(null);
@@ -64,7 +65,7 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
   const services = useQuery({ queryKey: ["owner", "services-active"], queryFn: async () => { const { data, error } = await supabase.from("services").select("id, name, duration_min").eq("active", true).order("sort_order"); if (error) throw error; return data ?? []; } });
 
   const matches = term.trim().length > 0 ? (clients.data ?? []).filter((c) => `${c.name} ${c.email} ${c.phone ?? ""}`.toLowerCase().includes(term.trim().toLowerCase())).slice(0, 5) : [];
-  const who = picked ?? (newClient.name.trim() && /\S+@\S+\.\S+/.test(newClient.email) ? { name: newClient.name.trim(), email: newClient.email.trim(), phone: newClient.phone.trim() } : null);
+  const who = picked ?? (mode === "new" && newClient.name.trim() && /\S+@\S+\.\S+/.test(newClient.email) ? { name: newClient.name.trim(), email: newClient.email.trim(), phone: newClient.phone.trim() } : null);
   const svc = services.data?.find((s) => s.id === serviceId);
   const canBook = !!who && !!serviceId && !!slot && !busy;
 
@@ -91,7 +92,8 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
 
       <div className="space-y-6 px-6 py-5">
         <section>
-          <h3 className="mb-2 t-sub">Client</h3>
+          <h3 className="mb-3 flex items-center gap-2 t-sub"><span className="tabular grid size-5 place-items-center rounded-full bg-deep-ink text-[11px] font-semibold text-white">1</span>Client</h3>
+          {!picked && <Segmented className="mb-3" label="Client" value={mode} onChange={(v) => setMode(v)} options={[{ value: "find", label: "Existing client" }, { value: "new", label: "New client" }]} />}
           {picked ? (
             <div className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5">
               <span className="grid size-8 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{picked.name.charAt(0)}</span>
@@ -100,38 +102,37 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
             </div>
           ) : (
             <>
-              <Input aria-label="Search existing clients" placeholder="Search by name, email or phone" value={term} onChange={(e) => setTerm(e.target.value)} />
+              {mode === "find" && <><Input aria-label="Search existing clients" placeholder="Search by name, email or phone" value={term} onChange={(e) => setTerm(e.target.value)} />
               {matches.length > 0 && <ul className="mt-2 divide-y divide-border rounded-xl border border-border">{matches.map((c) => (
                 <li key={c.id}><button type="button" onClick={() => { setPicked(c); setTerm(""); }} className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <span className="min-w-0 flex-1 truncate text-sm text-deep-ink">{c.name} <span className="text-xs text-muted-foreground">{c.email}</span></span>
                 </button></li>))}</ul>}
-              {term.trim() && !clients.isLoading && matches.length === 0 && <p className="mt-2 text-xs text-muted-foreground">No client matches. Add them below.</p>}
-              <p className="mb-2 mt-4 text-xs text-muted-foreground">Or a new client</p>
-              <div className="grid gap-2 sm:grid-cols-2">
+              {term.trim() && !clients.isLoading && matches.length === 0 && <p className="mt-2 text-xs text-muted-foreground">No client matches. <button type="button" className="font-medium text-ink underline" onClick={() => { setMode("new"); setNewClient({ ...newClient, name: term.trim() }); }}>Add them as a new client</button></p>}
+              </>}
+              {mode === "new" && <div className="grid gap-2 sm:grid-cols-2">
                 <Input aria-label="Full name" placeholder="Full name" value={newClient.name} onChange={(e) => setNewClient({ ...newClient, name: e.target.value })} className="sm:col-span-2" />
                 <Input aria-label="Email" type="email" placeholder="Email" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} />
                 <Input aria-label="Phone" type="tel" placeholder="Phone (optional)" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} />
-              </div>
+              </div>}
             </>
           )}
         </section>
 
         <section>
-          <h3 className="mb-2 t-sub">Service</h3>
+          <h3 className="mb-3 flex items-center gap-2 t-sub"><span className="tabular grid size-5 place-items-center rounded-full bg-deep-ink text-[11px] font-semibold text-white">2</span>Service and place</h3>
           {services.isLoading ? <Skeleton className="h-24 rounded-xl" /> : (
             <div className="grid gap-2 sm:grid-cols-2">{(services.data ?? []).map((s) => (
               <Button key={s.id} variant="secondary" aria-pressed={serviceId === s.id} onClick={() => { setServiceId(s.id); setSlot(null); }}
-                className={cn("h-auto justify-between whitespace-normal px-3 py-2.5 text-left", serviceId === s.id && "bg-primary text-primary-foreground hover:bg-primary")}>
+                className={cn("h-auto min-h-11 justify-between gap-3 whitespace-normal px-3 py-2.5 text-left", serviceId === s.id && "bg-deep-ink text-white hover:bg-deep-ink")}>
                 <span className="text-sm">{s.name}</span><span className={cn("tabular text-xs", serviceId === s.id ? "text-primary-foreground/70" : "text-muted-foreground")}>{s.duration_min} min</span>
               </Button>))}</div>
           )}
+          <Segmented className="mt-3" label="Meeting type" value={meeting} onChange={setMeeting} options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />
         </section>
-
-        <Segmented label="Meeting type" value={meeting} onChange={setMeeting} options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />
 
         {serviceId && (
           <section>
-            <h3 className="mb-2 t-sub">Time <span className="text-xs font-normal text-muted-foreground">All times Eastern</span></h3>
+            <h3 className="mb-3 flex items-center gap-2 t-sub"><span className="tabular grid size-5 place-items-center rounded-full bg-deep-ink text-[11px] font-semibold text-white">3</span>Time<span className="text-xs font-normal text-muted-foreground">All times Eastern</span></h3>
             <SlotPicker key={serviceId} serviceId={serviceId!} value={slot} onChange={setSlot} />
           </section>
         )}
@@ -139,8 +140,8 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
       </div>
 
       <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 rounded-b-2xl border-t border-border bg-sheet px-6 py-4">
-        <span className="min-w-0 text-xs text-muted-foreground">{slot && svc ? `${svc.name}, ${fmtDateLong(slot)} at ${fmtTime(slot)}` : "Pick a client, service and time."}</span>
-        <div className="flex gap-2"><Button variant="secondary" onClick={onDone}>Cancel</Button><Button disabled={!canBook} onClick={submit}>{busy ? "Booking…" : "Book and send confirmation"}</Button></div>
+        <span className="min-w-0 text-xs text-muted-foreground">{!who ? "Choose or add the client." : !serviceId ? "Pick a service." : !slot ? "Pick a time." : `${who.name}: ${svc?.name}, ${fmtDateLong(slot)} at ${fmtTime(slot)}`}</span>
+        <div className="flex gap-2"><Button variant="secondary" onClick={onDone}>Cancel</Button><Button disabled={!canBook} onClick={submit}>{busy ? "Scheduling…" : "Schedule and send confirmation"}</Button></div>
       </footer>
     </div>
   );
@@ -150,24 +151,35 @@ function NewAppointmentForm({ onDone }: { onDone: () => void }) {
 export function SlotPicker({ serviceId, value, onChange }: { serviceId: string; value: string | null; onChange: (slot: string | null) => void }) {
   const fetchWindow = useServerFn(getAvailabilityWindow);
   const [date, setDate] = useState<string | null>(null);
-  const avail = useQuery({ queryKey: ["availability", serviceId], staleTime: 15_000, queryFn: () => fetchWindow({ data: { serviceId, days: 14 } }) });
+  const avail = useQuery({ queryKey: ["availability", serviceId], staleTime: 15_000, queryFn: () => fetchWindow({ data: { serviceId, days: 21 } }) });
   const days = (avail.data?.days ?? []).map((d) => ({ ...d, slots: d.slots.filter((x) => new Date(x).getUTCMinutes() % 30 === 0) }));
   const selDate = date ?? days.find((d) => d.slots.length)?.date ?? null;
   const day = days.find((d) => d.date === selDate);
+  const weeks = Math.max(1, Math.ceil(days.length / 7));
+  const [week, setWeek] = useState(0);
+  const shown = days.slice(week * 7, week * 7 + 7);
+  const weekLabel = shown.length ? `${fmtDayChip(shown[0]!.date).month} ${fmtDayChip(shown[0]!.date).day} to ${fmtDayChip(shown.at(-1)!.date).month} ${fmtDayChip(shown.at(-1)!.date).day}` : "";
   if (avail.isLoading) return <div className="flex gap-1">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[68px] rounded-lg" />)}</div>;
   if (avail.isError || avail.data?.error) return <p className="text-sm text-muted-foreground">Couldn't load times. <button className="font-medium text-ink underline" onClick={() => avail.refetch()}>Try again</button></p>;
   return (
     <>
-      <div className="flex gap-1 overflow-x-auto pb-2 [scrollbar-width:none]" role="listbox" aria-label="Choose a day">
-        {days.map((d) => {
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-deep-ink">{weekLabel}</p>
+        <div className="flex gap-1">
+          <Button variant="secondary" size="icon" aria-label="Previous week" disabled={week === 0} onClick={() => setWeek((w) => Math.max(0, w - 1))}><ChevronLeft /></Button>
+          <Button variant="secondary" size="icon" aria-label="Next week" disabled={week >= weeks - 1} onClick={() => setWeek((w) => Math.min(weeks - 1, w + 1))}><ChevronRight /></Button>
+        </div>
+      </div>
+      <div className="grid grid-cols-7 gap-1" role="listbox" aria-label="Choose a day">
+        {shown.map((d) => {
           const c = fmtDayChip(d.date); const active = d.date === selDate; const n = d.slots.length; const full = !d.closed && n === 0;
           return (
-            <Button key={d.date} variant="secondary" role="option" aria-selected={active} disabled={d.closed || full} onClick={() => { setDate(d.date); onChange(null); }}
-              className={cn("flex h-[68px] w-[68px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border px-1", active ? "border-deep-ink bg-deep-ink text-primary-foreground hover:bg-deep-ink" : d.closed ? "border-transparent bg-transparent text-muted-foreground/50" : "border-line-1 bg-sheet")}>
-              <span className={cn("text-[11px]", active ? "text-primary-foreground/70" : "text-muted-foreground")}>{c.dow}</span>
+            <button key={d.date} type="button" role="option" aria-selected={active} disabled={d.closed || full} onClick={() => { setDate(d.date); onChange(null); }}
+              className={cn("flex min-h-[64px] flex-col items-center justify-center gap-0.5 rounded-lg border px-0.5 transition-colors duration-150", active ? "border-deep-ink bg-deep-ink text-white" : d.closed || full ? "border-transparent text-muted-foreground/60" : "border-line-1 bg-sheet text-deep-ink hover:border-line-3")}>
+              <span className={cn("text-[11px]", active ? "text-white/70" : "text-muted-foreground")}>{c.dow}</span>
               <span className="tabular text-base font-medium leading-tight">{c.day}</span>
-              <span className={cn("text-[10px] font-medium", active ? "text-primary-foreground/80" : full || d.closed ? "text-muted-foreground" : "text-success")}>{d.closed ? "Closed" : full ? "Full" : `${n} open`}</span>
-            </Button>
+              <span className={cn("text-[10px] font-medium", active ? "text-white/80" : full || d.closed ? "" : "text-success")}>{d.closed ? "Closed" : full ? "Full" : `${n} open`}</span>
+            </button>
           );
         })}
       </div>

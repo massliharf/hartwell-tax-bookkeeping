@@ -14,7 +14,7 @@ export function Segmented<T extends string>({ value, onChange, options, label, c
         const active = o.value === value;
         return (
           <button key={o.value} type="button" role="radio" aria-checked={active} onClick={() => onChange(o.value)}
-            className={cn("relative inline-flex shrink-0 items-center justify-center gap-2 rounded-md px-3 font-medium transition-colors duration-150", size === "md" ? "h-9 text-[13px] sm:h-7 sm:text-xs" : "h-7 text-xs", active ? "text-deep-ink" : "text-muted-foreground hover:text-deep-ink")}>
+            className={cn("relative inline-flex shrink-0 items-center justify-center gap-2 rounded-md px-3 font-medium transition-colors duration-150", size === "md" ? "h-9 text-[13px] sm:h-7 sm:text-xs" : "h-9 text-xs sm:h-7 sm:text-xs", active ? "text-deep-ink" : "text-muted-foreground hover:text-deep-ink")}>
             {active && <motion.span layoutId={`seg-${id}`} transition={reduce ? { duration: 0 } : { duration: 0.2, ease: [0.4, 0, 0.2, 1] }} className="absolute inset-0 rounded-md bg-sheet shadow-[0_1px_2px_rgba(16,16,16,0.08)]" />}
             <span className="relative inline-flex items-center gap-2 [&_svg]:size-3.5">{o.label}</span>
           </button>

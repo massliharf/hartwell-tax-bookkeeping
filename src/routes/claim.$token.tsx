@@ -44,7 +44,8 @@ function ClaimPage() {
   const [state, setState] = useState<"idle" | "busy" | "missed" | { token: string }>("idle");
 
   if (q.isLoading) return <Shell><div role="status" aria-label="Loading" className="space-y-4"><Skeleton className="mx-auto h-5 w-36" /><Skeleton className="mx-auto h-9 w-64 max-w-full" /><Skeleton className="mx-auto h-6 w-44" /><Skeleton className="mx-auto mt-8 h-10 w-full" /></div></Shell>;
-  if (q.isError || !q.data) return <Shell><ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See open times</Link></Button>}>It may have expired. You're still on the waitlist, and we'll email you when another spot opens.</ResultPanel></Shell>;
+  if (q.isError) return <Shell><ResultPanel icon={<Clock />} tone="warning" title="This page didn't load." actions={<Button size="lg" onClick={() => q.refetch()}>Try again</Button>}>Your place on the waitlist is safe. Try again in a moment.</ResultPanel></Shell>;
+  if (!q.data) return <Shell><ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<Button asChild size="lg" variant="secondary"><Link to="/book">See open times</Link></Button>}>It may have expired. You're still on the waitlist, and we'll email you when another spot opens.</ResultPanel></Shell>;
   if (state === "missed" || (state === "idle" && q.data.status !== "open")) return <Shell><Missed /></Shell>;
   if (typeof state === "object") {
     return (

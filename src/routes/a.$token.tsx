@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon, Hourglass } from "lucide-react";
+import { AlertTriangle, Camera, Check, ChevronDown, CreditCard, FileText, Loader2, Lock, MapPin, Upload, Video, Users, CalendarClock, X, PenLine, Link as LinkIcon, Hourglass, RotateCcw } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -82,7 +82,16 @@ function PortalPage() {
   const q = useQuery({ queryKey: ["portal", token], queryFn: () => fetchAppt({ data: { token } }), retry: false });
   const refresh = () => q.refetch();
 
-  if (q.isError || (q.data && !q.data.appointment)) {
+  if (q.isError) {
+    return (
+      <BookingShell>
+        <ResultPanel icon={<RotateCcw />} tone="warning" title="Your appointment didn't load." actions={<><Button size="lg" onClick={() => q.refetch()}>Try again</Button><Button asChild size="lg" variant="secondary"><a href="tel:+19735550142">Call (973) 555-0142</a></Button></>}>
+          It's on our side, not yours. Try again in a moment.
+        </ResultPanel>
+      </BookingShell>
+    );
+  }
+  if (q.data && !q.data.appointment) {
     return (
       <BookingShell>
         <ResultPanel icon={<LinkIcon />} tone="warning" title="This link isn't working." actions={<><Button asChild size="lg"><Link to="/book/returning">Email me a new link</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/">Back to home</Link></Button></>}>
@@ -152,8 +161,8 @@ function PortalPage() {
 
         {/* 1. Before the meeting: when and where, confirm/move/cancel, then the checklist. */}
         {ahead && <>
-          <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} />
           {!!a.intake_answers?.["intake_pending"] && <IntakeCard token={token} slug={a.services?.slug ?? null} onDone={refresh} />}
+          <AppointmentCard appt={a} mode="upcoming" videoLink={q.data.videoLink ?? null} />
           <Actions token={token} appt={a} onChange={refresh} />
           {stage === "ready" ? sentDocs : checklist}
         </>}
@@ -234,7 +243,6 @@ function Timeline({ a, items, stage, nowIso }: { a: Appt; items: Item[]; stage: 
           </li>
         ))}
       </ol>
-      <p className="sr-only">Now: {nowIso}</p>
     </section>
   );
 }
@@ -255,14 +263,14 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
   };
   return (
     <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
-      <h2 className="t-sub">A few quick questions</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Claire booked this for you by phone. Your answers tell us exactly which documents to bring.</p>
+      <h2 className="t-card text-deep-ink">Tell Claire about your year.</h2>
+      <p className="mt-1 text-sm text-muted-foreground">A few yes-or-no questions. Your answers become the exact list of documents to bring.</p>
       <div className="mt-5 space-y-4">
         {qs.map((x) => (
           <div key={x.key} className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm text-deep-ink">{x.label}</span>
             {x.type === "count" ? (
-              <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" variant={ans[x.key] === n ? "dark" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
+              <div className="flex gap-1">{[0, 1, 2, 3].map((n) => <Button key={n} size="sm" className="min-w-10" variant={ans[x.key] === n ? "dark" : "secondary"} aria-pressed={ans[x.key] === n} onClick={() => setAns({ ...ans, [x.key]: n })}>{n === 3 ? "3+" : n}</Button>)}</div>
             ) : (
               <Segmented label={x.label} value={ans[x.key] === true ? "yes" : ans[x.key] === false ? "no" : ("" as "yes" | "no")} onChange={(v) => setAns({ ...ans, [x.key]: v === "yes" })} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
             )}
@@ -546,8 +554,8 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
           </div>
         )}
       {err && <p className="mt-2 text-sm text-destructive" role="alert">{err}</p>}
-      <input ref={fileRef} type="file" className="sr-only" accept="application/pdf,image/jpeg,image/png,image/heic,image/heif,.heic,.heif" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
-      <input ref={camRef} type="file" className="sr-only" accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+      <input ref={fileRef} type="file" className="sr-only" aria-label={`Upload ${item.document_name}`} accept="application/pdf,image/jpeg,image/png,image/heic,image/heif,.heic,.heif" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+      <input ref={camRef} type="file" className="sr-only" aria-label={`Take a photo of ${item.document_name}`} accept="image/jpeg,image/png" capture="environment" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
     </li>
   );
 }

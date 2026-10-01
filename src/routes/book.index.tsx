@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Loader2, Minus, Plus, Video, Users, Lock, CalendarCheck } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Video, Users, Lock } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,17 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Segmented } from "@/components/ui/segmented";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DocumentStack } from "@/components/brand/DocumentStack";
 import { ServiceIcon } from "@/components/brand/ServiceIcon";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
 import { getLeadDraft } from "@/lib/automations.functions";
-import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
+import { fmtDateLong, fmtDayChip, fmtTime, type Answers } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
-  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(3).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
+  validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(1).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
   head: () => ({
     meta: [
       { title: "Book an appointment — Hartwell Tax & Bookkeeping" },
@@ -69,7 +68,7 @@ function BookPage() {
       fetchLead({ data: { id: search.resume } }).then((l) => {
         if (!l) { navigate({ search: {}, replace: true }); return; }
         update({ email: l.email, name: l.name, meetingType: l.meetingType, answers: l.answers as Answers, ...(l.service ? { serviceSlug: l.service } : {}), slot: undefined, date: undefined });
-        navigate({ search: { step: l.service ? 2 : 0 }, replace: true });
+        navigate({ search: { step: 0 }, replace: true });
       }).catch(() => {});
       return;
     }
@@ -80,12 +79,12 @@ function BookPage() {
       return;
     }
     if (search.service && search.service !== draft.serviceSlug) update({ serviceSlug: search.service, slot: undefined, date: undefined });
+    else if (!draft.serviceSlug) update({ serviceSlug: "individual" });
   }, [loaded, search.service, search.resume, search.start, draft.serviceSlug, update, fetchLead, navigate]);
 
   const service = services.data?.find((s) => s.slug === draft.serviceSlug);
   let step = search.step ?? 0;
-  if (loaded && !draft.serviceSlug) step = 0;
-  if (loaded && step === 3 && !draft.slot) step = 2;
+  if (loaded && step === 1 && !draft.slot) step = 0;
 
   // Steps slide forward or back with the direction of travel (DESIGN_SYSTEM motion: expo-out, 260ms).
   const prevStep = useRef(step);
@@ -97,10 +96,9 @@ function BookPage() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "instant" });
   };
 
-  const preview = useMemo(() => previewChecklist(draft.serviceSlug, draft.answers), [draft.serviceSlug, draft.answers]);
-  const questionsComplete = questionsFor(draft.serviceSlug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean");
   const detailsComplete = draft.name.trim().length > 0 && emailOk(draft.email);
-  const canContinue = step === 0 ? !!service : step === 1 ? questionsComplete : step === 2 ? !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date : detailsComplete && !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date && !bookingBusy;
+  const slotOk = !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date;
+  const canContinue = step === 0 ? !!service && slotOk : detailsComplete && slotOk && !bookingBusy;
 
   if (!loaded) {
      return <BookingShell step={0}><div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]"><div><Skeleton className="h-10 w-3/4" /><Skeleton className="mt-3 h-5 w-2/3" /><div className="mt-14 grid gap-5 sm:grid-cols-2">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div></div><div className="hidden lg:block"><Skeleton className="h-48 rounded-2xl" /></div></div></BookingShell>;
@@ -118,147 +116,24 @@ function BookPage() {
               exit={reduce ? { opacity: 0 } : { opacity: 0, x: -8 * dir }}
               transition={{ duration: reduce ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}
             >
-              {step === 0 && (
-                <ServiceStep
-                  services={services}
-                  selected={draft.serviceSlug}
-                  onPick={(slug) => {
-                    if (slug !== draft.serviceSlug) update({ serviceSlug: slug, slot: undefined, date: undefined });
-                  }}
-                />
-              )}
-              {step === 1 && (
-                <>
-                  {draft.slot && (
-                    <p className="mb-6 flex items-center gap-2.5 rounded-2xl bg-ink-50 px-4 py-3 text-sm text-deep-ink">
-                      <CalendarCheck className="size-4 shrink-0 text-ink" />
-                      <span>Your time: <span className="font-medium">{fmtDateLong(draft.slot)} at {fmtTime(draft.slot)}</span>. Answer a few questions and it's yours.</span>
-                    </p>
-                  )}
-                  <QuestionsStep slug={draft.serviceSlug} answers={draft.answers} onChange={(answers) => update({ answers })} />
-                </>
-              )}
-              {step === 2 && service && <TimeStep service={service} draft={draft} update={update} />}
-              {step === 3 && service && <DetailsStep service={service} draft={draft} update={update} busy={bookingBusy} setBusy={setBookingBusy} onPickAgain={() => go(2)} />}
+              {step === 0 && (service
+                ? <TimeStep service={service} services={services.data ?? []} draft={draft} update={update} />
+                : <div className="space-y-4"><Skeleton className="h-9 w-2/3" /><Skeleton className="h-9 w-full" /><Skeleton className="h-40 w-full" /></div>)}
+              {step === 1 && service && <DetailsStep service={service} draft={draft} update={update} busy={bookingBusy} setBusy={setBookingBusy} onPickAgain={() => go(0)} />}
             </motion.div>
           </AnimatePresence>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-sheet px-5 py-3 lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
-            <Dialog><DialogTrigger asChild><Button variant="ghost" size="icon" className="relative shrink-0 lg:hidden" aria-label={`Your checklist, ${service ? preview.length : 0} documents`}><FileText className="size-4" /><span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-fill-selected text-[10px] text-deep-ink">{service ? preview.length : 0}</span></Button></DialogTrigger>
-              <DialogContent className="max-w-md"><DialogTitle className="sr-only">Your checklist</DialogTitle><ChecklistPreview docs={preview} hasService={!!service} /></DialogContent>
-            </Dialog>
             {step === 0 ? <Button asChild variant="secondary" size="lg"><Link to="/">Back</Link></Button> : <Button variant="secondary" size="lg" onClick={() => go(step - 1)}><ArrowLeft className="size-4" /> Back</Button>}
-            <Button size="lg" className="flex-1 lg:flex-none" type={step === 3 ? "submit" : "button"} form={step === 3 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 3 ? () => go(step + 1) : undefined}>{step === 3 ? "Book my appointment" : "Continue"}</Button>
+            <Button size="lg" className="flex-1 lg:flex-none" type={step === 1 ? "submit" : "button"} form={step === 1 ? "booking-details" : undefined} disabled={!canContinue} onClick={step === 0 ? () => go(1) : undefined}>{step === 1 ? (bookingBusy ? "Booking…" : "Book this time") : "Continue"}</Button>
           </div>
         </div>
-        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">
-          {step === 3 && service && <BookingSummary service={service} draft={draft} onPickAgain={() => go(2)} />}
-          <ChecklistPreview docs={preview} hasService={!!service} />
-        </div></aside>
+        <aside className="hidden lg:block"><div className="sticky top-8">{service && <BookingSummary service={service} draft={draft} onPickAgain={step === 1 ? () => go(0) : undefined} />}</div></aside>
       </div>
     </BookingShell>
   );
 }
 
-function ChecklistPreview({ docs, hasService }: { docs: ReturnType<typeof previewChecklist>; hasService: boolean }) {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-sheet">
-      <div className="bg-surface-2 p-3 px-4">
-         <p className="text-xs font-medium leading-6 text-muted-foreground">Your checklist so far</p>
-         <p className="t-card text-deep-ink">
-           <span className="tabular">{hasService ? docs.length : 0}</span> document{hasService && docs.length === 1 ? "" : "s"}
-        </p>
-      </div>
-       {hasService ? <><div className="max-h-[440px] overflow-y-auto px-4 pt-4"><DocumentStack docs={[...docs].reverse().map((d) => ({ ...d, received: false }))} /></div>
-       <p className="px-4 pb-6 pt-4 text-xs text-muted-foreground">You'll upload these after booking. They never hold up your appointment.</p></> : <p className="px-4 py-8 text-sm text-muted-foreground">Pick a service to start your checklist.</p>}
-    </div>
-  );
-}
-
-/* ---------- Step 1: service ---------- */
-function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
-  return (
-    <>
-       <StepTitle hideEyebrow eyebrow="Step 1 of 4" title="What can Claire help with?" sub="Pick the closest fit. You can add details in the next step." />
-      <div className="mb-6 text-sm text-muted-foreground">
-        Already booked, or booking again? <Link to="/book/returning" className="font-medium text-ink underline underline-offset-4">Get your private link</Link>
-      </div>
-       {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
-      {services.isError && (
-        <div className="rounded-2xl bg-surface-2 p-6 text-sm">
-          We couldn't load the services. <button className="font-medium text-ink underline" onClick={() => services.refetch()}>Try again</button>
-        </div>
-      )}
-       <div className="grid gap-3 sm:grid-cols-2">
-        {services.data?.map((s) => {
-          const active = s.slug === selected;
-          return (
-             <button
-              key={s.id}
-              type="button"
-              onClick={() => onPick(s.slug)}
-              aria-pressed={active}
-              className={`lift flex min-h-36 w-full flex-col rounded-[22px] border p-5 text-left ${active ? "border-ink bg-ink-50 shadow-[0_0_0_1px_var(--color-ink)]" : "border-line-1 bg-sheet hover:border-line-2 hover:bg-surface-2"}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <ServiceIcon service={s.slug} size={40} />
-                <span className={`mt-1 size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] duration-150 ${active ? "border-[6px] border-ink" : "border-line-2 bg-sheet"}`} />
-              </div>
-              <h2 className="mt-3 t-card text-deep-ink">{s.name}</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">{s.description}</p>
-              <div className="mt-auto flex items-center justify-between pt-4 text-sm">
-                <span className="tabular text-muted-foreground">{s.duration_min} min</span>
-                <span className="text-deep-ink">
-                  {s.is_from_price && <span className="mr-1 text-xs text-muted-foreground">from</span>}
-                  <span className="tabular text-base font-semibold">${Number(s.price_from)}</span>
-                </span>
-              </div>
-             </button>
-          );
-        })}
-      </div>
-      <p className="mt-6 text-sm text-muted-foreground">No payment now. The fee is paid when your return is filed.</p>
-    </>
-  );
-}
-
-/* ---------- Step 2: questions ---------- */
-function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void }) {
-  const qs = questionsFor(slug);
-  const set = (k: keyof Answers, v: boolean | number) => onChange({ ...answers, [k]: v });
-
-  return (
-    <>
-       <StepTitle hideEyebrow eyebrow="Step 2 of 4" title="A few quick questions" sub="This builds your personal checklist, so you'll know exactly what to bring." />
-      <div className="space-y-3">
-         {qs.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-deep-ink">{q.label}</p>
-              {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
-            </div>
-            {q.type === "count" ? (
-              <div className="flex h-10 shrink-0 items-center gap-1 rounded-lg bg-fill-neutral px-1">
-                <button aria-label="Fewer" onClick={() => set(q.key, Math.max(0, ((answers[q.key] as number) ?? 0) - 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-selected">
-                  <Minus className="size-3.5" />
-                </button>
-                <span className="tabular w-6 text-center text-xs font-semibold">{(answers[q.key] as number) ?? 0}</span>
-                <button aria-label="More" onClick={() => set(q.key, Math.min(6, ((answers[q.key] as number) ?? 0) + 1))} className="grid size-8 place-items-center rounded-md transition-colors duration-150 hover:bg-fill-selected">
-                  <Plus className="size-3.5" />
-                </button>
-              </div>
-            ) : (
-              <Segmented className="shrink-0" label={q.label} value={answers[q.key] === true ? "yes" : answers[q.key] === false ? "no" : ("" as "yes" | "no")}
-                onChange={(v) => set(q.key, v === "yes")} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
-            )}
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-/* ---------- Step 3: time ---------- */
-function TimeStep({ service, draft, update }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void }) {
+function TimeStep({ service, services, draft, update }: { service: Service; services: Service[]; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void }) {
   const fetchWindow = useServerFn(getAvailabilityWindow);
   const strip = useRef<HTMLDivElement>(null);
   const q = useQuery({ queryKey: ["availability", service.id], queryFn: () => fetchWindow({ data: { serviceId: service.id, days: 14 } }), staleTime: 30_000 });
@@ -270,7 +145,15 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 3 of 4" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. All times Eastern.`} />
+        <StepTitle hideEyebrow eyebrow="Step 1 of 2" title="Book a time with Claire" sub="All times are Eastern. You can move or cancel later from your link." />
+      <div role="radiogroup" aria-label="Service" className="mb-5 flex flex-wrap gap-1.5">
+        {services.map((x) => (
+          <button key={x.slug} type="button" role="radio" aria-checked={x.slug === service.slug} onClick={() => { if (x.slug !== service.slug) update({ serviceSlug: x.slug, slot: undefined, date: undefined }); }}
+            className={`h-10 rounded-md border px-3.5 text-[13px] font-semibold transition-colors duration-150 ${x.slug === service.slug ? "border-ink bg-ink text-white" : "border-line-1 bg-sheet text-body hover:border-line-3"}`}>
+            {x.name}
+          </button>
+        ))}
+      </div>
       <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
         options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />
 
@@ -381,11 +264,30 @@ function WaitlistPanel({ service, date, draft }: { service: Service; date: strin
 }
 
 /* ---------- Step 4: details + book ---------- */
-function BookingSummary({ service, draft, onPickAgain }: { service: Service; draft: BookingDraft; onPickAgain: () => void }) {
-  return <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-sheet p-4">
-    <div className="min-w-0"><p className="font-medium text-deep-ink">{service.name}</p><p className="text-sm text-muted-foreground">{draft.slot && `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}`}, {draft.meetingType === "video" ? "Video call" : "In person"}</p></div>
-    <Button size="sm" variant="secondary" onClick={onPickAgain}>Change</Button>
-  </div>;
+function BookingSummary({ service, draft, onPickAgain }: { service: Service; draft: BookingDraft; onPickAgain?: (() => void) | undefined }) {
+  const rows: [string, string][] = [
+    ["Service", service.name],
+    ["When", draft.slot ? `${fmtDateLong(draft.slot)}, ${fmtTime(draft.slot)}` : "Pick a time"],
+    ["Where", draft.meetingType === "video" ? "Video call" : "412 Bloomfield Ave, Montclair"],
+    ["Length", `${service.duration_min} minutes`],
+    ["Fee", `${service.is_from_price ? "From " : ""}$${service.price_from}, paid when your return is filed`],
+  ];
+  return (
+    <div className="overflow-hidden rounded-xl border border-line-2 bg-sheet">
+      <p className="bg-deep-ink px-4 py-2.5 text-[13px] font-bold text-white">Your appointment</p>
+      <dl className="divide-y divide-line-1">
+        {rows.map(([k, v]) => (
+          <div key={k} className="grid grid-cols-[72px_1fr] gap-3 px-4 py-2.5 text-[13px]">
+            <dt className="font-semibold text-muted-foreground">{k}</dt><dd className={k === "When" && !draft.slot ? "text-muted-foreground" : "text-deep-ink"}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="border-t border-line-1 bg-surface-2 px-4 py-3 text-[12px] leading-5 text-muted-foreground">
+        Confirmed as soon as you book. Move or cancel any time from your link.
+        {onPickAgain && <button type="button" onClick={onPickAgain} className="ml-1 font-semibold text-ink underline underline-offset-2">Change time</button>}
+      </div>
+    </div>
+  );
 }
 
 function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { service: Service; draft: BookingDraft; update: (p: Partial<BookingDraft>) => void; busy: boolean; setBusy: (value: boolean) => void; onPickAgain: () => void }) {
@@ -407,7 +309,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
     try {
       const r = await book({ data: {
         serviceId: service.id, start: slot, name: draft.name.trim(), email: draft.email.trim(),
-        phone: draft.phone.trim() || undefined, meetingType: draft.meetingType, intake: toIntakePayload(service.slug, draft.answers),
+        phone: draft.phone.trim() || undefined, meetingType: draft.meetingType, intake: { intake_pending: true },
       } });
       if (r.ok) {
         clearDraft();
@@ -426,7 +328,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
 
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 4 of 4" title="Your details" sub="So we can send your confirmation and checklist." />
+       <StepTitle hideEyebrow eyebrow="Step 2 of 2" title="Your details" sub="Where to send your confirmation. That's all we need to book." />
        <div className="mb-6 lg:hidden"><BookingSummary service={service} draft={draft} onPickAgain={onPickAgain} /></div>
        <form id="booking-details" className="w-full space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot && draft.date === nyDay(draft.slot)) submit(draft.slot); }}>
         <div className="space-y-1.5">
@@ -465,7 +367,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
         )}
 
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <Lock className="mt-0.5 size-3.5 shrink-0" /> We'll never ask for your Social Security number online. Confirmed instantly, no payment now.
+          <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed instantly, nothing to pay now. We never ask for your Social Security number online.
         </p>
       </form>
     </>

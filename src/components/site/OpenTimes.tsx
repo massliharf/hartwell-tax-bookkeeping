@@ -45,7 +45,7 @@ export function OpenTimes() {
       <div role="tablist" aria-label="Service" className="-mx-1 mt-3 flex gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
         {(services.data ?? []).map((s) => (
           <button key={s.slug} role="tab" aria-selected={s.slug === svc?.slug} type="button" onClick={() => setSlug(s.slug)}
-            className={cn("h-8 shrink-0 rounded-full px-3 text-[12.5px] font-medium transition-colors duration-150", s.slug === svc?.slug ? "bg-deep-ink text-white" : "bg-tint-1 text-body hover:bg-tint-2")}>
+            className={cn("h-10 shrink-0 rounded-full px-3 text-[12.5px] font-medium transition-colors duration-150 sm:h-8", s.slug === svc?.slug ? "bg-deep-ink text-white" : "bg-tint-1 text-body hover:bg-tint-2")}>
             {SHORT[s.slug] ?? s.name}
           </button>
         ))}
@@ -74,7 +74,7 @@ export function OpenTimes() {
       </div>
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-line-1 pt-4 text-[12.5px]">
         <span className="text-muted-foreground">{next ? `Next: ${dayLabel(days[0]!.date)}, ${time(next)}` : "\u00a0"}{svc ? ` · ${svc.duration_min} min` : ""}</span>
-        <Link to="/book" search={{ service: svc?.slug }} className="group inline-flex items-center gap-1 font-medium text-ink">All times<ArrowRight className="size-3.5 transition-transform duration-150 group-hover:translate-x-0.5" /></Link>
+        <Link to="/book" search={{ service: svc?.slug }} className="group inline-flex min-h-10 items-center gap-1 font-medium text-ink">All times<ArrowRight className="size-3.5 transition-transform duration-150 group-hover:translate-x-0.5" /></Link>
       </div>
     </div>
   );

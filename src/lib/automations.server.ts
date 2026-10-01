@@ -41,6 +41,8 @@ export async function sendBookingConfirmation(apptId: string, origin: string) {
   const docs = await missingDocs(a.id);
   const portal = `${origin}/a/${a.manage_token}`;
   const when = `${fmtDate(a.start_at)} at ${fmtTime(a.start_at)}`;
+  const { data: ia } = await s.from("appointments").select("intake_answers").eq("id", a.id).maybeSingle();
+  const pending = !!(ia?.intake_answers as Record<string, unknown> | null)?.["intake_pending"];
   await sendMessage({
     dedupeKey: `confirm:${a.id}:${a.start_at}`, type: "booking_confirmation", minutesSaved: 5,
     clientId: a.clients.id, appointmentId: a.id, to: a.clients.email,
@@ -49,8 +51,9 @@ export async function sendBookingConfirmation(apptId: string, origin: string) {
     blocks: [
       { p: `${a.services?.name ?? "Your appointment"} on ${when} (Eastern).` },
       where(a),
-      ...(docs.all.length ? [{ p: "Here is your personal checklist. Upload whenever it suits you, there's no rush today." } as Block, { list: docs.all }] : []),
-      { button: { label: "Open your appointment", href: portal } },
+      ...(pending
+        ? [{ p: "One more minute: answer five yes-or-no questions about your year, and you'll get the exact list of documents to bring." } as Block, { button: { label: "Answer the questions", href: portal } } as Block]
+        : [...(docs.all.length ? [{ p: "Here is your personal checklist. Upload whenever it suits you, there's no rush today." } as Block, { list: docs.all } as Block] : []), { button: { label: "Open your appointment", href: portal } } as Block]),
       { note: "A calendar invite is attached. Your documents go to private storage that only Claire can see." },
     ],
     ics: buildIcs({ id: a.id, start: a.start_at, end: a.end_at, title: `Hartwell Tax: ${a.services?.name ?? "Appointment"}`,

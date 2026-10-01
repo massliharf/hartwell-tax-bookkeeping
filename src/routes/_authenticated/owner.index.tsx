@@ -1,63 +1,33 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRight, CalendarDays, CreditCard, FileSearch, Plus, Send, Users, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, apptsRange, et, etToIso, fmtLong, needsYou, readyToFile } from "@/components/owner/lib";
 import { ApptList, Empty, ErrorNote, LoadingRows, NeedsList } from "@/components/owner/ui";
-import { useApptPanel } from "@/components/owner/drawer-context";
-import { openNewAppointment } from "@/components/owner/new-appointment";
+import { NewAppointmentButton } from "@/components/owner/new-appointment";
 import { Tag } from "@/components/ui/tag";
 
 export const Route = createFileRoute("/_authenticated/owner/")({ head: () => ({ meta: [{ title: "Today — Hartwell Tax & Bookkeeping" }, { name: "description", content: "Today at Hartwell Tax & Bookkeeping." }, { property: "og:title", content: "Today — Hartwell Tax & Bookkeeping" }, { property: "og:description", content: "Today at Hartwell Tax & Bookkeeping." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Today });
 
-type Shortcut = { label: string; icon: LucideIcon; rgb: string; count?: number | undefined; onClick: () => void; disabled?: boolean };
 
-/** Home base: greeting, shortcuts, then the work in two columns. Search stays in the owner navigation. */
+/** Home base: what went out on its own, what needs Claire, and today. Navigation, search and New appointment live in the sidebar. */
 function Today() {
   const now = useOwnerCtx().data!.now;
-  const navigate = useNavigate();
-  const openAppt = useApptPanel();
   const { ymd, minutes } = et(now);
   const q = useQuery(apptsRange(etToIso(ymd, 0), etToIso(addDays(ymd, 1), 0)));
-  const upcoming = useQuery(apptsRange(etToIso(addDays(ymd, 1), 0), etToIso(addDays(ymd, 15), 0)));
   const needs = useQuery(needsYou(now));
   const toFile = useQuery(readyToFile());
   const hi = minutes < 12 * 60 ? "Good morning" : minutes < 17 * 60 ? "Good afternoon" : "Good evening";
-  const review = needs.data?.filter((i) => i.kind === "review") ?? [];
-  const unpaid = needs.data?.filter((i) => i.kind === "unpaid") ?? [];
-  const reviewCount = review.reduce((sum, i) => sum + (i.kind === "review" ? i.count : 0), 0);
-  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  const shortcuts: Shortcut[] = [
-    { label: "New appointment", icon: Plus, rgb: "122,31,31", onClick: openNewAppointment },
-    { label: "Calendar", icon: CalendarDays, rgb: "125,91,166", onClick: () => navigate({ to: "/owner/calendar" }) },
-    { label: "Clients", icon: Users, rgb: "62,125,96", onClick: () => navigate({ to: "/owner/clients" }) },
-    { label: "Documents to check", icon: FileSearch, rgb: "196,128,20", count: reviewCount, disabled: !reviewCount, onClick: () => { const r = review[0]; if (r) openAppt({ appointmentId: r.id }); } },
-    { label: "Unpaid", icon: CreditCard, rgb: "179,38,30", count: unpaid.length, disabled: !unpaid.length, onClick: () => scrollTo("today-needs") },
-    { label: "Ready to file", icon: Send, rgb: "30,107,69", count: toFile.data?.length ?? 0, disabled: !toFile.data?.length, onClick: () => scrollTo("today-to-file") },
-  ];
   return (
     <div className="pb-6">
-      <header className="pt-2 text-left sm:pt-4">
+      <header className="flex items-start justify-between gap-3 pt-2 sm:pt-4">
+        <div>
         <h1 className="font-serif text-[26px] font-medium leading-9 text-deep-ink sm:text-[28px] sm:leading-[42px]">{hi}, Claire.</h1>
         <p className="mt-1 text-[13px] text-muted-foreground">{fmtLong(now)}</p>
+        </div>
+        <div className="sm:hidden"><NewAppointmentButton /></div>
       </header>
-
-      <ul className="mt-5 grid grid-cols-3 gap-1 sm:mt-6 sm:grid-cols-6 lg:max-w-[760px]">
-        {shortcuts.map((s) => (
-          <li key={s.label}>
-            <button type="button" onClick={s.onClick} disabled={s.disabled}
-              className="group relative flex w-full flex-col items-center gap-2.5 rounded-2xl px-1 py-3 text-center transition-colors duration-150 hover:bg-tint-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent">
-              <span className="grid size-12 place-items-center rounded-lg" style={{ backgroundColor: `rgba(${s.rgb},0.1)`, color: `rgb(${s.rgb})` }}>
-                <s.icon className="size-5" strokeWidth={1.75} />
-              </span>
-              <span className="text-[12.5px] font-medium leading-4 text-deep-ink">{s.label}</span>
-              {!!s.count && <span className="tabular absolute right-3 top-1.5 grid min-w-5 place-items-center rounded-full bg-ink px-1.5 text-[10px] font-semibold leading-5 text-white">{s.count}</span>}
-            </button>
-          </li>
-        ))}
-      </ul>
 
       <SavedBanner now={now} />
 
@@ -84,13 +54,6 @@ function Today() {
             {q.isError && <ErrorNote onRetry={() => q.refetch()} />}
             {q.data && !q.data.length && <Empty title="A quiet day.">Nothing on the calendar. New bookings show up here on their own.</Empty>}
             {q.data && !!q.data.length && <ApptList appts={q.data} />}
-          </section>
-          <section>
-            <h2 className="mb-3 t-sub">Next up</h2>
-            {upcoming.isLoading && <LoadingRows n={3} />}
-            {upcoming.isError && <ErrorNote onRetry={() => upcoming.refetch()} />}
-            {upcoming.data && !upcoming.data.length && <p className="text-sm text-muted-foreground">No appointments in the next two weeks.</p>}
-            {upcoming.data && !!upcoming.data.length && <ApptList appts={upcoming.data.slice(0, 5)} showDate />}
           </section>
         </div>
       </div>

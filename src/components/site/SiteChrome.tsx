@@ -23,7 +23,7 @@ export function AnnouncementBar() {
 }
 
 function Wordmark() {
-  return <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="min-w-0"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>;
+  return <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>;
 }
 
 const LINKS = [{ href: "/#what", label: "What we do" }, { href: "/#how", label: "How it works" }, { href: "/#services", label: "Prices" }, { href: "/#about", label: "About" }, { href: "/#faq", label: "FAQ" }];
@@ -89,7 +89,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-xs text-white/50">
           <span>© {new Date().getFullYear()} Hartwell Tax & Bookkeeping</span>
-          <span className="flex gap-5"><Link to="/story" className="inline-flex min-h-10 items-center hover:text-white">Case study</Link><Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner login</Link></span>
+          <Link to="/owner" className="inline-flex min-h-10 items-center hover:text-white">Owner login</Link>
         </div>
       </div>
     </footer>

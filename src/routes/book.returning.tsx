@@ -58,7 +58,7 @@ function ReturningPage() {
               </Button>
               <p className="text-center text-xs text-muted-foreground">For your privacy, we never show booking details on this page.</p>
             </form>
-            <p className="mt-6 text-center text-sm text-muted-foreground">New here? <Link to="/book" className="font-medium text-ink underline underline-offset-4">Start a new booking</Link></p>
+            <p className="mt-6 text-center text-sm text-muted-foreground">New here? <Link to="/book" className="inline-flex min-h-10 items-center font-medium text-ink underline underline-offset-4">Start a new booking</Link></p>
           </>
         )}
       </div>

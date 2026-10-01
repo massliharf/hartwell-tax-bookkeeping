@@ -148,7 +148,7 @@ function Metric({ title, value, note, good, children }: { title: string; value: 
     <article className="flex flex-col rounded-2xl border border-border p-5">
       <p className="text-xs font-medium text-muted-foreground">{title}</p>
       <p className="tabular mt-1 text-2xl font-medium leading-8 text-deep-ink">{value}</p>
-      <p className={`text-xs ${good === undefined ? "text-muted-foreground" : good ? "text-success" : "text-warning"}`}>{note}</p>
+      <p className={`text-xs ${good === undefined ? "text-muted-foreground" : good ? "text-success" : "text-alert-warning-fg"}`}>{note}</p>
       <div className="mt-4 h-24">{children}</div>
     </article>
   );

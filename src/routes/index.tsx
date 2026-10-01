@@ -101,7 +101,7 @@ function Hero() {
     <section className="enter overflow-hidden">
       <div className="grid items-center gap-8 px-1 pb-10 pt-6 sm:px-4 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pb-16 md:pt-14">
         <div>
-          <Link to="/book" search={{ service: "extension" }} className="group inline-flex h-8 items-center gap-2 rounded-full border border-line-1 bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:border-line-2">
+          <Link to="/book" search={{ service: "extension" }} className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-line-1 bg-sheet pl-1 pr-3 text-xs text-body transition-colors duration-150 hover:border-line-2">
             <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-medium text-white">Oct 15</span>
             Extended returns are due. <span className="font-medium text-ink group-hover:underline">Book a slot</span>
           </Link>
@@ -398,7 +398,7 @@ function Testimonials() {
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
       <SectionHead title="What clients say." />
-      <div className="mt-8 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible">
+      <div tabIndex={0} aria-label="Client reviews, scroll sideways" className="mt-8 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-ring md:grid md:grid-cols-3 md:overflow-visible">
         {t.map((x) => (
           <figure key={x.n} className="flex w-[82vw] shrink-0 snap-start flex-col rounded-2xl bg-surface-2 p-6 md:w-auto">
             <blockquote className="text-base leading-7 text-deep-ink">"{x.q}"</blockquote>

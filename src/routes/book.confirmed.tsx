@@ -1,13 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarPlus, Check, Download, Lock, Upload, Users, Video } from "lucide-react";
+import { CalendarPlus, Check, Download, Lock, Users, Video, RotateCcw, Link as LinkIcon } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DocumentStack } from "@/components/brand/DocumentStack";
-import { ReadyRing } from "@/components/brand/ReadyRing";
-import { BookingShell } from "@/components/booking/BookingShell";
+import { BookingShell, ResultPanel } from "@/components/booking/BookingShell";
 import { getAppointmentByToken } from "@/lib/portal.functions";
 import { fmtDateLong, fmtTime } from "@/lib/intake";
 
@@ -47,14 +45,21 @@ function ConfirmedPage() {
   const fetchAppt = useServerFn(getAppointmentByToken);
   const q = useQuery({ queryKey: ["appt", token], queryFn: () => fetchAppt({ data: { token: token! } }), enabled: !!token });
 
-  if (!token || (q.data && !q.data.appointment) || q.isError) {
+  if (q.isError) {
     return (
       <BookingShell>
-        <div className="mx-auto max-w-md text-center">
-          <h1 className="t-page text-deep-ink">We couldn't find that booking</h1>
-          <p className="mt-3 text-deep-ink/70">Check the link in your confirmation email, or book again.</p>
-          <Button asChild size="lg" className="mt-6"><Link to="/book">Book an appointment</Link></Button>
-        </div>
+        <ResultPanel icon={<RotateCcw />} tone="warning" title="Your booking didn't load." actions={<><Button size="lg" onClick={() => q.refetch()}>Try again</Button><Button asChild size="lg" variant="secondary"><Link to="/book/returning">Email me my link</Link></Button></>}>
+          Your appointment is still booked. This page just couldn't load it.
+        </ResultPanel>
+      </BookingShell>
+    );
+  }
+  if (!token || (q.data && !q.data.appointment)) {
+    return (
+      <BookingShell>
+        <ResultPanel icon={<LinkIcon />} tone="warning" title="We couldn't find that booking." actions={<><Button asChild size="lg"><Link to="/book/returning">Email me my link</Link></Button><Button asChild size="lg" variant="secondary"><Link to="/book">Book an appointment</Link></Button></>}>
+          Check the link in your confirmation email, or we can send you a fresh one.
+        </ResultPanel>
       </BookingShell>
     );
   }
@@ -66,7 +71,6 @@ function ConfirmedPage() {
     start_at: string; end_at: string; meeting_type: "in_person" | "video"; ready_score: number;
     services: { name: string } | null; clients: { name: string } | null;
   };
-  const items = q.data.checklist;
   const service = a.services?.name ?? "Appointment";
   const first = a.clients?.name?.split(" ")[0] ?? "";
   const where = a.meeting_type === "video" ? "Video call (link will be emailed)" : ADDRESS;
@@ -79,7 +83,7 @@ function ConfirmedPage() {
     <BookingShell>
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
-          <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="draw-check size-5" strokeWidth={2.5} /></span>
+          <span className="enter-spot mx-auto grid size-12 place-items-center rounded-full bg-alert-success text-alert-success-fg"><Check className="size-5" strokeWidth={2.5} /></span>
           <h1
             className="mt-5 t-page text-deep-ink">
             You're booked{first && `, ${first}`}.
@@ -90,7 +94,7 @@ function ConfirmedPage() {
         </div>
 
         <div
-          className="sheet-stack mt-10 p-6">
+          className="mt-10 rounded-xl border border-line-1 bg-sheet p-6">
           <p className="text-[11px] font-medium text-muted-foreground">{service}</p>
           <p className="mt-1 t-card text-deep-ink">{fmtDateLong(a.start_at)}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-deep-ink/80">
@@ -106,24 +110,18 @@ function ConfirmedPage() {
           </div>
         </div>
 
-        <div
-          className="sheet-stack mt-8 p-6">
-          <div className="flex items-center gap-5">
-            <ReadyRing value={a.ready_score} size={84} />
-            <div className="min-w-0">
-              <p className="t-card text-deep-ink">Your checklist</p>
-              <p className="text-sm text-deep-ink/70"><span className="tabular">{items.length}</span> documents to bring. Send them ahead and Claire will check everything before you arrive.</p>
-            </div>
+        <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
+          <p className="bg-deep-ink px-5 py-2.5 text-[13px] font-bold text-white">One more minute, and you're ready</p>
+          <div className="p-5 sm:p-6">
+            <p className="t-card text-deep-ink">Tell Claire about your year.</p>
+            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">Five yes-or-no questions, like whether you have a mortgage or freelance income. Your answers turn into the exact list of documents to bring, and you can send them from your phone.</p>
+            <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
+              <Link to="/a/$token" params={{ token: token! }}>Answer the questions</Link>
+            </Button>
+            <p className="mt-3 text-[13px] text-muted-foreground">Not now? The link is in your confirmation email, and we'll remind you.</p>
           </div>
-          <div className="mt-6">
-            <DocumentStack docs={items.map((i) => ({ id: i.id, title: i.document_name, note: i.description ?? (i.required ? "Needed" : "If you have it"), received: i.status === "uploaded" }))} />
-          </div>
-          <Button asChild size="lg" className="mt-6 w-full">
-            <Link to="/a/$token" params={{ token: token! }}><Upload /> Upload your documents now</Link>
-          </Button>
-          <p className="mt-3 text-center text-sm text-muted-foreground">Or do it later. We'll remind you.</p>
-          <p className="mt-5 flex items-start gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
-            <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We'll never ask for your Social Security number online.
+          <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
+            <Lock className="mt-0.5 size-3.5 shrink-0" /> Your files go to private storage that only Claire can open. We never ask for your Social Security number online.
           </p>
         </div>
       </div>

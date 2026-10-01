@@ -58,7 +58,7 @@ function AuthPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-sm">
-        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home"><Logo /></Link>
+        <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="inline-flex min-h-10 items-center"><Logo /></Link>
         <form onSubmit={submit} className="mt-8 space-y-5 rounded-2xl border border-border bg-sheet p-7">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-fill-neutral text-deep-ink"><Lock className="h-4 w-4" /></span>
           <div>

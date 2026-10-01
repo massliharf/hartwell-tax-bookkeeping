@@ -65,7 +65,7 @@ function Clients() {
 
       <div role="radiogroup" aria-label="Filter clients" className="-mx-1 mb-4 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
         {chips.map(([k, label]) => (
-          <Button key={k} size="sm" role="radio" aria-checked={filter === k} variant={filter === k ? "dark" : "secondary"} onClick={() => setFilter(k)} className="h-8 shrink-0 rounded-full px-3.5">
+          <Button key={k} size="sm" role="radio" aria-checked={filter === k} variant={filter === k ? "dark" : "secondary"} onClick={() => setFilter(k)} className="h-10 shrink-0 rounded-full px-3.5 sm:h-8">
             {label}<span className={`tabular text-[11px] ${filter === k ? "text-white/70" : "text-muted-foreground"}`}>{counts[k]}</span>
           </Button>
         ))}

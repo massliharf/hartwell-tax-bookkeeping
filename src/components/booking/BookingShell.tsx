@@ -4,14 +4,14 @@ import { Logo } from "@/components/brand/Logo";
 import { Stepper } from "@/components/ui/stepper";
 import type { ReactNode } from "react";
 
-export const STEPS = ["Service", "Questions", "Time", "Details"] as const;
+export const STEPS = ["Pick a time", "Your details"] as const;
 
 export function BookingShell({ step, children }: { step?: number; children: ReactNode }) {
   return (
     <div className="min-h-screen bg-canvas sm:p-2">
       <header>
         <div className="mx-auto flex h-[60px] max-w-6xl items-center justify-between gap-4 px-6 sm:px-4">
-          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="min-w-0"><Logo /></Link>
+          <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo /></Link>
           <Link to="/" aria-label="Leave booking" className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-fill-neutral text-deep-ink hover:bg-fill-selected sm:size-8 sm:rounded-lg">
             <X className="size-4" />
           </Link>

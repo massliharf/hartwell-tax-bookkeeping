@@ -146,13 +146,13 @@ function OwnerLayout() {
 
       <nav className="fixed inset-x-0 bottom-0 z-30 flex h-[63px] items-center justify-around rounded-t-2xl bg-surface-2 px-5 py-3 sm:hidden" style={{ boxShadow: "0 -1px 0 rgba(16,16,16,0.05)" }}>
         {mobileMain.map((n) => (
-          <Link key={n.to} to={n.to} className="relative flex flex-col items-center gap-0.5 text-[10px] leading-[15px] text-muted-foreground" activeProps={{ className: "text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
+          <Link key={n.to} to={n.to} className="relative flex min-h-11 min-w-14 flex-col items-center justify-center gap-0.5 text-[10px] leading-[15px] text-muted-foreground" activeProps={{ className: "text-deep-ink" }} activeOptions={{ exact: "exact" in n }}>
             <n.icon className="size-5" />{n.label}
             {n.to === "/owner" && count > 0 && <span className="absolute -top-1 right-1 grid size-3.5 place-items-center rounded-full bg-ink text-[8px] font-bold text-primary-foreground">{count}</span>}
           </Link>
         ))}
         <DropdownMenu>
-          <DropdownMenuTrigger className={`flex flex-col items-center gap-0.5 text-[10px] leading-[15px] ${mobileMore.some((n) => n.to === current.to) ? "text-deep-ink" : "text-muted-foreground"}`}>
+          <DropdownMenuTrigger className={`flex min-h-11 min-w-14 flex-col items-center justify-center gap-0.5 text-[10px] leading-[15px] ${mobileMore.some((n) => n.to === current.to) ? "text-deep-ink" : "text-muted-foreground"}`}>
             <MoreHorizontal className="size-5" />More
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="top" className="w-56 rounded-2xl py-2">

@@ -27,7 +27,7 @@ export function AskForm({ className = "" }: { className?: string }) {
     <div className={`rounded-2xl border border-border bg-surface-1 p-5 ${className}`} role="status">
       <div className="flex items-center gap-2 text-sm font-medium text-deep-ink"><span className="grid size-6 place-items-center rounded-full bg-success text-primary-foreground"><Check className="size-3.5" /></span>{done.auto ? "Here's your answer" : "Thanks, Claire has your question"}</div>
       <p className="mt-3 whitespace-pre-line text-sm leading-[22px] text-body">{done.auto ? done.reply : "She'll reply by email, usually within one business day. Please don't send your Social Security number or account numbers."}</p>
-      {done.auto && <p className="mt-3 text-xs text-muted-foreground">A copy is on its way to {f.email}.</p>}
+      {done.auto && <p className="mt-3 text-xs text-muted-foreground">A copy is on its way to {f.email}, from claire@hartwelltax.com.</p>}
       <Button variant="ghost" size="sm" className="mt-3" onClick={() => { setDone(null); setF({ ...f, question: "" }); }}>Ask something else</Button>
     </div>
   );

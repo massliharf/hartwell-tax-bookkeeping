@@ -315,3 +315,29 @@ export const demoFillWeek = createServerFn({ method: "POST" }).middleware([requi
 
   return { message: `Added ${made} sample appointments across this week: every state, a full day with a waitlist, and open gaps. Reset demo data to remove them.` };
 });
+
+/** Owner: send a real copy of one demo message to an address you own, to see it in a real inbox. */
+export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => (d as { id: string; to: string }))
+  .handler(async ({ data, context }) => {
+    const to = String(data.to ?? "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to) || to.length > 200) return { ok: false as const, reason: "email" as const };
+    const { s } = await owner(context);
+    const key = process.env["RESEND_API_KEY"];
+    if (!key) return { ok: false as const, reason: "no_key" as const };
+    const { data: m } = await s.from("messages").select("subject, body, type").eq("id", data.id).maybeSingle();
+    if (!m) return { ok: false as const, reason: "missing" as const };
+    const { renderEmail } = await import("./email.server");
+    const paras = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+    const heading = m.subject ?? "Hartwell Tax";
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: process.env["RESEND_FROM"] || "Claire Hartwell, EA <onboarding@resend.dev>",
+        to: [to], subject: `[Demo] ${heading}`, html: renderEmail(heading, paras.map((p) => ({ p }))), text: m.body,
+      }),
+    });
+    if (!res.ok) { console.error("Demo copy failed", res.status, await res.text()); return { ok: false as const, reason: "failed" as const }; }
+    return { ok: true as const };
+  });

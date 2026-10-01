@@ -510,12 +510,13 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
              <div className="flex items-start gap-3">
                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink"><FileText className="size-4" strokeWidth={1.75} /></span>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
+                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-deep-ink">{item.document_name}</p>
                   {!item.required && <Tag>If you have it</Tag>}
                 </div>
                  <p className="mt-0.5 text-[13px] leading-5 text-deep-ink/70">{docGuide(item.document_name, item.description)}</p>
               </div>
+               {!naOpen && <Button size="sm" variant="ghost" className="hidden shrink-0 px-2 sm:inline-flex" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>}
             </div>
             {naOpen ? (
                <div className="mt-2.5 space-y-2">
@@ -530,7 +531,7 @@ function DocCard({ token, item, onChange }: { token: string; item: Item; onChang
                 <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Upload />} Upload</Button>
                 <Button size="sm" variant="outline" onClick={() => camRef.current?.click()} disabled={busy}><Camera /> Take a photo</Button>
                  <span className="hidden text-xs text-muted-foreground sm:inline">Or drag a file onto this card.</span>
-                 <Button size="sm" variant="ghost" className="sm:ml-auto" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
+                 <Button size="sm" variant="ghost" className="min-h-8 w-full justify-start px-0 sm:hidden" onClick={() => setNaOpen(true)}>Doesn't apply to me</Button>
               </div>
             )}
           </div>

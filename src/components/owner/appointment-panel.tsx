@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ChevronRight, FileText, MapPin, Video, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronRight, FileText, MapPin, Video, Maximize2, Minimize2, X } from "lucide-react";
 import { Tag } from "@/components/ui/tag";
 import { Stepper } from "@/components/ui/stepper";
 import { FollowUps, MeetingPicker, MoreActions, RequestDocument } from "./follow-ups";
@@ -27,19 +27,53 @@ import { MeetingNotes } from "./meeting-notes";
 import { reviewDocument } from "@/lib/owner.functions";
 import type { ApptPanelTarget } from "./drawer-context";
 import { cn } from "@/lib/utils";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 /** One appointment: when, who, how ready, and the two things Claire can do. Nothing else. */
-export function AppointmentPanel({ target, onClose }: { target: ApptPanelTarget | null; onClose: () => void }) {
-  // Opens as a focused window; Expand turns it into a full workspace (details left, what's happening right), like Magnific's asset view.
-  const [expanded, setExpanded] = useState(false);
+/** True on screens wide enough to keep the panel docked next to the page (Magnific-style right panel). */
+export function useDocked() {
+  const [docked, setDocked] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia("(min-width: 1180px)");
+    const on = () => setDocked(m.matches);
+    on(); m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, []);
+  return docked;
+}
+
+/**
+ * One appointment. On wide screens it docks as a right panel beside the page (the page makes room, nothing is covered,
+ * clicking another appointment just switches it); Expand widens it into a two-column workspace. On phones it's a sheet.
+ */
+export function AppointmentPanel({ target, onClose, expanded, setExpanded }: { target: ApptPanelTarget | null; onClose: () => void; expanded: boolean; setExpanded: (v: boolean) => void }) {
+  const docked = useDocked();
+  const close = () => { onClose(); setExpanded(false); };
+  const expandBtn = (
+    <button type="button" onClick={() => setExpanded(!expanded)} aria-label={expanded ? "Shrink panel" : "Expand panel"} title={expanded ? "Shrink" : "Expand"}
+      className="absolute right-14 top-4 z-10 hidden size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink sm:grid">
+      {expanded ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
+    </button>
+  );
+  if (docked) {
+    return (
+      <DialogPrimitive.Root open={!!target} modal={false} onOpenChange={(o) => { if (!o) close(); }}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Content onInteractOutside={(e) => e.preventDefault()} onOpenAutoFocus={(e) => e.preventDefault()}
+            className={`panel-in fixed bottom-2 right-2 top-2 z-40 flex flex-col overflow-hidden rounded-2xl border border-line-1 bg-sheet shadow-[0_0_2px_rgba(18,18,18,0.08),0_16px_40px_-12px_rgba(18,18,18,0.18)] transition-[width] duration-300 ease-expo ${expanded ? "w-[760px]" : "w-[440px]"}`}>
+            {expandBtn}
+            <DialogPrimitive.Close aria-label="Close panel" className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink"><X className="size-4" /></DialogPrimitive.Close>
+            <div className="min-h-0 flex-1 overflow-y-auto">{target && <AppointmentContent key={target.appointmentId} id={target.appointmentId} onClose={close} expanded={expanded} />}</div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+    );
+  }
   return (
-    <Dialog open={!!target} onOpenChange={(o) => { if (!o) { onClose(); setExpanded(false); } }}>
+    <Dialog open={!!target} onOpenChange={(o) => { if (!o) close(); }}>
       <DialogContent className={`block gap-0 overflow-y-auto p-0 transition-[max-width,height] duration-300 ease-expo ${expanded ? "h-[94dvh] max-h-[94dvh] max-w-[min(1180px,calc(100vw-32px))]" : "max-h-[92dvh] max-w-[680px]"}`}>
-        <button type="button" onClick={() => setExpanded((e) => !e)} aria-label={expanded ? "Shrink window" : "Expand window"} title={expanded ? "Shrink" : "Expand"}
-          className="absolute right-14 top-4 z-10 hidden size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-tint-1 hover:text-deep-ink sm:grid">
-          {expanded ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
-        </button>
-        {target && <AppointmentContent id={target.appointmentId} onClose={onClose} expanded={expanded} />}
+        {expandBtn}
+        {target && <AppointmentContent id={target.appointmentId} onClose={close} expanded={expanded} />}
       </DialogContent>
     </Dialog>
   );

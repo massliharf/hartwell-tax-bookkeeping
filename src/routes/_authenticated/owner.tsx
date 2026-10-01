@@ -1,12 +1,12 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { AppointmentPanel } from "@/components/owner/appointment-panel";
+import { AppointmentPanel, useDocked } from "@/components/owner/appointment-panel";
 import { ApptPanelContext, type ApptPanelTarget } from "@/components/owner/drawer-context";
 import { useLocation } from "@tanstack/react-router";
-import { BarChart3, CalendarDays, FlaskConical, Inbox, LogOut, Settings, Smartphone, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
+import { BarChart3, CalendarDays, FlaskConical, Globe, Inbox, LogOut, Settings, Smartphone, Sun, Users, PanelLeft, MoreHorizontal, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,8 @@ function OwnerLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [panel, setPanel] = useState<ApptPanelTarget | null>(null);
+  const [panelWide, setPanelWide] = useState(false);
+  const docked = useDocked();
   const [paletteTerm, setPaletteTerm] = useState("");
   const clients = useQuery({ queryKey: ["owner", "clients"], enabled: !!ctx.data?.isOwner && paletteOpen, queryFn: async () => { const { data, error } = await supabase.from("clients").select("id, name, email, phone, is_returning, appointments(start_at, status)").order("name"); if (error) throw error; return data ?? []; } });
   const [email, setEmail] = useState("");
@@ -89,7 +91,7 @@ function OwnerLayout() {
   const wide = path === "/owner" || path.startsWith("/owner/calendar") || path.startsWith("/owner/clients") || path.startsWith("/owner/settings") || path.startsWith("/owner/insights");
 
   return (
-    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper sm:flex sm:bg-canvas sm:py-2 sm:pr-2">
+    <ApptPanelContext.Provider value={setPanel}><TooltipProvider delayDuration={200}><div className="min-h-screen bg-paper transition-[padding] duration-300 ease-expo sm:flex sm:bg-canvas sm:py-2 sm:pr-2" style={docked && panel ? { paddingRight: panelWide ? 776 : 456 } : undefined}>
       {/* DESIGN_SYSTEM v2 §5: the sidebar sits on the canvas (no card); the main panel is the white card. */}
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-3 transition-[width,padding] duration-300 ease-expo sm:flex ${collapsed ? "w-[60px] px-2" : "w-[220px] px-3"}`}>
         <div className={`flex h-9 items-center ${collapsed ? "justify-center" : "justify-between"}`}>
@@ -116,12 +118,7 @@ function OwnerLayout() {
           ))}
         </nav>
         <div className="flex-1" />
-        <DemoTools rows collapsed={collapsed} />
-        <div className={`flex items-center gap-2 border-t border-line-1 pt-3 ${collapsed ? "flex-col" : ""}`}>
-          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink" title={collapsed ? `Claire Hartwell, ${email}` : undefined}>CH</span>
-          {!collapsed && <span className="min-w-0 flex-1"><span className="block truncate text-xs font-medium text-deep-ink">Claire Hartwell</span><span className="block truncate text-[11px] text-muted-foreground">{email}</span></span>}
-          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="ghost" aria-label="Sign out" onClick={signOut}><LogOut className="size-4" /></Button></TooltipTrigger><TooltipContent side={collapsed ? "right" : "top"}>Sign out</TooltipContent></Tooltip>
-        </div>
+        <div className="hidden"><DemoTools rows collapsed /></div>
       </aside>
 
       <div className="min-w-0 flex-1">
@@ -132,7 +129,7 @@ function OwnerLayout() {
         <main className="min-h-[calc(100vh-56px)] bg-sheet sm:min-h-[calc(100vh-16px)] sm:rounded-2xl">
           <div className="hidden h-14 items-center justify-between px-6 sm:flex">
             <p className="text-[13px] font-medium text-deep-ink">{current.label}</p>
-
+            <ProfileMenu email={email} onSignOut={signOut} />
           </div>
           <div className="px-5 pb-28 pt-4 sm:px-8 sm:pb-12 sm:pt-2">
             <div className={wide ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
@@ -192,7 +189,38 @@ function OwnerLayout() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
-      <AppointmentPanel target={panel} onClose={() => setPanel(null)} />
+      <AppointmentPanel target={panel} onClose={() => setPanel(null)} expanded={panelWide} setExpanded={setPanelWide} />
     </div></TooltipProvider></ApptPanelContext.Provider>
+  );
+}
+
+/** Top-right account menu, Magnific-style: who's signed in, the week at a glance, settings and tools, sign out. */
+function ProfileMenu({ email, onSignOut }: { email: string; onSignOut: () => void }) {
+  const row = "h-10 gap-3 rounded-lg px-3 text-[13px] text-deep-ink";
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger aria-label="Account" className="grid size-9 place-items-center rounded-full bg-fill-neutral text-xs font-semibold text-deep-ink ring-offset-2 transition-shadow duration-150 hover:ring-2 hover:ring-line-2 focus-visible:ring-2 focus-visible:ring-ink">CH</DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={8} className="w-[320px] rounded-2xl p-0">
+        <div className="flex items-center gap-3 p-4">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-fill-neutral text-sm font-semibold text-deep-ink">CH</span>
+          <span className="min-w-0"><span className="block truncate text-sm font-semibold text-deep-ink">Claire Hartwell</span><span className="block truncate text-xs text-muted-foreground">{email}</span></span>
+        </div>
+        <DropdownMenuSeparator className="my-0" />
+        <div className="p-1.5">
+          <DropdownMenuItem asChild className={row}><Link to="/owner/settings"><Settings className="size-4" />Settings</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild className={row}><Link to="/owner/insights"><BarChart3 className="size-4" />Report</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild className={row}><a href="/" target="_blank" rel="noreferrer"><Globe className="size-4" />View the website</a></DropdownMenuItem>
+        </div>
+        <DropdownMenuSeparator className="my-0" />
+        <div className="p-1.5">
+          <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event("owner:demo"))} className={row}><FlaskConical className="size-4" />Demo tools</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event("owner:phone"))} className={row}><Smartphone className="size-4" />Phone preview</DropdownMenuItem>
+        </div>
+        <DropdownMenuSeparator className="my-0" />
+        <div className="p-1.5">
+          <DropdownMenuItem onSelect={onSignOut} className={row}><LogOut className="size-4" />Sign out</DropdownMenuItem>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

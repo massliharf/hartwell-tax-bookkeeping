@@ -5,8 +5,8 @@ Made with the `web-ux-copywriter` skill. Check changes with:
 
 ## Message hierarchy
 - **Business goal:** turn "can you do my taxes?" into a confirmed, prepared appointment, without Claire picking up the phone.
-- **Promise:** Your tax return, done in one appointment.
-- **How:** Choose a time online, upload your documents before you come in, and leave with your return done.
+- **Promise:** Your taxes and books, handled by one local expert. (Tax returns, IRS letters, tax planning and bookkeeping.)
+- **How:** Choose a time online, upload your documents, and most work is done in one appointment.
 - **Proof (once, in "What clients say"):** 4.9 from 276 reviews (Google 212, Yelp 64) · 1,800+ returns since 2014 · 98% come back · accuracy guarantee · IRS Enrolled Agent.
 - **Objections and where they're answered:** price (Services and prices, booking summary), effort (How it works), trust (What clients say, Meet Claire), privacy (Your documents are private, next to uploads), flexibility (move or cancel from the confirmation email).
 - **Calls to action:** primary "Schedule an appointment" everywhere; secondary "Free 15-minute call".

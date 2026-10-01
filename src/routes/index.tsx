@@ -13,7 +13,7 @@ import claire from "@/assets/claire-portrait.jpg";
 
 
 const TITLE = "Hartwell Tax & Bookkeeping — Tax preparation in Montclair, NJ";
-const DESC = "Tax preparation in Montclair, NJ for families, freelancers, landlords and small businesses. See available times, schedule in two minutes, and file in one visit.";
+const DESC = "Tax returns, IRS letters, tax planning and bookkeeping in Montclair, NJ, with an IRS Enrolled Agent. See available times and schedule online in two minutes.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,16 +67,34 @@ function Home() {
 }
 
 
+const HERO_SERVICES = [
+  { id: "individual", label: "Tax returns" },
+  { id: "letter", label: "IRS letters" },
+  { id: "extension", label: "Extensions and past years" },
+  { id: "planning", label: "Tax planning" },
+  { id: "bookkeeping", label: "Bookkeeping" },
+];
+
 function Hero() {
   return (
     <section className="overflow-hidden">
       <div className="grid items-center gap-10 px-2 pb-10 pt-10 sm:px-4 md:min-h-[530px] md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-14 md:pt-16">
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink">Hartwell Tax & Bookkeeping in Montclair, NJ</p>
-          <h1 className="mt-5 max-w-[16ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your tax return, done in one appointment.</h1>
+          <h1 className="mt-5 max-w-[17ch] text-balance t-hero text-deep-ink md:!text-[56px] md:!leading-[58px]">Your taxes and books, handled by one local expert.</h1>
           <p className="mt-6 max-w-[33rem] text-base leading-7 text-body sm:text-lg sm:leading-8">
-            We prepare tax returns for families, freelancers, landlords and small businesses in Montclair, NJ. Choose a time online, upload your documents before you come in, and leave with your return done.
+            Tax returns, IRS letters, tax planning and bookkeeping for families, freelancers, landlords and small businesses. Choose a time online, upload your documents, and most work is done in one appointment.
           </p>
+          {/* Everything Claire does, at a glance; each one opens scheduling with that service picked. */}
+          <ul aria-label="Services" className="mt-6 flex flex-wrap gap-2">
+            {HERO_SERVICES.map((x) => (
+              <li key={x.id}>
+                <Link to="/book" search={{ service: x.id }} className="inline-flex h-9 items-center gap-2 rounded-full border border-line-1 bg-sheet pl-1.5 pr-3 text-[13px] font-medium text-deep-ink transition-colors duration-150 hover:border-line-3">
+                  <ServiceIcon service={x.id} size={28} />{x.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button asChild size="lg"><Link to="/book">Schedule an appointment</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
@@ -133,13 +151,13 @@ function HowItWorks() {
     { t: "Choose a time online", d: "Pick any available time. You're confirmed right away, no phone call needed." },
     { t: "Get your document checklist", d: "Answer a few yes-or-no questions and we'll list exactly which documents to bring." },
     { t: "Upload your documents", d: "Upload them any time before your appointment. We check each one and tell you if anything is missing." },
-    { t: "Go over your return with Claire", d: "In person or by video. Afterwards you sign and pay online, and we file your return with the IRS." },
+    { t: "Meet with Claire", d: "In person or by video. For a tax return, you then sign and pay online and we file it with the IRS." },
   ];
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
       <div className="max-w-3xl">
         <h2 className="t-section text-balance text-deep-ink">How it works.</h2>
-        <p className="mt-3 text-base leading-7 text-muted-foreground">Four steps, from choosing a time to your filed return. Most clients only need one appointment.</p>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">The same four steps for every service. Most clients only need one appointment.</p>
       </div>
       <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (

@@ -144,7 +144,7 @@ function PortalPage() {
         <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> Only your preparer can see your files. We never ask for your Social Security number.
       </p>
        <ul className="space-y-2">{items.map((i) => <DocCard key={i.id} token={token} item={i} onChange={refresh} />)}</ul>
-       <p className="mt-3 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB each. Phone photos are perfect.</p>
+       <p className="mt-3 text-xs text-muted-foreground">PDF, JPG, PNG or HEIC, up to 15MB.</p>
     </section>
   );
   const sentDocs = (
@@ -274,7 +274,7 @@ function AppointmentCard({ appt, mode, videoLink, nowIso }: { appt: Appt; mode: 
       {video ? (
         <div className="border-t border-border bg-surface-2 px-6 py-5">
           <p className="flex items-center gap-2 text-sm font-medium text-deep-ink"><Video className="size-4" />Video call{intro ? " with Claire" : ""}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{join === "open" ? "Your call is open. Join now." : "The Join button opens 10 minutes before. Works in your browser; no app needed."}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{join === "open" ? "Your call is open." : "Join opens 10 minutes before."}</p>
           {videoLink && (
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {join === "open" ? <Button size="lg" asChild><a href={videoLink} target="_blank" rel="noreferrer"><Video /> Join call</a></Button>
@@ -581,7 +581,7 @@ function CloseoutSection({ token, appt, onDone, clientEmail }: { token: string; 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="t-card text-deep-ink">Review, sign and pay</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Two steps. We file as soon as both are done.</p>
+          
         </div>
         <div className="text-right">
           <p className="text-xs text-muted-foreground">{appt.services?.name}</p>

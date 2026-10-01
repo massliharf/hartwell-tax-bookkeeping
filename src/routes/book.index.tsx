@@ -140,7 +140,7 @@ function BookPage() {
             <Button size="lg" className="min-w-0 flex-1 truncate lg:flex-none" type={step === 2 ? "submit" : "button"} form={step === 2 ? "booking-details" : undefined} disabled={!canContinue} onClick={step < 2 ? () => go(step + 1) : undefined}>{cta}</Button>
           </div>
         </div>
-        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && preview.length > 0 && <ChecklistPreview docs={preview} complete={questionsComplete} />}{step === 0 && <p className="rounded-xl bg-surface-2 p-4 text-sm leading-6 text-muted-foreground">Not sure? Pick the closest. We adjust it when we see your documents, and agree the price before we start.</p>}</div></aside>
+        <aside className="hidden lg:block"><div className="sticky top-8 space-y-4">{service && step > 0 && <BookingSummary service={service} draft={draft} onPickAgain={step === 2 ? () => go(1) : undefined} />}{step === 2 && preview.length > 0 && <ChecklistPreview docs={preview} complete={questionsComplete} />}</div></aside>
       </div>
     </BookingShell>
   );
@@ -150,7 +150,7 @@ function BookPage() {
 function ServiceStep({ services, selected, onPick }: { services: ReturnType<typeof useServices>; selected?: string | undefined; onPick: (slug: string) => void }) {
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Pick the closest fit. Nothing to pay now." />
+       <StepTitle hideEyebrow eyebrow="Step 1 of 3" title="What do you need help with?" sub="Nothing to pay now." />
        {services.isLoading && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>}
       {services.isError && (
         <div className="rounded-2xl bg-surface-2 p-6 text-sm">
@@ -204,7 +204,7 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
               if (!items.length) return null;
               return (
                 <div key={g.id} className="mb-8">
-                  <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2"><h2 className="t-sub">{g.title}</h2><p className="text-xs text-muted-foreground">{g.sub}</p></div>
+                  <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2"><h2 className="t-sub">{g.title}</h2></div>
                   <div className="grid gap-3 sm:grid-cols-2">{items.map(card)}</div>
                 </div>
               );
@@ -214,7 +214,6 @@ function ServiceStep({ services, selected, onPick }: { services: ReturnType<type
           </>
         );
       })()}
-      <p className="mt-6 text-sm text-muted-foreground">Already have an appointment? <Link to="/book/returning" className="inline-flex min-h-10 items-center font-medium text-ink underline underline-offset-4">Find it here</Link></p>
     </>
   );
 }
@@ -235,7 +234,6 @@ function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewC
           </li>
         ))}
       </ul>
-       <p className="border-t border-line-1 px-4 py-2.5 text-xs text-muted-foreground">Send them from your phone after you book.</p>
     </div>
   );
 }
@@ -271,8 +269,8 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
 
   return (
     <>
-        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub={`${service.name}, ${service.duration_min} minutes. Eastern time. You can move it later.`} />
-      {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">A 15-minute video call. Add your phone number on the next step if you would rather talk by phone.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
+        <StepTitle hideEyebrow eyebrow="Step 2 of 3" title="Pick a time" sub="Eastern time" />
+      {isIntro(service.slug) ? <p className="mb-6 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">A 15-minute video call.</p> : <Segmented className="mb-6" label="Meeting type" value={draft.meetingType} onChange={(v) => update({ meetingType: v })}
         options={[{ value: "in_person", label: <><Users /> In person</> }, { value: "video", label: <><Video /> Video call</> }]} />}
 
        {q.isLoading && <div className="space-y-6"><div className="flex gap-1 overflow-hidden">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[68px] w-[72px] shrink-0 rounded-lg" />)}</div><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-8 rounded-lg" />)}</div></div>}
@@ -311,7 +309,7 @@ function TimeStep({ service, draft, update }: { service: Service; draft: Booking
           </div>
 
           <div className="mt-6">
-            {day && day.slots.length > 0 && <p className="mb-4 text-xs text-muted-foreground">{fmtDateLong(day.slots[0]!)}. Only open times are shown.</p>}
+            {day && day.slots.length > 0 && <p className="mb-4 text-xs text-muted-foreground">Available times</p>}
             {day && day.slots.length > 0 && (
                <div className="space-y-6">{(["Morning", "Afternoon", "Evening"] as const).map((period) => {
                  const slots = day.slots.filter((s) => {
@@ -389,9 +387,7 @@ function BookingSummary({ service, draft, onPickAgain }: { service: Service; dra
           </div>
         ))}
       </dl>
-      <div className="border-t border-line-1 bg-surface-2 px-4 py-3 text-[12px] leading-5 text-muted-foreground">
-        Confirmed right away. Move or cancel from your link.
-        {onPickAgain && <button type="button" onClick={onPickAgain} className="ml-1 font-semibold text-ink underline underline-offset-2">Change time</button>}
+      <div className="border-t border-line-1 bg-surface-2 px-4 py-3 text-[12px] leading-5 text-muted-foreground">        {onPickAgain && <button type="button" onClick={onPickAgain} className="ml-1 font-semibold text-ink underline underline-offset-2">Change time</button>}
       </div>
     </div>
   );
@@ -435,7 +431,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
 
   return (
     <>
-       <StepTitle hideEyebrow eyebrow="Step 3 of 3" title="Your details" sub="For your confirmation and reminders." />
+       <StepTitle hideEyebrow eyebrow="Step 3 of 3" title="Your details" />
        <div className="mb-6 lg:hidden"><BookingSummary service={service} draft={draft} onPickAgain={onPickAgain} /></div>
        <form id="booking-details" className="w-full space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid && draft.slot && draft.date === nyDay(draft.slot)) submit(draft.slot); }}>
         <div className="space-y-1.5">
@@ -474,7 +470,7 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
         )}
 
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed right away. Nothing to pay now. We never ask for your Social Security number online.
+          <Lock className="mt-0.5 size-3.5 shrink-0" /> We never ask for your Social Security number online.
         </p>
       </form>
       {(questionsFor(service.slug).length > 0 || chipsFor(service.slug).length > 0) && <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />}

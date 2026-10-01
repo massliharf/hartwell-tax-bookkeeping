@@ -93,7 +93,7 @@ function ConfirmedPage() {
               {a.meeting_type === "video" ? "Video call" : `In person, ${ADDRESS}`}
             </span>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">{a.meeting_type === "video" ? "The Join link is on your appointment page and in your reminder. It opens 10 minutes before." : "Directions and parking are on your appointment page."}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{a.meeting_type === "video" ? "The Join link is on your appointment page." : "Directions are on your appointment page."}</p>
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button variant="outline" size="sm" onClick={() => downloadIcs(title, a.start_at, a.end_at, where, details)}><Download /> Add to calendar (.ics)</Button>
             <Button variant="outline" size="sm" asChild><a href={gcal} target="_blank" rel="noreferrer"><CalendarPlus /> Google Calendar</a></Button>
@@ -125,7 +125,7 @@ function ConfirmedPage() {
           <div className="mt-6 overflow-hidden rounded-xl border border-line-2 bg-sheet">
              <div className="border-b border-line-1 bg-surface-2 px-5 py-3">
               <p className="t-card text-deep-ink">What to bring</p>
-              <p className="mt-1 text-sm text-muted-foreground">{items.length} document{items.length === 1 ? "" : "s"}, from your answers. Send them from your phone; we check each one as it arrives.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Send them from your phone.</p>
             </div>
             <ul className="divide-y divide-line-1">
               {items.map((i) => (
@@ -137,7 +137,6 @@ function ConfirmedPage() {
             </ul>
              <div className="border-t border-line-1 px-5 py-4">
               <Button asChild size="lg" className="w-full sm:w-auto"><Link to="/a/$token" params={{ token: token! }}>Send your documents</Link></Button>
-              <p className="mt-3 text-[13px] text-muted-foreground">Not now? The link is in your confirmation email, and we'll remind you about anything missing.</p>
             </div>
             <p className="flex items-start gap-2 border-t border-line-1 bg-surface-2 px-5 py-3 text-xs text-muted-foreground">
               <Lock className="mt-0.5 size-3.5 shrink-0" /> Private storage. Only your preparer can open your files.

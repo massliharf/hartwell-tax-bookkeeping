@@ -33,7 +33,7 @@ export function IntakeQuestions({ slug, answers, onChange }: { slug?: string | n
         <fieldset className="rounded-xl bg-surface-2 p-4">
           <legend className="sr-only">Which of these applied this year?</legend>
           <p className="text-sm font-medium text-deep-ink" aria-hidden="true">Which of these applied this year?</p>
-          <p className="text-xs text-muted-foreground">Pick all that fit. Each one adds the matching form to your list.</p>
+          <p className="text-xs text-muted-foreground">Pick all that fit.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {chips.map((k) => {
               const on = answers[k] === true;

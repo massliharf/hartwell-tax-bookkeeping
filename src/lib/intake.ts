@@ -26,7 +26,7 @@ export type ChipKey = Exclude<keyof Answers, "w2_count" | "filed_with_us" | "non
 export type Question = { key: keyof Answers; label: string; hint?: string; type: "yesno" | "count" };
 
 const Q: Record<string, Question> = {
-  w2_count: { key: "w2_count", label: "How many W-2 jobs did you have?", hint: "Count every employer this year.", type: "count" },
+  w2_count: { key: "w2_count", label: "How many W-2 jobs did you have?", type: "count" },
   filed_with_us: { key: "filed_with_us", label: "Did you file with us last year?", type: "yesno" },
 };
 

@@ -81,7 +81,7 @@ function Hero() {
             <Button asChild size="lg"><Link to="/book">See open times</Link></Button>
             <Button asChild size="lg" variant="secondary"><Link to="/book" search={{ service: "intro" }}>Free 15-minute call</Link></Button>
           </div>
-          <p className="mt-5 text-sm text-muted-foreground">Your time is confirmed right away. Documents can follow.</p>
+          
         </div>
         <div className="reveal min-w-0 rounded-[24px] bg-ink-50 px-4 py-4 sm:px-8 sm:py-6" style={{ ["--d" as string]: "250ms" }}><HeroVisual /></div>
       </div>
@@ -105,22 +105,20 @@ function Year() {
         <div>
           <p className="text-sm font-medium text-primary-foreground/70">When to come in</p>
           <h2 className="t-section mt-3 max-w-[13ch] text-balance">Here all year, not just at tax time.</h2>
-          <p className="mt-5 max-w-lg text-base leading-7 text-primary-foreground/75">A return in spring, an extension in fall, or a question in between: you can come to Claire when you need her.</p>
         </div>
         <div className="min-w-0 border-t border-primary-foreground/25 pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0">
-          <p className="text-sm font-medium text-primary-foreground/70">When to plan your visit</p>
-          <div className="mt-6 space-y-0 divide-y divide-primary-foreground/20">
+          <div className="space-y-0 divide-y divide-primary-foreground/20">
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 first:pt-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Feb–Apr</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">The busiest stretch for returns. Choose your time early; your documents can follow.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Busiest for returns. Book early.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">Oct 15</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Extended returns are due. If your day is full, the waitlist gives you a chance at a cancelled time.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Extended returns due. Full days have a waitlist.</p>
             </div>
             <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-4 last:pb-0 sm:grid-cols-[7rem_1fr]">
               <span className="font-semibold text-primary-foreground">All year</span>
-              <p className="text-sm leading-6 text-primary-foreground/75">Letters, planning and bookkeeping don't have to wait for filing season.</p>
+              <p className="text-sm leading-6 text-primary-foreground/75">Letters, planning and bookkeeping.</p>
             </div>
           </div>
           <div className="mt-8 grid grid-cols-12 gap-1" aria-label="Busier months: February, March, April and October">
@@ -138,24 +136,21 @@ function Year() {
 }
 function HowItWorks() {
   const steps = [
-    { t: "Choose a time", d: "Pick an open slot online. You're confirmed right away.", note: "Your place is yours" },
-    { t: "Answer five questions", d: "They become the exact list of documents to bring.", note: "Know what to gather" },
-    { t: "Send your documents", d: "From your phone. We check each one as it arrives.", note: "Get ready at your pace" },
-    { t: "Meet Claire, then sign and pay", d: "One appointment. Then sign and pay online, and we e-file.", note: "Finish without another visit" },
+    { t: "Choose a time", d: "Pick an open slot online. You're confirmed right away." },
+    { t: "Answer five questions", d: "They become the exact list of documents to bring." },
+    { t: "Send your documents", d: "From your phone. We check each one as it arrives." },
+    { t: "Meet Claire, then sign and pay", d: "One appointment, then sign and pay online." },
   ];
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
       <div className="max-w-3xl">
-        <p className="text-sm font-medium text-ink">How it works</p>
-        <h2 className="t-section mt-3 text-balance text-deep-ink">From first question to filed return.</h2>
-        <p className="mt-3 text-base leading-7 text-muted-foreground">You know what to gather before you meet. Claire can spend your time together on the return, not on chasing paperwork.</p>
+        <h2 className="t-section text-balance text-deep-ink">From first question to filed return.</h2>
       </div>
       <ol className="mt-10 grid gap-x-8 gap-y-8 border-t border-line-2 pt-7 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
           <li key={x.t} className="min-w-0">
             <span className="flex size-9 items-center justify-center rounded-full bg-ink text-sm font-semibold tabular-nums text-primary-foreground">{i + 1}</span>
-            <p className="mt-5 text-xs font-medium text-ink">{x.note}</p>
-            <h3 className="mt-1 text-lg font-semibold leading-snug text-deep-ink">{x.t}</h3>
+            <h3 className="mt-5 text-lg font-semibold leading-snug text-deep-ink">{x.t}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{x.d}</p>
           </li>
         ))}
@@ -167,7 +162,7 @@ function Services() {
   const price = (x: (typeof SERVICES)[number]) => (x.price === 0 ? "Free" : `${x.from ? "from " : ""}$${x.price}`);
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="What can we help with?" sub="From a quick question to a full return. Starting prices are shown here; your fee is agreed before work begins, and nothing is due when you choose a time." />
+      <SectionHead title="What can we help with?" sub="Prices agreed before we start. Nothing due when you book." />
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         {GROUPS.map((g) => (
           <div key={g.id}>
@@ -210,7 +205,7 @@ function About() {
         </div>
         <div className="px-5 py-12 sm:px-10 sm:py-16">
           <h2 className="t-section text-deep-ink">One person who knows your return.</h2>
-          <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">Claire Hartwell is an IRS Enrolled Agent: licensed to prepare your return and to represent you if the IRS has questions. Hartwell Tax is her practice. You work with her from your first document to the final signature.</p>
+          <p className="mt-4 max-w-[34rem] text-base leading-7 text-body">An IRS Enrolled Agent, licensed to prepare your return and represent you before the IRS. You work with her from start to finish.</p>
           <blockquote className="mt-8 border-l-2 border-ink pl-4 text-[15px] leading-6 text-body">“I sent everything the week before. The appointment took forty minutes, and I didn't have to come back.”<footer className="mt-2 text-[13px] text-muted-foreground">Anita R., Montclair</footer></blockquote>
           <dl className="mt-8 grid grid-cols-3 gap-2">
             {stats.map((x) => (
@@ -235,7 +230,7 @@ function Privacy() {
   ];
   return (
     <section className={`${panel} px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="Your documents stay between us." sub="Send what your checklist asks for, knowing Claire is the only person who can open it." />
+      <SectionHead title="Your documents stay between us." sub="Only Claire can open your files." />
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {points.map((x) => (
           <li key={x.title} className="flex gap-3">

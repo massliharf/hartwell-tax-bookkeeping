@@ -93,6 +93,7 @@ function ConfirmedPage() {
               {a.meeting_type === "video" ? "Video call" : `In person, ${ADDRESS}`}
             </span>
           </div>
+          <p className="mt-2 text-sm text-muted-foreground">{a.meeting_type === "video" ? "The Join link is on your appointment page and in your reminder. It opens 10 minutes before." : "Directions and parking are on your appointment page."}</p>
           <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
             <Button variant="outline" size="sm" onClick={() => downloadIcs(title, a.start_at, a.end_at, where, details)}><Download /> Add to calendar (.ics)</Button>
             <Button variant="outline" size="sm" asChild><a href={gcal} target="_blank" rel="noreferrer"><CalendarPlus /> Google Calendar</a></Button>

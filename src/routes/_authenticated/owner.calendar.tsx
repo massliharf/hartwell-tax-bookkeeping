@@ -263,6 +263,16 @@ function CalendarPage() {
         {q.isLoading ? <Skeleton className="h-40 rounded-2xl" /> : byDay(mobileDay).length ? (
           <ApptList appts={byDay(mobileDay)} />
         ) : <p className="rounded-2xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">Nothing booked on {ymdLabel(mobileDay)}.</p>}
+        {gapsOn(mobileDay).length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            <p className="text-xs font-medium text-muted-foreground">Open time</p>
+            {gapsOn(mobileDay).map((g) => (
+              <button key={g.from} type="button" onClick={() => openNewAppointment()} className="flex min-h-11 w-full items-center justify-between rounded-xl border border-dashed border-line-2 px-3 text-left text-sm text-muted-foreground transition-colors duration-150 hover:border-ink hover:text-ink">
+                <span className="tabular">{fmtMins(g.from)}–{fmtMins(g.to)}</span><span className="inline-flex items-center gap-1 text-xs font-medium text-ink"><Plus className="size-3.5" />Add</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <AlertDialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>

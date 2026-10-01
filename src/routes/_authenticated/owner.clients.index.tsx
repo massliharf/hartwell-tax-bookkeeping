@@ -88,7 +88,7 @@ function Clients() {
                   <span className="flex min-w-0 items-center gap-3">
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-fill-neutral text-xs font-medium text-deep-ink">{c.name.charAt(0)}</span>
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-deep-ink">{c.name}</span>
+                      <span className="block truncate text-sm font-medium text-deep-ink">{c.name}{!c.is_returning && <Tag tone="accent" className="ml-2 align-middle">New</Tag>}</span>
                       <span className="block truncate text-xs text-muted-foreground">{c.email}</span>
                     </span>
                   </span>
@@ -97,7 +97,6 @@ function Clients() {
                     {c.next && typeof c.next.ready_score === "number" && (c.next.ready_score >= 100 ? <Tag tone="success">Ready</Tag> : <Tag tone="warning">{c.next.ready_score}% ready</Tag>)}
                     {c.unpaid && <Tag tone="danger">Unpaid</Tag>}
                     {!c.next && !c.unpaid && c.filed && <Tag tone="success">Filed</Tag>}
-                    {!c.is_returning && <Tag tone="accent">New</Tag>}
                   </span>
                   <span className="tabular hidden text-[13px] text-muted-foreground md:block">{c.last ? d(c.last.start_at) : "None"}</span>
                   <span className="hidden justify-end md:flex"><ChevronRight className="size-4 text-muted-foreground" /></span>

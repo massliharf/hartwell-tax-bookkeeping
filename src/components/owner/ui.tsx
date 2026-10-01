@@ -134,7 +134,8 @@ export function ApptRow({ a, showDate = false, showClient = true }: { a: Appt; s
   );
 }
 
-export function ApptList({ appts, showDate = false, showClient = true }: { appts: Appt[]; showDate?: boolean; showClient?: boolean }) {
+export function ApptList({ appts, showDate = false, showClient = true, bare = false }: { appts: Appt[]; showDate?: boolean; showClient?: boolean; bare?: boolean }) {
+  if (bare) return <>{appts.map((a) => <ApptRow key={a.id} a={a} showDate={showDate} showClient={showClient} />)}</>;
   return <div className="overflow-hidden rounded-2xl border border-border">{appts.map((a, i) => <div key={a.id} className="enter-item" style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}><ApptRow a={a} showDate={showDate} showClient={showClient} /></div>)}</div>;
 }
 
@@ -155,7 +156,7 @@ export function NeedRow({ it, onAct, busy, idx = 0 }: { it: NeedItem; onAct: () 
       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-fill-neutral text-deep-ink [&_svg]:size-4">{icon}</span>
       <button type="button" disabled={!appointmentId} onClick={() => appointmentId && openAppt({ appointmentId })} className="min-w-0 flex-1 basis-[calc(100%-44px)] text-left disabled:cursor-default sm:basis-auto">
         <span className="block line-clamp-2 text-sm font-medium text-deep-ink sm:truncate">{title}</span>
-        <span className="block truncate text-xs text-muted-foreground" title={reason}>{reason}</span>
+        <span className="line-clamp-2 block text-xs leading-[18px] text-muted-foreground" title={reason}>{reason}</span>
       </button>
       <Button size="sm" variant="secondary" disabled={busy} onClick={onAct} className="ml-11 shrink-0 sm:ml-0">{busy ? "Saving…" : action}</Button>
     </li>

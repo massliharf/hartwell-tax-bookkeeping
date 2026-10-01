@@ -18,7 +18,7 @@
   _Why: this is a real client project (Hartwell Tax & Bookkeeping); the rules there
   (instant booking, never ask for an SSN, `getNow()` for all time logic) are
   non-negotiable and must survive every session._
-- Brand primitives live in src/components/brand; the shared Logo/LogoMark use matching raster artwork for every app surface and the favicon/email use the same artwork. Service data in src/lib/services.ts is the single source for prices/hours. _Why: one visual identity must remain consistent across client, owner, and communications._
+- Brand primitives live in src/components/brand (ReadyRing, DocumentStack, Reveal); service data in src/lib/services.ts — single source for prices/hours.
 - All DB tables are owner-only via RLS (is_owner()); clients act only through token-validated server functions in src/lib/portal.functions.ts using the admin client.
 - Time logic on the server uses getNow() in src/lib/clock.server.ts (real time + settings.demo_time_offset_minutes).
 - Automations live in src/lib/automations.server.ts; every message goes through sendMessage() in src/lib/email.server.ts, which claims a unique messages.dedupe_key before sending. _Why: the 15-min job and immediate triggers can overlap; nothing may send twice._

@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useOwnerCtx } from "@/components/owner/ctx";
 import { needsYou } from "@/components/owner/lib";
 import { DemoTools } from "@/components/owner/demo";
-import { Logo, LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { NewAppointmentButton } from "@/components/owner/new-appointment";
 
 export const Route = createFileRoute("/_authenticated/owner")({
@@ -95,7 +95,7 @@ function OwnerLayout() {
       {/* DESIGN_SYSTEM v2 §5: the sidebar sits on the canvas (no card); the main panel is the white card. */}
       <aside className={`sticky top-2 hidden h-[calc(100vh-16px)] shrink-0 flex-col gap-3 transition-[width,padding] duration-300 ease-expo sm:flex ${collapsed ? "w-[60px] px-2" : "w-[220px] px-3"}`}>
         <div className={`flex h-9 items-center ${collapsed ? "justify-center" : "justify-between"}`}>
-          {collapsed ? <Link to="/owner" aria-label="Hartwell Tax owner dashboard"><LogoMark size={28} /></Link> : <Link to="/owner" aria-label="Hartwell Tax owner dashboard" className="min-w-0"><Logo size={28} sub="Owner dashboard" /></Link>}
+          {collapsed ? null : <Link to="/owner" aria-label="Hartwell Tax owner dashboard" className="min-w-0"><Logo size={28} sub="Owner dashboard" /></Link>}
           <Button size="icon" variant="ghost" onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}><PanelLeft className="size-4" /></Button>
         </div>
         <div className="flex flex-col gap-0.5">

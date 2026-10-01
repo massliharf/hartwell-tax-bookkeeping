@@ -105,6 +105,7 @@ export type NeedItem =
   | { kind: "review"; id: string; count: number; appt: Appt }
   | { kind: "unpaid"; id: string; appt: Appt }
   | { kind: "wrap"; id: string; appt: Appt }
+  | { kind: "file"; id: string; appt: Appt }
   | { kind: "failed"; id: string; msg: { id: string; subject: string | null; recipient: string | null; error: string | null; sent_at: string; type: string } }
   | { kind: "claimed"; id: string; offer: { id: string; slot_start: string; name: string; service: string } };
 
@@ -116,7 +117,8 @@ export const needsYou = (nowIso: string) =>
       const in48 = new Date(now + 48 * 3600e3).toISOString();
       const ago3 = new Date(now - 3 * 86400e3).toISOString();
       const ago5 = new Date(now - 5 * 86400e3).toISOString();
-      const [low, sig, failed, claimed, rev, unpaid, wrap] = await Promise.all([
+      const ago1 = new Date(now - 86400e3).toISOString();
+      const [low, sig, failed, claimed, rev, unpaid, wrap, file] = await Promise.all([
         supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lt("ready_score", 70)
           .gt("start_at", nowIso).lte("start_at", in48).order("start_at"),
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "pending").is("filed_at", null).lt("end_at", ago3).order("end_at"),
@@ -126,8 +128,10 @@ export const needsYou = (nowIso: string) =>
         supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").is("paid_at", null).not("fee_cents", "is", null).lt("finished_at", ago5).order("finished_at"),
         // Meeting is over but not finished yet: Claire decides Finish, another meeting, or no-show.
         supabase.from("appointments").select(APPT_SELECT).in("status", ["booked", "confirmed"]).lte("end_at", nowIso).order("end_at"),
+        // Signed and paid over 24h ago, still not marked filed.
+        supabase.from("appointments").select(APPT_SELECT).eq("status", "completed").eq("signature_status", "signed").is("filed_at", null).not("paid_at", "is", null).lt("paid_at", ago1).lt("signed_at", ago1).order("paid_at"),
       ]);
-      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error ?? wrap.error;
+      const err = low.error ?? sig.error ?? failed.error ?? claimed.error ?? rev.error ?? unpaid.error ?? wrap.error ?? file.error;
       if (err) throw err;
       const revRows = (rev.data ?? []) as unknown as { appointment_id: string; appointments: { start_at: string } }[];
       let review: NeedItem[] = [];
@@ -138,6 +142,7 @@ export const needsYou = (nowIso: string) =>
       }
       return [
         ...((wrap.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "wrap" as const, id: a.id, appt: a })),
+        ...((file.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "file" as const, id: a.id, appt: a })),
         ...review,
         ...((unpaid.data ?? []) as unknown as Appt[]).map((a) => ({ kind: "unpaid" as const, id: a.id, appt: a })),
         ...((low.data ?? []) as unknown as Appt[]).filter((a) => a.attention_reason !== "handled").map((a) => ({ kind: "low" as const, id: a.id, appt: a })),

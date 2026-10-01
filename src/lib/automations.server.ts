@@ -280,6 +280,26 @@ export async function runAutomations(origin: string) {
     }
   }
 
+  // Returns signed and paid over 24h ago but not marked filed: one daily nudge to Claire.
+  const ago24 = iso(t - 24 * H);
+  const { data: unfiled } = await s.from("appointments").select("id, signed_at, paid_at")
+    .eq("status", "completed").eq("signature_status", "signed").is("filed_at", null)
+    .not("paid_at", "is", null).lt("paid_at", ago24).lt("signed_at", ago24);
+  if (unfiled?.length) {
+    const { data: admin } = await s.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
+    const ownerEmail = admin ? (await s.auth.admin.getUserById(admin.user_id)).data.user?.email : null;
+    if (ownerEmail) {
+      const day = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(now);
+      const n = unfiled.length;
+      hit("file_reminder", await sendMessage({
+        dedupeKey: `file_reminder:${day}`, type: "file_reminder", minutesSaved: 2, clientId: null, to: ownerEmail,
+        subject: `${n} return${n === 1 ? " is" : "s are"} ready to e-file`,
+        heading: "Ready to e-file.",
+        blocks: [{ p: `Claire, ${n} return${n === 1 ? " is" : "s are"} signed, paid and waiting to be e-filed.` }, { button: { label: "Open Needs you", href: `${origin}/owner/needs` } }],
+      }));
+    }
+  }
+
   return { now: now.toISOString(), sent: counts };
 }
 

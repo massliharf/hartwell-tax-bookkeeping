@@ -45,9 +45,11 @@ export function Integrations() {
         <p className="mt-2">Keep this link private. Anyone with it can see appointment times and client names.</p>
       </Row>
       <VideoLinkRow />
-      <Row icon={<Mail />} title="Email" status={q.data.email.connected ? <Tag tone="success">Connected</Tag> : <Tag tone="warning">Not connected</Tag>}>
+      <Row icon={<Mail />} title="Email" status={q.data.email.connected ? q.data.email.customSender ? <Tag tone="success">Sender configured</Tag> : <Tag tone="warning">Test sender only</Tag> : <Tag tone="warning">Not connected</Tag>}>
         {q.data.email.connected
-          ? <p>Confirmations, reminders and signature requests go out from <span className="text-deep-ink">{q.data.email.from}</span>.</p>
+          ? q.data.email.customSender
+            ? <p>Confirmations, reminders and signature requests use <span className="text-deep-ink">{q.data.email.from}</span>. Verify its domain in Resend and send a test; check Report for delivery failures.</p>
+            : <p>Resend is connected, but <span className="text-deep-ink">{q.data.email.from}</span> can only send to the Resend account owner's inbox. Verify your sending domain and set RESEND_FROM before sending to clients. Check Report for delivery failures.</p>
           : <p>Add a Resend API key to send confirmations and reminders by email. Until then, messages are only logged in Report.</p>}
       </Row>
       <Row icon={<MessageSquare />} title="Text messages" status={q.data.sms.connected ? <Tag tone="success">Connected</Tag> : <Tag>Demo mode</Tag>}>

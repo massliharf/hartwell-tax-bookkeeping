@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "./demo";
+import type { Block } from "./email.server";
 
 async function owner(context: { supabase: import("@supabase/supabase-js").SupabaseClient; userId: string }) {
   const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
@@ -318,26 +319,41 @@ export const demoFillWeek = createServerFn({ method: "POST" }).middleware([requi
 
 /** Owner: send a real copy of one demo message to an address you own, to see it in a real inbox. */
 export const demoSendCopy = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => (d as { id: string; to: string }))
+  .inputValidator((d) => z.object({ id: z.string().uuid(), to: z.string().email().max(200) }).parse(d))
   .handler(async ({ data, context }) => {
-    const to = String(data.to ?? "").trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to) || to.length > 200) return { ok: false as const, reason: "email" as const };
+    const to = data.to.trim();
     const { s } = await owner(context);
     const key = process.env["RESEND_API_KEY"];
     if (!key) return { ok: false as const, reason: "no_key" as const };
-    const { data: m } = await s.from("messages").select("subject, body, type").eq("id", data.id).maybeSingle();
-    if (!m) return { ok: false as const, reason: "missing" as const };
-    const { renderEmail } = await import("./email.server");
-    const paras = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-    const heading = m.subject ?? "Hartwell Tax";
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env["RESEND_FROM"] || "Claire Hartwell, EA <onboarding@resend.dev>",
-        to: [to], subject: `[Demo] ${heading}`, html: renderEmail(heading, paras.map((p) => ({ p }))), text: m.body,
-      }),
+    const { data: m } = await s.from("messages").select("subject, body, recipient").eq("id", data.id).eq("channel", "email").maybeSingle();
+    if (!m || !/@example\.(com|org|net)$/i.test(m.recipient ?? "")) return { ok: false as const, reason: "missing" as const };
+    const { renderEmail, toText } = await import("./email.server");
+    const parts = m.body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+    parts.shift(); // The stored plain-text message starts with its heading.
+    if (parts.at(-1) === "Claire Hartwell, EA") parts.pop();
+    const blocks = parts.flatMap((part): Block[] => {
+      const lines = part.split("\n");
+      if (lines.every((line) => line.startsWith("- "))) return [{ list: lines.map((line) => line.slice(2)) }];
+      const links = lines.map((line) => line.match(/^(.+?): (https:\/\/\S+)$/));
+      if (links.every((link) => link !== null)) return links.map((link) => ({ button: { label: link?.[1] ?? "Open appointment", href: link?.[2] ?? "" } }));
+      const trailing = part.match(/^(.*?)(?:\n+)(Open your appointment): (https:\/\/\S+)$/s);
+      if (trailing) return [{ p: trailing[1] ?? "" }, { button: { label: trailing[2] ?? "Open your appointment", href: trailing[3] ?? "" } }];
+      return [{ p: part }];
     });
-    if (!res.ok) { console.error("Demo copy failed", res.status, await res.text()); return { ok: false as const, reason: "failed" as const }; }
-    return { ok: true as const };
+    const heading = m.subject ?? "Hartwell Tax";
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: process.env["RESEND_FROM"] || "Claire Hartwell, EA <onboarding@resend.dev>",
+          to: [to], subject: `[Demo] ${heading}`, html: renderEmail(heading, blocks), text: toText(heading, blocks),
+        }),
+      });
+      if (!res.ok) { console.error("Demo copy failed", res.status, await res.text()); return { ok: false as const, reason: res.status === 403 ? "sender" as const : "failed" as const }; }
+      return { ok: true as const };
+    } catch (error) {
+      console.error("Demo copy failed", error);
+      return { ok: false as const, reason: "failed" as const };
+    }
   });

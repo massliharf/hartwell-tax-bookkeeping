@@ -1,4 +1,4 @@
-/** Brand email (DESIGN_SYSTEM v2): canvas grey, white card, Hartwell blue buttons, logo tile. Table layout for mail clients. */
+/** Brand email (Studio Shell): warm canvas, white sheet, oxblood actions. Table layout for mail clients. */
 import type { Database } from "@/integrations/supabase/types";
 import { OFFICE_EMAIL, OFFICE_EMAIL_HREF } from "./meeting";
 
@@ -95,19 +95,25 @@ export async function sendMessage(a: SendArgs): Promise<boolean> {
   if (!key) delivery = "simulated";
   else if (/@example\.(com|org|net)$/i.test(a.to)) delivery = "simulated";
   else {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env["RESEND_FROM"] || FROM_DEFAULT,
-        to: [a.to], subject: a.subject, html: renderEmail(a.heading, a.blocks), text,
-        ...(a.ics ? { attachments: [{ filename: "appointment.ics", content: btoa(a.ics) }] } : {}),
-      }),
-    });
-    if (!res.ok) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: process.env["RESEND_FROM"] || FROM_DEFAULT,
+          to: [a.to], subject: a.subject, html: renderEmail(a.heading, a.blocks), text,
+          ...(a.ics ? { attachments: [{ filename: "appointment.ics", content: btoa(a.ics) }] } : {}),
+        }),
+      });
+      if (!res.ok) {
+        delivery = "failed";
+        err = `[${res.status}] ${(await res.text()).slice(0, 400)}`;
+        console.error("Resend failed", err);
+      }
+    } catch (cause) {
       delivery = "failed";
-      err = `[${res.status}] ${(await res.text()).slice(0, 400)}`;
-      console.error("Resend failed", err);
+      err = cause instanceof Error ? cause.message.slice(0, 400) : "Network error";
+      console.error("Resend failed", cause);
     }
   }
   await supabaseAdmin.from("messages").update({ delivery, error: err }).eq("id", claimed.id);

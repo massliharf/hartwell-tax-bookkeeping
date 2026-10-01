@@ -10,7 +10,7 @@ export const getIntegrations = createServerFn({ method: "GET" })
     const { calendarToken } = await import("./integrations.server");
     return {
       calendarToken: calendarToken(),
-      email: { connected: !!process.env["RESEND_API_KEY"], from: process.env["RESEND_FROM"] || "Claire Hartwell, EA <onboarding@resend.dev>" },
+      email: { connected: !!process.env["RESEND_API_KEY"], verifiedSender: !!process.env["RESEND_FROM"], from: process.env["RESEND_FROM"] || "Claire Hartwell, EA <onboarding@resend.dev>" },
       sms: { connected: !!process.env["TWILIO_AUTH_TOKEN"] },
       payments: { connected: !!process.env["STRIPE_SECRET_KEY"] },
     };

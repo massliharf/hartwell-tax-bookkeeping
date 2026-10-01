@@ -27,7 +27,7 @@ function Wordmark() {
   return <Link to="/" aria-label="Hartwell Tax & Bookkeeping, home" className="flex min-h-10 min-w-0 items-center"><Logo sub="Tax & Bookkeeping, Montclair NJ" /></Link>;
 }
 
-const LINKS = [{ href: "/#services", label: "Services and prices" }, { href: "/#how", label: "How it works" }, { href: "/#reviews", label: "Reviews" }, { href: "/#about", label: "Meet Claire" }, { href: "/#faq", label: "Questions" }];
+const LINKS = [{ href: "/#how", label: "How it works" }, { href: "/#services", label: "Services and prices" }, { href: "/#reviews", label: "Reviews" }, { href: "/#about", label: "Meet Claire" }, { href: "/#faq", label: "Questions" }];
 
 export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
   return (

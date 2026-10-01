@@ -52,8 +52,8 @@ function Home() {
       <SiteHeader warm />
       <main className="mx-auto max-w-6xl space-y-3 px-2 pb-6 sm:space-y-4 sm:px-5">
         <Hero />
-        <Services />
         <HowItWorks />
+        <Services />
         <Reviews />
         <About />
         <Year />
@@ -139,15 +139,16 @@ function Year() {
 }
 function HowItWorks() {
   const steps = [
-    { t: "Choose a time", d: "Pick an open slot online. You're confirmed right away." },
-    { t: "Answer five questions", d: "They become the exact list of documents to bring." },
-    { t: "Send your documents", d: "From your phone. We check each one as it arrives." },
-    { t: "Meet Claire, then sign and pay", d: "One appointment, then sign and pay online." },
+    { t: "Book in two minutes", d: "See every open time, day or night. You're confirmed on the spot." },
+    { t: "Get your exact checklist", d: "A few quick answers decide which documents you need. Nothing extra." },
+    { t: "Send documents from your phone", d: "We check each one as it arrives and tell you if something's off." },
+    { t: "Meet Claire once", d: "Then sign and pay online, and we e-file. No second visit." },
   ];
   return (
     <section id="how" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
       <div className="max-w-3xl">
-        <h2 className="t-section text-balance text-deep-ink">From first question to filed return.</h2>
+        <h2 className="t-section text-balance text-deep-ink">No phone tag. No guessing. No second visit.</h2>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">How a tax appointment works with us.</p>
       </div>
       <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((x, i) => (
@@ -165,7 +166,7 @@ function Services() {
   const price = (x: (typeof SERVICES)[number]) => (x.price === 0 ? "Free" : `${x.from ? "from " : ""}$${x.price}`);
   return (
     <section id="services" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
-      <SectionHead title="What can we help with?" sub="Prices agreed before we start. Nothing due when you book." />
+      <SectionHead title="Services and fixed prices." sub="Agreed before we start. Nothing due when you book." />
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         {GROUPS.map((g) => (
           <div key={g.id}>
@@ -234,7 +235,7 @@ function Reviews() {
   return (
     <section id="reviews" className={`${panel} scroll-mt-24 px-5 py-12 sm:px-10 sm:py-16`}>
       <div className="flex flex-wrap items-end justify-between gap-6">
-        <SectionHead title="What clients say." />
+        <SectionHead title="Why clients come back." sub="98% return the next year." />
         <ul className="flex gap-6">
           {sources.map((x) => (
             <li key={x.s}>
@@ -308,7 +309,7 @@ function DeadlineCta() {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
           <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"><Link to="/book" search={{ service: c.service }}>{c.cta}</Link></Button>
-          <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><a href="#services">See all services</a></Button>
+          <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><a href="tel:+19735550142">Call (973) 555-0142</a></Button>
         </div>
       </div>
       <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-primary-foreground/10 pt-6 text-xs text-primary-foreground/70">

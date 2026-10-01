@@ -14,11 +14,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Segmented } from "@/components/ui/segmented";
 import { DocumentStack } from "@/components/brand/DocumentStack";
 import { ServiceIcon } from "@/components/brand/ServiceIcon";
+import { IntakeQuestions } from "@/components/booking/IntakeQuestions";
 import { BookingShell, StepTitle } from "@/components/booking/BookingShell";
 import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-store";
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
 import { getLeadDraft } from "@/lib/automations.functions";
-import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
+import { fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers, chipsFor, intakeComplete } from "@/lib/intake";
 
 export const Route = createFileRoute("/book/")({
   validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(2).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
@@ -104,7 +105,7 @@ function BookPage() {
 
   const detailsComplete = draft.name.trim().length > 0 && emailOk(draft.email);
   const slotOk = !!draft.slot && !!draft.date && nyDay(draft.slot) === draft.date;
-  const questionsComplete = questionsFor(draft.serviceSlug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean");
+  const questionsComplete = intakeComplete(draft.serviceSlug, draft.answers);
   const preview = previewChecklist(draft.serviceSlug, draft.answers);
   const canContinue = step === 0 ? !!service : step === 1 ? slotOk : detailsComplete && questionsComplete && slotOk && !bookingBusy;
   const cta = step === 0 ? (service ? `Continue with ${service.name}` : "Choose what you need")
@@ -241,32 +242,13 @@ function ChecklistPreview({ docs, complete }: { docs: ReturnType<typeof previewC
 
 /* ---------- The five questions (shown on the details step) ---------- */
 function QuestionsStep({ slug, answers, onChange }: { slug?: string | undefined; answers: Answers; onChange: (a: Answers) => void }) {
-  const qs = questionsFor(slug);
-  const set = (k: keyof Answers, v: boolean | number) => onChange({ ...answers, [k]: v });
-
   return (
     <>
-       <div className="mb-4 mt-10 border-t border-line-1 pt-8">
+      <div className="mb-4 mt-10 border-t border-line-1 pt-8">
         <h2 className="t-card text-deep-ink">Tell us about your year</h2>
         <p className="mt-1 text-sm text-muted-foreground">Your answers become your document list.</p>
       </div>
-      <div className="space-y-3">
-         {qs.map((q) => (
-          <div key={q.key} className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-deep-ink">{q.label}</p>
-              {q.hint && <p className="text-xs text-muted-foreground">{q.hint}</p>}
-            </div>
-            {q.type === "count" ? (
-              <Segmented className="shrink-0" label={q.label} value={String((answers[q.key] as number) ?? 0)} onChange={(v) => set(q.key, Number(v))}
-                options={[0, 1, 2, 3].map((n) => ({ value: String(n), label: n === 3 ? "3+" : String(n) }))} />
-                        ) : (
-              <Segmented className="shrink-0" label={q.label} value={answers[q.key] === true ? "yes" : answers[q.key] === false ? "no" : ("" as "yes" | "no")}
-                onChange={(v) => set(q.key, v === "yes")} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
-            )}
-          </div>
-        ))}
-      </div>
+      <IntakeQuestions slug={slug} answers={answers} onChange={onChange} />
     </>
   );
 }
@@ -495,8 +477,8 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
           <Lock className="mt-0.5 size-3.5 shrink-0" /> Confirmed right away. Nothing to pay now. We never ask for your Social Security number online.
         </p>
       </form>
-      {questionsFor(service.slug).length > 0 && <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />}
-      {previewChecklist(service.slug, draft.answers).length > 0 && <div className="mt-6 lg:hidden"><ChecklistPreview docs={previewChecklist(service.slug, draft.answers)} complete={questionsFor(service.slug).every((q) => q.type === "count" || typeof draft.answers[q.key] === "boolean")} /></div>}
+      {(questionsFor(service.slug).length > 0 || chipsFor(service.slug).length > 0) && <QuestionsStep slug={service.slug} answers={draft.answers} onChange={(answers) => update({ answers })} />}
+      {previewChecklist(service.slug, draft.answers).length > 0 && <div className="mt-6 lg:hidden"><ChecklistPreview docs={previewChecklist(service.slug, draft.answers)} complete={intakeComplete(service.slug, draft.answers)} /></div>}
     </>
   );
 }

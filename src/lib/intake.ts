@@ -1,40 +1,78 @@
 // Intake questions per service + a client-side mirror of document_rules for the live preview.
 export type Answers = {
   w2_count?: number | undefined;
+  filed_with_us?: boolean | undefined;
+  none_apply?: boolean | undefined;
   freelance?: boolean | undefined;
   interest?: boolean | undefined;
+  investments?: boolean | undefined;
+  retirement?: boolean | undefined;
+  social_security?: boolean | undefined;
+  unemployment?: boolean | undefined;
   mortgage?: boolean | undefined;
   student_loans?: boolean | undefined;
   dependents?: boolean | undefined;
+  tuition?: boolean | undefined;
+  marketplace?: boolean | undefined;
+  hsa?: boolean | undefined;
+  donations?: boolean | undefined;
+  nj_rent?: boolean | undefined;
+  nj_homeowner?: boolean | undefined;
+  estimated?: boolean | undefined;
   rental?: boolean | undefined;
   irs_letter?: boolean | undefined;
-  filed_with_us?: boolean | undefined;
 };
+export type ChipKey = Exclude<keyof Answers, "w2_count" | "filed_with_us" | "none_apply" | "irs_letter">;
 export type Question = { key: keyof Answers; label: string; hint?: string; type: "yesno" | "count" };
 
 const Q: Record<string, Question> = {
   w2_count: { key: "w2_count", label: "How many W-2 jobs did you have?", hint: "Count every employer this year.", type: "count" },
-  freelance: { key: "freelance", label: "Any freelance or side income?", type: "yesno" },
-  interest: { key: "interest", label: "Did you earn bank interest?", type: "yesno" },
-  mortgage: { key: "mortgage", label: "Do you pay a mortgage?", type: "yesno" },
-  student_loans: { key: "student_loans", label: "Paying student loans?", type: "yesno" },
-  dependents: { key: "dependents", label: "Kids or childcare costs?", type: "yesno" },
-  irs_letter: { key: "irs_letter", label: "Did you get a letter from the IRS?", type: "yesno" },
   filed_with_us: { key: "filed_with_us", label: "Did you file with us last year?", type: "yesno" },
 };
 
-const BY_SERVICE: Record<string, (keyof typeof Q)[]> = {
-  individual: ["w2_count", "mortgage", "student_loans", "dependents", "filed_with_us"],
-  "self-employed": ["w2_count", "mortgage", "dependents", "filed_with_us"],
-  rental: ["w2_count", "mortgage", "filed_with_us"],
-  extension: ["w2_count", "freelance", "filed_with_us"],
-  letter: ["filed_with_us"],
-  planning: ["w2_count", "freelance", "filed_with_us"],
-  bookkeeping: ["w2_count", "interest", "filed_with_us"],
-  intro: [],
+/** Things that change which documents you need. Short labels; each one maps to document_rules.condition. */
+export const CHIPS: Record<ChipKey, string> = {
+  interest: "Bank interest or dividends",
+  investments: "Sold stocks or crypto",
+  retirement: "Retirement income or 401(k)",
+  social_security: "Social Security",
+  unemployment: "Unemployment",
+  freelance: "Side or freelance income",
+  rental: "Rental income",
+  mortgage: "Mortgage",
+  student_loans: "Student loans",
+  dependents: "Kids or childcare",
+  tuition: "College tuition",
+  marketplace: "Marketplace health insurance",
+  hsa: "HSA",
+  donations: "Donations",
+  nj_rent: "Rented in NJ",
+  nj_homeowner: "Own a home in NJ",
+  estimated: "Paid estimated taxes",
 };
 
-export const questionsFor = (slug?: string | null): Question[] => (BY_SERVICE[slug ?? ""] ?? BY_SERVICE["individual"]!).map((k) => Q[k]!);
+const INDIVIDUAL: ChipKey[] = ["interest", "investments", "retirement", "social_security", "unemployment", "freelance", "mortgage", "student_loans", "dependents", "tuition", "marketplace", "hsa", "donations", "nj_rent", "nj_homeowner", "estimated"];
+const BY_SERVICE: Record<string, { questions: (keyof typeof Q)[]; chips: ChipKey[] }> = {
+  individual: { questions: ["w2_count", "filed_with_us"], chips: INDIVIDUAL },
+  "self-employed": { questions: ["w2_count", "filed_with_us"], chips: INDIVIDUAL.filter((k) => k !== "freelance" && k !== "unemployment") },
+  rental: { questions: ["w2_count", "filed_with_us"], chips: ["interest", "investments", "retirement", "social_security", "freelance", "mortgage", "dependents", "marketplace", "donations", "nj_homeowner", "estimated"] },
+  extension: { questions: ["w2_count", "filed_with_us"], chips: INDIVIDUAL },
+  letter: { questions: ["filed_with_us"], chips: [] },
+  planning: { questions: ["w2_count", "filed_with_us"], chips: ["freelance", "rental", "investments", "retirement", "estimated"] },
+  bookkeeping: { questions: ["filed_with_us"], chips: ["interest", "rental", "estimated"] },
+  intro: { questions: [], chips: [] },
+};
+const plan = (slug?: string | null) => BY_SERVICE[slug ?? ""] ?? BY_SERVICE["individual"]!;
+
+export const questionsFor = (slug?: string | null): Question[] => plan(slug).questions.map((k) => Q[k]!);
+export const chipsFor = (slug?: string | null): ChipKey[] => plan(slug).chips;
+
+/** Answered enough to build the list: every question, and either a chip or "None of these". */
+export function intakeComplete(slug: string | null | undefined, a: Answers) {
+  const qsDone = questionsFor(slug).every((q) => (q.type === "count" ? true : typeof a[q.key] === "boolean"));
+  const chips = chipsFor(slug);
+  return qsDone && (chips.length === 0 || !!a.none_apply || chips.some((k) => a[k] === true));
+}
 
 export function impliedFlags(slug?: string | null): Partial<Answers> {
   if (slug === "self-employed" || slug === "bookkeeping") return { freelance: true };
@@ -57,10 +95,21 @@ export function previewChecklist(slug: string | null | undefined, answers: Answe
     docs.push({ id: "ie", title: "Income & expense summary", note: "A simple list is fine" });
     docs.push({ id: "ho", title: "Home office details", note: "Optional" });
   }
-  if (a.interest) docs.push({ id: "int", title: "1099-INT", note: "From your bank" });
+  if (a.interest) { docs.push({ id: "int", title: "1099-INT", note: "From your bank" }); docs.push({ id: "div", title: "1099-DIV", note: "Dividends" }); }
+  if (a.investments) { docs.push({ id: "b", title: "1099-B", note: "From your brokerage" }); docs.push({ id: "crypto", title: "Crypto transaction report", note: "If you traded crypto" }); }
+  if (a.retirement) docs.push({ id: "r", title: "1099-R", note: "Pension, IRA or 401(k)" });
+  if (a.social_security) docs.push({ id: "ssa", title: "SSA-1099", note: "Social Security benefits" });
+  if (a.unemployment) docs.push({ id: "g", title: "1099-G", note: "Unemployment benefits" });
   if (a.mortgage) docs.push({ id: "1098", title: "1098 mortgage interest statement", note: "From your lender" });
   if (a.student_loans) docs.push({ id: "1098e", title: "1098-E", note: "Student loan interest" });
   if (a.dependents) docs.push({ id: "care", title: "Childcare provider info and costs", note: "Name, tax ID, total paid" });
+  if (a.tuition) docs.push({ id: "t", title: "1098-T", note: "Tuition statement" });
+  if (a.marketplace) docs.push({ id: "a", title: "1095-A", note: "Needed to file" });
+  if (a.hsa) docs.push({ id: "hsa", title: "5498-SA and 1099-SA", note: "From your HSA provider" });
+  if (a.donations) docs.push({ id: "don", title: "Donation receipts", note: "Optional" });
+  if (a.nj_rent) docs.push({ id: "rent-nj", title: "Rent you paid this year", note: "Total and landlord's name" });
+  if (a.nj_homeowner) docs.push({ id: "ptax-home", title: "Property tax bill for your home", note: "Latest bill" });
+  if (a.estimated) docs.push({ id: "est", title: "Estimated tax payments", note: "Dates and amounts" });
   if (a.rental) {
     docs.push({ id: "rent", title: "Rental income & expenses", note: "Rent, repairs, insurance" });
     docs.push({ id: "ptax", title: "Property tax bill", note: "For the rental" });
@@ -77,28 +126,16 @@ export function previewChecklist(slug: string | null | undefined, answers: Answe
 /** Shape stored as appointments.intake_answers (read by generate_checklist). */
 export function toIntakePayload(slug: string, answers: Answers) {
   const a = { ...answers, ...impliedFlags(slug) };
-  return {
-    w2_employers: employerLabels(a.w2_count ?? 0),
-    freelance: !!a.freelance,
-    interest: !!a.interest,
-    mortgage: !!a.mortgage,
-    student_loans: !!a.student_loans,
-    dependents: !!a.dependents,
-    rental: !!a.rental,
-    irs_letter: !!a.irs_letter,
-    filed_with_us: !!a.filed_with_us,
-  };
+  const flags = Object.fromEntries((Object.keys(CHIPS) as ChipKey[]).map((k) => [k, !!a[k]]));
+  return { w2_employers: employerLabels(a.w2_count ?? 0), ...flags, irs_letter: !!a.irs_letter, filed_with_us: !!a.filed_with_us };
 }
 
 /** Reverse of toIntakePayload, for returning clients. */
 export function fromIntakePayload(p: Record<string, unknown>): Answers {
   const emps = Array.isArray(p["w2_employers"]) ? p["w2_employers"].length : 0;
-  const b = (k: string) => (typeof p[k] === "boolean" ? (p[k] as boolean) : undefined);
-  return {
-    w2_count: emps, freelance: b("freelance"), interest: b("interest"), mortgage: b("mortgage"),
-    student_loans: b("student_loans"), dependents: b("dependents"), rental: b("rental"),
-    irs_letter: false, filed_with_us: true,
-  };
+  const out: Answers = { w2_count: emps, irs_letter: false, filed_with_us: true };
+  for (const k of Object.keys(CHIPS) as ChipKey[]) if (typeof p[k] === "boolean") out[k] = p[k] as boolean;
+  return out;
 }
 
 export const TZ = "America/New_York";

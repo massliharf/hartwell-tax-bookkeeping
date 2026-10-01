@@ -11,7 +11,7 @@ import { Stepper } from "@/components/ui/stepper";
 import { DIRECTIONS, MAP_EMBED, OFFICE, OFFICE_ADDRESS, downloadIcs, joinState } from "@/lib/meeting";
 import { INTRO_STEPS, STEPS, introStepOf, isIntroAppt, meetingAhead, stageOf, stepOf, type Stage } from "@/lib/lifecycle";
 import { Checkout } from "@/components/booking/Checkout";
-import { Segmented } from "@/components/ui/segmented";
+import { IntakeQuestions } from "@/components/booking/IntakeQuestions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,7 +26,7 @@ import {
   keepFlaggedFile, markNotApplicable, rescheduleAppointment, saveIntake, signForm8879, testPay, undoNotApplicable,
 } from "@/lib/portal.functions";
 import { getAvailabilityWindow } from "@/lib/booking.functions";
-import { fmtDateLong, fmtDayChip, fmtTime, questionsFor, toIntakePayload, type Answers } from "@/lib/intake";
+import { fmtDateLong, fmtDayChip, fmtTime, toIntakePayload, type Answers, intakeComplete } from "@/lib/intake";
 import { docGuide } from "@/lib/doc-guide";
 
 export const Route = createFileRoute("/a/$token")({
@@ -226,11 +226,10 @@ function StatusCard({ icon, title, children, action }: { icon: React.ReactNode; 
 /* ---------- Intake (phone-in bookings) ---------- */
 function IntakeCard({ token, slug, onDone }: { token: string; slug: string | null; onDone: () => void }) {
   const save = useServerFn(saveIntake);
-  const qs = questionsFor(slug);
   const [ans, setAns] = useState<Answers>({});
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const done = qs.every((x) => ans[x.key] !== undefined);
+  const done = intakeComplete(slug, ans);
   const submit = async () => {
     setBusy(true); setErr(null);
     try { const r = await save({ data: { token, intake: toIntakePayload(slug ?? "individual", ans) } }); if (!r.ok) throw new Error(); toast.success("Thanks. Your document list is ready below."); onDone(); }
@@ -240,19 +239,8 @@ function IntakeCard({ token, slug, onDone }: { token: string; slug: string | nul
   return (
     <section className="rounded-2xl border border-border bg-sheet p-5 sm:p-6">
       <h2 className="t-card text-deep-ink">Tell us about your year.</h2>
-      <p className="mt-1 text-sm text-muted-foreground">A few yes-or-no questions. Your answers become the exact list of documents to bring.</p>
-      <div className="mt-5 space-y-4">
-        {qs.map((x) => (
-          <div key={x.key} className="flex flex-wrap items-center justify-between gap-3">
-            <span className="text-sm text-deep-ink">{x.label}</span>
-            {x.type === "count" ? (
-              <Segmented label={x.label} value={typeof ans[x.key] === "number" ? String(ans[x.key]) : ""} onChange={(v) => setAns({ ...ans, [x.key]: Number(v) })} options={[0, 1, 2, 3].map((n) => ({ value: String(n), label: n === 3 ? "3+" : String(n) }))} />
-            ) : (
-              <Segmented label={x.label} value={ans[x.key] === true ? "yes" : ans[x.key] === false ? "no" : ("" as "yes" | "no")} onChange={(v) => setAns({ ...ans, [x.key]: v === "yes" })} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} />
-            )}
-          </div>
-        ))}
-      </div>
+      <p className="mt-1 text-sm text-muted-foreground">Your answers become your document list.</p>
+      <div className="mt-5"><IntakeQuestions slug={slug} answers={ans} onChange={setAns} /></div>
       {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
       <Button className="mt-5" disabled={!done || busy} onClick={submit}>{busy ? "Saving…" : "Save answers"}</Button>
     </section>

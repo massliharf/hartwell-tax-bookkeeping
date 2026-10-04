@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/Logo";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import { Lock, Menu } from "lucide-react";
 import { HOURS } from "@/lib/services";
 import { OFFICE_EMAIL, OFFICE_EMAIL_HREF, OFFICE_PHONE, OFFICE_PHONE_HREF } from "@/lib/meeting";
 
@@ -37,16 +37,18 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
         <nav aria-label="Main" className="hidden items-center gap-1 xl:flex">
           {LINKS.map((l) => <a key={l.href} href={l.href} className="relative flex h-10 items-center px-2 text-[13px] font-medium text-body transition-colors duration-150 after:absolute after:inset-x-2 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-150 hover:text-ink hover:after:scale-x-100 focus-visible:text-ink focus-visible:after:scale-x-100">{l.label}</a>)}
         </nav>
-        <div className="ml-auto hidden items-center gap-2 md:flex xl:ml-0">
-          <Button asChild variant="ghost" className="text-ink hover:text-ink"><Link to="/book/returning">My appointment</Link></Button>
-          <Button asChild><Link to="/book">Schedule an appointment</Link></Button>
+        <div className="ml-auto hidden items-center gap-1 md:flex xl:ml-0">
+          <Button asChild variant="ghost" size="sm" className="text-ink hover:text-ink"><Link to="/book/returning">My appointment</Link></Button>
+          <Button asChild size="sm"><Link to="/book">Book</Link></Button>
+          <Button asChild variant="ghost" size="sm" className="ml-1 gap-1.5 text-ink hover:text-ink"><Link to="/auth"><Lock className="size-3.5" strokeWidth={1.75} />Owner login</Link></Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="ml-2 xl:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={8} className="w-[calc(100vw-32px)] max-w-xs rounded-2xl border-border p-2 shadow-lift">
             {LINKS.map((l) => <DropdownMenuItem key={l.href} asChild className="h-11 rounded-lg px-3 text-sm"><a href={l.href}>{l.label}</a></DropdownMenuItem>)}
             <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/book/returning">My appointment</Link></DropdownMenuItem>
-            <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Schedule an appointment</Link></Button></div>
+            <DropdownMenuItem asChild className="h-11 rounded-lg px-3 text-sm"><Link to="/auth">Owner login</Link></DropdownMenuItem>
+            <div className="p-1 pt-2"><Button asChild size="lg" className="w-full"><Link to="/book">Book</Link></Button></div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

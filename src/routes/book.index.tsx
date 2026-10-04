@@ -20,6 +20,7 @@ import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-st
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
 import { getLeadDraft } from "@/lib/automations.functions";
 import { userTz, fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers, chipsFor, intakeComplete } from "@/lib/intake";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/")({
   validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(2).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),

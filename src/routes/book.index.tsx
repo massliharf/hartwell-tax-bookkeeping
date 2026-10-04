@@ -414,6 +414,19 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
       } });
       if (r.ok) {
         clearDraft();
+        toast.custom((t) => (
+          <div className="flex w-[min(92vw,26rem)] items-start gap-3 rounded-xl border border-line bg-card p-4 shadow-lg">
+            <span className="mt-0.5 shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">Demo walkthrough</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-ink">Booking confirmed</p>
+              <p className="mt-0.5 text-xs text-ink-soft">Click to see this booking on the owner page.</p>
+              <div className="mt-2 flex gap-2">
+                <Button asChild size="sm"><Link to="/owner/calendar" onClick={() => toast.dismiss(t)}>View in owner page</Link></Button>
+                <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>Dismiss</Button>
+              </div>
+            </div>
+          </div>
+        ), { duration: Infinity });
         navigate({ to: "/book/confirmed", search: { token: r.manageToken } });
         return;
       }

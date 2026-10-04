@@ -20,6 +20,7 @@ import { useBookingDraft, clearDraft, type BookingDraft } from "@/lib/booking-st
 import { bookAppointment, getAvailabilityWindow, joinWaitlist, saveLead } from "@/lib/booking.functions";
 import { getLeadDraft } from "@/lib/automations.functions";
 import { userTz, fmtDateLong, fmtDayChip, fmtTime, previewChecklist, questionsFor, toIntakePayload, type Answers, chipsFor, intakeComplete } from "@/lib/intake";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/")({
   validateSearch: z.object({ service: z.string().optional(), step: z.number().int().min(0).max(2).optional(), resume: z.string().uuid().optional(), start: z.string().datetime({ offset: true }).optional() }),
@@ -414,6 +415,19 @@ function DetailsStep({ service, draft, update, busy, setBusy, onPickAgain }: { s
       } });
       if (r.ok) {
         clearDraft();
+        toast.custom((t) => (
+          <div className="flex w-[min(92vw,26rem)] items-start gap-3 rounded-xl border border-line-2 bg-card p-4 shadow-lg">
+            <span className="mt-0.5 shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-foreground">Demo walkthrough</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-ink">Booking confirmed</p>
+              <p className="mt-0.5 text-xs text-ink/70">Click to see this booking on the owner page.</p>
+              <div className="mt-2 flex gap-2">
+                <Button asChild size="sm"><Link to="/owner/calendar" onClick={() => toast.dismiss(t)}>View in owner page</Link></Button>
+                <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>Dismiss</Button>
+              </div>
+            </div>
+          </div>
+        ), { duration: Infinity });
         navigate({ to: "/book/confirmed", search: { token: r.manageToken } });
         return;
       }

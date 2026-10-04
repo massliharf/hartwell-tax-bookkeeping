@@ -38,9 +38,9 @@ export function SiteHeader({ warm = false }: { warm?: boolean } = {}) {
           {LINKS.map((l) => <a key={l.href} href={l.href} className="relative flex h-10 items-center px-2 text-[13px] font-medium text-body transition-colors duration-150 after:absolute after:inset-x-2 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-150 hover:text-ink hover:after:scale-x-100 focus-visible:text-ink focus-visible:after:scale-x-100">{l.label}</a>)}
         </nav>
         <div className="ml-auto hidden items-center gap-1 md:flex xl:ml-0">
+          <Button asChild variant="ghost" size="sm" className="gap-1.5 text-ink hover:text-ink"><Link to="/auth"><Lock className="size-3.5" strokeWidth={1.75} />Owner login</Link></Button>
           <Button asChild variant="ghost" size="sm" className="text-ink hover:text-ink"><Link to="/book/returning">My appointment</Link></Button>
           <Button asChild size="sm"><Link to="/book">Book</Link></Button>
-          <Button asChild variant="ghost" size="sm" className="ml-1 gap-1.5 text-ink hover:text-ink"><Link to="/auth"><Lock className="size-3.5" strokeWidth={1.75} />Owner login</Link></Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="ml-2 xl:hidden" aria-label="Open menu"><Menu className="size-5" /></Button></DropdownMenuTrigger>
